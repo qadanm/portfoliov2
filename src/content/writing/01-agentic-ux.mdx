@@ -1,0 +1,71 @@
+---
+title: "What Agentic UX Actually Means"
+description: "Most discussions of 'agentic AI' focus on the technology. The interesting design problem is what happens to the interface when AI stops being a feature and starts being an actor."
+date: 2025-10-15
+tags: ["Agentic UX", "AI Product Design", "Interface Design"]
+featured: true
+readingTime: 8
+---
+
+The term "agentic AI" has achieved the usual fate of useful technical concepts that enter the product conversation: it's been stretched into meaninglessness by proximity to hype.
+
+So let's be precise about what it actually means in the context of product design.
+
+An agent is a system that can take actions toward a goal — not just respond to queries. The action-taking is what's new. Traditional AI features respond. Agents *do*.
+
+That shift — from responding to doing — changes almost everything about how you design the interface.
+
+## What changes when AI starts doing
+
+In a response-model AI product, the user is always the initiator and the executor. They ask, the AI answers, they decide what to do with the answer. The interface is a conversation wrapper.
+
+In an action-model AI product, the agent is initiating *and* executing steps. The user defines a goal and the constraints. The agent runs. The user's job becomes oversight, not operation.
+
+This is fundamentally different work. And it requires fundamentally different interface design.
+
+## The three hard problems
+
+### 1. Status without anxiety
+
+When an agent is running a multi-step task, users need to know what's happening without needing to monitor it constantly.
+
+The design problem: show enough to maintain trust and catch problems, but don't create a notification firehose that trains users to ignore status updates.
+
+The pattern I've found most effective: distinguish between **process status** (the agent is working) and **checkpoint status** (the agent needs you). The former should be ambient and low-friction. The latter should be prominent and specific.
+
+### 2. Control without micromanagement
+
+Users should be able to intervene in an agent's work — redirect, pause, override — without having to manage every step.
+
+The design problem: too much control means users just end up doing the work themselves. Too little means they feel helpless and stop trusting the system.
+
+The right answer depends on the task type and user expertise. A general principle: controls should be available but not prominent. The agent doing its job well is the primary interface. Control surfaces are secondary — visible when you look for them, invisible when you're not looking.
+
+### 3. Accountability without blame
+
+When an agent's output is wrong, the user needs to understand what happened and what to do about it — not be handed a technical error log.
+
+The design problem: AI failure is often probabilistic, not binary. The agent didn't crash; it produced output that was plausible but wrong. How do you communicate that in a way that helps the user fix it?
+
+The pattern: explain what the agent *tried to do* rather than what went wrong technically. "I couldn't find a confident answer for X, so I made an assumption about Y" is more useful than any stack trace.
+
+## The interface is not the feature
+
+One of the most common mistakes in AI product design is treating the AI capability as the product. The AI is the mechanism. The interface is the product.
+
+This matters because the interface determines whether the AI capability translates into real user value — or just impressive demos.
+
+A well-designed agentic interface makes the AI's work feel natural, trustworthy, and correctable. A poorly designed one makes it feel unpredictable, opaque, and risky — even if the underlying model is excellent.
+
+The AI labs are competing on model capability. The competitive advantage in product is still design.
+
+## What good looks like
+
+The agentic products I find most impressive aren't the ones with the most capable models. They're the ones where:
+
+- I understand what the agent is doing without actively monitoring it
+- I can redirect it with minimal friction when it's going somewhere I don't want
+- I trust its output because the interface gives me enough signal to evaluate it
+- I can undo its actions easily enough that I'm willing to give it more autonomy
+
+This is standard UX craft applied to a new context. The context is new. The principles are not.

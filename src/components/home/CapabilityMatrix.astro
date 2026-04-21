@@ -1,0 +1,223 @@
+---
+const capabilities = [
+  {
+    area: 'Platform-Level UX Engineering',
+    description: 'Owning and evolving UX across multi-site production platforms — not just pages, but the systems underneath them.',
+    level: 5,
+    icon: `<polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/>`,
+    tags: ['Multi-Site', 'ASP.NET MVC', 'Production Systems'],
+    accent: true,
+  },
+  {
+    area: 'Front-End Architecture',
+    description: 'Structural thinking that survives long-lived codebases — component hierarchy, layout systems, and maintainability at scale.',
+    level: 5,
+    icon: `<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>`,
+    tags: ['TypeScript', 'React', 'Astro', 'Razor/MVC'],
+    accent: false,
+  },
+  {
+    area: 'Design Systems',
+    description: 'Token-based component systems that scale across properties and teams. Design and implementation in the same conversation.',
+    level: 5,
+    icon: `<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>`,
+    tags: ['Figma', 'Design Tokens', 'CSS Systems'],
+    accent: false,
+  },
+  {
+    area: 'Legacy System Evolution',
+    description: 'Working inside real constraints — monolithic codebases, long-lived dependencies, mixed patterns — and improving them without breaking them.',
+    level: 4,
+    icon: `<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>`,
+    tags: ['ASP.NET', 'Entity Framework', 'jQuery', 'IIS'],
+    accent: false,
+  },
+  {
+    area: 'AI-Native Workflows',
+    description: 'Integrating Claude and Cursor as structural participants in design and development — not autocomplete, but a designed workflow layer.',
+    level: 4,
+    icon: `<circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4"/>`,
+    tags: ['Claude', 'Cursor', 'Prompt Engineering'],
+    accent: false,
+  },
+  {
+    area: 'Implementation-Aware Design',
+    description: 'Design decisions informed by what actually gets built. I move between Figma and code because both perspectives make the work better.',
+    level: 5,
+    icon: `<path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>`,
+    tags: ['Figma', 'Design-Dev Handoff', 'Specs'],
+    accent: false,
+  },
+];
+---
+
+<section class="section-gap" aria-labelledby="capabilities-heading">
+  <div class="container-site">
+    <div class="section-header">
+      <span class="badge badge-muted">Capabilities</span>
+      <h2 id="capabilities-heading" class="section-title">
+        Where I operate
+      </h2>
+      <p class="section-desc">
+        Six disciplines — each one sharpened by working across real production
+        systems with real constraints. They're more useful together than apart.
+      </p>
+    </div>
+
+    <div class="capability-grid">
+      {capabilities.map((cap) => (
+        <div class:list={['capability-card', { 'capability-card--accent': cap.accent }]}>
+          <div class="cap-header">
+            <div class="cap-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" set:html={cap.icon} />
+            </div>
+            <div class="cap-level" aria-label={`Depth: ${cap.level} of 5`}>
+              {Array.from({ length: 5 }).map((_, j) => (
+                <div class:list={['level-pip', { 'level-pip--active': j < cap.level }]}></div>
+              ))}
+            </div>
+          </div>
+          <h3 class="cap-area">{cap.area}</h3>
+          <p class="cap-description">{cap.description}</p>
+          <div class="cap-tags">
+            {cap.tags.map(tag => (
+              <span class="cap-tag">{tag}</span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .section-header {
+    margin-bottom: var(--space-12);
+    max-width: 560px;
+  }
+
+  .section-title {
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: var(--color-text);
+    margin-top: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+
+  .section-desc {
+    font-size: 16px;
+    color: var(--color-text-muted);
+    line-height: 1.65;
+  }
+
+  .capability-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1px;
+    background-color: var(--color-border);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+  }
+
+  @media (min-width: 600px) {
+    .capability-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (min-width: 1024px) {
+    .capability-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  .capability-card {
+    padding: var(--space-6);
+    background-color: var(--color-bg-elevated);
+    transition: background-color 200ms;
+  }
+
+  .capability-card:hover { background-color: var(--color-bg-muted); }
+
+  .capability-card--accent {
+    background-color: var(--color-accent-dim);
+  }
+
+  .capability-card--accent:hover { background-color: var(--color-accent-muted); }
+
+  .cap-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-4);
+  }
+
+  .cap-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    background-color: var(--color-bg-muted);
+    color: var(--color-accent);
+    flex-shrink: 0;
+  }
+
+  .capability-card--accent .cap-icon {
+    background-color: var(--color-accent-muted);
+  }
+
+  .cap-level {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+  }
+
+  .level-pip {
+    width: 14px;
+    height: 3px;
+    border-radius: 9999px;
+    background-color: var(--color-border);
+  }
+
+  .level-pip--active { background-color: var(--color-accent); }
+
+  .cap-area {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-text);
+    letter-spacing: -0.01em;
+    margin-bottom: var(--space-2);
+    line-height: 1.3;
+  }
+
+  .cap-description {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    margin-bottom: var(--space-4);
+  }
+
+  .cap-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .cap-tag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    background-color: var(--color-bg-muted);
+    color: var(--color-text-subtle);
+    border: 1px solid var(--color-border);
+    font-family: var(--font-mono);
+  }
+
+  .capability-card--accent .cap-tag {
+    background-color: var(--color-accent-dim);
+    border-color: var(--color-accent-muted);
+    color: var(--color-accent);
+  }
+</style>

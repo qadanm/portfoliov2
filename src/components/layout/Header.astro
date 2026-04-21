@@ -1,0 +1,304 @@
+---
+const pathname = Astro.url.pathname;
+
+const nav = [
+  { href: '/work', label: 'Work' },
+  { href: '/lab', label: 'Lab' },
+  { href: '/writing', label: 'Writing' },
+  { href: '/about', label: 'About' },
+];
+
+function isActive(href: string) {
+  if (href === '/') return pathname === '/';
+  return pathname.startsWith(href);
+}
+---
+
+<header class="site-header" id="site-header">
+  <div class="container-site header-inner">
+    <a href="/" class="logo" aria-label="Moe Qadan — Home">
+      <span class="logo-name">Moe</span>
+      <span class="logo-dot" aria-hidden="true">.</span>
+    </a>
+
+    <nav class="nav-desktop" aria-label="Primary navigation">
+      {nav.map(item => (
+        <a
+          href={item.href}
+          class:list={['nav-link', { 'nav-link--active': isActive(item.href) }]}
+          aria-current={isActive(item.href) ? 'page' : undefined}
+        >
+          {item.label}
+        </a>
+      ))}
+    </nav>
+
+    <div class="header-actions">
+      <button
+        class="theme-toggle"
+        id="theme-toggle"
+        aria-label="Toggle color theme"
+        title="Toggle theme"
+      >
+        <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M18.66 5.34l-1.41 1.41"/>
+        </svg>
+        <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+
+      <button class="nav-mobile-toggle" id="mobile-menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <span class="hamburger" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Nav -->
+  <div class="nav-mobile" id="mobile-nav" aria-hidden="true">
+    <nav aria-label="Mobile navigation">
+      {nav.map(item => (
+        <a
+          href={item.href}
+          class:list={['nav-mobile-link', { 'nav-mobile-link--active': isActive(item.href) }]}
+          aria-current={isActive(item.href) ? 'page' : undefined}
+        >
+          {item.label}
+        </a>
+      ))}
+    </nav>
+  </div>
+</header>
+
+<script>
+  import { THEME_KEY } from '@/utils/theme';
+
+  const toggle = document.getElementById('theme-toggle');
+  const html = document.documentElement;
+
+  function getTheme() {
+    return html.getAttribute('data-theme') || 'dark';
+  }
+
+  function setTheme(theme: string) {
+    html.setAttribute('data-theme', theme);
+    localStorage.setItem(THEME_KEY, theme);
+  }
+
+  toggle?.addEventListener('click', () => {
+    setTheme(getTheme() === 'dark' ? 'light' : 'dark');
+  });
+
+  const mobileToggle = document.getElementById('mobile-menu-toggle');
+  const mobileNav = document.getElementById('mobile-nav');
+
+  mobileToggle?.addEventListener('click', () => {
+    const isOpen = mobileToggle.getAttribute('aria-expanded') === 'true';
+    mobileToggle.setAttribute('aria-expanded', String(!isOpen));
+    mobileNav?.setAttribute('aria-hidden', String(isOpen));
+    mobileNav?.classList.toggle('nav-mobile--open');
+    mobileToggle?.classList.toggle('is-open');
+  });
+
+  mobileNav?.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      mobileNav.classList.remove('nav-mobile--open');
+      mobileNav.setAttribute('aria-hidden', 'true');
+      mobileToggle?.setAttribute('aria-expanded', 'false');
+      mobileToggle?.classList.remove('is-open');
+    });
+  });
+
+  const header = document.getElementById('site-header');
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 80) {
+      header?.classList.add('header--scrolled');
+    } else {
+      header?.classList.remove('header--scrolled');
+    }
+  }, { passive: true });
+</script>
+
+<style>
+  .site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    border-bottom: 1px solid transparent;
+    transition: background-color 250ms ease, border-color 250ms ease, backdrop-filter 250ms ease;
+  }
+
+  .header--scrolled {
+    background-color: color-mix(in srgb, var(--color-bg) 85%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom-color: var(--color-border-subtle);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    gap: 32px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: var(--color-text);
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.02em;
+    transition: color 150ms;
+  }
+
+  .logo:hover { color: var(--color-accent); }
+
+  .logo-dot {
+    color: var(--color-accent);
+    margin-left: 1px;
+  }
+
+  .nav-desktop {
+    display: none;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    justify-content: center;
+  }
+
+  @media (min-width: 768px) {
+    .nav-desktop { display: flex; }
+  }
+
+  .nav-link {
+    padding: 6px 14px;
+    border-radius: 9999px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color 150ms, background-color 150ms;
+    letter-spacing: -0.01em;
+  }
+
+  .nav-link:hover {
+    color: var(--color-text);
+    background-color: var(--color-bg-muted);
+  }
+
+  .nav-link--active {
+    color: var(--color-text);
+    background-color: var(--color-bg-muted);
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 9999px;
+    border: 1px solid var(--color-border);
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: all 150ms;
+    flex-shrink: 0;
+  }
+
+  .theme-toggle:hover {
+    color: var(--color-text);
+    border-color: var(--color-accent);
+    background-color: var(--color-accent-dim);
+  }
+
+  .icon-moon { display: none; }
+
+  :global([data-theme="dark"]) .icon-sun { display: none; }
+  :global([data-theme="dark"]) .icon-moon { display: block; }
+
+  .nav-mobile-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: transparent;
+    cursor: pointer;
+    transition: all 150ms;
+  }
+
+  @media (min-width: 768px) {
+    .nav-mobile-toggle { display: none; }
+  }
+
+  .hamburger,
+  .hamburger::before,
+  .hamburger::after {
+    display: block;
+    width: 16px;
+    height: 1.5px;
+    background-color: var(--color-text-muted);
+    border-radius: 9999px;
+    transition: all 200ms;
+    position: relative;
+  }
+
+  .hamburger::before,
+  .hamburger::after {
+    content: '';
+    position: absolute;
+  }
+
+  .hamburger::before { top: -5px; }
+  .hamburger::after { top: 5px; }
+
+  .is-open .hamburger { background-color: transparent; }
+  .is-open .hamburger::before { transform: rotate(45deg); top: 0; }
+  .is-open .hamburger::after { transform: rotate(-45deg); top: 0; }
+
+  .nav-mobile {
+    display: none;
+    flex-direction: column;
+    padding: 12px 24px 20px;
+    border-top: 1px solid var(--color-border);
+    background-color: var(--color-bg);
+  }
+
+  .nav-mobile--open { display: flex; }
+
+  @media (min-width: 768px) {
+    .nav-mobile { display: none !important; }
+  }
+
+  .nav-mobile-link {
+    display: block;
+    padding: 12px 0;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    border-bottom: 1px solid var(--color-border-subtle);
+    transition: color 150ms;
+  }
+
+  .nav-mobile-link:last-child { border-bottom: none; }
+
+  .nav-mobile-link--active,
+  .nav-mobile-link:hover { color: var(--color-text); }
+</style>

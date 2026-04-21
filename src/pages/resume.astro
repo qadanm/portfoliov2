@@ -1,0 +1,426 @@
+---
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Background — Moe Qadan"
+  description="Overview of Moe Qadan's experience in UX engineering, platform systems, and AI-native workflows."
+>
+  <div class="bg-page">
+    <div class="bg-hero">
+      <div class="container-site">
+        <div class="bg-hero-inner">
+          <div>
+            <span class="badge badge-muted">Background</span>
+            <h1 class="bg-title animate-fade-up">Moe Qadan</h1>
+            <p class="bg-role animate-fade-up animate-delay-100">
+              UX Engineer · Platform Systems · AI-Native Workflows
+            </p>
+            <div class="bg-contact animate-fade-up animate-delay-200">
+              <a href="mailto:muhammedqadan@outlook.com" class="bg-contact-link">muhammedqadan@outlook.com</a>
+              <span aria-hidden="true">·</span>
+              <a href="https://linkedin.com/in/muhammedqadan" target="_blank" rel="noopener noreferrer" class="bg-contact-link">LinkedIn</a>
+            </div>
+          </div>
+          <a href="/resume.pdf" download class="btn-download" aria-label="Download full resume PDF">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+            </svg>
+            Full resume
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-site bg-body">
+      <div class="bg-layout">
+        <div class="bg-main">
+
+          <!-- Summary -->
+          <section class="bg-section">
+            <h2 class="bg-section-title">Overview</h2>
+            <p class="bg-summary">
+              UX engineer and platform systems owner with production-scale experience across
+              multi-site web architecture, design systems, and AI-augmented development workflows.
+              I work at the intersection of design and implementation — designing the system,
+              writing the code, maintaining the architecture.
+            </p>
+          </section>
+
+          <!-- Experience -->
+          <section class="bg-section">
+            <h2 class="bg-section-title">Experience</h2>
+
+            <div class="bg-job">
+              <div class="job-header">
+                <div>
+                  <h3 class="job-title">UX Engineer / Platform Systems Owner</h3>
+                  <div class="job-company">MagTek, Inc.</div>
+                </div>
+                <div class="job-meta">
+                  <span class="job-period">2024 – Present</span>
+                  <span class="job-location">Remote</span>
+                </div>
+              </div>
+              <ul class="job-bullets">
+                <li>Own and evolve UX across ~85% of MagTek.com — a large production platform built on ASP.NET MVC 5 serving enterprise buyers, developers, and partners</li>
+                <li>Maintain front-end architecture and UX consistency across 11 additional websites that share the same ASP.NET MVC foundation</li>
+                <li>Design and build page-level UX improvements, shared components, and system-level layout patterns within real legacy constraints (.NET Framework, Razor views, Bootstrap, jQuery)</li>
+                <li>Architected and implemented QwickPAY onboarding flow — a multi-step user journey with backend integration dependencies across account provisioning, hardware registration, and payment processor setup</li>
+                <li>Established token-based design system and Figma component library aligned with production implementation; used Claude to accelerate documentation while maintaining editorial quality</li>
+                <li>Work across staging and production environments with real deployment processes; navigate staging/production configuration inconsistencies as a routine part of the workflow</li>
+              </ul>
+            </div>
+
+            <div class="bg-job">
+              <div class="job-header">
+                <div>
+                  <h3 class="job-title">Freelance UX Engineer</h3>
+                  <div class="job-company">Independent</div>
+                </div>
+                <div class="job-meta">
+                  <span class="job-period">2023 – Present</span>
+                  <span class="job-location">Remote</span>
+                </div>
+              </div>
+              <ul class="job-bullets">
+                <li>Designed and operates a personal multi-agent production workflow — structured specs → Claude generation → Cursor implementation → human review → ship — applied to all personal and client project delivery</li>
+                <li>Conducted original research into AI-native interface patterns across writing tools, coding assistants, and workflow automation products; produced a working pattern reference applied to ongoing work</li>
+                <li>UX engineering consulting for early-stage teams: component architecture, design system foundation, design-to-code translation</li>
+              </ul>
+            </div>
+          </section>
+
+          <!-- Selected work -->
+          <section class="bg-section">
+            <h2 class="bg-section-title">Selected Work</h2>
+            <div class="bg-projects">
+              <div class="bg-project">
+                <div class="bp-header">
+                  <span class="bp-name">Platform UX Evolution — MagTek.com</span>
+                  <span class="badge badge-muted">Platform</span>
+                </div>
+                <p class="bp-desc">End-to-end UX ownership across the primary production site. System-level layout work, shared component evolution, and page-level improvements across all major sections.</p>
+              </div>
+              <div class="bg-project">
+                <div class="bp-header">
+                  <span class="bp-name">Multi-Site Architecture — 11 Properties</span>
+                  <span class="badge badge-muted">Systems</span>
+                </div>
+                <p class="bp-desc">Maintaining UX consistency and front-end integrity across 11 additional sites sharing the MagTek ASP.NET MVC architecture. Shared component governance, site-specific isolation.</p>
+              </div>
+              <div class="bg-project">
+                <div class="bp-header">
+                  <span class="bp-name">QwickPAY Onboarding System</span>
+                  <span class="badge badge-muted">UX Engineering</span>
+                </div>
+                <p class="bp-desc">Structured multi-step onboarding for mobile payment product. Designed the user-facing state machine to match the backend integration dependency chain.</p>
+              </div>
+              <div class="bg-project">
+                <div class="bp-header">
+                  <span class="bp-name">Agentic Development Workflow</span>
+                  <span class="badge badge-accent">AI System</span>
+                </div>
+                <p class="bp-desc">Personal production workflow with Claude + Cursor as structured participants. Explicit specs, human review gates, designed process instead of improvised prompting.</p>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="bg-sidebar">
+          <div class="bg-sidebar-section">
+            <h2 class="bg-section-title">Technical</h2>
+            <div class="skill-categories">
+              <div class="skill-cat">
+                <div class="skill-cat-label">Production stack</div>
+                <div class="skill-list">
+                  <span class="skill-item">ASP.NET MVC 5</span>
+                  <span class="skill-item">.NET Framework</span>
+                  <span class="skill-item">Razor Views</span>
+                  <span class="skill-item">Entity Framework</span>
+                  <span class="skill-item">Web API 2</span>
+                  <span class="skill-item">Bootstrap</span>
+                  <span class="skill-item">jQuery</span>
+                  <span class="skill-item">IIS</span>
+                  <span class="skill-item">SMTP Workflows</span>
+                </div>
+              </div>
+              <div class="skill-cat">
+                <div class="skill-cat-label">Modern stack</div>
+                <div class="skill-list">
+                  <span class="skill-item">TypeScript</span>
+                  <span class="skill-item">React</span>
+                  <span class="skill-item">Astro</span>
+                  <span class="skill-item">Tailwind CSS</span>
+                  <span class="skill-item">CSS Architecture</span>
+                  <span class="skill-item">GitHub / CI</span>
+                </div>
+              </div>
+              <div class="skill-cat">
+                <div class="skill-cat-label">Design</div>
+                <div class="skill-list">
+                  <span class="skill-item">Figma</span>
+                  <span class="skill-item">Design Systems</span>
+                  <span class="skill-item">Design Tokens</span>
+                  <span class="skill-item">Component Design</span>
+                  <span class="skill-item">Accessibility</span>
+                  <span class="skill-item">Hardware UX</span>
+                </div>
+              </div>
+              <div class="skill-cat">
+                <div class="skill-cat-label">AI & Workflow</div>
+                <div class="skill-list">
+                  <span class="skill-item">Claude</span>
+                  <span class="skill-item">Cursor</span>
+                  <span class="skill-item">Prompt Engineering</span>
+                  <span class="skill-item">Agentic Workflow Design</span>
+                  <span class="skill-item">AI UX Patterns</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .bg-hero {
+    padding-top: calc(64px + var(--space-12));
+    padding-bottom: var(--space-10);
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: var(--space-10);
+  }
+
+  .bg-hero-inner {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-6);
+    flex-wrap: wrap;
+  }
+
+  .bg-title {
+    font-size: clamp(36px, 5vw, 52px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--color-text);
+    margin-top: var(--space-3);
+    margin-bottom: var(--space-2);
+    line-height: 1.1;
+  }
+
+  .bg-role {
+    font-size: 15px;
+    color: var(--color-text-muted);
+    font-weight: 500;
+    margin-bottom: var(--space-3);
+  }
+
+  .bg-contact {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: var(--color-text-subtle);
+  }
+
+  .bg-contact-link {
+    color: var(--color-accent);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 150ms;
+  }
+
+  .bg-contact-link:hover { color: var(--color-accent-hover); }
+
+  .btn-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-elevated);
+    text-decoration: none;
+    transition: all 200ms;
+    white-space: nowrap;
+    align-self: flex-start;
+  }
+
+  .btn-download:hover {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+    background-color: var(--color-accent-dim);
+  }
+
+  .bg-body { padding-bottom: var(--space-24); }
+
+  .bg-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-10);
+  }
+
+  @media (min-width: 1024px) {
+    .bg-layout { grid-template-columns: 1fr 260px; gap: var(--space-16); }
+  }
+
+  .bg-section { margin-bottom: var(--space-10); }
+  .bg-section:last-child { margin-bottom: 0; }
+
+  .bg-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+    margin-bottom: var(--space-5);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .bg-summary {
+    font-size: 16px;
+    color: var(--color-text-muted);
+    line-height: 1.75;
+    max-width: 62ch;
+  }
+
+  .bg-job {
+    margin-bottom: var(--space-8);
+    padding-bottom: var(--space-8);
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .bg-job:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+  .job-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+    flex-wrap: wrap;
+  }
+
+  .job-title {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+    margin-bottom: 3px;
+  }
+
+  .job-company {
+    font-size: 13px;
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  .job-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    text-align: right;
+  }
+
+  .job-period {
+    font-size: 13px;
+    color: var(--color-text);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .job-location {
+    font-size: 12px;
+    color: var(--color-text-subtle);
+  }
+
+  .job-bullets {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .job-bullets li {
+    font-size: 14px;
+    color: var(--color-text-muted);
+    line-height: 1.65;
+    padding-left: var(--space-4);
+    position: relative;
+  }
+
+  .job-bullets li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  .bg-projects { display: flex; flex-direction: column; gap: var(--space-3); }
+
+  .bg-project {
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-elevated);
+  }
+
+  .bp-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-2);
+    flex-wrap: wrap;
+  }
+
+  .bp-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-text);
+    letter-spacing: -0.01em;
+  }
+
+  .bp-desc {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+  }
+
+  .bg-sidebar-section { margin-bottom: var(--space-8); }
+
+  .skill-categories { display: flex; flex-direction: column; gap: var(--space-5); }
+
+  .skill-cat-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-subtle);
+    margin-bottom: var(--space-2);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .skill-list { display: flex; flex-wrap: wrap; gap: 5px; }
+
+  .skill-item {
+    font-size: 12px;
+    padding: 3px 9px;
+    border-radius: 9999px;
+    background-color: var(--color-bg-muted);
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
+    font-weight: 500;
+  }
+</style>

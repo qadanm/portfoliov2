@@ -1,0 +1,437 @@
+---
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="About — Moe Qadan"
+  description="UX engineer and platform systems owner at MagTek. Working at the intersection of design, front-end engineering, and AI-native workflows."
+>
+  <div class="about-page">
+    <div class="about-hero">
+      <div class="container-site">
+        <span class="badge badge-muted animate-fade-up">About</span>
+        <h1 class="about-title animate-fade-up animate-delay-100">
+          I work on platforms.<br />
+          <em>Not just pages.</em>
+        </h1>
+      </div>
+    </div>
+
+    <div class="container-site about-body">
+      <div class="about-grid">
+        <!-- Main narrative -->
+        <div class="about-narrative">
+          <p class="about-lead">
+            I'm Moe Qadan — a UX engineer and front-end systems owner who works
+            at the intersection of design, implementation, and platform architecture.
+          </p>
+
+          <p class="about-para">
+            My day-to-day involves owning and evolving the UX across approximately
+            85% of MagTek's primary production website, plus maintaining front-end
+            consistency and system integrity across 11 additional properties that
+            share the same architecture. This is platform-level work, not feature work.
+          </p>
+
+          <p class="about-para">
+            The stack is real: ASP.NET MVC 5, Razor views, Bootstrap, jQuery, Entity
+            Framework, Web API 2, IIS. A long-lived monolith with real constraints,
+            real production traffic, and real consequences when something breaks. I don't
+            avoid this kind of environment — I've learned to work inside it effectively,
+            which is a different and harder skill than building on a clean stack.
+          </p>
+
+          <p class="about-para">
+            Hardware interface design at MagTek also taught me that constraints are
+            specific: glare-heavy environments, operator gloves, PCI compliance,
+            embedded terminal displays. Generic UI patterns don't survive contact with
+            these realities. You think from first principles or you build something
+            that looks fine in Figma and fails in the field.
+          </p>
+
+          <p class="about-para">
+            Over the past year, I've been integrating AI — specifically Claude and Cursor
+            — as structural participants in my workflow. Not as autocomplete. As a designed
+            process where structured specs become the input, agents handle the implementation
+            layer, and I own the review, direction, and quality standard. The distinction
+            matters: improvised AI use produces inconsistent results; designed AI workflows
+            produce consistent ones.
+          </p>
+
+          <blockquote class="about-quote">
+            "The most interesting work happens inside real systems with real constraints —
+            not in greenfield projects with perfect stacks."
+          </blockquote>
+
+          <p class="about-para">
+            I'm interested in problems that require both design judgment and implementation
+            depth — places where you can't separate "what it should be" from "what it can
+            be built to be." That's where the combination of disciplines matters most.
+          </p>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="about-sidebar">
+          <div class="about-card">
+            <h2 class="about-card-title">Profile</h2>
+            <div class="about-fact-list">
+              <div class="about-fact">
+                <span class="fact-label">Primary role</span>
+                <span class="fact-value">UX Engineer / Platform Systems</span>
+              </div>
+              <div class="about-fact">
+                <span class="fact-label">Platform</span>
+                <span class="fact-value">MagTek.com + 11 additional sites</span>
+              </div>
+              <div class="about-fact">
+                <span class="fact-label">Stack (production)</span>
+                <span class="fact-value">ASP.NET MVC, Razor, Bootstrap, jQuery, Entity Framework</span>
+              </div>
+              <div class="about-fact">
+                <span class="fact-label">Stack (modern)</span>
+                <span class="fact-value">Astro, TypeScript, React, Tailwind</span>
+              </div>
+              <div class="about-fact">
+                <span class="fact-label">AI workflow</span>
+                <span class="fact-value">Claude + Cursor, structured production pipeline</span>
+              </div>
+              <div class="about-fact">
+                <span class="fact-label">Location</span>
+                <span class="fact-value">United States · Remote-capable</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="about-card">
+            <h2 class="about-card-title">What I do well</h2>
+            <ul class="about-role-list">
+              <li>Platform-level UX systems ownership</li>
+              <li>Front-end architecture in legacy environments</li>
+              <li>Design-to-implementation without translation loss</li>
+              <li>Structured AI workflow design</li>
+              <li>Hardware interface UX</li>
+              <li>Multi-site consistency at scale</li>
+            </ul>
+          </div>
+
+          <div class="about-card about-card--contact">
+            <h2 class="about-card-title">Get in touch</h2>
+            <p class="about-card-note">
+              If you're working on something interesting — complex systems,
+              platform engineering, AI-native product work — I'm always open
+              to a conversation.
+            </p>
+            <div class="about-links">
+              <a href="mailto:muhammedqadan@outlook.com" class="about-link-btn about-link-btn--primary">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+                Email
+              </a>
+              <a href="https://linkedin.com/in/muhammedqadan" target="_blank" rel="noopener noreferrer" class="about-link-btn">
+                LinkedIn
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- How I work section -->
+      <div class="about-principles">
+        <h2 class="principles-title">How I work</h2>
+        <div class="principles-grid">
+          <div class="principle">
+            <div class="principle-num">01</div>
+            <h3 class="principle-name">Systems before solutions</h3>
+            <p class="principle-desc">
+              Every problem is more interesting at the system level. I'd rather
+              understand the structure that produces an issue than patch the symptom.
+              This takes longer upfront and compounds in your favor over time.
+            </p>
+          </div>
+          <div class="principle">
+            <div class="principle-num">02</div>
+            <h3 class="principle-name">Constraints are information</h3>
+            <p class="principle-desc">
+              A legacy monolith, a PCI compliance requirement, a 10-year-old jQuery
+              dependency — these aren't obstacles to work around. They're the actual
+              design brief. The best work accounts for them, not around them.
+            </p>
+          </div>
+          <div class="principle">
+            <div class="principle-num">03</div>
+            <h3 class="principle-name">Designed AI, not improvised AI</h3>
+            <p class="principle-desc">
+              I build workflows where AI operates inside a structure I've designed —
+              explicit inputs, explicit outputs, human judgment at every checkpoint.
+              The difference between this and ad-hoc prompting is the same difference
+              between a system and a habit.
+            </p>
+          </div>
+          <div class="principle">
+            <div class="principle-num">04</div>
+            <h3 class="principle-name">Implement what you design</h3>
+            <p class="principle-desc">
+              The gap between design intent and built output is where quality disappears.
+              Working across both sides closes the gap by construction rather than
+              by coordination. I don't hand things off to myself — I finish them.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .about-hero {
+    padding-top: calc(64px + var(--space-16));
+    padding-bottom: var(--space-12);
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: var(--space-12);
+  }
+
+  .about-title {
+    font-family: var(--font-display);
+    font-size: clamp(44px, 6vw, 80px);
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    color: var(--color-text);
+    margin-top: var(--space-4);
+  }
+
+  .about-title em {
+    font-style: italic;
+    color: var(--color-accent);
+  }
+
+  .about-body {
+    padding-bottom: var(--space-24);
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-10);
+    margin-bottom: var(--space-16);
+  }
+
+  @media (min-width: 1024px) {
+    .about-grid {
+      grid-template-columns: 1fr 320px;
+      gap: var(--space-16);
+    }
+  }
+
+  .about-lead {
+    font-size: clamp(18px, 2.5vw, 21px);
+    font-weight: 500;
+    color: var(--color-text);
+    line-height: 1.6;
+    margin-bottom: var(--space-6);
+  }
+
+  .about-para {
+    font-size: 17px;
+    color: var(--color-text-muted);
+    line-height: 1.75;
+    margin-bottom: var(--space-5);
+    max-width: 62ch;
+  }
+
+  .about-quote {
+    border-left: 3px solid var(--color-accent);
+    padding: var(--space-4) var(--space-6);
+    margin: var(--space-8) 0;
+    background-color: var(--color-accent-dim);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    font-size: 17px;
+    color: var(--color-text);
+    font-style: italic;
+    font-family: var(--font-display);
+    line-height: 1.6;
+  }
+
+  .about-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .about-card {
+    padding: var(--space-5);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-elevated);
+  }
+
+  .about-card--contact {
+    border-color: var(--color-accent-muted);
+    background-color: var(--color-accent-dim);
+  }
+
+  .about-card-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+    margin-bottom: var(--space-4);
+  }
+
+  .about-fact-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .about-fact {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .fact-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+  }
+
+  .fact-value {
+    font-size: 13px;
+    color: var(--color-text);
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .about-role-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .about-role-list li {
+    font-size: 13px;
+    color: var(--color-text);
+    font-weight: 500;
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--color-border-subtle);
+    line-height: 1.4;
+  }
+
+  .about-role-list li:last-child { border-bottom: none; }
+
+  .about-role-list li::before {
+    content: '→ ';
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .about-card-note {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    margin-bottom: var(--space-4);
+  }
+
+  .about-links {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .about-link-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    background-color: var(--color-bg);
+    transition: all 150ms;
+  }
+
+  .about-link-btn:hover {
+    color: var(--color-text);
+    border-color: var(--color-accent);
+    background-color: var(--color-accent-dim);
+  }
+
+  .about-link-btn--primary {
+    background-color: var(--color-accent);
+    color: var(--color-bg);
+    border-color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  .about-link-btn--primary:hover {
+    background-color: var(--color-accent-hover);
+    color: var(--color-bg);
+    border-color: var(--color-accent-hover);
+  }
+
+  .about-principles {
+    padding-top: var(--space-12);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .principles-title {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+    margin-bottom: var(--space-8);
+  }
+
+  .principles-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .principles-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .principle {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-5);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-elevated);
+  }
+
+  .principle-num {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+  }
+
+  .principle-name {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+    line-height: 1.3;
+  }
+
+  .principle-desc {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    line-height: 1.65;
+  }
+</style>

@@ -1,0 +1,141 @@
+---
+---
+
+<section class="section-gap" aria-labelledby="contact-heading">
+  <div class="container-site">
+    <div class="cta-block dot-grid">
+      <div class="cta-inner">
+        <h2 id="contact-heading" class="cta-title">
+          If you're building something<br />
+          <em>worth building</em> — let's talk.
+        </h2>
+        <p class="cta-desc">
+          I'm always open to conversations about platform systems, AI workflows,
+          product engineering, and complex UX challenges. No pitch necessary.
+        </p>
+        <div class="cta-actions">
+          <a href="mailto:muhammedqadan@outlook.com" class="btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+            Reach out
+          </a>
+          <a href="https://linkedin.com/in/muhammedqadan" target="_blank" rel="noopener noreferrer" class="btn-secondary">
+            LinkedIn
+          </a>
+        </div>
+        <p class="cta-fine">
+          Based in the US · Remote-capable
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta-block {
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .cta-block::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 70% 80% at 50% 0%, var(--color-accent-dim), transparent 70%);
+    pointer-events: none;
+  }
+
+  .cta-inner {
+    position: relative;
+    padding: var(--space-16) var(--space-12);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-5);
+  }
+
+  @media (max-width: 640px) {
+    .cta-inner {
+      padding: var(--space-12) var(--space-6);
+    }
+  }
+
+  .cta-title {
+    font-family: var(--font-display);
+    font-size: clamp(36px, 5vw, 58px);
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .cta-title em {
+    font-style: italic;
+    color: var(--color-accent);
+  }
+
+  .cta-desc {
+    font-size: 16px;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+    max-width: 480px;
+  }
+
+  .cta-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 9999px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-bg);
+    background-color: var(--color-accent);
+    text-decoration: none;
+    transition: all 200ms var(--ease-out);
+  }
+
+  .btn-primary:hover {
+    background-color: var(--color-accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px var(--color-accent-muted);
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 24px;
+    border-radius: 9999px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
+    text-decoration: none;
+    transition: all 200ms;
+  }
+
+  .btn-secondary:hover {
+    color: var(--color-text);
+    border-color: var(--color-accent);
+    background-color: var(--color-accent-dim);
+  }
+
+  .cta-fine {
+    font-size: 13px;
+    color: var(--color-text-subtle);
+  }
+</style>

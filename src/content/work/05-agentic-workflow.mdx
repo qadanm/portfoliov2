@@ -1,0 +1,57 @@
+---
+title: "Agentic Development Workflow"
+description: "A personal production workflow where Claude and Cursor operate as structured participants — not autocomplete — with human review gates at every critical step."
+type: "Agentic Workflow"
+year: "2024–Present"
+role: "Workflow Architect"
+tags: ["Claude", "Cursor", "Prompt Engineering", "Multi-Agent", "AI Workflow"]
+featured: false
+order: 5
+outcome: "Consistent, higher-quality output on personal and freelance work; explicit quality gates replace ad-hoc review"
+---
+
+## Background
+
+Most people use AI coding tools reactively. They hit a problem, ask for help, get a suggestion, accept or reject it. The AI responds to the user's ad-hoc prompts inside a workflow the user is improvising.
+
+That's useful. But it's also inconsistent — the quality of what you get depends heavily on the quality of the conversation you happened to have that day.
+
+The more interesting territory is designing the workflow itself. Not just using AI, but building a structured process where AI operates inside a system you've designed — with explicit inputs, explicit outputs, and human judgment at every consequential checkpoint.
+
+## The system
+
+### Layer 1: Structured specification
+
+Every meaningful task starts with a spec, not a prompt. The difference:
+
+A prompt is conversational: "build me a card component in React."
+
+A spec is explicit: it defines the role the agent is operating in, the output it's responsible for, the constraints it must respect (token system, naming conventions, accessibility requirements), the format of its output, and what success looks like. The spec does the thinking that would otherwise be delegated to the model's interpretation.
+
+Vague input produces inconsistent output. Structured input produces structured output. This is the most leverage-able part of the whole system.
+
+### Layer 2: Agent execution
+
+Claude generates. Cursor implements. These roles are separated deliberately — Claude is effective at generation; Cursor is effective at project-aware implementation (imports, type-checking, file placement). Mixing the roles produces worse results from both.
+
+### Layer 3: Human review gates
+
+Every output goes through structured review against the original spec before advancing. Not a visual check — a deliberate comparison: Does this match what was asked for? Does it handle the edge cases? Does it follow established patterns? Does it introduce regressions?
+
+The review gate is not optional. Skipping it is how you accumulate AI-generated debt.
+
+### Layer 4: Feedback and iteration
+
+When output doesn't pass review, it goes back with specific, structured feedback. "This is wrong" is not useful feedback. "The component doesn't handle the disabled state correctly; it's using a primitive color token instead of the semantic token" is.
+
+Specific feedback produces specific improvement. The loop is efficient when the spec is good and the review is rigorous.
+
+## What changed
+
+The most significant change from this workflow isn't speed — it's consistency. When the process is designed, the output variance drops. Ad-hoc AI use produces high variance; structured AI use produces consistent quality.
+
+Speed is a second-order effect. The parallelism available in a designed agent workflow — spec multiple tasks, run agents on each, review together — is meaningful. But consistency is the real return.
+
+## Stack
+
+Claude API · Cursor · Structured prompt templates · TypeScript · GitHub · Figma (upstream design source)

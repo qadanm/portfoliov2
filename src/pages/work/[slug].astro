@@ -1,0 +1,326 @@
+---
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const work = await getCollection('work', ({ data }) => !data.draft);
+  return work.map(project => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await project.render();
+
+const typeColors: Record<string, string> = {
+  'Agentic Workflow': 'badge-accent',
+  'AI-Native': 'badge-accent',
+};
+const badgeClass = typeColors[project.data.type] || 'badge-muted';
+---
+
+<BaseLayout
+  title={`${project.data.title} — Work`}
+  description={project.data.description}
+  article={true}
+>
+  <article class="case-study">
+    <header class="cs-header">
+      <div class="container-site">
+        <a href="/work" class="cs-back">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M13 8H3M7 12l-4-4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          All work
+        </a>
+
+        <div class="cs-meta">
+          <span class={`badge ${badgeClass}`}>{project.data.type}</span>
+          <span class="cs-year">{project.data.year}</span>
+          {project.data.client && <span class="cs-client">{project.data.client}</span>}
+        </div>
+
+        <h1 class="cs-title animate-fade-up">{project.data.title}</h1>
+        <p class="cs-desc animate-fade-up animate-delay-100">{project.data.description}</p>
+
+        {project.data.outcome && (
+          <div class="cs-outcome animate-fade-up animate-delay-200">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M2 7l4 4 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            {project.data.outcome}
+          </div>
+        )}
+
+        <div class="cs-attributes animate-fade-up animate-delay-300">
+          <div class="cs-attr">
+            <span class="cs-attr-label">Role</span>
+            <span class="cs-attr-value">{project.data.role}</span>
+          </div>
+          <div class="cs-attr">
+            <span class="cs-attr-label">Year</span>
+            <span class="cs-attr-value">{project.data.year}</span>
+          </div>
+          <div class="cs-attr">
+            <span class="cs-attr-label">Stack</span>
+            <div class="cs-tags">
+              {project.data.tags.map(tag => (
+                <span class="cs-tag">{tag}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="container-narrow cs-content">
+      <div class="prose">
+        <Content />
+      </div>
+    </div>
+
+    <footer class="cs-footer">
+      <div class="container-site">
+        <div class="cs-footer-inner">
+          <a href="/work" class="btn-secondary-sm">
+            ← Back to all work
+          </a>
+          <a href="mailto:muhammedqadan@outlook.com" class="btn-primary-sm">
+            Discuss this work →
+          </a>
+        </div>
+      </div>
+    </footer>
+  </article>
+</BaseLayout>
+
+<style>
+  .cs-header {
+    padding-top: calc(64px + var(--space-12));
+    padding-bottom: var(--space-12);
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: var(--space-12);
+  }
+
+  .cs-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    margin-bottom: var(--space-6);
+    transition: color 150ms;
+  }
+
+  .cs-back:hover { color: var(--color-accent); }
+
+  .cs-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+    flex-wrap: wrap;
+  }
+
+  .cs-year, .cs-client {
+    font-size: 13px;
+    color: var(--color-text-subtle);
+    font-weight: 500;
+  }
+
+  .cs-client::before {
+    content: '·';
+    margin-right: var(--space-3);
+  }
+
+  .cs-title {
+    font-size: clamp(32px, 5vw, 60px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    color: var(--color-text);
+    margin-bottom: var(--space-4);
+    max-width: 720px;
+  }
+
+  .cs-desc {
+    font-size: 18px;
+    color: var(--color-text-muted);
+    line-height: 1.65;
+    max-width: 600px;
+    margin-bottom: var(--space-5);
+  }
+
+  .cs-outcome {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: var(--radius-md);
+    background-color: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    color: var(--color-success);
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: var(--space-6);
+    line-height: 1.4;
+    max-width: 640px;
+  }
+
+  .cs-outcome svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .cs-attributes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-6);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .cs-attr {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .cs-attr-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+  }
+
+  .cs-attr-value {
+    font-size: 14px;
+    color: var(--color-text);
+    font-weight: 500;
+  }
+
+  .cs-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 2px;
+  }
+
+  .cs-tag {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    background-color: var(--color-bg-muted);
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
+    font-family: var(--font-mono);
+  }
+
+  .cs-content {
+    padding-bottom: var(--space-16);
+  }
+
+  .prose :global(h2) {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+  }
+
+  .prose :global(h3) {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+  }
+
+  .prose :global(p) {
+    font-size: 17px;
+    line-height: 1.75;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-4);
+  }
+
+  .prose :global(ul), .prose :global(ol) {
+    padding-left: var(--space-6);
+    color: var(--color-text-muted);
+    font-size: 17px;
+    line-height: 1.75;
+    margin-bottom: var(--space-4);
+  }
+
+  .prose :global(li) {
+    margin-bottom: var(--space-2);
+  }
+
+  .prose :global(strong) {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  .prose :global(hr) {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: var(--space-10) 0;
+  }
+
+  .cs-footer {
+    border-top: 1px solid var(--color-border);
+    padding-block: var(--space-8);
+  }
+
+  .cs-footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  .btn-secondary-sm {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    border-radius: 9999px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
+    text-decoration: none;
+    transition: all 150ms;
+  }
+
+  .btn-secondary-sm:hover {
+    color: var(--color-text);
+    border-color: var(--color-accent);
+    background-color: var(--color-accent-dim);
+  }
+
+  .btn-primary-sm {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    border-radius: 9999px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-bg);
+    background-color: var(--color-accent);
+    text-decoration: none;
+    transition: all 200ms;
+  }
+
+  .btn-primary-sm:hover {
+    background-color: var(--color-accent-hover);
+    transform: translateY(-1px);
+  }
+</style>

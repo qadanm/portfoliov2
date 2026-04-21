@@ -1,0 +1,245 @@
+---
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('writing', ({ data }) => !data.draft);
+  return posts.map(post => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+
+function formatDate(d: Date) {
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+---
+
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description}
+  article={true}
+>
+  <article class="writing-article">
+    <header class="wa-header">
+      <div class="container-narrow">
+        <a href="/writing" class="wa-back">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M13 8H3M7 12l-4-4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          All writing
+        </a>
+
+        <div class="wa-meta">
+          <time datetime={post.data.date.toISOString()} class="wa-date">
+            {formatDate(post.data.date)}
+          </time>
+          {post.data.readingTime && (
+            <span class="wa-reading">{post.data.readingTime} min read</span>
+          )}
+        </div>
+
+        <h1 class="wa-title animate-fade-up">{post.data.title}</h1>
+        <p class="wa-desc animate-fade-up animate-delay-100">{post.data.description}</p>
+
+        <div class="wa-tags animate-fade-up animate-delay-200">
+          {post.data.tags.map(tag => (
+            <span class="wa-tag">{tag}</span>
+          ))}
+        </div>
+      </div>
+    </header>
+
+    <div class="container-narrow wa-content">
+      <div class="prose">
+        <Content />
+      </div>
+    </div>
+
+    <footer class="wa-footer">
+      <div class="container-narrow">
+        <div class="wa-footer-inner">
+          <a href="/writing" class="btn-secondary-sm">← All writing</a>
+          <a href="mailto:muhammedqadan@outlook.com" class="btn-primary-sm">Discuss this →</a>
+        </div>
+      </div>
+    </footer>
+  </article>
+</BaseLayout>
+
+<style>
+  .wa-header {
+    padding-top: calc(64px + var(--space-12));
+    padding-bottom: var(--space-10);
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: var(--space-10);
+  }
+
+  .wa-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    margin-bottom: var(--space-6);
+    transition: color 150ms;
+  }
+
+  .wa-back:hover { color: var(--color-accent); }
+
+  .wa-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+  }
+
+  .wa-date {
+    font-size: 13px;
+    color: var(--color-text-subtle);
+    font-weight: 500;
+  }
+
+  .wa-reading {
+    font-size: 13px;
+    color: var(--color-text-subtle);
+  }
+
+  .wa-reading::before {
+    content: '·';
+    margin-right: var(--space-4);
+  }
+
+  .wa-title {
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: var(--color-text);
+    margin-bottom: var(--space-4);
+  }
+
+  .wa-desc {
+    font-size: 18px;
+    color: var(--color-text-muted);
+    line-height: 1.65;
+    margin-bottom: var(--space-5);
+  }
+
+  .wa-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .wa-tag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    background-color: var(--color-accent-dim);
+    color: var(--color-accent);
+    border: 1px solid var(--color-accent-muted);
+  }
+
+  .wa-content {
+    padding-bottom: var(--space-16);
+  }
+
+  .prose :global(h2) {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+  }
+
+  .prose :global(h3) {
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+  }
+
+  .prose :global(p) {
+    font-size: 18px;
+    line-height: 1.78;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-5);
+  }
+
+  .prose :global(ul), .prose :global(ol) {
+    padding-left: var(--space-6);
+    color: var(--color-text-muted);
+    font-size: 18px;
+    line-height: 1.78;
+    margin-bottom: var(--space-5);
+  }
+
+  .prose :global(li) {
+    margin-bottom: var(--space-2);
+  }
+
+  .prose :global(strong) {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  .wa-footer {
+    border-top: 1px solid var(--color-border);
+    padding-block: var(--space-8);
+  }
+
+  .wa-footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  .btn-secondary-sm {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 20px;
+    border-radius: 9999px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
+    text-decoration: none;
+    transition: all 150ms;
+  }
+
+  .btn-secondary-sm:hover {
+    color: var(--color-text);
+    border-color: var(--color-accent);
+    background-color: var(--color-accent-dim);
+  }
+
+  .btn-primary-sm {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 20px;
+    border-radius: 9999px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-bg);
+    background-color: var(--color-accent);
+    text-decoration: none;
+    transition: all 200ms;
+  }
+
+  .btn-primary-sm:hover {
+    background-color: var(--color-accent-hover);
+    transform: translateY(-1px);
+  }
+</style>

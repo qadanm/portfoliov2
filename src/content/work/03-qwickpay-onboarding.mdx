@@ -1,0 +1,66 @@
+---
+title: "QwickPAY Onboarding System"
+description: "Designing and building the structured onboarding flow for QwickPAY — a mobile payment product built on MagTek hardware. A contained example of systems-level workflow design inside a complex platform."
+type: "UX Engineering"
+year: "2024"
+role: "UX Engineer / Designer"
+client: "MagTek"
+tags: ["Workflow Design", "Onboarding UX", "ASP.NET MVC", "Integration Design", "User Flows"]
+featured: true
+order: 3
+outcome: "Structured multi-step onboarding replacing ad-hoc flows; clearer user path from account creation to first transaction"
+---
+
+## Context
+
+QwickPAY is MagTek's mobile payment processing product — it lets merchants process card-present transactions using MagTek hardware. The onboarding flow is where new merchants go from "I've purchased the hardware" to "I can run my first transaction."
+
+This is one specific project within the broader MagTek platform. I'm calling it out separately because it illustrates a different mode of work: designing a user-facing system with real integration dependencies, not just a page.
+
+## The problem
+
+The onboarding experience prior to this project was not a designed system. It was a sequence of steps accumulated over time — some from engineering decisions, some from support feedback, some from integration constraints. The result was a flow that worked technically but created significant friction for new users.
+
+The specific problems:
+
+- **No clear mental model.** Users didn't know how many steps they had, what was coming, or what success looked like.
+- **Integration touchpoints were invisible.** Account provisioning, hardware registration, and payment processor onboarding all had to happen in a specific order. Users had no visibility into this.
+- **Error states were terminal.** When something went wrong in the integration chain, users got dead ends instead of recovery paths.
+- **No completion confirmation.** The flow ended ambiguously — users weren't sure if they were ready to transact.
+
+## What I did
+
+### System mapping first
+
+Before designing any screens, I mapped the system. What are all the integration touchpoints? What can fail at each one? What's the minimum the user needs to know at each step? What does the backend state look like at each point?
+
+This is where UX engineering differs from UI design. The interesting constraints aren't visual — they're systemic. The design has to account for the actual behavior of the integration layer, not just the happy path.
+
+### Structured step system
+
+I designed a multi-step flow with:
+
+- **Visible progress** — users know where they are in the sequence and how many steps remain
+- **Step validation** — each step validates before advancing; errors surface at the point they occur, not at submission
+- **Integration status transparency** — when the system is waiting on a backend process, the UI says so explicitly rather than going silent
+- **Recovery paths** — for each major failure mode, a specific recovery path rather than a generic error message
+
+### Integration design
+
+The onboarding flow touches multiple backend systems: account creation, hardware registration, and payment processor provisioning. These happen in a dependency chain — you can't register the hardware before the account exists; you can't enable processing before the hardware is registered.
+
+I designed the UI state machine to match the backend state machine. The interface reflects what's actually true about the system state at each moment, rather than presenting a simplified fiction that breaks when reality diverges from it.
+
+### Implementation
+
+Built within the ASP.NET MVC architecture — Razor views, controller actions for each step, state managed through session and database. The implementation followed the design closely because I was doing both, which meant no translation loss.
+
+## What this illustrates
+
+Onboarding design that accounts for real backend constraints and integration dependencies is a different discipline than designing a linear form. The interesting work is in the state management — what happens when step 2 fails after step 1 succeeded? What happens when the user refreshes mid-flow? What does the UI show when the backend is processing?
+
+These questions are design questions. They're also engineering questions. Working across both is what makes the answer good.
+
+## Stack
+
+ASP.NET MVC 5 · Razor Views · jQuery · Entity Framework · Web API 2 · SMTP workflows · Figma

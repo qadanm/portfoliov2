@@ -1,0 +1,56 @@
+---
+title: "Component System & Design Language"
+description: "Building and maintaining a token-based design system that spans MagTek's platform — unifying visual and interaction patterns across a multi-site architecture while working within real legacy constraints."
+type: "Design System"
+year: "2024–Present"
+role: "UX Engineer / Designer"
+client: "MagTek"
+tags: ["Design Systems", "Figma", "CSS Architecture", "Component Design", "Tokens"]
+featured: false
+order: 4
+outcome: "Shared visual language across primary platform and satellite sites; reduced per-page design decisions; Figma library aligned with production implementation"
+---
+
+## Starting from inside a legacy system
+
+Building a design system for a new product is one thing. Building one for a system that already exists — that has 12+ sites, thousands of pages, and years of accumulated decisions — is different work.
+
+The goal isn't to impose a new design language from the outside. It's to extract the implicit system that already exists, make it explicit, improve it incrementally, and document it well enough that future decisions follow from it rather than drift from it.
+
+## Token foundation
+
+Before touching components, I established a semantic token system:
+
+- **Primitive tokens** — the raw values: a specific color, a specific spacing unit
+- **Semantic tokens** — named by usage, not value: `--color-surface-elevated`, `--color-text-muted`, `--space-section-gap`
+- **Component tokens** — specific to components when they need values that diverge from semantics
+
+This separation means themes are possible (dark mode, print styles) and refactors are local. When a spacing value needs to change, you change the primitive. Everything that references the semantic token updates.
+
+## Figma to production alignment
+
+One of the consistent failure modes in design systems is a Figma library that doesn't match production. Designers spec something; engineers implement something slightly different; the gap accumulates.
+
+I maintained alignment by doing both sides of the work — the Figma library and the CSS implementation — which means the gap is small by construction rather than corrected after the fact.
+
+Where I couldn't close the gap completely (because of legacy constraints in specific templates), I documented the delta explicitly so it doesn't accumulate silently.
+
+## Hardware-specific considerations
+
+MagTek's hardware interface design has constraints that don't apply to typical web products:
+
+- **Touch targets for operator use** — devices used by people in gloves, under time pressure, in high-ambient-light environments
+- **PCI compliance constraints** — certain data can't be rendered certain ways
+- **Small-screen terminal displays** — embedded web views with constrained viewports
+
+The component system accounts for these. It's not a generic web component library adapted awkwardly — it's designed for the actual context it operates in.
+
+## Using AI to accelerate documentation
+
+Component documentation is high-value, high-volume work. I used Claude to accelerate first drafts: given a component's structure and intended usage, generate a documentation template. Every output was reviewed, edited, and frequently substantially rewritten.
+
+This is the right use of AI for documentation work: generate the scaffolding, preserve the judgment. The accelerated workflow meant documentation stayed current with implementation rather than lagging behind it.
+
+## Stack
+
+Figma · CSS Custom Properties · ASP.NET MVC · Razor Views · Claude (documentation drafts) · Cursor

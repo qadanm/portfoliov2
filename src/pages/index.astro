@@ -1,0 +1,29 @@
+---
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import Hero from '@/components/home/Hero.astro';
+import CapabilityMatrix from '@/components/home/CapabilityMatrix.astro';
+import AgentPipeline from '@/components/home/AgentPipeline.astro';
+import SelectedWork from '@/components/home/SelectedWork.astro';
+import WritingTeaser from '@/components/home/WritingTeaser.astro';
+import ContactCTA from '@/components/home/ContactCTA.astro';
+import { getCollection } from 'astro:content';
+
+const allWork = await getCollection('work', ({ data }) => !data.draft);
+const featuredWork = allWork
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 3);
+
+const allWriting = await getCollection('writing', ({ data }) => !data.draft);
+const recentWriting = allWriting
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 3);
+---
+
+<BaseLayout>
+  <Hero />
+  <CapabilityMatrix />
+  <AgentPipeline />
+  <SelectedWork projects={featuredWork} />
+  <WritingTeaser posts={recentWriting} />
+  <ContactCTA />
+</BaseLayout>

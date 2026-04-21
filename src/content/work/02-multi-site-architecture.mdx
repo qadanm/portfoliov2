@@ -1,0 +1,51 @@
+---
+title: "Multi-Site UX Architecture"
+description: "Maintaining UX consistency and front-end architecture across 11 additional websites that share the same ASP.NET MVC foundation as MagTek.com — each with different requirements, audiences, and constraints."
+type: "Platform"
+year: "2024–Present"
+role: "UX Engineer / Front-End Systems"
+client: "MagTek"
+tags: ["Multi-Site", "ASP.NET MVC", "Architecture", "Component Systems", "UX Consistency"]
+featured: true
+order: 2
+outcome: "Shared component improvements propagate consistently across the portfolio; site-specific customizations stay isolated without fragmenting the shared foundation"
+---
+
+## The challenge of multi-site shared architecture
+
+Maintaining UX across a single large site is complex. Maintaining it across 12 related sites — each with different audiences, different content requirements, and different stakeholder priorities, all built on the same underlying architecture — requires a different level of systems thinking.
+
+The 11 additional properties in this portfolio share layout templates, navigation components, and front-end patterns with MagTek.com. Changes to shared components propagate across all of them. Bugs introduced in shared code affect all of them. Design inconsistencies introduced in one property create expectations that break in others.
+
+## The constraint structure
+
+The multi-site architecture has a specific constraint profile:
+
+**Shared components must be general enough to work across all properties.** A navigation component, a page template, a footer — these need to work in contexts that weren't all anticipated when they were first built. Changes to them require understanding all the contexts they appear in.
+
+**Site-specific requirements must be handled without fragmenting the shared foundation.** When one property needs something different, the right solution is usually configuration or composition, not a fork. Forks create maintenance debt that compounds over time.
+
+**Staging and production environments have real differences.** Configuration-driven integrations behave differently in staging and production. Changes must be validated in both environments before they can be considered complete.
+
+## What systems thinking looks like here
+
+The most valuable work in a multi-site architecture isn't fixing bugs — it's maintaining the structural integrity of the shared foundation so that improvements remain possible.
+
+This means:
+
+- Treating shared components as platform components, not just reusable UI
+- Understanding the data flow from backend to frontend across all properties, not just the one you're currently working in
+- Making changes that are backwards-compatible with existing site-specific implementations
+- Documenting changes that will affect other teams or properties
+
+## The AI angle
+
+Multi-site shared architectures are exactly the kind of system where AI tooling creates real leverage — not because the AI writes the code, but because the pattern recognition required to work across 12 related codebases is something AI assists well.
+
+When I'm making a change to a shared component, I can use Claude to analyze how the component is used across multiple files, identify places where the change might break something, and generate test cases for the contexts I'm most likely to miss. This is structured augmentation, not replacement of judgment.
+
+The judgment — what to change, why, in what order, with what trade-offs — stays human.
+
+## Stack
+
+ASP.NET MVC 5 · .NET Framework · Razor Views · Bootstrap · jQuery · IIS · Config-driven integrations · Claude (analysis assistance)

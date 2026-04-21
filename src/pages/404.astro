@@ -1,0 +1,106 @@
+---
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="404 — Not Found"
+  description="Page not found."
+  noindex={true}
+>
+  <div class="not-found">
+    <div class="container-site nf-inner">
+      <span class="nf-code">404</span>
+      <h1 class="nf-title">Page not found</h1>
+      <p class="nf-desc">
+        This page doesn't exist — or it moved. Let's get you back.
+      </p>
+      <div class="nf-actions">
+        <a href="/" class="btn-primary">Go home</a>
+        <a href="/work" class="btn-secondary">View work</a>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .not-found {
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    padding-top: 64px;
+  }
+
+  .nf-inner {
+    text-align: center;
+    padding-block: var(--space-20);
+  }
+
+  .nf-code {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 80px;
+    font-weight: 700;
+    color: var(--color-accent);
+    line-height: 1;
+    margin-bottom: var(--space-4);
+    opacity: 0.6;
+  }
+
+  .nf-title {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+    margin-bottom: var(--space-4);
+  }
+
+  .nf-desc {
+    font-size: 17px;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-8);
+  }
+
+  .nf-actions {
+    display: flex;
+    gap: var(--space-3);
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 24px;
+    border-radius: 9999px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-bg);
+    background-color: var(--color-accent);
+    text-decoration: none;
+    transition: all 200ms;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--color-accent-hover);
+    transform: translateY(-1px);
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 24px;
+    border-radius: 9999px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
+    text-decoration: none;
+    transition: all 200ms;
+  }
+
+  .btn-secondary:hover {
+    color: var(--color-text);
+    border-color: var(--color-accent);
+    background-color: var(--color-accent-dim);
+  }
+</style>
