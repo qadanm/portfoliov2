@@ -1,0 +1,416 @@
+---
+interface Props {
+  variant?: 'full' | 'compact';
+  formId?: string;
+}
+
+const { variant = 'full', formId = 'contact-form' } = Astro.props;
+
+const accessKey = import.meta.env.PUBLIC_WEB3FORMS_KEY ?? '';
+
+const projectTypes = [
+  'Product or platform work',
+  'AI-native product',
+  'Frontend systems / UX engineering',
+  'Just saying hi',
+  'Something else',
+];
+---
+
+<form
+  class:list={['cf', `cf--${variant}`]}
+  id={formId}
+  data-contact-form
+  data-access-key={accessKey}
+  novalidate
+>
+  <input type="hidden" name="access_key" value={accessKey} />
+  <input type="hidden" name="from_name" value="Moe — Portfolio" />
+  <input type="hidden" name="subject" value="New message from portfolio" />
+  <input type="checkbox" name="botcheck" class="cf__honeypot" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+  {variant === 'full' ? (
+    <>
+      <div class="cf__row cf__row--two">
+        <label class="cf__field">
+          <span class="cf__label">Your name</span>
+          <input type="text" name="name" required autocomplete="name" placeholder="Jane Doe" />
+        </label>
+        <label class="cf__field">
+          <span class="cf__label">Email</span>
+          <input type="email" name="email" required autocomplete="email" placeholder="you@company.com" />
+        </label>
+      </div>
+
+      <label class="cf__field">
+        <span class="cf__label">Project type</span>
+        <div class="cf__select-wrap">
+          <select name="project_type" class="cf__select">
+            <option value="">Choose one (optional)</option>
+            {projectTypes.map(type => (
+              <option value={type}>{type}</option>
+            ))}
+          </select>
+          <svg class="cf__select-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <path d="M3 5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </label>
+
+      <label class="cf__field">
+        <span class="cf__label">Message</span>
+        <textarea name="message" required rows="5" minlength="10" placeholder="A few sentences on what you're building, the timeline, and why it might be a fit."></textarea>
+      </label>
+    </>
+  ) : (
+    <>
+      <label class="cf__field cf__field--inline">
+        <span class="cf__label">Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@company.com" />
+      </label>
+      <label class="cf__field">
+        <span class="cf__label">Quick note</span>
+        <textarea name="message" required rows="3" minlength="10" placeholder="What are you building? A few words is plenty."></textarea>
+      </label>
+    </>
+  )}
+
+  <div class="cf__footer">
+    <button type="submit" class="cf__submit" data-cf-submit>
+      <span class="cf__submit-label">Send message</span>
+      <svg class="cf__submit-icon" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="cf__submit-spinner" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5" stroke-dasharray="14 30" stroke-linecap="round"/>
+        </svg>
+      </span>
+    </button>
+    <p class="cf__hint">No tracking. Replies usually within a day.</p>
+  </div>
+
+  <div class="cf__status" data-cf-status role="status" aria-live="polite"></div>
+</form>
+
+<template data-cf-success>
+  <div class="cf__done">
+    <svg class="cf__done-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+      <path d="M8 12.5l3 3 5-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <h3 class="cf__done-title">Message sent.</h3>
+    <p class="cf__done-text">I'll reply soon, usually within a day. <span aria-hidden="true">🫡</span></p>
+  </div>
+</template>
+
+<script>
+  interface Web3FormsResponse {
+    success: boolean;
+    message?: string;
+  }
+
+  function initContactForms() {
+    const forms = document.querySelectorAll<HTMLFormElement>('[data-contact-form]');
+
+    forms.forEach(form => {
+      if (form.dataset.cfBound === 'true') return;
+      form.dataset.cfBound = 'true';
+
+      const submitBtn = form.querySelector<HTMLButtonElement>('[data-cf-submit]');
+      const statusEl = form.querySelector<HTMLDivElement>('[data-cf-status]');
+      const successTpl = form.parentElement?.querySelector<HTMLTemplateElement>('[data-cf-success]')
+        ?? document.querySelector<HTMLTemplateElement>('[data-cf-success]');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!form.reportValidity()) return;
+
+        const accessKey = form.dataset.accessKey || '';
+        if (!accessKey || accessKey === 'your-web3forms-access-key-here') {
+          if (statusEl) {
+            statusEl.classList.add('cf__status--error');
+            statusEl.textContent = 'Form not configured yet. Set PUBLIC_WEB3FORMS_KEY in your environment.';
+          }
+          return;
+        }
+
+        const formData = new FormData(form);
+        const json = Object.fromEntries(formData.entries());
+
+        if (json.botcheck) return;
+
+        form.classList.add('cf--submitting');
+        if (submitBtn) submitBtn.disabled = true;
+        if (statusEl) {
+          statusEl.classList.remove('cf__status--error');
+          statusEl.textContent = '';
+        }
+
+        try {
+          const res = await fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+            },
+            body: JSON.stringify(json),
+          });
+
+          const data: Web3FormsResponse = await res.json();
+
+          if (data.success) {
+            if (successTpl) {
+              const cloned = successTpl.content.cloneNode(true);
+              form.replaceWith(cloned as Node);
+            } else {
+              form.reset();
+              if (statusEl) statusEl.textContent = 'Message sent.';
+            }
+          } else {
+            if (statusEl) {
+              statusEl.classList.add('cf__status--error');
+              statusEl.textContent = data.message || 'Something went wrong. Try email instead?';
+            }
+          }
+        } catch {
+          if (statusEl) {
+            statusEl.classList.add('cf__status--error');
+            statusEl.textContent = 'Network issue. Try email instead?';
+          }
+        } finally {
+          form.classList.remove('cf--submitting');
+          if (submitBtn) submitBtn.disabled = false;
+        }
+      });
+    });
+  }
+
+  initContactForms();
+  document.addEventListener('astro:page-load', initContactForms);
+</script>
+
+<style>
+  .cf {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    max-width: 100%;
+  }
+
+  .cf__honeypot {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .cf__row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 600px) {
+    .cf__row--two {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .cf__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .cf__label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+  }
+
+  .cf input[type='text'],
+  .cf input[type='email'],
+  .cf textarea,
+  .cf__select {
+    width: 100%;
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    transition: border-color 150ms, box-shadow 150ms;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .cf textarea {
+    resize: vertical;
+    min-height: 96px;
+    font-family: var(--font-body);
+  }
+
+  .cf input::placeholder,
+  .cf textarea::placeholder {
+    color: var(--color-text-subtle);
+  }
+
+  .cf input:focus-visible,
+  .cf textarea:focus-visible,
+  .cf__select:focus-visible {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-dim);
+  }
+
+  .cf input:invalid:not(:placeholder-shown),
+  .cf textarea:invalid:not(:placeholder-shown) {
+    border-color: rgba(239, 68, 68, 0.5);
+  }
+
+  .cf__select-wrap {
+    position: relative;
+  }
+
+  .cf__select {
+    padding-right: 36px;
+    cursor: pointer;
+  }
+
+  .cf__select-arrow {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-subtle);
+    pointer-events: none;
+  }
+
+  /* Footer with submit + hint */
+  .cf__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    margin-top: var(--space-2);
+  }
+
+  .cf__submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 22px;
+    border-radius: 9999px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--color-bg);
+    background-color: var(--color-text);
+    border: none;
+    cursor: pointer;
+    transition: transform 200ms var(--ease-out), box-shadow 200ms;
+    position: relative;
+  }
+
+  .cf__submit:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .cf__submit:disabled {
+    opacity: 0.7;
+    cursor: progress;
+  }
+
+  .cf__submit-spinner {
+    display: none;
+    line-height: 0;
+    animation: spin 700ms linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .cf--submitting .cf__submit-icon { display: none; }
+  .cf--submitting .cf__submit-spinner { display: inline-flex; }
+  .cf--submitting .cf__submit-label::after { content: 'ing…'; }
+
+  .cf__hint {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-text-subtle);
+    line-height: 1.4;
+  }
+
+  .cf__status {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    min-height: 0;
+  }
+
+  .cf__status--error {
+    color: #EF4444;
+    padding: var(--space-3);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    background-color: rgba(239, 68, 68, 0.08);
+    border-radius: var(--radius-md);
+  }
+
+  /* Success state */
+  .cf__done {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-6);
+    border: 1px solid var(--color-accent-muted);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-accent-dim);
+    animation: fadeUp 500ms var(--ease-out) both;
+  }
+
+  .cf__done-icon {
+    color: var(--color-accent);
+  }
+
+  .cf__done-title {
+    font-family: var(--font-display);
+    font-size: clamp(22px, 2.4vw, 28px);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .cf__done-text {
+    font-size: 15px;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* Compact variant - tighter spacing */
+  .cf--compact {
+    gap: var(--space-3);
+  }
+
+  .cf--compact .cf__field {
+    gap: 4px;
+  }
+
+  .cf--compact textarea {
+    min-height: 72px;
+  }
+</style>

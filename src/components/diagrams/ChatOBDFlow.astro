@@ -1,0 +1,205 @@
+---
+const stages = [
+  { id: '01', name: 'Vehicle data', sub: 'OBD codes · freeze frames · live PIDs', tone: 'input' },
+  { id: '02', name: 'Interpretation', sub: 'Severity rules · context · history', tone: 'process' },
+  { id: '03', name: 'AI reasoning', sub: 'Constrained outputs · verdict tier', tone: 'process' },
+  { id: '04', name: 'Structured output', sub: 'Verdict card · next-best-action', tone: 'output' },
+];
+---
+
+<figure class="diagram diagram--flow" aria-label="ChatOBD2 system flow: vehicle data to structured output">
+  <header class="diagram__head">
+    <span class="diagram__eyebrow">System flow</span>
+    <h3 class="diagram__title">Data becomes understanding</h3>
+  </header>
+
+  <div class="flow">
+    {stages.map((stage, i) => (
+      <>
+        <div class:list={['flow__step', `flow__step--${stage.tone}`]}>
+          <span class="flow__id">{stage.id}</span>
+          <span class="flow__name">{stage.name}</span>
+          <span class="flow__sub">{stage.sub}</span>
+        </div>
+        {i < stages.length - 1 && (
+          <span class="flow__arrow" aria-hidden="true">
+            <svg width="20" height="10" viewBox="0 0 20 10" fill="none">
+              <path d="M0 5h17M13 1l4 4-4 4" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        )}
+      </>
+    ))}
+  </div>
+
+  <footer class="diagram__foot">
+    <span>Inputs are messy.</span>
+    <span class="diagram__sep" aria-hidden="true">·</span>
+    <span>The system constrains the output.</span>
+  </footer>
+</figure>
+
+<style>
+  .diagram {
+    margin: var(--space-10) 0;
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-bg-elevated);
+  }
+
+  .diagram__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .diagram__eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+  }
+
+  .diagram__title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .flow {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+    align-items: stretch;
+  }
+
+  @media (min-width: 720px) {
+    .flow {
+      grid-template-columns: repeat(7, 1fr);
+      align-items: center;
+    }
+  }
+
+  .flow__step {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-bg);
+    position: relative;
+    transition: border-color var(--duration-base) var(--ease-out), transform var(--duration-base) var(--ease-out);
+  }
+
+  .flow__step:hover {
+    border-color: var(--color-text-subtle);
+    transform: translateY(-1px);
+  }
+
+  @media (min-width: 720px) {
+    .flow__step {
+      grid-column: span 2;
+      min-height: 124px;
+    }
+  }
+
+  .flow__step--output {
+    border-color: var(--color-accent);
+    background-color: var(--color-accent-dim);
+    box-shadow: 0 0 0 1px var(--color-accent-muted), 0 6px 18px rgba(245, 158, 11, 0.05);
+  }
+
+  .flow__step--output::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(135deg, var(--color-accent-dim), transparent 70%);
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  .flow__step--output:hover {
+    border-color: var(--color-accent-hover);
+    transform: translateY(-2px);
+  }
+
+  .flow__id {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--color-text-subtle);
+    position: relative;
+  }
+
+  .flow__step--output .flow__id {
+    color: var(--color-accent);
+  }
+
+  .flow__name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text);
+    letter-spacing: -0.01em;
+    margin-top: 2px;
+    position: relative;
+  }
+
+  .flow__step--output .flow__name {
+    color: var(--color-accent-hover);
+  }
+
+  .flow__sub {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+    position: relative;
+  }
+
+  .flow__arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-subtle);
+    line-height: 0;
+    padding: var(--space-1) 0;
+  }
+
+  @media (min-width: 720px) {
+    .flow__arrow {
+      grid-column: span 0.33;
+      padding: 0;
+    }
+  }
+
+  .diagram__foot {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    margin-top: var(--space-5);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border-subtle);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-text-subtle);
+  }
+
+  .diagram__sep {
+    color: var(--color-border);
+  }
+</style>

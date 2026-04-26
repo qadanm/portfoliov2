@@ -1,29 +1,372 @@
 ---
 import BaseLayout from '@/components/layout/BaseLayout.astro';
 import Hero from '@/components/home/Hero.astro';
-import CapabilityMatrix from '@/components/home/CapabilityMatrix.astro';
-import AgentPipeline from '@/components/home/AgentPipeline.astro';
-import SelectedWork from '@/components/home/SelectedWork.astro';
-import WritingTeaser from '@/components/home/WritingTeaser.astro';
-import ContactCTA from '@/components/home/ContactCTA.astro';
+import ProjectGrid from '@/components/ProjectGrid.astro';
+import ContactForm from '@/components/ContactForm.astro';
+import AIWorkflowStrip from '@/components/diagrams/AIWorkflowStrip.astro';
 import { getCollection } from 'astro:content';
 
-const allWork = await getCollection('work', ({ data }) => !data.draft);
-const featuredWork = allWork
-  .sort((a, b) => a.data.order - b.data.order)
-  .slice(0, 3);
-
-const allWriting = await getCollection('writing', ({ data }) => !data.draft);
-const recentWriting = allWriting
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
-  .slice(0, 3);
+const projects = (await getCollection('work', ({ data }) => !data.draft))
+  .sort((a, b) => a.data.order - b.data.order);
 ---
 
-<BaseLayout>
+<BaseLayout
+  title="Qadan — UX &amp; Frontend Systems"
+  description="I build systems that make complex things usable. UX, frontend architecture, and AI-native products."
+>
   <Hero />
-  <CapabilityMatrix />
-  <AgentPipeline />
-  <SelectedWork projects={featuredWork} />
-  <WritingTeaser posts={recentWriting} />
-  <ContactCTA />
+
+  <section class="home-about" id="how-i-work">
+    <div class="container-site">
+      <div class="home-about__inner">
+        <div class="home-about__col" data-reveal>
+          <span class="home-about__eyebrow">
+            <span class="section-index" aria-hidden="true">01</span>
+            How I work
+          </span>
+          <h2 class="home-about__title">
+            Most of my work isn't about building from scratch.
+          </h2>
+        </div>
+        <div class="home-about__col" data-reveal data-reveal-delay="2">
+          <p class="home-about__para">
+            It's about stepping into existing systems and making them better.
+            That means understanding the constraints before changing anything,
+            improving structure instead of piling on, and building things that
+            can be reused.
+          </p>
+          <p class="home-about__para">
+            These days, AI is part of the workflow. Models for drafting,
+            agents for the parts they handle well.
+          </p>
+          <p class="home-about__para">
+            The goal is the same as it's always been: make complex systems
+            easier to use and easier to build on.
+          </p>
+          <a href="/about" class="home-about__link">
+            More about how I work
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="home-about__strip" data-reveal data-reveal-delay="3">
+        <span class="home-about__strip-caption">From intent to ship</span>
+        <AIWorkflowStrip />
+      </div>
+    </div>
+  </section>
+
+  <section class="home-work" id="work">
+    <div class="container-site">
+      <div class="home-work__head" data-reveal data-reveal-delay="1">
+        <span class="home-work__eyebrow">
+          <span class="section-index" aria-hidden="true">02</span>
+          Work
+        </span>
+        <h2 class="home-work__title">
+          Things I've built,<br />and systems I work in.
+        </h2>
+        <p class="home-work__lede">
+          A flagship AI product on one side, a multi-site platform and
+          financial advisor systems on the other. All of them have to
+          keep running while they get better.
+        </p>
+      </div>
+
+      <div data-reveal data-reveal-delay="2">
+        <ProjectGrid projects={projects} />
+      </div>
+    </div>
+  </section>
+
+  <section class="home-contact">
+    <div class="container-site home-contact__inner">
+      <div class="home-contact__intro" data-reveal>
+        <span class="home-contact__eyebrow">
+          <span class="section-index" aria-hidden="true">03</span>
+          Get in touch
+        </span>
+        <h2 class="home-contact__title">
+          If you're building something <em>interesting</em>,<br />drop a note.
+        </h2>
+        <p class="home-contact__sub">
+          A few words is plenty. Replies usually within a day.
+        </p>
+      </div>
+
+      <div class="home-contact__form" data-reveal data-reveal-delay="2">
+        <ContactForm variant="compact" formId="contact-form-home" />
+      </div>
+
+      <p class="home-contact__alt">
+        Want more space? <a href="/contact">Use the contact page</a>.
+      </p>
+    </div>
+  </section>
 </BaseLayout>
+
+<style>
+  /* About / How I work — comes first now */
+  .home-about {
+    padding-top: var(--space-20);
+    padding-bottom: var(--space-20);
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  @media (min-width: 768px) {
+    .home-about {
+      padding-top: var(--space-24);
+      padding-bottom: var(--space-24);
+    }
+  }
+
+  .home-about__inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+
+  @media (min-width: 900px) {
+    .home-about__inner {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-16);
+    }
+  }
+
+  .home-about__title {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 3.5vw, 44px);
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    color: var(--color-text);
+    max-width: 18ch;
+  }
+
+  .home-about__para {
+    font-size: clamp(15px, 1.4vw, 17px);
+    line-height: 1.75;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-4);
+    max-width: 56ch;
+  }
+
+  .home-about__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: var(--space-3);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text);
+    text-decoration: none;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 6px;
+    transition: color 150ms, border-color 150ms;
+  }
+
+  .home-about__link:hover {
+    color: var(--color-accent);
+    border-bottom-color: var(--color-accent);
+  }
+
+  .home-about__strip {
+    margin-top: var(--space-10);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  @media (min-width: 768px) {
+    .home-about__strip {
+      margin-top: var(--space-12);
+    }
+  }
+
+  .home-about__strip-caption {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+  }
+
+  /* Work — comes second now */
+  .home-work {
+    padding-top: var(--space-24);
+    padding-bottom: var(--space-20);
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  @media (min-width: 768px) {
+    .home-work {
+      padding-top: var(--space-32);
+      padding-bottom: var(--space-24);
+    }
+  }
+
+  .home-work__head {
+    margin-bottom: var(--space-12);
+    max-width: 720px;
+  }
+
+  .home-work__eyebrow,
+  .home-about__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+    margin-bottom: var(--space-4);
+  }
+
+  .section-index {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 22px;
+    padding: 0 7px;
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-elevated);
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+
+  .home-work__title {
+    font-family: var(--font-display);
+    font-size: clamp(36px, 5vw, 64px);
+    font-weight: 400;
+    letter-spacing: -0.028em;
+    line-height: 1.0;
+    color: var(--color-text);
+    margin-bottom: var(--space-6);
+  }
+
+  .home-work__lede {
+    font-size: clamp(15px, 1.5vw, 17px);
+    line-height: 1.65;
+    color: var(--color-text-muted);
+    max-width: 56ch;
+    opacity: 0.92;
+  }
+
+  /* Contact — close */
+  .home-contact {
+    padding-top: var(--space-24);
+    padding-bottom: var(--space-20);
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  @media (min-width: 768px) {
+    .home-contact {
+      padding-top: 144px;
+      padding-bottom: var(--space-24);
+    }
+  }
+
+  .home-contact__inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-10);
+    max-width: 1000px;
+  }
+
+  @media (min-width: 900px) {
+    .home-contact__inner {
+      grid-template-columns: 1fr 1.2fr;
+      gap: var(--space-16);
+      align-items: start;
+    }
+  }
+
+  .home-contact__intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .home-contact__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+  }
+
+  .home-contact__title {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 3.5vw, 44px);
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    color: var(--color-text);
+    max-width: 18ch;
+  }
+
+  .home-contact__title em {
+    font-style: italic;
+    color: var(--color-accent);
+  }
+
+  .home-contact__sub {
+    font-size: 14px;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    max-width: 38ch;
+  }
+
+  .home-contact__form {
+    padding: var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    background-color: var(--color-bg-elevated);
+  }
+
+  @media (min-width: 600px) {
+    .home-contact__form {
+      padding: var(--space-6);
+    }
+  }
+
+  .home-contact__alt {
+    grid-column: 1 / -1;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-text-subtle);
+    line-height: 1.5;
+    margin-top: var(--space-2);
+  }
+
+  .home-contact__alt a {
+    color: var(--color-text-muted);
+    text-decoration: underline;
+    text-decoration-color: var(--color-border);
+    text-underline-offset: 3px;
+    transition: color 150ms;
+  }
+
+  .home-contact__alt a:hover {
+    color: var(--color-accent);
+  }
+</style>

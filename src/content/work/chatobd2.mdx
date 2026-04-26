@@ -1,0 +1,50 @@
+---
+title: ChatOBD2
+short: AI-native automotive diagnostics interface
+category: Flagship
+keyFocus:
+  - AI-native UX
+  - System translation
+  - Technical interaction design
+placeholder:
+  from: '#0B0D12'
+  to: '#1A1F2B'
+  label: ChatOBD2
+  sublabel: AI Diagnostics System
+  angle: 135
+  labelTone: light
+featured: true
+order: 1
+---
+
+## The premise
+
+Most diagnostic tools assume the user already knows how to interpret them. They don't.
+
+That's not a polish problem. It's a translation problem.
+
+Codes, freeze frames, partial explanations. The data is technically present, but the user is left to assemble it into an answer. The tool exposes complexity instead of resolving it.
+
+That gap is the actual problem.
+
+## A different idea
+
+ChatOBD2 is built around a different premise: diagnostics should explain themselves.
+
+The interface is intentionally simple. The system behind it isn't.
+
+It pairs structured diagnostic inputs with layered interpretation and AI-assisted reasoning, and it constrains the output. Every scan returns the same shape: is it safe to drive, how confident is the answer, what matters most, what to do next.
+
+This is where AI earns its keep. The model's job is reducing complexity, not generating content.
+
+## Three decisions that shaped the product
+
+**The verdict comes first, before any text.** When a scan finishes, the safe-to-drive answer is the first thing rendered, full-width and color-coded, ahead of every paragraph. The tradeoff is less narrative warmth, but anyone glancing at the screen has the answer they came for in under a second.
+
+**Confidence is part of the answer.** A partial scan changes what the verdict means. Showing scan quality as a fixed bar instead of hiding it costs a small piece of optimism, but earns a much larger piece of trust. It's the kind of decision a less-confident product wouldn't make.
+
+**Prompts live in the system, not in components.** No part of the UI hardcodes an AI prompt string. All next-best-actions derive from verdict tier and code context, in a single module. When the language changes, it changes everywhere. The analytics stay clean across the product.
+
+## What the system does, in short
+
+It turns vehicle data into something a person can act on. The chat surface is the home screen. The verdict card is the unit of output. AI sits in the middle of the pipeline, constrained by structure on either side.

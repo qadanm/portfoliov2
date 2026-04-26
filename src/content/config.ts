@@ -4,43 +4,25 @@ const work = defineCollection({
   type: 'content',
   schema: z.object({
     title: z.string(),
-    description: z.string(),
-    type: z.enum(['Product System', 'Design System', 'Agentic Workflow', 'UX Engineering', 'AI-Native', 'Platform', 'Research']),
-    year: z.string(),
-    role: z.string(),
-    tags: z.array(z.string()),
+    short: z.string(),
+    category: z.enum(['Flagship', 'Platform', 'Product', 'Frontend']),
+    keyFocus: z.array(z.string()),
+    placeholder: z.object({
+      from: z.string(),
+      to: z.string(),
+      label: z.string(),
+      sublabel: z.string().optional(),
+      angle: z.number().default(135),
+      labelTone: z.enum(['light', 'dark']).default('light'),
+    }),
     featured: z.boolean().default(false),
     order: z.number().default(99),
     draft: z.boolean().default(false),
-    cover: z.string().optional(),
-    outcome: z.string().optional(),
-    client: z.string().optional(),
+    engagement: z.enum(['independent', 'work']).default('independent'),
+    company: z.string().optional(),
+    period: z.string().optional(),
+    stack: z.array(z.string()).optional(),
   }),
 });
 
-const writing = defineCollection({
-  type: 'content',
-  schema: z.object({
-    title: z.string(),
-    description: z.string(),
-    date: z.coerce.date(),
-    tags: z.array(z.string()).default([]),
-    draft: z.boolean().default(false),
-    featured: z.boolean().default(false),
-    readingTime: z.number().optional(),
-  }),
-});
-
-const lab = defineCollection({
-  type: 'content',
-  schema: z.object({
-    title: z.string(),
-    description: z.string(),
-    status: z.enum(['Active', 'Shipped', 'Archived', 'Concept']),
-    tags: z.array(z.string()).default([]),
-    date: z.coerce.date(),
-    order: z.number().default(99),
-  }),
-});
-
-export const collections = { work, writing, lab };
+export const collections = { work };

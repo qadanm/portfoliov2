@@ -1,0 +1,129 @@
+---
+import ProjectCard from './ProjectCard.astro';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  projects: CollectionEntry<'work'>[];
+}
+
+const { projects } = Astro.props;
+
+const sorted = [...projects].sort((a, b) => a.data.order - b.data.order);
+const builtProjects = sorted.filter(p => p.data.engagement !== 'work');
+const experienceProjects = sorted.filter(p => p.data.engagement === 'work');
+
+interface SectionProps {
+  label: string;
+  note: string;
+  list: CollectionEntry<'work'>[];
+}
+
+const sections: SectionProps[] = [
+  { label: 'Selected projects', note: "Things I've built.", list: builtProjects },
+  { label: 'Experience', note: 'Systems I operate within.', list: experienceProjects },
+].filter(s => s.list.length > 0);
+---
+
+<div class="pg">
+  {sections.map((section, sectionIndex) => {
+    const [lead, ...rest] = section.list;
+    return (
+      <section class="pg__section" data-reveal data-reveal-delay={sectionIndex === 0 ? undefined : '2'}>
+        <header class="pg__head">
+          <span class="pg__eyebrow">{section.label}</span>
+          <span class="pg__note">{section.note}</span>
+        </header>
+
+        {lead && (
+          <div class="pg__lead">
+            <ProjectCard project={lead} size="feature" index={0} />
+          </div>
+        )}
+
+        {rest.length > 0 && (
+          <div class:list={['pg__rest', { 'pg__rest--solo': rest.length === 1 }]}>
+            {rest.map((project, i) => (
+              <ProjectCard project={project} index={i + 1} />
+            ))}
+          </div>
+        )}
+      </section>
+    );
+  })}
+</div>
+
+<style>
+  .pg {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-16);
+  }
+
+  @media (min-width: 768px) {
+    .pg {
+      gap: var(--space-20);
+    }
+  }
+
+  .pg__section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .pg__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .pg__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+  }
+
+  .pg__note {
+    font-size: 13px;
+    color: var(--color-text-subtle);
+    font-style: italic;
+    line-height: 1.5;
+  }
+
+  .pg__lead {
+    /* Single lead card per section, full width */
+  }
+
+  .pg__rest {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+
+  @media (min-width: 720px) {
+    .pg__rest {
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-6);
+    }
+
+    /* When there's only one secondary card, give it half width and align right
+       to balance the lead card visually. */
+    .pg__rest--solo {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .pg__rest--solo :global(.project-card) {
+      grid-column: 2 / 3;
+    }
+  }
+</style>

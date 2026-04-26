@@ -1,0 +1,490 @@
+---
+---
+
+<figure class="verdict-mock" aria-label="A mock of the ChatOBD2 verdict card UI surface">
+  <header class="verdict-mock__head">
+    <span class="verdict-mock__eyebrow">Product surface</span>
+    <h3 class="verdict-mock__title">What a scan returns</h3>
+  </header>
+
+  <div class="verdict-mock__frame">
+    <!-- Phone-frame style mock -->
+    <div class="vm__device">
+      <div class="vm__device-bar">
+        <span class="vm__device-time">9:41</span>
+        <span class="vm__device-pulse" aria-hidden="true"></span>
+        <span class="vm__device-status">connected · 2014 Civic</span>
+      </div>
+
+      <div class="vm__bubble vm__bubble--user">
+        <span class="vm__bubble-meta">You</span>
+        <p>Run a scan. Anything I should worry about?</p>
+      </div>
+
+      <div class="vm__card">
+        <div class="vm__safe-bar">
+          <span class="vm__safe-dot" aria-hidden="true"></span>
+          <span class="vm__safe-label">Safe to drive</span>
+          <span class="vm__safe-tier">Monitor</span>
+        </div>
+
+        <div class="vm__confidence">
+          <span class="vm__confidence-label">Scan confidence</span>
+          <div class="vm__confidence-bar" aria-hidden="true">
+            <span class="vm__confidence-fill"></span>
+          </div>
+          <span class="vm__confidence-value">Solid · 14 PIDs</span>
+        </div>
+
+        <div class="vm__verdict">
+          <span class="vm__verdict-eyebrow">Verdict</span>
+          <h4 class="vm__verdict-headline">One pending code, no immediate action</h4>
+          <p class="vm__verdict-summary">
+            P0420 (catalyst efficiency) is logged but not active. Drivetrain
+            pulled clean across two cycles. Re-scan in 200 mi.
+          </p>
+        </div>
+
+        <div class="vm__findings">
+          <span class="vm__findings-eyebrow">What matters most</span>
+          <ul class="vm__findings-list">
+            <li>
+              <span class="vm__finding-tier vm__finding-tier--monitor"></span>
+              <span class="vm__finding-code">P0420</span>
+              <span class="vm__finding-name">Catalyst efficiency below threshold</span>
+            </li>
+            <li>
+              <span class="vm__finding-tier vm__finding-tier--ok"></span>
+              <span class="vm__finding-code">12 systems</span>
+              <span class="vm__finding-name">Healthy across drivetrain &amp; emissions</span>
+            </li>
+          </ul>
+        </div>
+
+        <button class="vm__action" type="button">
+          <span class="vm__action-label">Explain P0420 in plain language</span>
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="vm__followups" aria-hidden="true">
+        <span class="vm__chip">Is this getting worse?</span>
+        <span class="vm__chip">Cost to fix?</span>
+        <span class="vm__chip">Will it fail emissions?</span>
+      </div>
+    </div>
+
+    <aside class="verdict-mock__notes">
+      <span class="verdict-mock__notes-eyebrow">Why it's structured</span>
+      <ol class="verdict-mock__notes-list">
+        <li>Safe-to-drive answer comes <strong>first</strong>, before any text.</li>
+        <li>Confidence is <strong>part of the answer</strong>. Partial scans say so.</li>
+        <li>Findings are <strong>tier-coded</strong>, instead of a flat list of acronyms.</li>
+        <li>Next action is <strong>one tap</strong>. No prompt-writing required.</li>
+      </ol>
+    </aside>
+  </div>
+</figure>
+
+<style>
+  .verdict-mock {
+    margin: var(--space-12) 0;
+  }
+
+  .verdict-mock__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .verdict-mock__eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+  }
+
+  .verdict-mock__title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .verdict-mock__frame {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    align-items: stretch;
+  }
+
+  @media (min-width: 820px) {
+    .verdict-mock__frame {
+      grid-template-columns: minmax(280px, 360px) 1fr;
+      gap: var(--space-8);
+    }
+  }
+
+  /* Device shell */
+  .vm__device {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background-color: #0A0A0C;
+    border: 1px solid #18181B;
+    border-radius: 28px;
+    box-shadow: var(--shadow-xl);
+    color: #FAFAFA;
+  }
+
+  .vm__device-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: rgba(250, 250, 250, 0.55);
+    letter-spacing: 0.04em;
+  }
+
+  .vm__device-time {
+    font-weight: 600;
+    color: rgba(250, 250, 250, 0.85);
+  }
+
+  .vm__device-pulse {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: #10B981;
+    box-shadow: 0 0 8px #10B981;
+    margin: 0 4px;
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+
+  .vm__device-status {
+    flex: 1;
+    text-align: right;
+  }
+
+  /* Chat bubble */
+  .vm__bubble {
+    align-self: flex-end;
+    padding: 8px 14px;
+    border-radius: 16px 16px 4px 16px;
+    background-color: #1F1F23;
+    color: #FAFAFA;
+    font-size: 13px;
+    line-height: 1.5;
+    max-width: 86%;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .vm__bubble--user {
+    background-color: #2A2A30;
+  }
+
+  .vm__bubble-meta {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: rgba(250, 250, 250, 0.4);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* The verdict card itself */
+  .vm__card {
+    align-self: stretch;
+    background-color: #14141A;
+    border: 1px solid #232329;
+    border-radius: 20px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* Safe-to-drive bar */
+  .vm__safe-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(245, 158, 11, 0.04));
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 12px;
+  }
+
+  .vm__safe-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #F59E0B;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+  }
+
+  .vm__safe-label {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 600;
+    color: #FAFAFA;
+  }
+
+  .vm__safe-tier {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #F59E0B;
+    padding: 3px 8px;
+    border-radius: 9999px;
+    background-color: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+  }
+
+  /* Confidence */
+  .vm__confidence {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    gap: 4px 10px;
+    align-items: center;
+  }
+
+  .vm__confidence-label {
+    grid-row: 1;
+    grid-column: 1;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: rgba(250, 250, 250, 0.5);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .vm__confidence-value {
+    grid-row: 1;
+    grid-column: 2;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: #10B981;
+    letter-spacing: 0.04em;
+  }
+
+  .vm__confidence-bar {
+    grid-row: 2;
+    grid-column: 1 / -1;
+    height: 4px;
+    background-color: rgba(250, 250, 250, 0.08);
+    border-radius: 9999px;
+    overflow: hidden;
+  }
+
+  .vm__confidence-fill {
+    display: block;
+    width: 84%;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.4), #10B981);
+    border-radius: inherit;
+  }
+
+  /* Verdict text */
+  .vm__verdict {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .vm__verdict-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: rgba(250, 250, 250, 0.5);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .vm__verdict-headline {
+    font-size: 14px;
+    font-weight: 600;
+    color: #FAFAFA;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+
+  .vm__verdict-summary {
+    font-size: 12px;
+    color: rgba(250, 250, 250, 0.65);
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  /* Findings */
+  .vm__findings {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(250, 250, 250, 0.06);
+  }
+
+  .vm__findings-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: rgba(250, 250, 250, 0.5);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .vm__findings-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .vm__findings-list li {
+    display: grid;
+    grid-template-columns: 4px auto 1fr;
+    gap: 10px;
+    align-items: center;
+    padding: 6px 0;
+    font-size: 12px;
+  }
+
+  .vm__finding-tier {
+    width: 4px;
+    height: 24px;
+    border-radius: 2px;
+    background-color: #F59E0B;
+  }
+
+  .vm__finding-tier--ok { background-color: #10B981; }
+
+  .vm__finding-code {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: #FAFAFA;
+  }
+
+  .vm__finding-name {
+    color: rgba(250, 250, 250, 0.7);
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  /* Next action button */
+  .vm__action {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 14px;
+    background-color: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    border-radius: 10px;
+    color: #F59E0B;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    cursor: pointer;
+    transition: background-color 150ms;
+  }
+
+  .vm__action:hover {
+    background-color: rgba(245, 158, 11, 0.14);
+  }
+
+  /* Follow-up chips */
+  .vm__followups {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 0 4px;
+  }
+
+  .vm__chip {
+    font-size: 11px;
+    padding: 5px 10px;
+    border-radius: 9999px;
+    background-color: rgba(250, 250, 250, 0.05);
+    border: 1px solid rgba(250, 250, 250, 0.1);
+    color: rgba(250, 250, 250, 0.7);
+    line-height: 1.2;
+  }
+
+  /* Right-side notes */
+  .verdict-mock__notes {
+    align-self: start;
+    padding: var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-bg-elevated);
+  }
+
+  .verdict-mock__notes-eyebrow {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+    margin-bottom: var(--space-4);
+  }
+
+  .verdict-mock__notes-list {
+    counter-reset: vm-notes;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .verdict-mock__notes-list li {
+    counter-increment: vm-notes;
+    position: relative;
+    padding-left: 28px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--color-text-muted);
+  }
+
+  .verdict-mock__notes-list li::before {
+    content: counter(vm-notes, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: 2px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--color-accent);
+    letter-spacing: 0.06em;
+  }
+
+  .verdict-mock__notes-list strong {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+</style>

@@ -1,0 +1,272 @@
+---
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import ContactForm from '@/components/ContactForm.astro';
+
+const channels = [
+  {
+    label: 'Email',
+    value: 'muhammedqadan@outlook.com',
+    href: 'mailto:muhammedqadan@outlook.com',
+    primary: true,
+  },
+  {
+    label: 'LinkedIn',
+    value: 'linkedin.com/in/muhammedqadan',
+    href: 'https://linkedin.com/in/muhammedqadan',
+    external: true,
+  },
+  {
+    label: 'GitHub',
+    value: 'github.com/muhammedqadan',
+    href: 'https://github.com/muhammedqadan',
+    external: true,
+  },
+];
+---
+
+<BaseLayout
+  title="Contact — Qadan"
+  description="Get in touch. Open to interesting work in UX, frontend systems, and AI-native products."
+>
+  <div class="contact">
+    <div class="container-site contact__inner">
+      <div class="contact__content">
+        <span class="contact__eyebrow">Contact</span>
+        <h1 class="contact__title">
+          If you're building something <em>interesting</em>,<br />
+          feel free to reach out.
+        </h1>
+        <p class="contact__lede">
+          Open to conversations about products, platforms, and AI-native
+          systems. Drop a note below, or use one of the direct channels.
+        </p>
+
+        <div class="contact__form-wrap">
+          <ContactForm variant="full" formId="contact-form-full" />
+        </div>
+
+        <div class="contact__divider" aria-hidden="true">
+          <span>Or reach out directly</span>
+        </div>
+
+        <ul class="contact__channels">
+          {channels.map(c => (
+            <li>
+              <a
+                href={c.href}
+                class:list={['contact__channel', { 'contact__channel--primary': c.primary }]}
+                target={c.external ? '_blank' : undefined}
+                rel={c.external ? 'noopener noreferrer' : undefined}
+              >
+                <span class="contact__channel-label">{c.label}</span>
+                <span class="contact__channel-value">{c.value}</span>
+                <span class="contact__channel-icon" aria-hidden="true">
+                  {c.external ? (
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <path d="M5 2h7v7M12 2 2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  ) : (
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                      <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  )}
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        <p class="contact__signoff">
+          What are we vibe coding next? <span aria-hidden="true">🫡</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .contact {
+    padding-top: calc(64px + var(--space-20));
+    padding-bottom: var(--space-24);
+    min-height: 80vh;
+  }
+
+  .contact__content {
+    max-width: 720px;
+  }
+
+  .contact__eyebrow {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+    margin-bottom: var(--space-4);
+  }
+
+  .contact__title {
+    font-family: var(--font-display);
+    font-size: clamp(36px, 5.5vw, 64px);
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    color: var(--color-text);
+    margin-bottom: var(--space-6);
+  }
+
+  .contact__title em {
+    font-style: italic;
+    color: var(--color-accent);
+  }
+
+  .contact__lede {
+    font-size: clamp(16px, 1.6vw, 18px);
+    line-height: 1.65;
+    color: var(--color-text-muted);
+    max-width: 56ch;
+    margin-bottom: var(--space-10);
+  }
+
+  .contact__form-wrap {
+    margin-bottom: var(--space-10);
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    background-color: var(--color-bg-elevated);
+    max-width: 640px;
+  }
+
+  @media (min-width: 720px) {
+    .contact__form-wrap {
+      padding: var(--space-7) var(--space-8);
+    }
+  }
+
+  .contact__divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
+    max-width: 560px;
+  }
+
+  .contact__divider::before,
+  .contact__divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background-color: var(--color-border-subtle);
+  }
+
+  .contact__divider span {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+  }
+
+  .contact__channels {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    max-width: 560px;
+  }
+
+  .contact__channel {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-bg-elevated);
+    text-decoration: none;
+    color: var(--color-text);
+    transition:
+      border-color 200ms,
+      transform 200ms var(--ease-out),
+      box-shadow 200ms;
+  }
+
+  .contact__channel:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md), 0 0 0 1px var(--color-accent-muted);
+  }
+
+  .contact__channel--primary {
+    border-color: var(--color-accent-muted);
+    background-color: var(--color-accent-dim);
+  }
+
+  .contact__channel-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-subtle);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    width: 80px;
+    flex-shrink: 0;
+  }
+
+  .contact__channel--primary .contact__channel-label {
+    color: var(--color-accent);
+  }
+
+  .contact__channel-value {
+    flex: 1;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--color-text);
+    letter-spacing: -0.005em;
+    word-break: break-all;
+  }
+
+  .contact__channel-icon {
+    color: var(--color-text-subtle);
+    transition: color 200ms, transform 200ms;
+    flex-shrink: 0;
+    display: inline-flex;
+  }
+
+  .contact__channel:hover .contact__channel-icon {
+    color: var(--color-accent);
+    transform: translate(2px, -2px);
+  }
+
+  @media (max-width: 480px) {
+    .contact__channel {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .contact__channel-label {
+      width: auto;
+    }
+  }
+
+  .contact__signoff {
+    margin-top: var(--space-12);
+    font-family: var(--font-display);
+    font-size: clamp(20px, 2.4vw, 28px);
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    color: var(--color-text-muted);
+    line-height: 1.4;
+  }
+
+  .contact__signoff span {
+    margin-left: 6px;
+    font-style: normal;
+    display: inline-block;
+    transform: translateY(-2px);
+  }
+</style>

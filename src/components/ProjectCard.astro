@@ -1,0 +1,333 @@
+---
+import Placeholder from './Placeholder.astro';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  project: CollectionEntry<'work'>;
+  size?: 'default' | 'feature';
+  index?: number;
+}
+
+const { project, size = 'default', index = 0 } = Astro.props;
+const { data, slug } = project;
+---
+
+<a
+  href={`/work/${slug}`}
+  class:list={['project-card', `project-card--${size}`, { 'project-card--flagship': data.category === 'Flagship' }]}
+  style={`animation-delay: ${index * 60}ms;`}
+  data-category={data.category}
+>
+  <div class="project-card__media">
+    <Placeholder
+      from={data.placeholder.from}
+      to={data.placeholder.to}
+      label={data.placeholder.label}
+      sublabel={data.placeholder.sublabel}
+      angle={data.placeholder.angle}
+      labelTone={data.placeholder.labelTone}
+    />
+    {data.category === 'Flagship' && (
+      <span class="project-card__pill">Flagship</span>
+    )}
+  </div>
+
+  <div class="project-card__body">
+    <div class="project-card__meta">
+      <span class="project-card__tags">
+        <span class:list={['project-card__tag', `project-card__tag--${data.category.toLowerCase()}`]}>
+          <span class="project-card__tag-dot" aria-hidden="true"></span>
+          {data.category}
+        </span>
+        {data.engagement === 'work' && data.company && (
+          <span class="project-card__work">
+            <svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+              <rect x="1.5" y="3.5" width="9" height="6.5" rx="1" stroke="currentColor" stroke-width="1"/>
+              <path d="M4.5 3.5V2.5a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1" stroke="currentColor" stroke-width="1"/>
+            </svg>
+            Work · {data.company}
+          </span>
+        )}
+      </span>
+      <span class="project-card__arrow" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+          <path d="M3 13L13 3M13 3H5M13 3v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+    </div>
+    <h3 class="project-card__title">{data.title}</h3>
+    <p class="project-card__short">{data.short}</p>
+    <ul class="project-card__focus">
+      {data.keyFocus.map(item => (
+        <li>{item}</li>
+      ))}
+    </ul>
+  </div>
+</a>
+
+<style>
+  .project-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-elevated);
+    overflow: hidden;
+    transition:
+      border-color 360ms var(--ease-out),
+      box-shadow 360ms var(--ease-out),
+      transform 360ms var(--ease-out);
+    height: 100%;
+    will-change: transform;
+  }
+
+  .project-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse 60% 80% at 80% 0%, var(--color-accent-dim), transparent 60%);
+    opacity: 0;
+    transition: opacity 420ms var(--ease-out);
+    border-radius: inherit;
+  }
+
+  .project-card:hover {
+    border-color: var(--color-accent-muted);
+    box-shadow:
+      0 1px 0 var(--color-border-subtle),
+      0 16px 40px rgba(0, 0, 0, 0.06),
+      0 4px 14px rgba(0, 0, 0, 0.04);
+    transform: translateY(-3px) scale(1.012);
+  }
+
+  .project-card:hover::after {
+    opacity: 0.7;
+  }
+
+  :global([data-theme="dark"]) .project-card:hover {
+    box-shadow:
+      0 0 0 1px var(--color-accent-muted),
+      0 20px 60px rgba(0, 0, 0, 0.45),
+      0 6px 16px rgba(0, 0, 0, 0.3);
+  }
+
+  .project-card__media {
+    position: relative;
+    border-bottom: 1px solid var(--color-border);
+    overflow: hidden;
+  }
+
+  .project-card__media :global(.placeholder) {
+    transition: transform 700ms var(--ease-out);
+    will-change: transform;
+  }
+
+  .project-card:hover .project-card__media :global(.placeholder) {
+    transform: scale(1.04);
+  }
+
+  .project-card__pill {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #FAFAFA;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .project-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-5) var(--space-5) var(--space-5);
+    flex: 1;
+  }
+
+  .project-card__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+
+  .project-card__tags {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .project-card__tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    padding: 4px 10px;
+    border-radius: 9999px;
+    background-color: var(--color-bg-muted);
+    border: 1px solid var(--color-border);
+    line-height: 1;
+  }
+
+  .project-card__work {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+    padding: 4px 10px;
+    border-radius: 9999px;
+    background-color: transparent;
+    border: 1px dashed var(--color-border);
+    line-height: 1;
+  }
+
+  .project-card__work svg {
+    color: var(--color-text-subtle);
+    flex-shrink: 0;
+  }
+
+  .project-card__tag-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: var(--color-text-subtle);
+  }
+
+  .project-card__tag--flagship {
+    color: var(--color-accent);
+    background-color: var(--color-accent-dim);
+    border-color: var(--color-accent-muted);
+  }
+
+  .project-card__tag--flagship .project-card__tag-dot {
+    background-color: var(--color-accent);
+    box-shadow: 0 0 8px var(--color-accent);
+  }
+
+  .project-card__tag--platform .project-card__tag-dot {
+    background-color: #60A5FA;
+  }
+
+  .project-card__tag--product .project-card__tag-dot {
+    background-color: #A78BFA;
+  }
+
+  .project-card__tag--frontend .project-card__tag-dot {
+    background-color: #34D399;
+  }
+
+  .project-card__arrow {
+    color: var(--color-text-subtle);
+    transition: color 200ms, transform 200ms var(--ease-out);
+    line-height: 0;
+  }
+
+  .project-card:hover .project-card__arrow {
+    color: var(--color-accent);
+    transform: translate(2px, -2px);
+  }
+
+  .project-card__title {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: var(--color-text);
+  }
+
+  .project-card__short {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+  }
+
+  .project-card__focus {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    margin-top: auto;
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-border-subtle);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+  }
+
+  .project-card__focus li {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-text-subtle);
+    line-height: 1.4;
+  }
+
+  .project-card__focus li + li::before {
+    content: '·';
+    margin-right: 8px;
+    color: var(--color-border);
+  }
+
+  /* Feature size — used as the lead card in each section */
+  @media (min-width: 900px) {
+    .project-card--feature {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+    }
+
+    .project-card--flagship.project-card--feature {
+      grid-template-columns: 1.25fr 1fr;
+    }
+
+    .project-card--feature .project-card__media {
+      border-bottom: none;
+      border-right: 1px solid var(--color-border);
+    }
+
+    .project-card--feature .project-card__body {
+      padding: var(--space-8);
+      justify-content: center;
+    }
+
+    .project-card--feature .project-card__title {
+      font-family: var(--font-display);
+      font-weight: 400;
+      letter-spacing: -0.025em;
+      font-size: 36px;
+      line-height: 1.05;
+    }
+
+    .project-card--flagship.project-card--feature .project-card__title {
+      font-size: 44px;
+    }
+
+    .project-card--feature .project-card__short {
+      font-size: 16px;
+      line-height: 1.65;
+    }
+
+    .project-card--flagship.project-card--feature .project-card__short {
+      font-size: 17px;
+    }
+  }
+</style>

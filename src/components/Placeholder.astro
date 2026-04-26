@@ -1,0 +1,106 @@
+---
+interface Props {
+  from: string;
+  to: string;
+  label: string;
+  sublabel?: string;
+  angle?: number;
+  labelTone?: 'light' | 'dark';
+  rounded?: boolean;
+  class?: string;
+}
+
+const {
+  from,
+  to,
+  label,
+  sublabel,
+  angle = 135,
+  labelTone = 'light',
+  rounded = true,
+  class: className = '',
+} = Astro.props;
+
+const gradient = `linear-gradient(${angle}deg, ${from} 0%, ${to} 100%)`;
+
+const labelColor = labelTone === 'light' ? 'rgba(255,255,255,0.96)' : 'rgba(15,15,20,0.92)';
+const sublabelColor = labelTone === 'light' ? 'rgba(255,255,255,0.55)' : 'rgba(15,15,20,0.55)';
+const dotColor = labelTone === 'light' ? 'rgba(255,255,255,0.18)' : 'rgba(15,15,20,0.12)';
+const ringColor = labelTone === 'light' ? 'rgba(255,255,255,0.10)' : 'rgba(15,15,20,0.08)';
+---
+
+<div
+  class:list={['placeholder', { 'placeholder--rounded': rounded }, className]}
+  style={`background-image: ${gradient};`}
+  aria-hidden="true"
+>
+  <div class="placeholder__grid" style={`background-image: radial-gradient(${dotColor} 1px, transparent 1px);`}></div>
+  <div class="placeholder__ring" style={`box-shadow: inset 0 0 0 1px ${ringColor};`}></div>
+  <div class="placeholder__content">
+    <div class="placeholder__label" style={`color: ${labelColor};`}>{label}</div>
+    {sublabel && (
+      <div class="placeholder__sublabel" style={`color: ${sublabelColor};`}>{sublabel}</div>
+    )}
+  </div>
+</div>
+
+<style>
+  .placeholder {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    display: block;
+    isolation: isolate;
+    container-type: inline-size;
+  }
+
+  .placeholder--rounded {
+    border-radius: var(--radius-lg);
+  }
+
+  .placeholder__grid {
+    position: absolute;
+    inset: 0;
+    background-size: 18px 18px;
+    opacity: 0.85;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+  }
+
+  .placeholder__ring {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  .placeholder__content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-align: center;
+    padding: 24px;
+  }
+
+  .placeholder__label {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 6cqw, 64px);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .placeholder__sublabel {
+    font-family: var(--font-mono);
+    font-size: clamp(10px, 1.4cqw, 12px);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+</style>

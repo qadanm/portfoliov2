@@ -1,0 +1,370 @@
+---
+const accounts = [
+  { name: 'Smith, J.', tier: 'Tier 1', balance: '4.2M', delta: '+0.8', up: true },
+  { name: 'Patel, R.', tier: 'Tier 2', balance: '1.1M', delta: '-0.2', up: false },
+  { name: 'Wong, A.', tier: 'Tier 1', balance: '6.8M', delta: '+1.4', up: true },
+  { name: 'Garcia, M.', tier: 'Tier 3', balance: '420K', delta: '+0.1', up: true },
+];
+
+const sparks = [
+  '4 9 6 12 8 14 10 16 13 19 11 22',
+  '8 14 7 11 9 13 6 10 5 8 4 6',
+  '3 7 5 10 7 13 9 16 11 19 13 22',
+];
+---
+
+<figure class="adv" aria-label="Advisor platform UI abstraction: accounts, allocation, and trends">
+  <header class="adv__head">
+    <span class="adv__eyebrow">Surface abstraction</span>
+    <h3 class="adv__title">Density made legible</h3>
+  </header>
+
+  <div class="adv__board">
+    <!-- Top: Accounts table -->
+    <div class="adv__panel adv__panel--accounts">
+      <div class="adv__panel-head">
+        <span class="adv__panel-label">Accounts</span>
+        <span class="adv__panel-meta">12 of 184</span>
+      </div>
+      <div class="adv__table">
+        <div class="adv__row adv__row--header">
+          <span>Name</span>
+          <span>Tier</span>
+          <span>Balance</span>
+          <span class="adv__row-num">Δ 30d</span>
+        </div>
+        {accounts.map(a => (
+          <div class="adv__row">
+            <span class="adv__cell-name">{a.name}</span>
+            <span class="adv__cell-tier">{a.tier}</span>
+            <span class="adv__cell-balance">{a.balance}</span>
+            <span class:list={['adv__cell-delta', a.up ? 'is-up' : 'is-down']}>
+              <svg width="8" height="8" viewBox="0 0 8 8" fill="none" aria-hidden="true">
+                {a.up
+                  ? <path d="M4 1.5l3 3M4 1.5L1 4.5M4 1.5v5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  : <path d="M4 6.5l3-3M4 6.5L1 3.5M4 6.5v-5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                }
+              </svg>
+              {a.delta}%
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Right: Allocation ring -->
+    <div class="adv__panel adv__panel--allocation">
+      <div class="adv__panel-head">
+        <span class="adv__panel-label">Allocation</span>
+        <span class="adv__panel-meta">Aggregate</span>
+      </div>
+      <div class="adv__alloc">
+        <svg width="120" height="120" viewBox="0 0 36 36" class="adv__ring" aria-hidden="true">
+          <circle cx="18" cy="18" r="15.915" fill="none" stroke="var(--color-border)" stroke-width="2.5"/>
+          <circle cx="18" cy="18" r="15.915" fill="none" stroke="var(--color-accent)" stroke-width="2.5" stroke-dasharray="58 100" stroke-dashoffset="25" stroke-linecap="round"/>
+          <circle cx="18" cy="18" r="15.915" fill="none" stroke="var(--color-text-muted)" stroke-width="2.5" stroke-dasharray="22 100" stroke-dashoffset="-33" stroke-linecap="round"/>
+          <circle cx="18" cy="18" r="15.915" fill="none" stroke="var(--color-text-subtle)" stroke-width="2.5" stroke-dasharray="20 100" stroke-dashoffset="-55" stroke-linecap="round"/>
+        </svg>
+        <ul class="adv__legend">
+          <li><span class="adv__dot adv__dot--accent"></span>Equities <em>58%</em></li>
+          <li><span class="adv__dot adv__dot--muted"></span>Fixed income <em>22%</em></li>
+          <li><span class="adv__dot adv__dot--subtle"></span>Alternatives <em>20%</em></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bottom: Spark trends -->
+    <div class="adv__panel adv__panel--trends">
+      <div class="adv__panel-head">
+        <span class="adv__panel-label">Trends · 12mo</span>
+        <span class="adv__panel-meta">Per role</span>
+      </div>
+      <div class="adv__sparks">
+        {sparks.map((points, i) => (
+          <div class="adv__spark">
+            <span class="adv__spark-label">{['Advisor', 'Operations', 'Compliance'][i]}</span>
+            <svg viewBox="0 0 50 24" preserveAspectRatio="none" aria-hidden="true">
+              <polyline
+                points={points}
+                fill="none"
+                stroke={i === 0 ? 'var(--color-accent)' : 'var(--color-text-muted)'}
+                stroke-width="1.2"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              />
+            </svg>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <footer class="adv__foot">
+    <span>The job: layout grammar that holds.</span>
+    <span class="adv__sep" aria-hidden="true">·</span>
+    <span>Tables, allocation, trends. Same primitives, different views.</span>
+  </footer>
+</figure>
+
+<style>
+  .adv {
+    margin: var(--space-12) 0;
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-bg-elevated);
+  }
+
+  .adv__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .adv__eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+  }
+
+  .adv__title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .adv__board {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    gap: var(--space-3);
+  }
+
+  @media (min-width: 720px) {
+    .adv__board {
+      grid-template-columns: 1.6fr 1fr;
+      grid-template-rows: auto auto;
+      gap: var(--space-3);
+    }
+
+    .adv__panel--accounts { grid-column: 1; grid-row: 1 / span 2; }
+    .adv__panel--allocation { grid-column: 2; grid-row: 1; }
+    .adv__panel--trends { grid-column: 2; grid-row: 2; }
+  }
+
+  .adv__panel {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-bg);
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    transition: border-color var(--duration-base) var(--ease-out);
+  }
+
+  .adv__panel--allocation {
+    border-color: var(--color-accent-muted);
+    background:
+      radial-gradient(ellipse 70% 80% at 30% 0%, var(--color-accent-dim), transparent 65%),
+      var(--color-bg);
+    box-shadow: 0 0 0 1px var(--color-accent-muted), 0 6px 16px rgba(245, 158, 11, 0.04);
+  }
+
+  .adv__panel-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .adv__panel-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text);
+  }
+
+  .adv__panel--allocation .adv__panel-label {
+    color: var(--color-accent);
+  }
+
+  .adv__panel-meta {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--color-text-subtle);
+    letter-spacing: 0.04em;
+  }
+
+  /* Table */
+  .adv__table {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .adv__row {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 0.9fr;
+    gap: var(--space-2);
+    padding: 8px 0;
+    align-items: center;
+    border-bottom: 1px solid var(--color-border-subtle);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-text);
+  }
+
+  .adv__row:last-child { border-bottom: none; }
+
+  .adv__row--header {
+    color: var(--color-text-subtle);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding-top: 0;
+    padding-bottom: 6px;
+  }
+
+  .adv__row-num {
+    text-align: right;
+  }
+
+  .adv__cell-name {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  .adv__cell-tier {
+    color: var(--color-text);
+    opacity: 0.85;
+  }
+
+  .adv__cell-balance {
+    color: var(--color-text);
+    font-weight: 500;
+  }
+
+  .adv__cell-delta {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    justify-content: flex-end;
+    font-size: 10px;
+  }
+
+  .adv__cell-delta.is-up { color: var(--color-success); }
+  .adv__cell-delta.is-down { color: var(--color-text-subtle); }
+
+  /* Allocation */
+  .adv__alloc {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+  }
+
+  .adv__ring {
+    flex-shrink: 0;
+    width: 96px;
+    height: 96px;
+    transform: rotate(-90deg);
+    filter: drop-shadow(0 0 5px var(--color-accent-dim));
+  }
+
+  .adv__legend {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+  }
+
+  .adv__legend li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--color-text-muted);
+    letter-spacing: 0.02em;
+  }
+
+  .adv__legend em {
+    margin-left: auto;
+    font-style: normal;
+    color: var(--color-text);
+    font-weight: 500;
+  }
+
+  .adv__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .adv__dot--accent { background-color: var(--color-accent); }
+  .adv__dot--muted { background-color: var(--color-text-muted); }
+  .adv__dot--subtle { background-color: var(--color-text-subtle); }
+
+  /* Sparks */
+  .adv__sparks {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .adv__spark {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .adv__spark-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--color-text-subtle);
+    letter-spacing: 0.04em;
+  }
+
+  .adv__spark svg {
+    width: 100%;
+    height: 24px;
+    display: block;
+  }
+
+  /* Footer */
+  .adv__foot {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    margin-top: var(--space-5);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border-subtle);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-text-subtle);
+  }
+
+  .adv__sep {
+    color: var(--color-border);
+  }
+</style>

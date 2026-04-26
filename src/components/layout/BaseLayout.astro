@@ -1,4 +1,5 @@
 ---
+import { ViewTransitions } from 'astro:transitions';
 import { themeScript } from '@/utils/theme';
 import Header from './Header.astro';
 import Footer from './Footer.astro';
@@ -13,19 +14,19 @@ interface Props {
 }
 
 const {
-  title = 'Moe Qadan — UX Engineer & Platform Systems',
-  description = 'UX engineering and platform systems work at MagTek. Designing and evolving multi-site production environments, component systems, and AI-augmented workflows.',
+  title = 'Qadan — UX & Frontend Systems',
+  description = 'I build systems that make complex things usable. UX, frontend architecture, and AI-native products.',
   image = '/og-default.png',
   article = false,
   noindex = false,
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const fullTitle = title.includes('Moe Qadan') ? title : `${title} — Moe Qadan`;
+const fullTitle = title.includes('Qadan') ? title : `${title} — Qadan`;
 ---
 
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -43,7 +44,7 @@ const fullTitle = title.includes('Moe Qadan') ? title : `${title} — Moe Qadan`
   <meta property="og:title" content={fullTitle} />
   <meta property="og:description" content={description} />
   <meta property="og:image" content={new URL(image, Astro.site)} />
-  <meta property="og:site_name" content="Moe Qadan" />
+  <meta property="og:site_name" content="Qadan" />
 
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content={fullTitle} />
@@ -52,6 +53,8 @@ const fullTitle = title.includes('Moe Qadan') ? title : `${title} — Moe Qadan`
 
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <ViewTransitions />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -72,5 +75,82 @@ const fullTitle = title.includes('Moe Qadan') ? title : `${title} — Moe Qadan`
     <slot />
   </main>
   <Footer />
+
+  <script is:inline>
+    (() => {
+      // Guard against re-execution on Astro view transitions.
+      // is:inline scripts in body are re-attached on every swap.
+      if (window.__siteInit) {
+        // Theme is the only thing that needs re-applying after each swap;
+        // the listener attached on first init handles it via astro:after-swap.
+        // We still need to run reveals for the new page's elements.
+        if (typeof window.__siteBindReveals === 'function') {
+          window.__siteBindReveals();
+        }
+        return;
+      }
+      window.__siteInit = true;
+
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let activeIO = null;
+
+      function bindReveals() {
+        const els = document.querySelectorAll('[data-reveal]:not(.is-revealed)');
+        if (prefersReduced) {
+          els.forEach(el => el.classList.add('is-revealed'));
+          return;
+        }
+        if (!('IntersectionObserver' in window) || els.length === 0) {
+          els.forEach(el => el.classList.add('is-revealed'));
+          return;
+        }
+        // Disconnect previous observer to avoid orphaned bindings to swapped DOM.
+        if (activeIO) activeIO.disconnect();
+        activeIO = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-revealed');
+              activeIO.unobserve(entry.target);
+            }
+          });
+        }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
+        els.forEach(el => activeIO.observe(el));
+      }
+      window.__siteBindReveals = bindReveals;
+
+      function smoothThemeToggle() {
+        const html = document.documentElement;
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach(m => {
+            if (m.attributeName === 'data-theme' && !window.__themeSyncing) {
+              html.setAttribute('data-theme-transitioning', 'true');
+              clearTimeout(window.__themeTransitionTO);
+              window.__themeTransitionTO = setTimeout(() => {
+                html.removeAttribute('data-theme-transitioning');
+              }, 480);
+            }
+          });
+        });
+        observer.observe(html, { attributes: true, attributeFilter: ['data-theme'] });
+      }
+
+      function applyStoredTheme() {
+        const stored = localStorage.getItem('mq-theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = stored || (prefersDark ? 'dark' : 'light');
+        if (document.documentElement.getAttribute('data-theme') !== theme) {
+          window.__themeSyncing = true;
+          document.documentElement.setAttribute('data-theme', theme);
+          requestAnimationFrame(() => { window.__themeSyncing = false; });
+        }
+      }
+
+      bindReveals();
+      smoothThemeToggle();
+      applyStoredTheme();
+      document.addEventListener('astro:page-load', bindReveals);
+      document.addEventListener('astro:after-swap', applyStoredTheme);
+    })();
+  </script>
 </body>
 </html>

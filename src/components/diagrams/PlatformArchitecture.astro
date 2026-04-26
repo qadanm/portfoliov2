@@ -1,0 +1,208 @@
+---
+const sites = [
+  'MagTek.com',
+  'Support Portal',
+  'QwickPAY',
+  '+8 sites',
+];
+
+const layers = [
+  { name: 'Razor components', mono: true },
+  { name: 'Layout grammar', mono: true },
+  { name: 'CSS tokens', mono: true },
+  { name: 'Navigation system', mono: true },
+];
+---
+
+<figure class="diagram diagram--arch" aria-label="MagTek platform architecture: shared system across multiple sites">
+  <header class="diagram__head">
+    <span class="diagram__eyebrow">Platform architecture</span>
+    <h3 class="diagram__title">One system, many properties</h3>
+  </header>
+
+  <div class="arch">
+    <div class="arch__sites">
+      {sites.map((site, i) => (
+        <div class:list={['arch__site', { 'arch__site--primary': i === 0 }]}>
+          <span class="arch__site-dot" aria-hidden="true"></span>
+          <span class="arch__site-name">{site}</span>
+        </div>
+      ))}
+    </div>
+
+    <div class="arch__connector" aria-hidden="true">
+      <svg width="100%" height="40" viewBox="0 0 400 40" preserveAspectRatio="none">
+        <path d="M50 0 V20 H350 V0 M50 20 V40 M137 20 V40 M225 20 V40 M312 20 V40"
+              stroke="currentColor" stroke-width="1" fill="none" opacity="0.3"/>
+      </svg>
+    </div>
+
+    <div class="arch__core">
+      <span class="arch__core-label">Shared system</span>
+      <div class="arch__core-layers">
+        {layers.map(layer => (
+          <span class="arch__layer">{layer.name}</span>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <footer class="diagram__foot">
+    <span>One change to the system.</span>
+    <span class="diagram__sep" aria-hidden="true">·</span>
+    <span>It propagates everywhere.</span>
+  </footer>
+</figure>
+
+<style>
+  .diagram {
+    margin: var(--space-10) 0;
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-bg-elevated);
+  }
+
+  .diagram__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .diagram__eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+  }
+
+  .diagram__title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .arch {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .arch__sites {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-2);
+  }
+
+  @media (min-width: 720px) {
+    .arch__sites {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .arch__site {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: var(--space-3) var(--space-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-bg);
+  }
+
+  .arch__site--primary {
+    border-color: var(--color-accent-muted);
+    background-color: var(--color-accent-dim);
+  }
+
+  .arch__site-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--color-text-subtle);
+  }
+
+  .arch__site--primary .arch__site-dot {
+    background-color: var(--color-accent);
+    box-shadow: 0 0 8px var(--color-accent);
+    animation: pulse-dot 3s ease-in-out infinite;
+  }
+
+  .arch__site-name {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--color-text);
+    text-align: center;
+  }
+
+  .arch__connector {
+    color: var(--color-text-subtle);
+    line-height: 0;
+    margin-block: -2px;
+  }
+
+  .arch__core {
+    padding: var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-bg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .arch__core-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+  }
+
+  .arch__core-layers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .arch__layer {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    background-color: var(--color-bg-muted);
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
+  }
+
+  .diagram__foot {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    margin-top: var(--space-5);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border-subtle);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-text-subtle);
+  }
+
+  .diagram__sep {
+    color: var(--color-border);
+  }
+</style>

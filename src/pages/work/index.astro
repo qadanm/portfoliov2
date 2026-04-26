@@ -1,244 +1,85 @@
 ---
 import BaseLayout from '@/components/layout/BaseLayout.astro';
+import ProjectGrid from '@/components/ProjectGrid.astro';
 import { getCollection } from 'astro:content';
 
-const allWork = await getCollection('work', ({ data }) => !data.draft);
-const projects = allWork.sort((a, b) => a.data.order - b.data.order);
-
-const typeColors: Record<string, string> = {
-  'Product System': 'badge-muted',
-  'Design System': 'badge-muted',
-  'Agentic Workflow': 'badge-accent',
-  'UX Engineering': 'badge-muted',
-  'AI-Native': 'badge-accent',
-  'Platform': 'badge-muted',
-  'Research': 'badge-muted',
-};
+const projects = (await getCollection('work', ({ data }) => !data.draft))
+  .sort((a, b) => a.data.order - b.data.order);
 ---
 
 <BaseLayout
-  title="Work — Muhammed Qadan"
-  description="Selected case studies in AI-native product design, design systems, agentic workflows, and UX engineering."
+  title="Work — Qadan"
+  description="Selected projects and experience across UX, frontend systems, platform-scale work, and AI-native products."
 >
-  <div class="page-hero">
-    <div class="container-site">
-      <span class="badge badge-muted animate-fade-up">Selected Work</span>
-      <h1 class="page-title animate-fade-up animate-delay-100">
-        Systems, products,<br />and workflows
-      </h1>
-      <p class="page-desc animate-fade-up animate-delay-200">
-        Case studies across design systems, agentic workflow architecture,
-        AI-native product design, and front-end engineering. Each one is
-        framed around how the work was done, not just what was made.
-      </p>
-    </div>
-  </div>
+  <div class="work-index">
+    <header class="work-index__hero">
+      <div class="container-site">
+        <span class="work-index__eyebrow">
+          <span class="eyebrow__index">W</span>
+          Work
+        </span>
+        <h1 class="work-index__title">
+          A flagship product, a platform,<br />and the systems <em>around them</em>.
+        </h1>
+        <p class="work-index__lede">
+          AI-native products on one side, multi-site platform UX and
+          financial advisor systems on the other. All of it approached
+          as work that has to keep running.
+        </p>
+      </div>
+    </header>
 
-  <div class="container-site" style="padding-bottom: var(--space-24)">
-    <div class="work-index-grid">
-      {projects.map((project, i) => (
-        <a
-          href={`/work/${project.slug}`}
-          class:list={['work-index-card', { 'work-index-card--featured': project.data.featured }]}
-          style={`animation-delay: ${i * 80}ms`}
-        >
-          <div class="wic-top">
-            <div class="wic-meta">
-              <span class={`badge ${typeColors[project.data.type] || 'badge-muted'}`}>
-                {project.data.type}
-              </span>
-              <span class="wic-year">{project.data.year}</span>
-            </div>
-            <div class="wic-arrow" aria-hidden="true">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M3 13L13 3M13 3H5M13 3v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-          </div>
-          <h2 class="wic-title">{project.data.title}</h2>
-          <p class="wic-desc">{project.data.description}</p>
-          {project.data.outcome && (
-            <div class="wic-outcome">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                <path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              {project.data.outcome}
-            </div>
-          )}
-          <div class="wic-footer">
-            <span class="wic-role">{project.data.role}</span>
-            <div class="wic-tags">
-              {project.data.tags.slice(0, 4).map(tag => (
-                <span class="wic-tag">{tag}</span>
-              ))}
-            </div>
-          </div>
-        </a>
-      ))}
+    <div class="container-site work-index__body">
+      <ProjectGrid projects={projects} />
     </div>
   </div>
 </BaseLayout>
 
 <style>
-  .page-hero {
+  .work-index__hero {
     padding-top: calc(64px + var(--space-16));
     padding-bottom: var(--space-12);
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border-subtle);
     margin-bottom: var(--space-12);
   }
 
-  .page-title {
-    font-size: clamp(40px, 6vw, 72px);
-    font-weight: 700;
-    letter-spacing: -0.03em;
-    line-height: 1.05;
-    color: var(--color-text);
-    margin-top: var(--space-4);
+  .work-index__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
     margin-bottom: var(--space-4);
   }
 
-  .page-desc {
-    font-size: 17px;
-    color: var(--color-text-muted);
-    line-height: 1.7;
-    max-width: 560px;
-  }
-
-  .work-index-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-4);
-  }
-
-  @media (min-width: 640px) {
-    .work-index-grid { grid-template-columns: repeat(2, 1fr); }
-  }
-
-  @media (min-width: 1024px) {
-    .work-index-grid { grid-template-columns: repeat(2, 1fr); }
-  }
-
-  .work-index-card {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-    padding: var(--space-6) var(--space-7);
-    border-radius: var(--radius-xl);
-    border: 1px solid var(--color-border);
-    background-color: var(--color-bg-elevated);
-    text-decoration: none;
-    color: inherit;
-    transition: border-color 200ms, box-shadow 200ms, transform 200ms var(--ease-out);
-    animation: fadeUp 500ms var(--ease-out) both;
-  }
-
-  .work-index-card:hover {
-    border-color: var(--color-accent);
-    box-shadow: 0 0 0 1px var(--color-accent-muted), var(--shadow-lg);
-    transform: translateY(-3px);
-  }
-
-  .work-index-card--featured {
-    border-color: var(--color-accent-muted);
-    background-color: var(--color-accent-dim);
-  }
-
-  .wic-top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-  }
-
-  .wic-meta {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-  }
-
-  .wic-year {
-    font-size: 12px;
-    color: var(--color-text-subtle);
-    font-weight: 500;
-  }
-
-  .wic-arrow {
-    color: var(--color-text-subtle);
-    transition: color 200ms, transform 200ms;
-    flex-shrink: 0;
-  }
-
-  .work-index-card:hover .wic-arrow {
-    color: var(--color-accent);
-    transform: translate(2px, -2px);
-  }
-
-  .wic-title {
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
+  .work-index__title {
+    font-family: var(--font-display);
+    font-size: clamp(40px, 6vw, 80px);
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    line-height: 1.05;
     color: var(--color-text);
-    line-height: 1.2;
+    margin-bottom: var(--space-5);
+    max-width: 18ch;
   }
 
-  .wic-desc {
-    font-size: 14px;
-    color: var(--color-text-muted);
-    line-height: 1.65;
-    flex: 1;
-  }
-
-  .wic-outcome {
-    display: flex;
-    align-items: flex-start;
-    gap: 6px;
-    font-size: 13px;
-    color: var(--color-success);
-    font-weight: 500;
-    line-height: 1.4;
-  }
-
-  .wic-outcome svg {
-    flex-shrink: 0;
-    margin-top: 2px;
-  }
-
-  .wic-footer {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-    padding-top: var(--space-4);
-    border-top: 1px solid var(--color-border);
-  }
-
-  .work-index-card--featured .wic-footer {
-    border-top-color: var(--color-accent-muted);
-  }
-
-  .wic-role {
-    font-size: 12px;
-    color: var(--color-text-subtle);
-    font-weight: 500;
-  }
-
-  .wic-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-  }
-
-  .wic-tag {
-    font-size: 11px;
-    padding: 2px 8px;
-    border-radius: 9999px;
-    background-color: var(--color-bg-muted);
-    color: var(--color-text-subtle);
-    border: 1px solid var(--color-border);
-    font-family: var(--font-mono);
-  }
-
-  .work-index-card--featured .wic-tag {
-    background-color: var(--color-accent-dim);
-    border-color: var(--color-accent-muted);
+  .work-index__title em {
+    font-style: italic;
     color: var(--color-accent);
+  }
+
+  .work-index__lede {
+    font-size: clamp(15px, 1.5vw, 17px);
+    line-height: 1.7;
+    color: var(--color-text-muted);
+    max-width: 60ch;
+  }
+
+  .work-index__body {
+    padding-bottom: var(--space-24);
   }
 </style>

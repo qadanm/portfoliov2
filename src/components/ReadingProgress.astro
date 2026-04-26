@@ -1,0 +1,110 @@
+---
+---
+
+<div class="reading-progress" id="reading-progress" aria-hidden="true">
+  <span class="reading-progress__bar"></span>
+</div>
+
+<script>
+  type Cleanup = () => void;
+
+  // Single source of truth across navigations. Stored on window so the
+  // module-script (which only runs once per session) can be re-driven by
+  // astro:page-load events without leaking listeners.
+  declare global {
+    interface Window {
+      __readingProgressCleanup?: Cleanup;
+    }
+  }
+
+  function teardown() {
+    if (typeof window.__readingProgressCleanup === 'function') {
+      window.__readingProgressCleanup();
+      window.__readingProgressCleanup = undefined;
+    }
+  }
+
+  function bindReadingProgress() {
+    teardown();
+
+    const wrap = document.getElementById('reading-progress');
+    const bar = wrap?.querySelector<HTMLElement>('.reading-progress__bar');
+    if (!wrap || !bar) return;
+
+    let raf = 0;
+
+    function update() {
+      if (!wrap || !bar) return;
+      const doc = document.documentElement;
+      const total = doc.scrollHeight - window.innerHeight;
+      if (total <= 80) {
+        wrap.classList.remove('reading-progress--visible');
+        return;
+      }
+      const scrolled = Math.min(Math.max(window.scrollY, 0), total);
+      const pct = (scrolled / total) * 100;
+      bar.style.transform = `scaleX(${pct / 100})`;
+      wrap.classList.toggle(
+        'reading-progress--visible',
+        scrolled > 24 && scrolled < total - 8
+      );
+    }
+
+    function onScroll() {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(update);
+    }
+
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+
+    window.__readingProgressCleanup = () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }
+
+  bindReadingProgress();
+  document.addEventListener('astro:page-load', bindReadingProgress);
+  document.addEventListener('astro:before-swap', teardown);
+</script>
+
+<style>
+  .reading-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: transparent;
+    z-index: 200;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--duration-base) var(--ease-out);
+  }
+
+  .reading-progress--visible {
+    opacity: 1;
+  }
+
+  .reading-progress__bar {
+    display: block;
+    height: 100%;
+    width: 100%;
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    background: linear-gradient(90deg, var(--color-accent), var(--color-accent-hover));
+    transition: transform 80ms linear;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reading-progress {
+      transition: none;
+    }
+    .reading-progress__bar {
+      transition: none;
+    }
+  }
+</style>
