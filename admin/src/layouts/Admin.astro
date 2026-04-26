@@ -1,0 +1,116 @@
+---
+import '@/styles/global.css';
+import { angles } from '@/data/angles';
+
+interface Props {
+  title?: string;
+  intro?: string;
+  activePath?: string;
+}
+const { title, intro, activePath = Astro.url.pathname } = Astro.props;
+
+function isActive(href: string) {
+  if (href === '/') return activePath === '/';
+  return activePath === href || activePath.startsWith(href + '/');
+}
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>{title ? `${title} · Qadan Admin` : 'Qadan Admin'}</title>
+</head>
+<body>
+  <div class="admin">
+    <aside class="admin__sidebar no-print" data-sidebar>
+      <div class="admin__brand-row">
+        <a href="/" class="admin__brand">Qadan<span>.</span> admin</a>
+        <button type="button" class="admin__menu-toggle" data-menu-toggle aria-expanded="false" aria-controls="admin-nav" aria-label="Open menu">
+          <span aria-hidden="true">☰</span>
+          <span class="admin__menu-label">Menu</span>
+        </button>
+      </div>
+      <nav id="admin-nav" class="admin__nav" aria-label="Admin navigation" data-nav>
+        <a href="/" class:list={{ 'is-active': isActive('/') }}>Dashboard</a>
+
+        <h4>Workflow</h4>
+        <a href="/jobs/new" class:list={{ 'is-active': activePath === '/jobs/new' }}>+ Add job (smart intake)</a>
+        <a href="/jobs" class:list={{ 'is-active': activePath === '/jobs' || activePath.startsWith('/jobs?') }}>Job tracker</a>
+        <a href="/analyzer" class:list={{ 'is-active': isActive('/analyzer') }}>JD analyzer</a>
+        <a href="/letters" class:list={{ 'is-active': isActive('/letters') }}>Letters &amp; messages</a>
+        <a href="/recruiters" class:list={{ 'is-active': isActive('/recruiters') }}>Recruiter CRM</a>
+        <a href="/interview" class:list={{ 'is-active': isActive('/interview') }}>Interview prep</a>
+        <a href="/export" class:list={{ 'is-active': isActive('/export') }}>Export &amp; backup</a>
+
+        <details class="admin__angles" open>
+          <summary><h4>Resume by angle</h4></summary>
+          {angles.map(a => (
+            <a href={`/resume/${a.id}`} class:list={{ 'is-active': isActive(`/resume/${a.id}`) }}>
+              {a.shortLabel}
+            </a>
+          ))}
+        </details>
+
+        <details class="admin__angles" open>
+          <summary><h4>Recruiter pack by angle</h4></summary>
+          {angles.map(a => (
+            <a href={`/recruiter/${a.id}`} class:list={{ 'is-active': isActive(`/recruiter/${a.id}`) }}>
+              {a.shortLabel}
+            </a>
+          ))}
+        </details>
+      </nav>
+    </aside>
+
+    <script is:inline>
+      // Mobile menu: collapsed by default at <=800px, click Menu to open,
+      // click any link or the toggle to close. Desktop ignores this entirely.
+      (() => {
+        const toggle = document.querySelector('[data-menu-toggle]');
+        const nav = document.querySelector('[data-nav]');
+        const sidebar = document.querySelector('[data-sidebar]');
+        if (!toggle || !nav || !sidebar) return;
+
+        const isMobile = () => window.matchMedia('(max-width: 800px)').matches;
+
+        function close() {
+          sidebar.classList.remove('admin__sidebar--open');
+          toggle.setAttribute('aria-expanded', 'false');
+          toggle.setAttribute('aria-label', 'Open menu');
+        }
+        function open() {
+          sidebar.classList.add('admin__sidebar--open');
+          toggle.setAttribute('aria-expanded', 'true');
+          toggle.setAttribute('aria-label', 'Close menu');
+        }
+
+        toggle.addEventListener('click', () => {
+          if (sidebar.classList.contains('admin__sidebar--open')) close(); else open();
+        });
+
+        nav.querySelectorAll('a').forEach((a) => {
+          a.addEventListener('click', () => { if (isMobile()) close(); });
+        });
+
+        // Reset state on resize past breakpoint so going from mobile → desktop doesn't leave the menu visually stuck.
+        const mq = window.matchMedia('(max-width: 800px)');
+        const onChange = () => { if (!mq.matches) close(); };
+        if (typeof mq.addEventListener === 'function') mq.addEventListener('change', onChange);
+        else mq.addListener(onChange);
+      })();
+    </script>
+    <main class="admin__main">
+      {(title || intro) && (
+        <header class="admin__head no-print">
+          {title && <h1>{title}</h1>}
+          {intro && <p>{intro}</p>}
+        </header>
+      )}
+      <slot />
+    </main>
+  </div>
+</body>
+</html>

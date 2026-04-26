@@ -1,0 +1,108 @@
+---
+import Admin from '@/layouts/Admin.astro';
+import { angles } from '@/data/angles';
+import { recruiterPacks } from '@/data/recruiter';
+import { angleById } from '@/data/angles';
+
+export function getStaticPaths() {
+  return angles.map(a => ({ params: { angle: a.id } }));
+}
+
+const { angle: angleId } = Astro.params;
+const angle = angleById(angleId!);
+const pack = recruiterPacks[angleId!];
+if (!angle || !pack) return Astro.redirect('/');
+---
+
+<Admin
+  title={`Recruiter — ${angle.label}`}
+  intro="Sharp drafts, not finished outreach. Read once, edit before sending. All copy below is grounded in your real portfolio."
+>
+  <section class="card pack" data-pack="short">
+    <header class="pack__head">
+      <h2>Short intro</h2>
+      <button class="btn copy-btn" data-target="short">Copy</button>
+    </header>
+    <p class="pack__body">{pack.shortIntro}</p>
+  </section>
+
+  <section class="card pack" data-pack="long" style="margin-top:16px;">
+    <header class="pack__head">
+      <h2>Long intro</h2>
+      <button class="btn copy-btn" data-target="long">Copy</button>
+    </header>
+    <p class="pack__body">{pack.longIntro}</p>
+  </section>
+
+  <section class="card pack" data-pack="tmay" style="margin-top:16px;">
+    <header class="pack__head">
+      <h2>Tell me about yourself</h2>
+      <button class="btn copy-btn" data-target="tmay">Copy</button>
+    </header>
+    <p class="pack__body">{pack.tellMeAboutYourself}</p>
+  </section>
+
+  <section class="card pack" data-pack="fit" style="margin-top:16px;">
+    <header class="pack__head">
+      <h2>Why I'm a fit</h2>
+      <button class="btn copy-btn" data-target="fit">Copy</button>
+    </header>
+    <ul class="pack__list">
+      {pack.whyImAFit.map(b => <li>{b}</li>)}
+    </ul>
+  </section>
+
+  <section class="card pack" data-pack="ai" style="margin-top:16px;">
+    <header class="pack__head">
+      <h2>AI / design / system explanation</h2>
+      <button class="btn copy-btn" data-target="ai">Copy</button>
+    </header>
+    <p class="pack__body">{pack.aiExplanation}</p>
+  </section>
+
+  <section class="card pack" data-pack="salary" style="margin-top:16px;">
+    <header class="pack__head">
+      <h2>Salary positioning</h2>
+      <button class="btn copy-btn" data-target="salary">Copy</button>
+    </header>
+    <p class="pack__body">{pack.salaryFraming}</p>
+  </section>
+</Admin>
+
+<style>
+  .pack__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .pack__head h2 {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+  .pack__body { font-size: 14px; line-height: 1.7; color: var(--c-text-muted); white-space: pre-wrap; }
+  .pack__list { padding-left: 18px; color: var(--c-text-muted); font-size: 14px; line-height: 1.7; }
+  .pack__list li { margin-bottom: 6px; }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const target = btn.dataset.target;
+      const card = document.querySelector(`[data-pack="${target}"]`);
+      if (!card) return;
+      const body = card.querySelector('.pack__body, .pack__list');
+      const text = (body?.textContent || '').trim();
+      try {
+        await navigator.clipboard.writeText(text);
+        const orig = btn.textContent;
+        btn.textContent = 'Copied';
+        setTimeout(() => { btn.textContent = orig; }, 1200);
+      } catch {
+        btn.textContent = 'Failed';
+      }
+    });
+  });
+</script>

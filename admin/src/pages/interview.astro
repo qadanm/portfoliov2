@@ -1,0 +1,117 @@
+---
+import Admin from '@/layouts/Admin.astro';
+
+interface Story {
+  theme: string;
+  prompt: string;
+  beat_bullets: string[];
+}
+
+const stories: Story[] = [
+  {
+    theme: 'Decision under constraint',
+    prompt: 'Tell me about a time you made a hard design call inside a long-running system.',
+    beat_bullets: [
+      'MagTek homepage carousel: six rotating slides nobody finished.',
+      'Replaced with a static hero on a single message. Sequenced the migration: parallel route, A/B against live, dependent surfaces migrated one at a time, carousel retired last.',
+      'The harder design decision was about how to land it without breaking the system around it.',
+    ],
+  },
+  {
+    theme: 'AI in the product',
+    prompt: 'Tell me about a time AI was the right call.',
+    beat_bullets: [
+      'ChatOBD2 verdict generation: AI sits in the middle of a pipeline, constrained by structure on either side.',
+      'Vehicle data → six deterministic reasoning layers → constrained prompt with 38k token budget → single verdict card.',
+      'The model’s job is reducing complexity, not generating content.',
+    ],
+  },
+  {
+    theme: 'Working with handoffs',
+    prompt: 'Tell me about a time the handoff was the design problem.',
+    beat_bullets: [
+      'InvestCloud advisor portals: Figma owned by upstream design teams; CMS without primitives for what was drawn.',
+      '60% reproducing intent at fidelity, 40% closing gaps the handoff didn’t see. The second 40% is where design literacy paid off.',
+      'A good handoff names the constraints up front. A bad handoff is just a frame.',
+    ],
+  },
+  {
+    theme: 'Cross-functional ownership',
+    prompt: 'Tell me about a time you owned something end to end.',
+    beat_bullets: [
+      'ChatOBD2 — designed and built the product, the marketing surface, and the developer portal.',
+      'Each surface treated as product work. Marketing site mirrors the product’s tone; dev portal gets the same care as the UI.',
+      'Made the calls. Built the surfaces. Living with the consequences.',
+    ],
+  },
+  {
+    theme: 'Design systems at scale',
+    prompt: 'Tell me about a design system you’ve shipped.',
+    beat_bullets: [
+      'MagTek: Razor component library + token-driven CSS substrate the rest of the multi-site platform can adopt incrementally.',
+      'No big-bang rewrites. Real consumers from day one. Incremental adoption on each property’s own timeline.',
+      'The systems I’ve shipped are the ones still in production.',
+    ],
+  },
+  {
+    theme: 'Disagreement / pushback',
+    prompt: 'Tell me about a time you pushed back on a design or product decision.',
+    beat_bullets: [
+      'ChatOBD2 confidence bar: tradeoff was less optimism in the verdict, more trust in the system.',
+      'It’s the kind of decision a less-confident product wouldn’t make.',
+      'I shipped it because the alternative — hiding scan quality — would have made the verdict mean less.',
+    ],
+  },
+];
+
+const cheatsheet = [
+  ['What I’m optimizing for', 'Surfaces that survive the system they live in. Decisions visible. Tradeoffs named. Calls owned.'],
+  ['How I describe the role', 'Product designer with deep frontend literacy. Most of my work happens in the seam where design and engineering overlap.'],
+  ['On AI', 'Used where it earns a seat. Claude Design at the front of the loop, Claude Code in the build, Cursor for the rest. The model drafts; I keep the architecture, the decisions, and the review.'],
+  ['On Figma', 'Still in the mix for precision and system maintenance. Not the source of truth — the source of truth is the components and tokens the product is built from.'],
+  ['Comfort zone', 'Long-running platforms with real constraints. AI-native products where structure beats vibes. System-level UX, not single-page polish.'],
+  ['Less interested in', 'Greenfield-from-greenfield with no domain. AI feature for AI feature’s sake. Visual refresh without structural change.'],
+];
+---
+
+<Admin
+  title="Interview prep"
+  intro="Story bank organized by behavioral theme. Plus a cheatsheet of one-liners to keep voice consistent across loops."
+>
+  <section style="display:flex; flex-direction:column; gap:16px;">
+    {stories.map(s => (
+      <article class="card">
+        <header style="margin-bottom:8px;">
+          <span style="font-family:var(--font-mono); font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--c-text-subtle);">
+            {s.theme}
+          </span>
+        </header>
+        <p style="font-family:var(--font-display); font-size:20px; font-weight:400; letter-spacing:-0.01em; margin-bottom:12px; line-height:1.3;">
+          {s.prompt}
+        </p>
+        <ul style="list-style:none; padding:0; margin:0;">
+          {s.beat_bullets.map(b => (
+            <li style="position:relative; padding-left:16px; font-size:14px; line-height:1.6; color:var(--c-text-muted); margin-bottom:6px;">
+              <span style="position:absolute; left:0; top:0.7em; width:8px; height:1px; background:var(--c-accent);"></span>
+              {b}
+            </li>
+          ))}
+        </ul>
+      </article>
+    ))}
+  </section>
+
+  <section class="card" style="margin-top:24px;">
+    <h2 style="font-family:var(--font-display); font-size:22px; font-weight:400; margin-bottom:16px; letter-spacing:-0.01em;">
+      Cheatsheet
+    </h2>
+    <dl style="display:grid; grid-template-columns:200px 1fr; row-gap:14px; column-gap:20px;">
+      {cheatsheet.map(([k, v]) => (
+        <div style="display:contents;">
+          <dt style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--c-text-subtle);">{k}</dt>
+          <dd style="font-size:14px; color:var(--c-text-muted); line-height:1.65;">{v}</dd>
+        </div>
+      ))}
+    </dl>
+  </section>
+</Admin>

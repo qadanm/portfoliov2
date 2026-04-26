@@ -1,0 +1,211 @@
+---
+import Admin from '@/layouts/Admin.astro';
+---
+
+<Admin
+  title="Job search command center"
+  intro="Local-only. Numbers below come from your browser storage. Use the workflow on the left to add applications, analyze JDs, and draft outreach."
+>
+  <section class="metrics" id="metrics">
+    <article class="metric"><span class="metric__label">Active pipeline</span><span class="metric__value" data-m="active">—</span></article>
+    <article class="metric"><span class="metric__label">Applied this week</span><span class="metric__value" data-m="applied7">—</span></article>
+    <article class="metric"><span class="metric__label">Interviews live</span><span class="metric__value" data-m="interviews">—</span></article>
+    <article class="metric"><span class="metric__label">Offers</span><span class="metric__value" data-m="offers">—</span></article>
+    <article class="metric"><span class="metric__label">Follow-ups due</span><span class="metric__value" data-m="dueFollowups">—</span></article>
+    <article class="metric"><span class="metric__label">Stale 14d+</span><span class="metric__value" data-m="stale">—</span></article>
+  </section>
+
+  <section class="card" style="margin-top: 24px;">
+    <h2 class="dash__h2">Today's queue</h2>
+    <div id="queue" class="dash__queue">
+      <p class="muted">Loading…</p>
+    </div>
+  </section>
+
+  <section style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px;">
+    <a class="card link-card" href="/jobs">
+      <h3>Job tracker</h3>
+      <p>Kanban + table views, search, filters, full schema.</p>
+    </a>
+    <a class="card link-card" href="/analyzer">
+      <h3>JD analyzer</h3>
+      <p>Paste a job description, get the recommended angle, fit score, missing keywords, risk flags.</p>
+    </a>
+    <a class="card link-card" href="/letters">
+      <h3>Letters &amp; messages</h3>
+      <p>Cover letters, recruiter DMs, follow-ups, thank-yous. Tone variants. Save to a job or recruiter.</p>
+    </a>
+    <a class="card link-card" href="/recruiters">
+      <h3>Recruiter CRM</h3>
+      <p>Track relationships and follow-up cadence. Auto-flags stale conversations.</p>
+    </a>
+  </section>
+
+  <section class="card" style="margin-top: 24px;">
+    <h2 class="dash__h2">Funnel</h2>
+    <div id="funnel" class="funnel"></div>
+  </section>
+
+  <section class="card" style="margin-top: 24px; font-size: 13px; color: var(--c-text-muted);">
+    <strong style="color: var(--c-text);">Local-only data.</strong>
+    Everything you add lives in your browser's <code style="font-family:var(--font-mono);">localStorage</code>.
+    Use <a href="/export" style="border-bottom:1px solid var(--c-border);">Export &amp; backup</a> to download a JSON snapshot you can restore on another machine.
+    Clearing site data clears the tracker. Nothing here is uploaded.
+  </section>
+</Admin>
+
+<style>
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+  }
+  .metric {
+    background: var(--c-bg-elev);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-lg);
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .metric__label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--c-text-subtle);
+  }
+  .metric__value {
+    font-family: var(--font-display);
+    font-size: 32px;
+    line-height: 1;
+    color: var(--c-text);
+  }
+  .dash__h2 {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    margin-bottom: 14px;
+  }
+  .dash__queue { display: flex; flex-direction: column; gap: 8px; }
+  .queue-item {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--c-border-subtle);
+    border-radius: var(--r-md);
+    align-items: center;
+    background: var(--c-bg);
+  }
+  .queue-item .q-action { font-family: var(--font-mono); font-size: 11px; color: var(--c-text-subtle); }
+  .queue-item.is-overdue { border-color: rgba(239, 68, 68, 0.4); }
+  .muted { color: var(--c-text-subtle); font-size: 13px; }
+  .link-card { text-decoration: none; color: inherit; transition: border-color 150ms; }
+  .link-card:hover { border-color: var(--c-accent); }
+  .link-card h3 { font-family: var(--font-display); font-weight: 400; font-size: 20px; margin-bottom: 6px; letter-spacing: -0.01em; }
+  .link-card p { font-size: 13px; color: var(--c-text-muted); line-height: 1.5; }
+  .funnel { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .funnel-step {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: var(--r-full);
+    background: var(--c-bg); border: 1px solid var(--c-border);
+    font-size: 12px; color: var(--c-text-muted);
+  }
+  .funnel-step strong { color: var(--c-text); font-family: var(--font-mono); font-size: 11px; }
+  .funnel-arrow { color: var(--c-text-subtle); font-family: var(--font-mono); font-size: 12px; }
+</style>
+
+<script>
+  import { jobsStore, recruitersStore, ensureSchema, ACTIVE_STATUSES, type Job } from '@/lib/storage';
+
+  function pluralize(n: number, s: string, p?: string) { return n === 1 ? `1 ${s}` : `${n} ${p ?? s + 's'}`; }
+  function fmtDate(ts: number) { return new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); }
+  function daysAgo(ts: number) { return Math.floor((Date.now() - ts) / 86400000); }
+
+  ensureSchema();
+  const jobs = jobsStore.list();
+  const recruiters = recruitersStore.list();
+
+  const now = Date.now();
+  const sevenDaysAgo = now - 7 * 86400000;
+  const fourteenDaysAgo = now - 14 * 86400000;
+
+  const active = jobs.filter(j => ACTIVE_STATUSES.includes(j.status));
+  const applied7 = jobs.filter(j => j.dateApplied && j.dateApplied >= sevenDaysAgo);
+  const interviews = jobs.filter(j => ['Recruiter Screen','Hiring Manager','Take-home','Interview Loop'].includes(j.status));
+  const offers = jobs.filter(j => j.status === 'Offer');
+
+  const dueFollowups: Job[] = jobs.filter(j => j.followUpDate && j.followUpDate <= now + 86400000 && !['Rejected','Ghosted','Archived'].includes(j.status));
+  const stale = active.filter(j => j.updatedAt < fourteenDaysAgo);
+
+  const setMetric = (key: string, val: string | number) => {
+    document.querySelectorAll(`[data-m="${key}"]`).forEach(el => { el.textContent = String(val); });
+  };
+  setMetric('active', active.length);
+  setMetric('applied7', applied7.length);
+  setMetric('interviews', interviews.length);
+  setMetric('offers', offers.length);
+  setMetric('dueFollowups', dueFollowups.length);
+  setMetric('stale', stale.length);
+
+  // Today's queue: due followups + stale + offers
+  const queueEl = document.getElementById('queue')!;
+  const items: { label: string; sub: string; action: string; href: string; overdue?: boolean }[] = [];
+  for (const j of dueFollowups) {
+    const overdue = j.followUpDate! < now;
+    items.push({
+      label: `${j.company} · ${j.role}`,
+      sub: overdue ? `Follow-up overdue by ${daysAgo(j.followUpDate!)}d` : `Follow-up due ${fmtDate(j.followUpDate!)}`,
+      action: 'Open job →',
+      href: `/jobs?id=${j.id}`,
+      overdue,
+    });
+  }
+  for (const j of stale.slice(0, 3)) {
+    items.push({
+      label: `${j.company} · ${j.role}`,
+      sub: `No update for ${daysAgo(j.updatedAt)}d (${j.status})`,
+      action: 'Nudge →',
+      href: `/jobs?id=${j.id}`,
+    });
+  }
+  for (const r of recruiters.filter(r => r.followUpDate && r.followUpDate <= now + 86400000)) {
+    items.push({
+      label: `${r.name}${r.company ? ' · ' + r.company : ''}`,
+      sub: `Recruiter follow-up ${r.followUpDate! < now ? 'overdue' : 'due ' + fmtDate(r.followUpDate!)}`,
+      action: 'Open →',
+      href: `/recruiters`,
+    });
+  }
+  if (items.length === 0) {
+    queueEl.innerHTML = '<p class="muted">Nothing on the queue. Add a job, analyze a JD, or draft a recruiter message.</p>';
+  } else {
+    queueEl.innerHTML = items.slice(0, 8).map(i => `
+      <a class="queue-item${i.overdue ? ' is-overdue' : ''}" href="${i.href}" style="text-decoration:none;color:inherit;">
+        <div>
+          <div style="font-size:13px;color:var(--c-text);">${i.label}</div>
+          <div style="font-size:11px;color:var(--c-text-subtle);font-family:var(--font-mono);">${i.sub}</div>
+        </div>
+        <span class="q-action">${i.action}</span>
+      </a>
+    `).join('');
+  }
+
+  // Funnel
+  const funnelEl = document.getElementById('funnel')!;
+  const stages: { label: string; count: number }[] = [
+    { label: 'Saved', count: jobs.filter(j => j.status === 'Saved').length },
+    { label: 'Applied', count: jobs.filter(j => j.status === 'Applied').length },
+    { label: 'Recruiter', count: jobs.filter(j => j.status === 'Recruiter Screen').length },
+    { label: 'HM', count: jobs.filter(j => j.status === 'Hiring Manager').length },
+    { label: 'Loop', count: jobs.filter(j => ['Interview Loop','Take-home'].includes(j.status)).length },
+    { label: 'Offer', count: jobs.filter(j => j.status === 'Offer').length },
+  ];
+  funnelEl.innerHTML = stages.map((s, i) =>
+    `<span class="funnel-step"><strong>${s.count}</strong> ${s.label}</span>` +
+    (i < stages.length - 1 ? `<span class="funnel-arrow">→</span>` : '')
+  ).join('');
+</script>

@@ -1,0 +1,116 @@
+---
+import Admin from '@/layouts/Admin.astro';
+import { angles } from '@/data/angles';
+---
+
+<Admin
+  title="Letters & messages"
+  intro="Cover letters, recruiter DMs, follow-ups, thank-yous, negotiation. Pick a kind, pick a tone, edit before sending."
+>
+  <div class="grid">
+    <section class="card">
+      <h2 class="h2">Configure</h2>
+
+      <label>Kind
+        <select id="kind">
+          <option value="cover-letter">Cover letter</option>
+          <option value="recruiter-dm">Recruiter DM</option>
+          <option value="connect-note">LinkedIn connect note (200ch)</option>
+          <option value="follow-up-applied">Follow-up after applying</option>
+          <option value="follow-up-interview">Follow-up after interview</option>
+          <option value="thank-you">Thank-you note</option>
+          <option value="negotiation">Negotiation response</option>
+          <option value="rejection-followup">After-rejection follow-up</option>
+          <option value="check-in">Check-in / nudge</option>
+        </select>
+      </label>
+
+      <label>Tone
+        <select id="tone">
+          <option value="direct">Direct</option>
+          <option value="warm" selected>Warm professional</option>
+          <option value="design">Design-focused</option>
+          <option value="technical">Technical</option>
+          <option value="senior">Senior / executive</option>
+        </select>
+      </label>
+
+      <label>Resume angle
+        <select id="angle">
+          {angles.map(a => <option value={a.id}>{a.label}</option>)}
+        </select>
+      </label>
+
+      <div class="row">
+        <label>Company<input id="company" /></label>
+        <label>Role<input id="role" /></label>
+      </div>
+      <label>Recruiter / contact first name<input id="recruiter" placeholder="optional" /></label>
+      <label>Custom hook (one sentence)<input id="custom" placeholder="optional — woven into the body" /></label>
+
+      <div class="row" style="margin-top:8px;">
+        <button class="btn btn--primary" id="generate">Generate</button>
+        <button class="btn" id="copy">Copy</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="h2">Output</h2>
+      <textarea id="output" rows="22" placeholder="Generated message will appear here. Edit freely before sending."></textarea>
+      <p class="muted" style="margin-top:8px;font-size:12px;">Always edit before sending. These are sharp drafts, not finished outreach.</p>
+    </section>
+  </div>
+</Admin>
+
+<style>
+  .grid { display: grid; grid-template-columns: 360px 1fr; gap: 16px; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+  .h2 { font-family: var(--font-display); font-size: 22px; font-weight: 400; letter-spacing: -0.01em; margin-bottom: 12px; }
+  label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--c-text-subtle); margin-bottom: 12px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .muted { color: var(--c-text-subtle); }
+  textarea { font-family: var(--font-mono); font-size: 12.5px; line-height: 1.55; min-height: 380px; resize: vertical; }
+</style>
+
+<script>
+  import { generateMessage, type Tone } from '@/lib/letters';
+  import type { LetterKind } from '@/lib/storage';
+
+  // Pre-fill from query string (analyzer, intake, or recruiter CRM)
+  const url = new URL(window.location.href);
+  const setIf = (id: string, key: string) => {
+    const v = url.searchParams.get(key);
+    if (v) (document.getElementById(id) as HTMLInputElement | HTMLSelectElement).value = v;
+  };
+  setIf('angle', 'angle');
+  setIf('company', 'company');
+  setIf('role', 'role');
+  setIf('kind', 'kind');
+  setIf('recruiter', 'recruiter');
+
+  const out = document.getElementById('output') as HTMLTextAreaElement;
+  const generate = () => {
+    const kind = (document.getElementById('kind') as HTMLSelectElement).value as LetterKind;
+    const tone = (document.getElementById('tone') as HTMLSelectElement).value as Tone;
+    const angleId = (document.getElementById('angle') as HTMLSelectElement).value;
+    const company = (document.getElementById('company') as HTMLInputElement).value.trim() || '[Company]';
+    const role = (document.getElementById('role') as HTMLInputElement).value.trim() || '[Role]';
+    const recruiterFirstName = (document.getElementById('recruiter') as HTMLInputElement).value.trim() || undefined;
+    const customLine = (document.getElementById('custom') as HTMLInputElement).value.trim() || undefined;
+    out.value = generateMessage(kind, { angleId, company, role, recruiterFirstName, customLine }, tone);
+  };
+
+  document.getElementById('generate')?.addEventListener('click', generate);
+  document.getElementById('copy')?.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(out.value);
+      const btn = document.getElementById('copy') as HTMLButtonElement;
+      const orig = btn.textContent;
+      btn.textContent = 'Copied';
+      setTimeout(() => { btn.textContent = orig; }, 1200);
+    } catch { /* ignore */ }
+  });
+
+  // Auto-generate on initial load if angle/company/role are pre-filled
+  if (url.searchParams.get('angle')) generate();
+</script>

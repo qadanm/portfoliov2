@@ -1,0 +1,4 @@
+# This is a private admin app. No crawler should ever index it.
+# Cloudflare Access also blocks unauthenticated requests upstream of this file.
+User-agent: *
+Disallow: /

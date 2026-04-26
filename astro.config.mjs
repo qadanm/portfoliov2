@@ -4,7 +4,7 @@ import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://muhammedqadan.com',
+  site: 'https://qadan.co',
   integrations: [
     tailwind({ applyBaseStyles: false }),
     mdx(),

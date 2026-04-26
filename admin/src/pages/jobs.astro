@@ -1,0 +1,471 @@
+---
+import Admin from '@/layouts/Admin.astro';
+import { angles } from '@/data/angles';
+import { JOB_STATUSES } from '@/lib/storage';
+---
+
+<Admin
+  title="Job tracker"
+  intro="Local-only. Add applications, drag through stages on the kanban, drill into a job for the full record. Use the search and filters to keep the list focused."
+>
+  <div class="bar no-print">
+    <div class="bar__left">
+      <input type="search" id="search" placeholder="Search company, role, notes…" />
+      <select id="filter-status">
+        <option value="">All statuses</option>
+        {JOB_STATUSES.map(s => <option value={s}>{s}</option>)}
+      </select>
+      <select id="filter-priority">
+        <option value="">Any priority</option>
+        <option value="1">P1 (highest)</option>
+        <option value="2">P2</option>
+        <option value="3">P3</option>
+      </select>
+      <select id="sort">
+        <option value="updatedAt">Last updated</option>
+        <option value="dateApplied">Applied date</option>
+        <option value="priority">Priority</option>
+        <option value="fitScore">Fit score</option>
+        <option value="salary">Salary (high)</option>
+      </select>
+    </div>
+    <div class="bar__right">
+      <div class="seg">
+        <button class="seg__btn is-active" data-view="kanban">Kanban</button>
+        <button class="seg__btn" data-view="table">Table</button>
+        <button class="seg__btn" data-view="compact">Compact</button>
+      </div>
+      <a class="btn btn--primary" href="/jobs/new">+ Add job</a>
+    </div>
+  </div>
+
+  <!-- Kanban -->
+  <section class="kanban view view--kanban is-active" id="view-kanban"></section>
+
+  <!-- Table -->
+  <section class="view view--table card" id="view-table" style="display:none;">
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th>Company</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Salary</th>
+          <th>Applied</th>
+          <th>Next step</th>
+          <th>Fit</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </section>
+
+  <!-- Compact -->
+  <section class="view view--compact card" id="view-compact" style="display:none;">
+    <ul id="compact-list" class="compact-list"></ul>
+  </section>
+
+  <!-- Job editor (modal-like) -->
+  <dialog id="job-editor" class="editor">
+    <form id="job-form" method="dialog" class="editor__form">
+      <header class="editor__head">
+        <h2 id="editor-title">Add job</h2>
+        <button type="button" class="btn" id="cancel-job">Cancel</button>
+      </header>
+
+      <input type="hidden" name="id" />
+
+      <div class="editor__row">
+        <label>Company<input name="company" required /></label>
+        <label>Role<input name="role" required /></label>
+      </div>
+      <div class="editor__row">
+        <label>URL<input name="url" type="url" placeholder="https://…" /></label>
+        <label>Source<input name="source" placeholder="LinkedIn, referral, etc." /></label>
+      </div>
+      <div class="editor__row">
+        <label>Location<input name="location" placeholder="Remote, Hybrid - SF, NYC" /></label>
+        <label>Status
+          <select name="status">
+            {JOB_STATUSES.map(s => <option value={s}>{s}</option>)}
+          </select>
+        </label>
+      </div>
+      <div class="editor__row">
+        <label>Salary min ($)<input name="salaryMin" type="number" min="0" step="1000" /></label>
+        <label>Salary max ($)<input name="salaryMax" type="number" min="0" step="1000" /></label>
+      </div>
+      <div class="editor__row">
+        <label>Date applied<input name="dateApplied" type="date" /></label>
+        <label>Follow-up date<input name="followUpDate" type="date" /></label>
+      </div>
+      <div class="editor__row">
+        <label>Contact name<input name="contactName" placeholder="Recruiter or hiring manager" /></label>
+        <label>Contact email<input name="contactEmail" type="email" /></label>
+      </div>
+      <div class="editor__row">
+        <label>Resume angle
+          <select name="resumeAngle">
+            <option value="">—</option>
+            {angles.map(a => <option value={a.id}>{a.label}</option>)}
+          </select>
+        </label>
+        <label>Priority
+          <select name="priority">
+            <option value="">—</option>
+            <option value="1">P1 (highest)</option>
+            <option value="2">P2</option>
+            <option value="3">P3</option>
+          </select>
+        </label>
+      </div>
+      <label>Next step<input name="nextStep" placeholder="What's the next concrete action?" /></label>
+      <label>Notes<textarea name="notes" rows="4" placeholder="Hiring manager name, panel mix, take-home details, anything sticky."></textarea></label>
+
+      <footer class="editor__foot">
+        <button type="button" class="btn" id="delete-job" style="margin-right:auto; display:none;">Delete</button>
+        <button type="submit" class="btn btn--primary">Save</button>
+      </footer>
+    </form>
+  </dialog>
+</Admin>
+
+<style>
+  .bar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .bar__left { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; min-width: 0; }
+  .bar__left input, .bar__left select { width: auto; min-width: 120px; }
+  .bar__left input[type="search"] { min-width: 180px; max-width: 280px; flex: 1 1 180px; }
+  .bar__right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; flex-shrink: 0; }
+
+  @media (max-width: 720px) {
+    .bar { grid-template-columns: 1fr; }
+  }
+
+  .seg { display: inline-flex; border: 1px solid var(--c-border); border-radius: var(--r-md); overflow: hidden; }
+  .seg__btn { background: transparent; color: var(--c-text-muted); border: none; padding: 6px 12px; cursor: pointer; font-size: 12px; }
+  .seg__btn.is-active { background: var(--c-bg-muted); color: var(--c-text); }
+
+  .view { display: none; }
+  .view.is-active { display: block; }
+
+  /* Kanban */
+  .kanban {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 260px;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+  .col {
+    background: var(--c-bg-elev);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-lg);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    min-height: 200px;
+  }
+  .col__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .col__title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--c-text-muted);
+  }
+  .col__count {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--c-text-subtle);
+  }
+  .col__body { display: flex; flex-direction: column; gap: 8px; }
+  .kcard {
+    background: var(--c-bg);
+    border: 1px solid var(--c-border-subtle);
+    border-radius: var(--r-md);
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: border-color 120ms;
+  }
+  .kcard:hover { border-color: var(--c-accent); }
+  .kcard__company { font-size: 13px; color: var(--c-text); font-weight: 500; }
+  .kcard__role { font-size: 12px; color: var(--c-text-muted); margin-top: 2px; }
+  .kcard__meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; font-family: var(--font-mono); font-size: 10px; color: var(--c-text-subtle); }
+  .kcard__pill { padding: 2px 6px; border-radius: var(--r-full); background: var(--c-bg-muted); border: 1px solid var(--c-border-subtle); }
+  .kcard__pill--p1 { color: var(--c-accent); border-color: var(--c-accent); }
+
+  /* Compact list */
+  .compact-list { list-style: none; padding: 0; margin: 0; }
+  .compact-list li {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--c-border-subtle);
+    align-items: center;
+    font-size: 13px;
+  }
+  .compact-list li:last-child { border-bottom: none; }
+  .compact-list .c-status { font-family: var(--font-mono); font-size: 10px; color: var(--c-text-subtle); }
+
+  /* Editor */
+  .editor {
+    width: 700px;
+    max-width: calc(100vw - 32px);
+    background: var(--c-bg-elev);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-lg);
+    padding: 0;
+    color: var(--c-text);
+  }
+  .editor::backdrop { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); }
+  .editor__form { display: flex; flex-direction: column; gap: 12px; padding: 24px; }
+  .editor__head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .editor__head h2 { font-family: var(--font-display); font-weight: 400; font-size: 22px; letter-spacing: -0.01em; }
+  .editor__row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .editor__form label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--c-text-subtle); }
+  .editor__form input, .editor__form select, .editor__form textarea { font-size: 13px; }
+  .editor__foot { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+</style>
+
+<script>
+  import { jobsStore, ensureSchema, JOB_STATUSES, ACTIVE_STATUSES, type Job, type JobStatus } from '@/lib/storage';
+
+  ensureSchema();
+
+  // ── State ────────────────────────────────────────────────────────────
+  let view: 'kanban' | 'table' | 'compact' = 'kanban';
+  let jobs: Job[] = [];
+
+  function load() { jobs = jobsStore.list(); }
+
+  // ── Filters ──────────────────────────────────────────────────────────
+  function filtered(): Job[] {
+    const q = (document.getElementById('search') as HTMLInputElement).value.trim().toLowerCase();
+    const s = (document.getElementById('filter-status') as HTMLSelectElement).value;
+    const p = (document.getElementById('filter-priority') as HTMLSelectElement).value;
+    let res = jobs.slice();
+    if (q) res = res.filter(j =>
+      [j.company, j.role, j.notes, j.contactName, j.location, j.source]
+        .some(v => v?.toLowerCase().includes(q))
+    );
+    if (s) res = res.filter(j => j.status === s);
+    if (p) res = res.filter(j => j.priority === Number(p));
+    const sortKey = (document.getElementById('sort') as HTMLSelectElement).value as 'updatedAt'|'dateApplied'|'priority'|'fitScore'|'salary';
+    res.sort((a, b) => {
+      switch (sortKey) {
+        case 'priority': return (a.priority ?? 99) - (b.priority ?? 99);
+        case 'fitScore': return (b.fitScore ?? 0) - (a.fitScore ?? 0);
+        case 'salary': return (b.salaryMax ?? 0) - (a.salaryMax ?? 0);
+        case 'dateApplied': return (b.dateApplied ?? 0) - (a.dateApplied ?? 0);
+        case 'updatedAt': default: return b.updatedAt - a.updatedAt;
+      }
+    });
+    return res;
+  }
+
+  // ── Renderers ────────────────────────────────────────────────────────
+  function fmtSalary(j: Job): string {
+    if (!j.salaryMin && !j.salaryMax) return '—';
+    const k = (n?: number) => n ? `$${Math.round(n / 1000)}k` : '—';
+    return j.salaryMin && j.salaryMax ? `${k(j.salaryMin)}–${k(j.salaryMax)}` : k(j.salaryMin ?? j.salaryMax);
+  }
+  function fmtDate(ts?: number): string { return ts ? new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: '2-digit' }) : '—'; }
+
+  function renderKanban() {
+    const root = document.getElementById('view-kanban')!;
+    const data = filtered();
+    const byStatus = new Map<JobStatus, Job[]>();
+    for (const s of JOB_STATUSES) byStatus.set(s, []);
+    for (const j of data) byStatus.get(j.status)?.push(j);
+    const visibleCols = JOB_STATUSES.filter(s => s !== 'Archived' || (byStatus.get(s)?.length ?? 0) > 0);
+    root.innerHTML = visibleCols.map(s => {
+      const items = byStatus.get(s) ?? [];
+      return `<div class="col" data-status="${s}">
+        <div class="col__head"><span class="col__title">${s}</span><span class="col__count">${items.length}</span></div>
+        <div class="col__body">${items.map(cardHTML).join('') || `<span class="col__count" style="opacity:.5;font-style:italic;">empty</span>`}</div>
+      </div>`;
+    }).join('');
+    root.querySelectorAll<HTMLElement>('.kcard').forEach(c => {
+      c.addEventListener('click', () => openEditor(c.dataset.id!));
+    });
+  }
+  function cardHTML(j: Job): string {
+    const pri = j.priority ? `<span class="kcard__pill kcard__pill--p${j.priority}">P${j.priority}</span>` : '';
+    const fit = j.fitScore ? `<span class="kcard__pill">Fit ${j.fitScore}</span>` : '';
+    const sal = (j.salaryMin || j.salaryMax) ? `<span class="kcard__pill">${fmtSalary(j)}</span>` : '';
+    return `<div class="kcard" data-id="${j.id}">
+      <div class="kcard__company">${escape(j.company)}</div>
+      <div class="kcard__role">${escape(j.role)}</div>
+      <div class="kcard__meta">${pri}${fit}${sal}</div>
+    </div>`;
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById('table-body')!;
+    const data = filtered();
+    if (data.length === 0) { tbody.innerHTML = `<tr><td colspan="9" class="muted" style="font-style:italic;color:var(--c-text-subtle);padding:24px;">No jobs match the filters.</td></tr>`; return; }
+    tbody.innerHTML = data.map(j => `
+      <tr data-id="${j.id}" style="cursor:pointer;">
+        <td>${j.priority ? `<span class="kcard__pill kcard__pill--p${j.priority}">P${j.priority}</span>` : ''}</td>
+        <td>${escape(j.company)}</td>
+        <td>${escape(j.role)}</td>
+        <td><select data-status data-id="${j.id}" style="font-size:12px;padding:2px 6px;">${JOB_STATUSES.map(s => `<option ${s===j.status?'selected':''}>${s}</option>`).join('')}</select></td>
+        <td>${fmtSalary(j)}</td>
+        <td style="font-family:var(--font-mono);font-size:11px;color:var(--c-text-subtle);">${fmtDate(j.dateApplied)}</td>
+        <td>${escape(j.nextStep ?? '—')}</td>
+        <td>${j.fitScore ?? '—'}</td>
+        <td><button class="btn" data-edit="${j.id}" style="font-size:11px;padding:4px 10px;">Edit</button></td>
+      </tr>
+    `).join('');
+    tbody.querySelectorAll<HTMLElement>('[data-edit]').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); openEditor(b.getAttribute('data-edit')!); }));
+    tbody.querySelectorAll<HTMLSelectElement>('[data-status]').forEach(s => s.addEventListener('change', () => quickStatus(s.dataset.id!, s.value as JobStatus)));
+    tbody.querySelectorAll<HTMLElement>('tr[data-id]').forEach(r => r.addEventListener('click', () => openEditor(r.getAttribute('data-id')!)));
+  }
+
+  function renderCompact() {
+    const ul = document.getElementById('compact-list')!;
+    const data = filtered();
+    if (data.length === 0) { ul.innerHTML = `<li style="font-style:italic;color:var(--c-text-subtle);">No jobs match the filters.</li>`; return; }
+    ul.innerHTML = data.map(j => `
+      <li data-id="${j.id}" style="cursor:pointer;">
+        <div><strong>${escape(j.company)}</strong> · ${escape(j.role)}</div>
+        <span class="c-status">${j.status}</span>
+        <span class="c-status">${fmtSalary(j)}</span>
+        <span class="c-status">${fmtDate(j.dateApplied)}</span>
+      </li>`).join('');
+    ul.querySelectorAll<HTMLElement>('li[data-id]').forEach(l => l.addEventListener('click', () => openEditor(l.getAttribute('data-id')!)));
+  }
+
+  function render() {
+    document.getElementById('view-kanban')!.style.display = view === 'kanban' ? 'grid' : 'none';
+    document.getElementById('view-table')!.style.display = view === 'table' ? 'block' : 'none';
+    document.getElementById('view-compact')!.style.display = view === 'compact' ? 'block' : 'none';
+    if (view === 'kanban') renderKanban();
+    if (view === 'table') renderTable();
+    if (view === 'compact') renderCompact();
+  }
+
+  function quickStatus(id: string, status: JobStatus) {
+    const j = jobsStore.get(id);
+    if (!j) return;
+    j.status = status;
+    if (status === 'Applied' && !j.dateApplied) j.dateApplied = Date.now();
+    jobsStore.upsert(j);
+    load(); render();
+  }
+
+  // ── Editor ───────────────────────────────────────────────────────────
+  const dlg = document.getElementById('job-editor') as HTMLDialogElement;
+  const form = document.getElementById('job-form') as HTMLFormElement;
+  const titleEl = document.getElementById('editor-title')!;
+  const deleteBtn = document.getElementById('delete-job') as HTMLButtonElement;
+
+  function openEditor(id?: string) {
+    form.reset();
+    if (id) {
+      const j = jobsStore.get(id);
+      if (!j) return;
+      titleEl.textContent = `Edit · ${j.company}`;
+      deleteBtn.style.display = 'inline-flex';
+      (form.elements.namedItem('id') as HTMLInputElement).value = id;
+      for (const k of ['company','role','url','source','location','status','contactName','contactEmail','nextStep','notes','resumeAngle']) {
+        const el = form.elements.namedItem(k) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null;
+        if (el) (el as any).value = (j as any)[k] ?? '';
+      }
+      (form.elements.namedItem('salaryMin') as HTMLInputElement).value = j.salaryMin ? String(j.salaryMin) : '';
+      (form.elements.namedItem('salaryMax') as HTMLInputElement).value = j.salaryMax ? String(j.salaryMax) : '';
+      (form.elements.namedItem('priority') as HTMLSelectElement).value = j.priority ? String(j.priority) : '';
+      (form.elements.namedItem('dateApplied') as HTMLInputElement).value = j.dateApplied ? new Date(j.dateApplied).toISOString().slice(0,10) : '';
+      (form.elements.namedItem('followUpDate') as HTMLInputElement).value = j.followUpDate ? new Date(j.followUpDate).toISOString().slice(0,10) : '';
+    } else {
+      titleEl.textContent = 'Add job';
+      deleteBtn.style.display = 'none';
+    }
+    dlg.showModal();
+  }
+
+  document.getElementById('cancel-job')?.addEventListener('click', () => dlg.close());
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const id = String(fd.get('id') || '') || crypto.randomUUID();
+    const existing = jobsStore.get(id);
+    const dateApplied = String(fd.get('dateApplied') || '');
+    const followUpDate = String(fd.get('followUpDate') || '');
+    const j: Job = {
+      id,
+      company: String(fd.get('company') || '').trim(),
+      role: String(fd.get('role') || '').trim(),
+      url: String(fd.get('url') || '').trim() || undefined,
+      source: String(fd.get('source') || '').trim() || undefined,
+      location: String(fd.get('location') || '').trim() || undefined,
+      salaryMin: Number(fd.get('salaryMin')) || undefined,
+      salaryMax: Number(fd.get('salaryMax')) || undefined,
+      status: (String(fd.get('status') || 'Saved') as JobStatus),
+      contactName: String(fd.get('contactName') || '').trim() || undefined,
+      contactEmail: String(fd.get('contactEmail') || '').trim() || undefined,
+      nextStep: String(fd.get('nextStep') || '').trim() || undefined,
+      notes: String(fd.get('notes') || '').trim() || undefined,
+      resumeAngle: String(fd.get('resumeAngle') || '').trim() || undefined,
+      priority: (Number(fd.get('priority')) as 1|2|3) || undefined,
+      dateFound: existing?.dateFound ?? Date.now(),
+      dateApplied: dateApplied ? new Date(dateApplied).getTime() : existing?.dateApplied,
+      followUpDate: followUpDate ? new Date(followUpDate).getTime() : undefined,
+      fitScore: existing?.fitScore,
+      jdText: existing?.jdText,
+      letterId: existing?.letterId,
+      createdAt: existing?.createdAt ?? Date.now(),
+      updatedAt: Date.now(),
+    };
+    jobsStore.upsert(j);
+    dlg.close();
+    load(); render();
+  });
+
+  deleteBtn.addEventListener('click', () => {
+    const id = (form.elements.namedItem('id') as HTMLInputElement).value;
+    if (!id) return;
+    if (!confirm('Delete this job? Cannot be undone (locally).')) return;
+    jobsStore.remove(id);
+    dlg.close();
+    load(); render();
+  });
+
+  // ── View switcher + filters ─────────────────────────────────────────
+  document.querySelectorAll<HTMLButtonElement>('.seg__btn').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.seg__btn').forEach(x => x.classList.remove('is-active'));
+      b.classList.add('is-active');
+      view = b.dataset.view as typeof view;
+      render();
+    });
+  });
+  ['search','filter-status','filter-priority','sort'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', render);
+    document.getElementById(id)?.addEventListener('change', render);
+  });
+
+  // Open by ?id=
+  const qid = new URL(window.location.href).searchParams.get('id');
+  if (qid) setTimeout(() => openEditor(qid), 100);
+
+  function escape(s: string): string { return s.replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]!)); }
+
+  load();
+  render();
+</script>

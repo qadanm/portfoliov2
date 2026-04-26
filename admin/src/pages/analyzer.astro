@@ -1,0 +1,209 @@
+---
+import Admin from '@/layouts/Admin.astro';
+import { angles } from '@/data/angles';
+---
+
+<Admin
+  title="JD analyzer"
+  intro="Paste a job description. Get the recommended angle, a fit score, surfaced strengths, missing keywords, and risk flags. Then save it as a job in one click."
+>
+  <div class="grid">
+    <section class="card">
+      <h2 class="h2">Job description</h2>
+      <textarea id="jd" rows="18" placeholder="Paste the full JD here. The more text, the better the analysis."></textarea>
+      <div class="row" style="margin-top:12px;">
+        <input id="company" placeholder="Company" />
+        <input id="role" placeholder="Role" />
+        <input id="url" type="url" placeholder="Job URL (optional)" />
+      </div>
+      <div class="row" style="margin-top:8px;">
+        <button class="btn btn--primary" id="analyze-btn">Analyze</button>
+        <button class="btn" id="save-job-btn" disabled>Save as job</button>
+        <button class="btn" id="clear-btn">Clear</button>
+      </div>
+    </section>
+
+    <section class="card" id="results-pane">
+      <h2 class="h2">Results</h2>
+      <p class="muted">Paste a JD and hit Analyze.</p>
+    </section>
+  </div>
+</Admin>
+
+<style>
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 1000px) { .grid { grid-template-columns: 1fr; } }
+  .h2 { font-family: var(--font-display); font-size: 22px; font-weight: 400; letter-spacing: -0.01em; margin-bottom: 12px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .row > input { flex: 1; min-width: 140px; }
+  .muted { color: var(--c-text-subtle); font-size: 13px; }
+  textarea { resize: vertical; min-height: 200px; font-family: var(--font-mono); font-size: 12px; }
+
+  .score {
+    display: flex; align-items: baseline; gap: 12px;
+    padding: 16px; background: var(--c-bg); border-radius: var(--r-md);
+    border: 1px solid var(--c-border);
+    margin-bottom: 16px;
+  }
+  .score__value { font-family: var(--font-display); font-size: 48px; line-height: 1; }
+  .score__label { font-family: var(--font-mono); font-size: 11px; color: var(--c-text-subtle); letter-spacing: 0.08em; text-transform: uppercase; }
+
+  .pill-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pill { padding: 4px 10px; border-radius: var(--r-full); font-family: var(--font-mono); font-size: 11px;
+    background: var(--c-bg-muted); border: 1px solid var(--c-border-subtle); color: var(--c-text-muted); }
+  .pill--good { color: var(--c-success); border-color: rgba(16, 185, 129, 0.4); background: rgba(16,185,129,0.08); }
+  .pill--gap { color: #F87171; border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.08); }
+  .pill--warn { color: var(--c-accent); border-color: var(--c-accent); background: var(--c-accent-dim); }
+
+  .section { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--c-border-subtle); }
+  .section h3 { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-text-subtle); margin-bottom: 8px; }
+
+  .ranked-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--c-border-subtle); font-size: 13px; }
+  .ranked-row:last-child { border-bottom: none; }
+  .ranked-row .ranked-name { color: var(--c-text); }
+  .ranked-row .ranked-score { font-family: var(--font-mono); color: var(--c-text-subtle); }
+
+  .actions { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+</style>
+
+<script>
+  import { analyzeJD, type AnalyzerResult } from '@/lib/analyzer';
+  import { jobsStore, ensureSchema, type Job } from '@/lib/storage';
+
+  ensureSchema();
+
+  const jd = document.getElementById('jd') as HTMLTextAreaElement;
+  const companyEl = document.getElementById('company') as HTMLInputElement;
+  const roleEl = document.getElementById('role') as HTMLInputElement;
+  const urlEl = document.getElementById('url') as HTMLInputElement;
+  const saveBtn = document.getElementById('save-job-btn') as HTMLButtonElement;
+  const pane = document.getElementById('results-pane')!;
+
+  let lastResult: AnalyzerResult | null = null;
+
+  function escape(s: string): string { return s.replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]!)); }
+
+  document.getElementById('analyze-btn')?.addEventListener('click', () => {
+    const text = jd.value.trim();
+    if (text.length < 50) {
+      pane.innerHTML = `<h2 class="h2">Results</h2><p class="muted">JD too short — paste at least a paragraph.</p>`;
+      saveBtn.disabled = true;
+      return;
+    }
+    lastResult = analyzeJD(text);
+    if (!lastResult) {
+      pane.innerHTML = `<h2 class="h2">Results</h2><p class="muted">Couldn't analyze.</p>`;
+      saveBtn.disabled = true;
+      return;
+    }
+    saveBtn.disabled = false;
+    render(lastResult);
+  });
+
+  function render(r: AnalyzerResult) {
+    const seniorityLabel = ({ ic: 'IC', senior: 'Senior', lead: 'Lead', principal: 'Principal/Staff', unclear: 'Unclear' } as const)[r.seniorityHint];
+    const remoteLabel = ({ remote: 'Remote', hybrid: 'Hybrid', onsite: 'On-site', unclear: 'Unclear' } as const)[r.remoteSignal];
+    pane.innerHTML = `
+      <h2 class="h2">Results</h2>
+
+      <div class="score">
+        <span class="score__value">${r.matchScore}</span>
+        <div>
+          <div class="score__label">Fit score (0–100)</div>
+          <div style="font-size:13px;color:var(--c-text-muted);">Heuristic blend of angle match and strength overlap.</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Recommended angle</h3>
+        <p style="font-family:var(--font-display);font-size:24px;letter-spacing:-0.01em;margin-bottom:6px;">${r.recommendedAngle.label}</p>
+        <div class="actions">
+          <a class="btn" href="/resume/${r.recommendedAngle.id}">Open resume</a>
+          <a class="btn" href="/recruiter/${r.recommendedAngle.id}">Open recruiter pack</a>
+          <a class="btn" href="/letters?angle=${r.recommendedAngle.id}&company=${encodeURIComponent(companyEl.value)}&role=${encodeURIComponent(roleEl.value)}">Draft cover letter</a>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Other angles to consider</h3>
+        ${r.rankedAngles.slice(1, 4).map(a => `
+          <div class="ranked-row">
+            <span class="ranked-name">${a.angle.label}</span>
+            <span class="ranked-score">signals: ${a.score}</span>
+          </div>
+        `).join('') || '<p class="muted">No other strong matches.</p>'}
+      </div>
+
+      <div class="section">
+        <h3>Quick read</h3>
+        <div class="pill-list">
+          <span class="pill">${seniorityLabel}</span>
+          <span class="pill">${remoteLabel}</span>
+          ${r.salaryClues.map(s => `<span class="pill pill--good">${escape(s)}</span>`).join('')}
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Strengths matched (${r.matchedStrengths.length})</h3>
+        <div class="pill-list">
+          ${r.matchedStrengths.length ? r.matchedStrengths.map(s => `<span class="pill pill--good">${escape(s)}</span>`).join('') : '<span class="muted">No direct strength matches yet — broaden the JD search or pick a different angle.</span>'}
+        </div>
+      </div>
+
+      ${r.potentialGaps.length ? `
+        <div class="section">
+          <h3>Stack gaps to address</h3>
+          <div class="pill-list">
+            ${r.potentialGaps.map(s => `<span class="pill pill--gap">${escape(s)}</span>`).join('')}
+          </div>
+          <p class="muted" style="margin-top:6px;">Either reframe these as adjacent skills, plan to learn before interviewing, or pass.</p>
+        </div>
+      ` : ''}
+
+      ${r.riskFlags.length ? `
+        <div class="section">
+          <h3>Risk flags</h3>
+          <ul style="padding-left:18px;color:var(--c-text-muted);font-size:13px;line-height:1.65;">
+            ${r.riskFlags.map(s => `<li>${escape(s)}</li>`).join('')}
+          </ul>
+        </div>
+      ` : ''}
+
+      <div class="section">
+        <h3>Top JD keywords (uncategorized)</h3>
+        <div class="pill-list">
+          ${r.topKeywords.map(k => `<span class="pill">${escape(k.word)} <span style="opacity:.5;">×${k.count}</span></span>`).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  saveBtn.addEventListener('click', () => {
+    if (!lastResult) return;
+    const company = companyEl.value.trim();
+    const role = roleEl.value.trim();
+    if (!company || !role) { alert('Add a company and role before saving.'); return; }
+    const j: Job = {
+      id: crypto.randomUUID(),
+      company,
+      role,
+      url: urlEl.value.trim() || undefined,
+      status: 'Saved',
+      resumeAngle: lastResult.recommendedAngle.id,
+      fitScore: lastResult.matchScore,
+      jdText: jd.value.trim(),
+      dateFound: Date.now(),
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+    jobsStore.upsert(j);
+    saveBtn.textContent = 'Saved';
+    setTimeout(() => { saveBtn.textContent = 'Save as job'; }, 1400);
+  });
+
+  document.getElementById('clear-btn')?.addEventListener('click', () => {
+    jd.value = ''; companyEl.value = ''; roleEl.value = ''; urlEl.value = '';
+    saveBtn.disabled = true;
+    pane.innerHTML = `<h2 class="h2">Results</h2><p class="muted">Paste a JD and hit Analyze.</p>`;
+  });
+</script>

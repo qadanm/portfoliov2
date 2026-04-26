@@ -1,0 +1,281 @@
+---
+import Admin from '@/layouts/Admin.astro';
+import { angles } from '@/data/angles';
+import { buildResume, resumeToText } from '@/lib/engine';
+
+export function getStaticPaths() {
+  return angles.map(a => ({ params: { angle: a.id } }));
+}
+
+const { angle: angleId } = Astro.params;
+const resume = buildResume(angleId!);
+if (!resume) return Astro.redirect('/');
+
+// All three modes are rendered into the DOM; JS toggles which one is visible.
+// This avoids round-tripping the dev server and makes switching instant.
+const textBody = resumeToText(resume);
+---
+
+<Admin
+  title={resume.angle.label}
+  intro="Switch modes below. Cmd-P to export PDF — only the visible mode prints."
+>
+  <div class="resume__bar no-print" style="display:flex; gap:8px; align-items:center; margin-bottom:24px; flex-wrap:wrap;">
+    <button type="button" class="chip chip--active" data-mode="beautiful">Beautiful</button>
+    <button type="button" class="chip" data-mode="ats">ATS</button>
+    <button type="button" class="chip" data-mode="text">Plain text</button>
+    <span style="flex:1"></span>
+    <button type="button" class="btn btn--primary" id="print-btn">Print to PDF</button>
+    <button type="button" class="btn" id="copy-btn" hidden>Copy text</button>
+  </div>
+
+  <div class="resume-mode" data-mode-content="beautiful">
+    <article class="resume resume--beautiful">
+      <header class="resume__head">
+        <h1 class="resume__name">{resume.identity.fullName}</h1>
+        <p class="resume__role">{resume.angle.label}</p>
+        {resume.kicker && <p class="resume__kicker">{resume.kicker}</p>}
+        <p class="resume__contact">
+          {resume.identity.location} · {resume.identity.email} · <a href={resume.identity.site}>{resume.identity.site.replace('https://', '')}</a> · <a href={resume.identity.linkedin}>linkedin</a> · <a href={resume.identity.github}>github</a>
+        </p>
+      </header>
+
+      <section class="resume__section">
+        <p class="resume__summary">{resume.summary}</p>
+      </section>
+
+      <section class="resume__section">
+        <h2 class="resume__h2">Experience</h2>
+        {resume.projects.map(p => (
+          <div class="resume__job">
+            <div class="resume__job-head">
+              <div>
+                <h3 class="resume__job-title">{p.title}{p.company && <span class="resume__job-company"> · {p.company}</span>}</h3>
+                <p class="resume__job-role">{p.role}{p.location && <span> · {p.location}</span>}</p>
+              </div>
+              <span class="resume__job-period">{p.period}</span>
+            </div>
+            <ul class="resume__bullets">
+              {p.bullets.map(b => <li>{b}</li>)}
+            </ul>
+          </div>
+        ))}
+      </section>
+
+      <section class="resume__section">
+        <h2 class="resume__h2">Skills</h2>
+        <dl class="resume__skills">
+          {resume.skillGroups.map(g => (
+            <div class="resume__skills-row">
+              <dt>{g.label}</dt>
+              <dd>{g.items.join(' · ')}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+    </article>
+  </div>
+
+  <div class="resume-mode" data-mode-content="ats" hidden>
+    <article class="resume resume--ats">
+      <h1>{resume.identity.fullName}</h1>
+      <p>{resume.angle.label}</p>
+      <p>
+        {resume.identity.location} | {resume.identity.email} | {resume.identity.site} | {resume.identity.linkedin} | {resume.identity.github}
+      </p>
+
+      <h2>Summary</h2>
+      <p>{resume.summary}</p>
+
+      <h2>Experience</h2>
+      {resume.projects.map(p => (
+        <div>
+          <h3>{p.title}{p.company ? ` — ${p.company}` : ''}</h3>
+          <p>{p.role} | {p.period}{p.location ? ` | ${p.location}` : ''}</p>
+          <ul>
+            {p.bullets.map(b => <li>{b}</li>)}
+          </ul>
+        </div>
+      ))}
+
+      <h2>Skills</h2>
+      {resume.skillGroups.map(g => (
+        <p><strong>{g.label}:</strong> {g.items.join(', ')}</p>
+      ))}
+    </article>
+  </div>
+
+  <div class="resume-mode" data-mode-content="text" hidden>
+    <pre id="text-output" class="resume__text">{textBody}</pre>
+  </div>
+</Admin>
+
+<style>
+  /* ─── Beautiful resume ─────────────────────────────────────────────── */
+  .resume--beautiful {
+    background: var(--c-bg-elev);
+    color: var(--c-text);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-lg);
+    padding: 48px;
+    max-width: 760px;
+  }
+  @media print {
+    .resume--beautiful {
+      background: white;
+      border: none;
+      padding: 14mm 16mm;
+      max-width: none;
+    }
+  }
+  .resume__head { margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--c-border-subtle); }
+  .resume__name {
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin-bottom: 4px;
+  }
+  .resume__role {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--c-text-subtle);
+    margin-bottom: 8px;
+  }
+  .resume__kicker { font-size: 13px; color: var(--c-text-muted); margin-bottom: 12px; }
+  .resume__contact { font-family: var(--font-mono); font-size: 11px; color: var(--c-text-muted); }
+  .resume__contact a { border-bottom: 1px solid var(--c-border); }
+  .resume__section { margin-top: 24px; }
+  .resume__summary { font-size: 14px; line-height: 1.65; max-width: 64ch; color: var(--c-text-muted); }
+  .resume__h2 {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--c-text-subtle);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--c-border-subtle);
+  }
+  .resume__job { margin-bottom: 18px; break-inside: avoid; }
+  .resume__job-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 6px; }
+  .resume__job-title { font-family: var(--font-display); font-size: 18px; font-weight: 400; letter-spacing: -0.01em; }
+  .resume__job-company { color: var(--c-text-muted); font-size: 16px; }
+  .resume__job-role { font-size: 12px; color: var(--c-text-subtle); }
+  .resume__job-period { font-family: var(--font-mono); font-size: 11px; color: var(--c-text-subtle); white-space: nowrap; }
+  .resume__bullets { list-style: none; padding: 0; margin: 8px 0 0; }
+  .resume__bullets li {
+    position: relative;
+    padding-left: 16px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--c-text-muted);
+    margin-bottom: 6px;
+  }
+  .resume__bullets li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.7em;
+    width: 8px;
+    height: 1px;
+    background: var(--c-accent);
+  }
+  .resume__skills { display: grid; grid-template-columns: 110px 1fr; row-gap: 8px; column-gap: 18px; }
+  .resume__skills-row { display: contents; }
+  .resume__skills dt { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-text-subtle); padding-top: 1px; }
+  .resume__skills dd { font-size: 13px; color: var(--c-text-muted); }
+
+  /* ─── ATS resume ───────────────────────────────────────────────────── */
+  .resume--ats {
+    background: white;
+    color: black;
+    padding: 32px 36px;
+    max-width: 760px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 11pt;
+    line-height: 1.5;
+  }
+  .resume--ats h1 { font-size: 20pt; font-weight: 700; margin-bottom: 4px; }
+  .resume--ats h2 { font-size: 13pt; font-weight: 700; text-transform: uppercase; margin-top: 18px; margin-bottom: 6px; border-bottom: 1px solid #000; padding-bottom: 2px; }
+  .resume--ats h3 { font-size: 12pt; font-weight: 700; margin-top: 12px; }
+  .resume--ats p { margin-bottom: 6px; }
+  .resume--ats ul { margin-left: 20px; margin-bottom: 8px; }
+  .resume--ats li { margin-bottom: 4px; }
+  @media print {
+    .resume--ats { padding: 14mm 16mm; max-width: none; }
+  }
+
+  /* ─── Plain text ───────────────────────────────────────────────────── */
+  .resume__text {
+    background: var(--c-bg-elev);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    padding: 24px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--c-text);
+    overflow-x: auto;
+    white-space: pre-wrap;
+  }
+  @media print {
+    .resume__text {
+      background: white;
+      color: black;
+      border: none;
+      border-radius: 0;
+      padding: 14mm 16mm;
+      font-size: 10pt;
+    }
+  }
+</style>
+
+<script>
+  // ── Mode switching ──────────────────────────────────────────────────
+  type Mode = 'beautiful' | 'ats' | 'text';
+
+  const chips = document.querySelectorAll<HTMLButtonElement>('[data-mode]');
+  const panes = document.querySelectorAll<HTMLElement>('[data-mode-content]');
+  const copyBtn = document.getElementById('copy-btn') as HTMLButtonElement | null;
+  const printBtn = document.getElementById('print-btn');
+  const textEl = document.getElementById('text-output');
+
+  function setMode(mode: Mode) {
+    chips.forEach(c => c.classList.toggle('chip--active', c.dataset.mode === mode));
+    panes.forEach(p => {
+      const isActive = p.dataset.modeContent === mode;
+      p.hidden = !isActive;
+    });
+    if (copyBtn) copyBtn.hidden = mode !== 'text';
+    // Reflect mode in URL without reloading.
+    const url = new URL(window.location.href);
+    if (mode === 'beautiful') url.searchParams.delete('mode');
+    else url.searchParams.set('mode', mode);
+    history.replaceState({}, '', url.toString());
+  }
+
+  chips.forEach(c => c.addEventListener('click', () => setMode(c.dataset.mode as Mode)));
+
+  // Honor an incoming ?mode= on first load.
+  const initial = new URL(window.location.href).searchParams.get('mode') as Mode | null;
+  if (initial && ['beautiful', 'ats', 'text'].includes(initial)) setMode(initial);
+
+  // ── Print + copy ────────────────────────────────────────────────────
+  printBtn?.addEventListener('click', () => window.print());
+
+  copyBtn?.addEventListener('click', async () => {
+    const text = textEl?.textContent || '';
+    try {
+      await navigator.clipboard.writeText(text);
+      const orig = copyBtn.textContent;
+      copyBtn.textContent = 'Copied';
+      setTimeout(() => { copyBtn.textContent = orig; }, 1400);
+    } catch {
+      copyBtn.textContent = 'Copy failed';
+    }
+  });
+</script>

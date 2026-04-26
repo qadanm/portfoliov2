@@ -1,0 +1,225 @@
+---
+import Admin from '@/layouts/Admin.astro';
+---
+
+<Admin
+  title="Recruiter CRM"
+  intro="Track conversations, set follow-up cadence, surface what to send next. Local-only — sync nothing."
+>
+  <div class="bar no-print">
+    <input type="search" id="search" placeholder="Search name, company, notes…" />
+    <select id="filter-status">
+      <option value="">All relationships</option>
+      <option value="active">Active</option>
+      <option value="warm">Warm</option>
+      <option value="cold">Cold</option>
+      <option value="cooled">Cooled</option>
+    </select>
+    <button class="btn btn--primary" id="new-rec">+ Add recruiter</button>
+  </div>
+
+  <section class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Company</th>
+          <th>Type</th>
+          <th>Relationship</th>
+          <th>Last contact</th>
+          <th>Follow-up</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="rec-body"></tbody>
+    </table>
+  </section>
+
+  <dialog id="rec-editor" class="editor">
+    <form id="rec-form" method="dialog" class="editor__form">
+      <header class="editor__head">
+        <h2 id="editor-title">Add recruiter</h2>
+        <button type="button" class="btn" id="cancel-rec">Cancel</button>
+      </header>
+      <input type="hidden" name="id" />
+      <div class="editor__row">
+        <label>Name<input name="name" required /></label>
+        <label>Company<input name="company" /></label>
+      </div>
+      <div class="editor__row">
+        <label>Email<input name="email" type="email" /></label>
+        <label>LinkedIn<input name="linkedin" type="url" placeholder="https://linkedin.com/in/…" /></label>
+      </div>
+      <div class="editor__row">
+        <label>Type
+          <select name="type">
+            <option value="agency">Agency</option>
+            <option value="internal">Internal</option>
+            <option value="hiring-manager">Hiring manager</option>
+            <option value="referral">Referral</option>
+          </select>
+        </label>
+        <label>Relationship
+          <select name="relationship">
+            <option value="cold">Cold</option>
+            <option value="warm">Warm</option>
+            <option value="active">Active</option>
+            <option value="cooled">Cooled</option>
+          </select>
+        </label>
+      </div>
+      <label>Roles discussed<input name="rolesDiscussed" placeholder="Senior Product Designer at Acme, Design Engineer at Bar" /></label>
+      <div class="editor__row">
+        <label>Last contact<input name="lastContactDate" type="date" /></label>
+        <label>Follow-up date<input name="followUpDate" type="date" /></label>
+      </div>
+      <label>Notes<textarea name="notes" rows="4" placeholder="Conversation history, role specifics, anything sticky."></textarea></label>
+      <footer class="editor__foot">
+        <button type="button" class="btn" id="delete-rec" style="margin-right:auto; display:none;">Delete</button>
+        <button type="submit" class="btn btn--primary">Save</button>
+      </footer>
+    </form>
+  </dialog>
+</Admin>
+
+<style>
+  .bar { display: flex; gap: 8px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+  .bar input, .bar select { width: auto; min-width: 180px; }
+  .editor {
+    width: 700px; max-width: calc(100vw - 32px);
+    background: var(--c-bg-elev); border: 1px solid var(--c-border);
+    border-radius: var(--r-lg); padding: 0; color: var(--c-text);
+  }
+  .editor::backdrop { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
+  .editor__form { display: flex; flex-direction: column; gap: 12px; padding: 24px; }
+  .editor__head { display: flex; justify-content: space-between; align-items: center; }
+  .editor__head h2 { font-family: var(--font-display); font-weight: 400; font-size: 22px; letter-spacing: -0.01em; }
+  .editor__row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .editor__form label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--c-text-subtle); }
+  .editor__foot { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+  .pill { padding: 2px 8px; border-radius: var(--r-full); font-family: var(--font-mono); font-size: 10px;
+    background: var(--c-bg-muted); border: 1px solid var(--c-border-subtle); color: var(--c-text-muted); }
+  .pill--active { color: var(--c-success); border-color: rgba(16,185,129,0.4); background: rgba(16,185,129,0.08); }
+  .pill--cold { color: var(--c-text-subtle); }
+  .pill--overdue { color: #F87171; border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.08); }
+</style>
+
+<script>
+  import { recruitersStore, ensureSchema, type Recruiter, type RecruiterType, type RelationshipStatus } from '@/lib/storage';
+
+  ensureSchema();
+  let recs: Recruiter[] = [];
+  function load() { recs = recruitersStore.list(); }
+
+  function fmtDate(ts?: number) { return ts ? new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: '2-digit' }) : '—'; }
+  function escape(s: string): string { return s.replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]!)); }
+
+  function filtered(): Recruiter[] {
+    const q = (document.getElementById('search') as HTMLInputElement).value.trim().toLowerCase();
+    const r = (document.getElementById('filter-status') as HTMLSelectElement).value;
+    let res = recs.slice();
+    if (q) res = res.filter(x => [x.name, x.company, x.notes, x.rolesDiscussed, x.email].some(v => v?.toLowerCase().includes(q)));
+    if (r) res = res.filter(x => x.relationship === r);
+    return res.sort((a, b) => (a.followUpDate ?? Infinity) - (b.followUpDate ?? Infinity));
+  }
+
+  function render() {
+    const body = document.getElementById('rec-body')!;
+    const data = filtered();
+    if (!data.length) { body.innerHTML = `<tr><td colspan="7" style="padding:24px;color:var(--c-text-subtle);font-style:italic;">No recruiters yet. Add one to start tracking.</td></tr>`; return; }
+    const now = Date.now();
+    const ec = encodeURIComponent;
+    body.innerHTML = data.map(r => {
+      const overdue = r.followUpDate && r.followUpDate < now;
+      const firstName = (r.name || '').split(/\s+/)[0] || '';
+      const draftHref = `/letters?kind=check-in&recruiter=${ec(firstName)}&company=${ec(r.company ?? '')}`;
+      return `<tr data-id="${r.id}" style="cursor:pointer;">
+        <td>${escape(r.name)}</td>
+        <td>${escape(r.company ?? '—')}</td>
+        <td><span class="pill">${r.type}</span></td>
+        <td><span class="pill pill--${r.relationship}">${r.relationship}</span></td>
+        <td style="font-family:var(--font-mono);font-size:11px;color:var(--c-text-subtle);">${fmtDate(r.lastContactDate)}</td>
+        <td style="font-family:var(--font-mono);font-size:11px;"><span class="${overdue ? 'pill pill--overdue' : ''}">${fmtDate(r.followUpDate)}</span></td>
+        <td style="white-space:nowrap;">
+          <a class="btn" href="${draftHref}" data-msg-link style="font-size:11px;padding:4px 10px;margin-right:4px;">Draft msg</a>
+          <button class="btn" data-edit="${r.id}" style="font-size:11px;padding:4px 10px;">Edit</button>
+        </td>
+      </tr>`;
+    }).join('');
+    body.querySelectorAll<HTMLElement>('[data-edit]').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); openEditor(b.getAttribute('data-edit')!); }));
+    body.querySelectorAll<HTMLElement>('[data-msg-link]').forEach(a => a.addEventListener('click', e => { e.stopPropagation(); }));
+    body.querySelectorAll<HTMLElement>('tr[data-id]').forEach(r => r.addEventListener('click', () => openEditor(r.getAttribute('data-id')!)));
+  }
+
+  const dlg = document.getElementById('rec-editor') as HTMLDialogElement;
+  const form = document.getElementById('rec-form') as HTMLFormElement;
+  const titleEl = document.getElementById('editor-title')!;
+  const deleteBtn = document.getElementById('delete-rec') as HTMLButtonElement;
+
+  function openEditor(id?: string) {
+    form.reset();
+    if (id) {
+      const r = recruitersStore.get(id);
+      if (!r) return;
+      titleEl.textContent = `Edit · ${r.name}`;
+      deleteBtn.style.display = 'inline-flex';
+      (form.elements.namedItem('id') as HTMLInputElement).value = id;
+      for (const k of ['name','company','email','linkedin','type','relationship','rolesDiscussed','notes']) {
+        const el = form.elements.namedItem(k) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null;
+        if (el) (el as any).value = (r as any)[k] ?? '';
+      }
+      (form.elements.namedItem('lastContactDate') as HTMLInputElement).value = r.lastContactDate ? new Date(r.lastContactDate).toISOString().slice(0,10) : '';
+      (form.elements.namedItem('followUpDate') as HTMLInputElement).value = r.followUpDate ? new Date(r.followUpDate).toISOString().slice(0,10) : '';
+    } else {
+      titleEl.textContent = 'Add recruiter';
+      deleteBtn.style.display = 'none';
+    }
+    dlg.showModal();
+  }
+
+  document.getElementById('new-rec')?.addEventListener('click', () => openEditor());
+  document.getElementById('cancel-rec')?.addEventListener('click', () => dlg.close());
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const id = String(fd.get('id') || '') || crypto.randomUUID();
+    const existing = recruitersStore.get(id);
+    const last = String(fd.get('lastContactDate') || '');
+    const fup = String(fd.get('followUpDate') || '');
+    const r: Recruiter = {
+      id,
+      name: String(fd.get('name') || '').trim(),
+      company: String(fd.get('company') || '').trim() || undefined,
+      email: String(fd.get('email') || '').trim() || undefined,
+      linkedin: String(fd.get('linkedin') || '').trim() || undefined,
+      type: (String(fd.get('type') || 'agency') as RecruiterType),
+      relationship: (String(fd.get('relationship') || 'cold') as RelationshipStatus),
+      rolesDiscussed: String(fd.get('rolesDiscussed') || '').trim() || undefined,
+      notes: String(fd.get('notes') || '').trim() || undefined,
+      lastContactDate: last ? new Date(last).getTime() : existing?.lastContactDate,
+      followUpDate: fup ? new Date(fup).getTime() : undefined,
+      createdAt: existing?.createdAt ?? Date.now(),
+      updatedAt: Date.now(),
+    };
+    recruitersStore.upsert(r);
+    dlg.close();
+    load(); render();
+  });
+
+  deleteBtn.addEventListener('click', () => {
+    const id = (form.elements.namedItem('id') as HTMLInputElement).value;
+    if (!id) return;
+    if (!confirm('Delete this recruiter?')) return;
+    recruitersStore.remove(id);
+    dlg.close();
+    load(); render();
+  });
+
+  ['search','filter-status'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', render);
+    document.getElementById(id)?.addEventListener('change', render);
+  });
+
+  load(); render();
+</script>

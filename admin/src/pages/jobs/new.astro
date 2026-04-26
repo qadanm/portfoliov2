@@ -1,0 +1,368 @@
+---
+import Admin from '@/layouts/Admin.astro';
+import { angles } from '@/data/angles';
+import { JOB_STATUSES } from '@/lib/storage';
+---
+
+<Admin
+  title="Add job"
+  intro="Paste a job link or the full job description. The system extracts what it can, scores the opportunity, and recommends a resume angle. Edit anything before saving."
+>
+  <!-- Step 1: input ─────────────────────────────────────────────── -->
+  <section class="card" id="step-input">
+    <label class="lbl">Job URL <span class="hint">optional</span></label>
+    <input id="jd-url" type="url" placeholder="https://… (LinkedIn, Greenhouse, Lever, Workday, company career site)" />
+
+    <label class="lbl" style="margin-top:14px;">Job description <span class="hint">paste the full posting for the best results</span></label>
+    <textarea id="jd-text" rows="14" placeholder="Most boards block browser fetching, so paste the description here. The longer the better."></textarea>
+
+    <div class="actions-row">
+      <button class="btn btn--primary" id="analyze-btn">Analyze</button>
+      <button class="btn" id="try-fetch-btn">Try to fetch from URL</button>
+      <button class="btn" id="reset-btn">Reset</button>
+    </div>
+    <p id="input-error" class="err" style="display:none;"></p>
+    <p id="fetch-status" class="hint" style="margin-top:6px;display:none;"></p>
+  </section>
+
+  <!-- Step 2: results + editable preview ────────────────────────── -->
+  <section id="step-preview" style="display:none; margin-top:16px;">
+    <div class="grid">
+      <!-- Score panel -->
+      <article class="card score-card">
+        <div class="score">
+          <div class="score__value" id="score-value">—</div>
+          <div>
+            <div class="score__label">Opportunity score</div>
+            <div id="score-meta" class="score__meta">—</div>
+          </div>
+        </div>
+
+        <div class="score-row">
+          <span class="lbl">Recommended angle</span>
+          <span id="rec-angle" class="rec">—</span>
+        </div>
+        <div class="score-row">
+          <span class="lbl">Confidence</span>
+          <span id="confidence" class="rec">—</span>
+        </div>
+        <div class="score-row">
+          <span class="lbl">Priority</span>
+          <span id="priority" class="rec">—</span>
+        </div>
+        <div class="score-row">
+          <span class="lbl">Application effort</span>
+          <span id="effort" class="rec">—</span>
+        </div>
+
+        <div class="section">
+          <h3>Recommended action</h3>
+          <p id="action" class="muted"></p>
+        </div>
+
+        <div class="section">
+          <h3>Score breakdown</h3>
+          <ul id="breakdown" class="bd"></ul>
+        </div>
+
+        <div class="section" id="strengths-section">
+          <h3>Strengths matched</h3>
+          <div id="strengths" class="pill-list"></div>
+        </div>
+
+        <div class="section" id="gaps-section" style="display:none;">
+          <h3>Stack gaps</h3>
+          <div id="gaps" class="pill-list"></div>
+        </div>
+
+        <div class="section" id="risks-section" style="display:none;">
+          <h3>Risk flags</h3>
+          <ul id="risks" class="muted bullet-list"></ul>
+        </div>
+      </article>
+
+      <!-- Editable job draft -->
+      <article class="card">
+        <h2 class="h2">Editable draft</h2>
+        <p class="hint" style="margin-bottom:10px;">Auto-filled from the analysis. Change anything before saving.</p>
+
+        <div class="row">
+          <label>Company<input id="f-company" /></label>
+          <label>Role<input id="f-role" /></label>
+        </div>
+        <div class="row">
+          <label>URL<input id="f-url" type="url" /></label>
+          <label>Source<input id="f-source" /></label>
+        </div>
+        <div class="row">
+          <label>Location<input id="f-location" /></label>
+          <label>Status
+            <select id="f-status">
+              {JOB_STATUSES.map(s => <option value={s}>{s}</option>)}
+            </select>
+          </label>
+        </div>
+        <div class="row">
+          <label>Salary min ($)<input id="f-salaryMin" type="number" min="0" step="1000" /></label>
+          <label>Salary max ($)<input id="f-salaryMax" type="number" min="0" step="1000" /></label>
+        </div>
+        <div class="row">
+          <label>Resume angle
+            <select id="f-angle">
+              {angles.map(a => <option value={a.id}>{a.label}</option>)}
+            </select>
+          </label>
+          <label>Priority
+            <select id="f-priority">
+              <option value="">—</option>
+              <option value="1">P1 (highest)</option>
+              <option value="2">P2</option>
+              <option value="3">P3</option>
+            </select>
+          </label>
+        </div>
+        <label>Next step<input id="f-nextStep" /></label>
+
+        <div class="actions-row" style="margin-top:14px;">
+          <button class="btn btn--primary" id="save-btn">Save job</button>
+          <button class="btn" id="discard-btn">Discard</button>
+        </div>
+        <p id="save-error" class="err" style="display:none;"></p>
+      </article>
+    </div>
+  </section>
+
+  <!-- Step 3: saved + quick actions ──────────────────────────────── -->
+  <section id="step-saved" class="card" style="display:none; margin-top:16px;">
+    <h2 class="h2">Saved <span class="hint">to /jobs</span></h2>
+    <p id="saved-summary" class="muted" style="margin-bottom:12px;"></p>
+    <h3 style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--c-text-subtle); margin-bottom:8px;">Quick actions</h3>
+    <div id="quick-actions" class="row" style="flex-wrap:wrap;"></div>
+    <div class="row" style="margin-top:14px;">
+      <a class="btn" href="/jobs">All jobs →</a>
+      <a class="btn" href="/jobs/new">Add another</a>
+    </div>
+  </section>
+</Admin>
+
+<style>
+  .lbl { font-size: 12px; color: var(--c-text-subtle); display: block; margin-bottom: 4px; }
+  .hint { color: var(--c-text-subtle); font-size: 12px; }
+  .err { color: #F87171; font-size: 12px; margin-top: 8px; line-height: 1.5; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .row > label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--c-text-subtle); }
+  .row .btn { font-size: 13px; }
+  .actions-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+  .actions-row #reset-btn, .actions-row #discard-btn { margin-left: auto; }
+  textarea { font-family: var(--font-mono); font-size: 12.5px; line-height: 1.55; resize: vertical; min-height: 220px; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 1000px) { .grid { grid-template-columns: 1fr; } }
+
+  .h2 { font-family: var(--font-display); font-size: 22px; font-weight: 400; letter-spacing: -0.01em; margin-bottom: 12px; }
+
+  .score-card { display: flex; flex-direction: column; gap: 12px; }
+  .score { display: flex; align-items: baseline; gap: 14px; padding: 16px; background: var(--c-bg); border: 1px solid var(--c-border); border-radius: var(--r-md); }
+  .score__value { font-family: var(--font-display); font-size: 56px; line-height: 1; }
+  .score__label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-text-subtle); }
+  .score__meta { font-size: 12px; color: var(--c-text-muted); margin-top: 2px; }
+  .score-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--c-border-subtle); font-size: 13px; }
+  .score-row:last-of-type { border-bottom: none; }
+  .rec { color: var(--c-text); font-weight: 500; }
+
+  .section { margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--c-border-subtle); }
+  .section h3 { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-text-subtle); margin-bottom: 8px; }
+  .muted { color: var(--c-text-muted); font-size: 13px; line-height: 1.6; }
+
+  .bd { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+  .bd :global(li) { display: grid; grid-template-columns: minmax(140px, max-content) 1fr 32px 32px; gap: 12px; align-items: center; font-size: 12px; color: var(--c-text-muted); }
+  .bd :global(.bd-label) { white-space: nowrap; }
+  .bd :global(.bar) { background: var(--c-bg-muted); height: 6px; border-radius: 3px; overflow: hidden; min-width: 60px; }
+  .bd :global(.bar) > :global(span) { display: block; height: 100%; background: var(--c-accent); }
+  .bd :global(.num) { font-family: var(--font-mono); text-align: right; font-size: 12px; color: var(--c-text); }
+  .bd :global(.bd-weight) { font-family: var(--font-mono); text-align: right; font-size: 10px; color: var(--c-text-subtle); }
+
+  .pill-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pill-list :global(.pill), :global(.score-row) :global(.pill) { padding: 3px 9px; border-radius: var(--r-full); font-family: var(--font-mono); font-size: 11px;
+    background: var(--c-bg-muted); border: 1px solid var(--c-border-subtle); color: var(--c-text-muted); }
+  .pill-list :global(.pill--good) { color: var(--c-success); border-color: rgba(16,185,129,0.4); background: rgba(16,185,129,0.08); }
+  .pill-list :global(.pill--gap) { color: #F87171; border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.08); }
+  :global(.score-row) :global(.pill--p1) { color: var(--c-accent); border-color: var(--c-accent); }
+
+  .bullet-list { padding-left: 18px; }
+  .bullet-list :global(li) { margin-bottom: 4px; }
+</style>
+
+<script>
+  import { runIntake, tryFetchJD, type IntakeResult } from '@/lib/job-intake';
+  import { jobsStore, ensureSchema, type Job, type JobStatus } from '@/lib/storage';
+
+  ensureSchema();
+
+  const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
+
+  let lastResult: IntakeResult | null = null;
+
+  function escape(s: string): string {
+    return s.replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]!));
+  }
+
+  function showStep(step: 'input' | 'preview' | 'saved') {
+    ($('step-input') as HTMLElement).style.display = step === 'input' ? 'block' : 'none';
+    ($('step-preview') as HTMLElement).style.display = step === 'preview' ? 'block' : 'none';
+    ($('step-saved') as HTMLElement).style.display = step === 'saved' ? 'block' : 'none';
+  }
+
+  function fillDraft(r: IntakeResult) {
+    const d = r.draft;
+    ($<HTMLInputElement>('f-company')).value = d.company ?? '';
+    ($<HTMLInputElement>('f-role')).value = d.role ?? '';
+    ($<HTMLInputElement>('f-url')).value = d.url ?? '';
+    ($<HTMLInputElement>('f-source')).value = d.source ?? '';
+    ($<HTMLInputElement>('f-location')).value = d.location ?? '';
+    ($<HTMLInputElement>('f-salaryMin')).value = d.salaryMin ? String(d.salaryMin) : '';
+    ($<HTMLInputElement>('f-salaryMax')).value = d.salaryMax ? String(d.salaryMax) : '';
+    ($<HTMLSelectElement>('f-status')).value = (d.status as JobStatus) ?? 'Saved';
+    ($<HTMLSelectElement>('f-angle')).value = d.resumeAngle ?? '';
+    ($<HTMLSelectElement>('f-priority')).value = d.priority ? String(d.priority) : '';
+    ($<HTMLInputElement>('f-nextStep')).value = d.nextStep ?? '';
+  }
+
+  function fillScore(r: IntakeResult) {
+    if (!r.score) return;
+    const s = r.score;
+    $('score-value').textContent = String(s.total);
+    $('score-meta').textContent = `${s.confidence} confidence · priority P${s.priority}`;
+    $('rec-angle').textContent = s.suggestedAngleLabel;
+    $('confidence').textContent = s.confidence;
+    $('priority').innerHTML = `<span class="pill ${s.priority === 1 ? 'pill--p1' : ''}">P${s.priority}</span>`;
+    $('effort').textContent = s.applicationEffort;
+    $('action').textContent = s.recommendedAction;
+
+    $('breakdown').innerHTML = s.breakdown.map(b => {
+      const rounded = Math.round(b.score);
+      const pct = Math.max(0, Math.min(100, rounded));
+      const color = b.score < 0 ? '#F87171' : 'var(--c-accent)';
+      const bar = b.weight > 0
+        ? `<span class="bar"><span style="width:${pct}%; background:${color};"></span></span>`
+        : `<span class="hint" style="font-size:11px;">${escape(b.note ?? '')}</span>`;
+      const weight = b.weight ? `<span class="bd-weight">${b.weight}%</span>` : '';
+      return `<li><span class="bd-label">${escape(b.label)}</span>${bar}<span class="num">${rounded}</span>${weight}</li>`;
+    }).join('');
+
+    $('strengths').innerHTML = s.topStrengths.length
+      ? s.topStrengths.map(x => `<span class="pill pill--good">${escape(x)}</span>`).join('')
+      : '<span class="hint">No strong matches yet — pick a different angle or add more JD text.</span>';
+
+    if (s.gaps.length) {
+      $('gaps-section').style.display = '';
+      $('gaps').innerHTML = s.gaps.map(x => `<span class="pill pill--gap">${escape(x)}</span>`).join('');
+    } else {
+      $('gaps-section').style.display = 'none';
+    }
+
+    if (r.analyzer?.riskFlags.length) {
+      $('risks-section').style.display = '';
+      $('risks').innerHTML = r.analyzer.riskFlags.map(f => `<li>${escape(f)}</li>`).join('');
+    } else {
+      $('risks-section').style.display = 'none';
+    }
+  }
+
+  function showInputError(msg: string) {
+    const el = $('input-error');
+    el.textContent = msg;
+    el.style.display = msg ? 'block' : 'none';
+  }
+  function showSaveError(msg: string) {
+    const el = $('save-error');
+    el.textContent = msg;
+    el.style.display = msg ? 'block' : 'none';
+  }
+
+  function runAnalysis() {
+    const urlText = ($<HTMLInputElement>('jd-url')).value.trim();
+    const jdText = ($<HTMLTextAreaElement>('jd-text')).value.trim();
+    if (!urlText && jdText.length < 50) {
+      showInputError('Paste a URL or at least a paragraph of job description.');
+      return;
+    }
+    showInputError('');
+    lastResult = runIntake({ urlText: urlText || undefined, jdText: jdText || undefined });
+    fillDraft(lastResult);
+    fillScore(lastResult);
+    showStep('preview');
+  }
+
+  $('analyze-btn').addEventListener('click', runAnalysis);
+
+  $('try-fetch-btn').addEventListener('click', async () => {
+    const urlText = ($<HTMLInputElement>('jd-url')).value.trim();
+    const status = $('fetch-status');
+    if (!urlText) {
+      showInputError('Paste a URL first.');
+      return;
+    }
+    showInputError('');
+    status.style.display = 'block';
+    status.textContent = 'Trying to fetch the page (most boards block this — expect to paste manually)…';
+    const text = await tryFetchJD(urlText);
+    if (text) {
+      ($<HTMLTextAreaElement>('jd-text')).value = text;
+      status.textContent = 'Fetched. Review the text above and hit Analyze.';
+    } else {
+      status.textContent = 'Couldn’t fetch the page (CORS or auth blocked it). Paste the job description into the box above.';
+    }
+  });
+
+  $('reset-btn').addEventListener('click', () => {
+    ($<HTMLInputElement>('jd-url')).value = '';
+    ($<HTMLTextAreaElement>('jd-text')).value = '';
+    $('fetch-status').style.display = 'none';
+    lastResult = null;
+    showStep('input');
+  });
+
+  $('discard-btn').addEventListener('click', () => {
+    lastResult = null;
+    showStep('input');
+  });
+
+  $('save-btn').addEventListener('click', () => {
+    const company = ($<HTMLInputElement>('f-company')).value.trim();
+    const role = ($<HTMLInputElement>('f-role')).value.trim();
+    if (!company || !role) {
+      showSaveError('Company and role are required.');
+      return;
+    }
+    showSaveError('');
+    const job: Job = {
+      id: crypto.randomUUID(),
+      company,
+      role,
+      url: ($<HTMLInputElement>('f-url')).value.trim() || undefined,
+      source: ($<HTMLInputElement>('f-source')).value.trim() || undefined,
+      location: ($<HTMLInputElement>('f-location')).value.trim() || undefined,
+      salaryMin: Number(($<HTMLInputElement>('f-salaryMin')).value) || undefined,
+      salaryMax: Number(($<HTMLInputElement>('f-salaryMax')).value) || undefined,
+      status: (($<HTMLSelectElement>('f-status')).value as JobStatus) || 'Saved',
+      resumeAngle: ($<HTMLSelectElement>('f-angle')).value || undefined,
+      priority: (Number(($<HTMLSelectElement>('f-priority')).value) as 1|2|3) || undefined,
+      fitScore: lastResult?.score?.total,
+      jdText: lastResult?.draft.jdText,
+      nextStep: ($<HTMLInputElement>('f-nextStep')).value.trim() || undefined,
+      dateFound: lastResult?.draft.dateFound ?? Date.now(),
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+    jobsStore.upsert(job);
+
+    // Saved view
+    $('saved-summary').textContent = `${company} — ${role}${lastResult?.score ? ` · score ${lastResult.score.total} · ${lastResult.score.suggestedAngleLabel}` : ''}`;
+    const links = (lastResult?.nextSteps ?? []).map(a => `<a class="btn" href="${a.href}">${escape(a.label)}</a>`).join('');
+    $('quick-actions').innerHTML = links;
+
+    showStep('saved');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+</script>

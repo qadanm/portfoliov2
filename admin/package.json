@@ -1,0 +1,19 @@
+{
+  "name": "qadan-admin",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "description": "Local-only career operating system for Moe Qadan. Never deployed.",
+  "scripts": {
+    "dev": "astro dev --port 4322 --host 127.0.0.1",
+    "build": "astro build",
+    "preview": "astro preview --port 4322 --host 127.0.0.1",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^4.16.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}

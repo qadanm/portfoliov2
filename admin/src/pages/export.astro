@@ -1,0 +1,115 @@
+---
+import Admin from '@/layouts/Admin.astro';
+---
+
+<Admin
+  title="Export & backup"
+  intro="Download a JSON snapshot to back up your local data, restore on another machine, or merge with an existing dataset. Also exports CSVs for spreadsheets."
+>
+  <section class="card">
+    <h2 class="h2">Backup (JSON)</h2>
+    <p class="muted">Download everything: jobs, recruiters, saved letters. Keep this file safe — it's the only way to restore.</p>
+    <div class="row" style="margin-top:12px;">
+      <button class="btn btn--primary" id="export-json">Download backup.json</button>
+    </div>
+  </section>
+
+  <section class="card" style="margin-top:16px;">
+    <h2 class="h2">Restore</h2>
+    <p class="muted">Replace overwrites everything. Merge keeps existing records and updates by id.</p>
+    <input type="file" id="restore-file" accept="application/json" />
+    <div class="row" style="margin-top:12px;">
+      <button class="btn" id="restore-merge">Restore (merge)</button>
+      <button class="btn" id="restore-replace">Restore (replace)</button>
+    </div>
+  </section>
+
+  <section class="card" style="margin-top:16px;">
+    <h2 class="h2">CSV exports</h2>
+    <p class="muted">Spreadsheet-ready snapshots.</p>
+    <div class="row" style="margin-top:12px;">
+      <button class="btn" id="export-jobs-csv">Download jobs.csv</button>
+      <button class="btn" id="export-recruiters-csv">Download recruiters.csv</button>
+    </div>
+  </section>
+
+  <section class="card" style="margin-top:16px;">
+    <h2 class="h2">Wipe local data</h2>
+    <p class="muted">Removes jobs, recruiters, and letters from this browser. Cannot be undone.</p>
+    <div class="row" style="margin-top:12px;">
+      <button class="btn" id="wipe" style="color:#F87171;border-color:rgba(239,68,68,0.3);">Wipe everything</button>
+    </div>
+  </section>
+</Admin>
+
+<style>
+  .h2 { font-family: var(--font-display); font-size: 22px; font-weight: 400; letter-spacing: -0.01em; margin-bottom: 8px; }
+  .muted { color: var(--c-text-subtle); font-size: 13px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  input[type="file"] { font-size: 13px; padding: 6px 0; background: transparent; border: none; }
+</style>
+
+<script>
+  import { exportAll, importAll, clearAll, jobsStore, recruitersStore, jobsToCSV, recruitersToCSV, ensureSchema, type Backup } from '@/lib/storage';
+
+  ensureSchema();
+
+  function download(name: string, content: string, type = 'application/json') {
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function todayName(prefix: string, ext: string) {
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${prefix}-${yyyy}-${mm}-${dd}.${ext}`;
+  }
+
+  document.getElementById('export-json')?.addEventListener('click', () => {
+    download(todayName('qadan-admin-backup', 'json'), JSON.stringify(exportAll(), null, 2));
+  });
+
+  document.getElementById('export-jobs-csv')?.addEventListener('click', () => {
+    download(todayName('jobs', 'csv'), jobsToCSV(jobsStore.list()), 'text/csv');
+  });
+
+  document.getElementById('export-recruiters-csv')?.addEventListener('click', () => {
+    download(todayName('recruiters', 'csv'), recruitersToCSV(recruitersStore.list()), 'text/csv');
+  });
+
+  async function readBackup(): Promise<Backup | null> {
+    const input = document.getElementById('restore-file') as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) { alert('Pick a backup.json file first.'); return null; }
+    try { return JSON.parse(await file.text()) as Backup; } catch { alert('Could not parse JSON.'); return null; }
+  }
+
+  document.getElementById('restore-merge')?.addEventListener('click', async () => {
+    const b = await readBackup();
+    if (!b) return;
+    importAll(b, 'merge');
+    alert(`Merged. Jobs: ${b.jobs?.length ?? 0}, recruiters: ${b.recruiters?.length ?? 0}, letters: ${b.letters?.length ?? 0}.`);
+  });
+
+  document.getElementById('restore-replace')?.addEventListener('click', async () => {
+    if (!confirm('Replace will overwrite all local data. Continue?')) return;
+    const b = await readBackup();
+    if (!b) return;
+    importAll(b, 'replace');
+    alert('Restored. Reload to see updated counts.');
+  });
+
+  document.getElementById('wipe')?.addEventListener('click', () => {
+    if (!confirm('Wipe ALL jobs, recruiters, and letters from this browser. This cannot be undone. Continue?')) return;
+    if (!confirm('Are you sure? Last chance.')) return;
+    clearAll();
+    alert('Wiped.');
+  });
+</script>

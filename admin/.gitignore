@@ -1,0 +1,13 @@
+# Build artifacts
+dist/
+.astro/
+node_modules/
+
+# Local data — never commit
+.env
+.env.local
+*.local
+
+# Generated PDFs / exports — keep out of git
+exports/
+*.pdf

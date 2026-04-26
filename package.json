@@ -6,7 +6,10 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "admin": "cd admin && npm run dev",
+    "admin:install": "cd admin && npm install",
+    "admin:build": "cd admin && npm run build"
   },
   "dependencies": {
     "@astrojs/mdx": "^3.1.0",
