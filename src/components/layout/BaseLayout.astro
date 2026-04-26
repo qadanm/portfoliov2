@@ -14,9 +14,9 @@ interface Props {
 }
 
 const {
-  title = 'Qadan — UX & Frontend Systems',
-  description = 'I build systems that make complex things usable. UX, frontend architecture, and AI-native products.',
-  image = '/og-default.png',
+  title = 'Qadan — Product Design & UX Engineering',
+  description = 'I design and build product systems end to end. Product UX, frontend architecture, and the constraints they live inside.',
+  image = '/images/chatobd2/hero.webp',
   article = false,
   noindex = false,
 } = Astro.props;
@@ -52,7 +52,6 @@ const fullTitle = title.includes('Qadan') ? title : `${title} — Qadan`;
   <meta name="twitter:image" content={new URL(image, Astro.site)} />
 
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
   <ViewTransitions />
 
@@ -64,9 +63,9 @@ const fullTitle = title.includes('Qadan') ? title : `${title} — Qadan`;
     "@type": "Person",
     "name": "Moe Qadan",
     "url": Astro.site,
-    "jobTitle": "UX Engineer & Platform Systems",
+    "jobTitle": "Product Designer & UX Engineer",
     "description": description,
-    "knowsAbout": ["UX Engineering", "Platform Systems", "Design Systems", "ASP.NET MVC", "AI-Native Workflows", "Front-End Architecture"],
+    "knowsAbout": ["Product Design", "UX Engineering", "Design Systems", "Platform UX", "AI-Native Products", "Front-End Architecture"],
   })} />
 </head>
 <body>
@@ -145,9 +144,29 @@ const fullTitle = title.includes('Qadan') ? title : `${title} — Qadan`;
         }
       }
 
+      // Live update when the OS color scheme changes — but only when the
+      // visitor hasn't manually overridden the theme.
+      function bindSystemSchemeListener() {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        const handler = (e) => {
+          if (localStorage.getItem('mq-theme')) return;
+          const theme = e.matches ? 'dark' : 'light';
+          if (document.documentElement.getAttribute('data-theme') !== theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+          }
+        };
+        if (typeof mq.addEventListener === 'function') {
+          mq.addEventListener('change', handler);
+        } else {
+          // Safari < 14 fallback
+          mq.addListener(handler);
+        }
+      }
+
       bindReveals();
       smoothThemeToggle();
       applyStoredTheme();
+      bindSystemSchemeListener();
       document.addEventListener('astro:page-load', bindReveals);
       document.addEventListener('astro:after-swap', applyStoredTheme);
     })();

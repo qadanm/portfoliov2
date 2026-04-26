@@ -3,7 +3,7 @@ import ProjectCard from './ProjectCard.astro';
 import type { CollectionEntry } from 'astro:content';
 
 interface Props {
-  projects: CollectionEntry<'work'>[];
+  projects: CollectionEntry<'build'>[];
 }
 
 const { projects } = Astro.props;
@@ -15,7 +15,7 @@ const experienceProjects = sorted.filter(p => p.data.engagement === 'work');
 interface SectionProps {
   label: string;
   note: string;
-  list: CollectionEntry<'work'>[];
+  list: CollectionEntry<'build'>[];
 }
 
 const sections: SectionProps[] = [

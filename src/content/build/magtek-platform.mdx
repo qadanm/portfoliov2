@@ -13,6 +13,8 @@ placeholder:
   sublabel: Multi-Site UX System
   angle: 135
   labelTone: dark
+coverImage: /images/magtek/homepage.webp
+coverAlt: MagTek homepage — "Secure Transactions. More than just payments." with metric story ($11B processed annually, 1.8s transaction speed, 99.9% uptime) and a photo of a collaborating team.
 featured: true
 order: 2
 engagement: work
@@ -56,7 +58,7 @@ A lot of the most valuable work is invisible when it's done right. The change yo
 
 The homepage needed to communicate a complex product ecosystem clearly. It's the highest-traffic entry point and the place most users decide whether they're in the right place.
 
-The work focused on improving hierarchy, simplifying messaging, and guiding users to the right paths faster. The goal wasn't a visual refresh. It was making navigation and understanding easier without resetting what was already working.
+The work was hierarchy. Which message comes first. Which paths get visual weight. Which ones get demoted. The goal wasn't a visual refresh. It was a homepage that answers am I in the right place before the visitor scrolls.
 
 The patterns introduced here became reusable across the rest of the platform: section structures, hierarchy rules, and a navigation grammar that the other properties have since adopted.
 
@@ -72,7 +74,9 @@ Less searching, more finding.
 
 Long-running systems develop strong opinions about how they want to be changed. Ignoring those opinions is how outages happen. Listening to them is how you ship things that survive.
 
-Some of the work that mattered most:
+One example. The homepage hero ran a six-slide rotating carousel that nobody finished. The straight design call was killing the slider and replacing it with a static hero on a single message. The harder problem was around it: the half-dozen marketing surfaces sized to the carousel's dimensions, the analytics taxonomy that named events by slide number, the stakeholders who'd argued for "their" slide. The work was sequencing it. Build the static hero on a parallel route first, run it as a measurable comparison against the live page, migrate the dependent surfaces one at a time, then retire the carousel last so nothing pointed at a dead artifact. The design decision was a single static hero with one message. The harder design decision was about how to land it without breaking the system around it.
+
+Some of the other work that mattered most:
 
 - Replacing a cluster of one-off layouts with a small set of layout primitives, without touching production traffic.
 - Moving spacing, color, and type into tokens that the rest of the platform could adopt incrementally, on its own timeline.

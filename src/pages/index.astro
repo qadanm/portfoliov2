@@ -4,15 +4,16 @@ import Hero from '@/components/home/Hero.astro';
 import ProjectGrid from '@/components/ProjectGrid.astro';
 import ContactForm from '@/components/ContactForm.astro';
 import AIWorkflowStrip from '@/components/diagrams/AIWorkflowStrip.astro';
+import DesignWorkflowStrip from '@/components/diagrams/DesignWorkflowStrip.astro';
 import { getCollection } from 'astro:content';
 
-const projects = (await getCollection('work', ({ data }) => !data.draft))
+const projects = (await getCollection('build', ({ data }) => !data.draft))
   .sort((a, b) => a.data.order - b.data.order);
 ---
 
 <BaseLayout
-  title="Qadan — UX &amp; Frontend Systems"
-  description="I build systems that make complex things usable. UX, frontend architecture, and AI-native products."
+  title="Qadan — Product Design &amp; UX Engineering"
+  description="I design and build product systems end to end. Product UX, frontend architecture, and the constraints they live inside."
 >
   <Hero />
 
@@ -59,12 +60,12 @@ const projects = (await getCollection('work', ({ data }) => !data.draft))
     </div>
   </section>
 
-  <section class="home-work" id="work">
+  <section class="home-work" id="build">
     <div class="container-site">
       <div class="home-work__head" data-reveal data-reveal-delay="1">
         <span class="home-work__eyebrow">
           <span class="section-index" aria-hidden="true">02</span>
-          Work
+          Build
         </span>
         <h2 class="home-work__title">
           Things I've built,<br />and systems I work in.
@@ -82,11 +83,50 @@ const projects = (await getCollection('work', ({ data }) => !data.draft))
     </div>
   </section>
 
+  <section class="home-design" id="design-workflow">
+    <div class="container-site">
+      <div class="home-design__inner">
+        <div class="home-design__col" data-reveal>
+          <span class="home-design__eyebrow">
+            <span class="section-index" aria-hidden="true">03</span>
+            Design workflow
+          </span>
+          <h2 class="home-design__title">
+            Design as part of the <em>build</em>.
+          </h2>
+        </div>
+        <div class="home-design__col" data-reveal data-reveal-delay="2">
+          <p class="home-design__para">
+            When a screen is easier to think through visually than in code,
+            I start in Claude Design. It sits in front of the implementation
+            loop without replacing the rest.
+          </p>
+          <ul class="home-design__bullets">
+            <li>Fast prototypes for flows, states, and reviews</li>
+            <li>More useful when the codebase or system is already in context</li>
+            <li>Cleaner handoff into implementation work</li>
+          </ul>
+          <a href="/design" class="home-design__link">
+            More about the design workflow
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="home-design__strip" data-reveal data-reveal-delay="3">
+        <span class="home-design__strip-caption">Where Claude Design sits in the loop</span>
+        <DesignWorkflowStrip />
+      </div>
+    </div>
+  </section>
+
   <section class="home-contact">
     <div class="container-site home-contact__inner">
       <div class="home-contact__intro" data-reveal>
         <span class="home-contact__eyebrow">
-          <span class="section-index" aria-hidden="true">03</span>
+          <span class="section-index" aria-hidden="true">04</span>
           Get in touch
         </span>
         <h2 class="home-contact__title">
@@ -267,6 +307,141 @@ const projects = (await getCollection('work', ({ data }) => !data.draft))
     opacity: 0.92;
   }
 
+  /* Design workflow — comes third */
+  .home-design {
+    padding-top: var(--space-24);
+    padding-bottom: var(--space-20);
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  @media (min-width: 768px) {
+    .home-design {
+      padding-top: var(--space-32);
+      padding-bottom: var(--space-24);
+    }
+  }
+
+  .home-design__inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+
+  @media (min-width: 900px) {
+    .home-design__inner {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-16);
+    }
+  }
+
+  .home-design__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+    margin-bottom: var(--space-4);
+  }
+
+  .home-design__title {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 3.5vw, 44px);
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    color: var(--color-text);
+    max-width: 18ch;
+  }
+
+  .home-design__title em {
+    font-style: italic;
+    color: var(--color-accent);
+  }
+
+  .home-design__para {
+    font-size: clamp(15px, 1.4vw, 17px);
+    line-height: 1.75;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-4);
+    max-width: 56ch;
+  }
+
+  .home-design__bullets {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    max-width: 56ch;
+  }
+
+  .home-design__bullets li {
+    position: relative;
+    padding-left: 22px;
+    font-size: clamp(14px, 1.3vw, 16px);
+    line-height: 1.65;
+    color: var(--color-text-muted);
+  }
+
+  .home-design__bullets li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.7em;
+    width: 12px;
+    height: 1px;
+    background-color: var(--color-accent);
+  }
+
+  .home-design__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: var(--space-2);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text);
+    text-decoration: none;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 6px;
+    transition: color 150ms, border-color 150ms;
+  }
+
+  .home-design__link:hover {
+    color: var(--color-accent);
+    border-bottom-color: var(--color-accent);
+  }
+
+  .home-design__strip {
+    margin-top: var(--space-10);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  @media (min-width: 768px) {
+    .home-design__strip {
+      margin-top: var(--space-12);
+    }
+  }
+
+  .home-design__strip-caption {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+  }
+
   /* Contact — close */
   .home-contact {
     padding-top: var(--space-24);
@@ -337,7 +512,7 @@ const projects = (await getCollection('work', ({ data }) => !data.draft))
   }
 
   .home-contact__form {
-    padding: var(--space-5);
+    padding: var(--space-6);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-xl);
     background-color: var(--color-bg-elevated);
@@ -345,7 +520,7 @@ const projects = (await getCollection('work', ({ data }) => !data.draft))
 
   @media (min-width: 600px) {
     .home-contact__form {
-      padding: var(--space-6);
+      padding: var(--space-7) var(--space-8);
     }
   }
 

@@ -1,0 +1,56 @@
+---
+title: Advisor Platforms
+short: Advisor-facing platforms across major wealth institutions
+category: Product
+keyFocus:
+  - Multi-tenant frontend
+  - Structured layouts for dense data
+  - Per-institution adaptation
+placeholder:
+  from: '#0B1729'
+  to: '#1E3A5F'
+  label: Advisor Platforms
+  sublabel: Wealth Management
+  angle: 135
+  labelTone: light
+featured: false
+order: 6
+engagement: work
+company: InvestCloud
+---
+
+## The setting
+
+Wealth management advisor and client portals built on InvestCloud's framework, deployed across institutions including Chase, Cetera, Northwestern Mutual, Voya, Silicon Valley Bank, and East West Bank.
+
+Multi-tenant by design. One platform underneath. Per-institution branding, structure, and information architecture on top. The shared system constrained what was possible. The per-institution work made each portal feel native to the bank that ran it.
+
+## Where the design problem actually was
+
+Not in the components. Components were defined upstream by design teams that owned the Figma files and the brand systems. The design problem was in the gap between Figma and a multi-tenant CMS that wasn't built around modern token systems.
+
+Most of the day-to-day was hand-written CSS implementing those handoffs faithfully, at the institution-specific level, without breaking the shared substrate underneath. That meant:
+
+- Reading Figma intent, not just specs, and reproducing it in a CMS that didn't always have a primitive for what was drawn.
+- Holding per-institution branding inside a system that wanted to enforce its own.
+- Keeping dense, data-heavy layouts readable across desktop, tablet, and mobile, often within design constraints that had been authored mostly for one breakpoint.
+- Coordinating with design, product, and QA tightly enough that "this looks right in Figma" and "this works in production" stayed connected.
+
+## What this taught me about handoff hygiene
+
+The portals that shipped well shared one thing: the design team and the implementation layer treated each other as collaborators, not as a one-way file drop. The portals that shipped badly were the ones where the handoff was assumed instead of negotiated.
+
+A good handoff names the constraints up front. Which spacings are token-backed. Which states the design has thought through. Where the system can flex. Where it can't. A bad handoff is just a frame.
+
+The implementation work was sixty percent reproducing intent faithfully and forty percent closing gaps the original handoff didn't see. The second forty percent is where the design literacy actually pays off.
+
+## What the platforms supported
+
+- Portfolio management
+- Advisor–client interaction
+- Onboarding and lifecycle workflows
+- Multi-account and multi-role environments
+
+## The takeaway
+
+Implementing other people's design at fidelity, across many institutions, is a different skill than designing from scratch. It builds an instinct for what design teams meant, and for what the system underneath them can actually carry. Both have stayed useful.

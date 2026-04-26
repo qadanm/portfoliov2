@@ -3,7 +3,7 @@ import Placeholder from './Placeholder.astro';
 import type { CollectionEntry } from 'astro:content';
 
 interface Props {
-  project: CollectionEntry<'work'>;
+  project: CollectionEntry<'build'>;
   size?: 'default' | 'feature';
   index?: number;
 }
@@ -13,7 +13,7 @@ const { data, slug } = project;
 ---
 
 <a
-  href={`/work/${slug}`}
+  href={`/build/${slug}`}
   class:list={['project-card', `project-card--${size}`, { 'project-card--flagship': data.category === 'Flagship' }]}
   style={`animation-delay: ${index * 60}ms;`}
   data-category={data.category}

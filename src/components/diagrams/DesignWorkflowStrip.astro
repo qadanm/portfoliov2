@@ -1,0 +1,100 @@
+---
+const nodes = [
+  { name: 'Idea', kind: 'input' },
+  { name: 'Claude Design', kind: 'agent' },
+  { name: 'Claude Code', kind: 'agent' },
+  { name: 'Ship', kind: 'output' },
+];
+---
+
+<div class="dw-strip" aria-label="Design workflow">
+  <span class="dw-strip__label">Design loop</span>
+  <div class="dw-strip__flow">
+    {nodes.map((node, i) => (
+      <>
+        <span class:list={['dw-strip__node', `dw-strip__node--${node.kind}`]}>
+          {node.kind === 'agent' && (
+            <svg class="dw-strip__icon" width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+              <circle cx="5" cy="5" r="2" fill="currentColor"/>
+              <circle cx="5" cy="5" r="4" stroke="currentColor" stroke-width="0.75" opacity="0.4"/>
+            </svg>
+          )}
+          {node.name}
+        </span>
+        {i < nodes.length - 1 && (
+          <span class="dw-strip__sep" aria-hidden="true">→</span>
+        )}
+      </>
+    ))}
+  </div>
+</div>
+
+<style>
+  .dw-strip {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: 9999px;
+    background-color: var(--color-bg-elevated);
+    width: fit-content;
+    max-width: 100%;
+  }
+
+  .dw-strip__label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+    padding-right: var(--space-3);
+    border-right: 1px solid var(--color-border-subtle);
+  }
+
+  .dw-strip__flow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .dw-strip__node {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    padding: 3px 9px;
+    border-radius: 9999px;
+    background-color: var(--color-bg-muted);
+    border: 1px solid var(--color-border);
+  }
+
+  .dw-strip__node--agent {
+    color: var(--color-accent);
+    background-color: var(--color-accent-dim);
+    border-color: var(--color-accent-muted);
+  }
+
+  .dw-strip__node--output {
+    color: var(--color-success);
+    background-color: rgba(16, 185, 129, 0.08);
+    border-color: rgba(16, 185, 129, 0.2);
+  }
+
+  .dw-strip__icon {
+    display: inline-block;
+    color: currentColor;
+  }
+
+  .dw-strip__sep {
+    color: var(--color-text-subtle);
+    font-size: 11px;
+    opacity: 0.6;
+  }
+</style>

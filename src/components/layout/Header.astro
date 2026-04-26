@@ -2,7 +2,8 @@
 const pathname = Astro.url.pathname;
 
 const nav = [
-  { href: '/work', label: 'Work' },
+  { href: '/build', label: 'Build' },
+  { href: '/design', label: 'Design' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
 ];
@@ -77,7 +78,10 @@ function isActive(href: string) {
   const html = document.documentElement;
 
   function getTheme() {
-    return html.getAttribute('data-theme') || 'dark';
+    const attr = html.getAttribute('data-theme');
+    if (attr === 'dark' || attr === 'light') return attr;
+    // Fallback to system preference when no attribute is set yet.
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
 
   function setTheme(theme: string) {
@@ -256,8 +260,8 @@ function isActive(href: string) {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     border-radius: 9999px;
     border: 1px solid var(--color-border);
     background: transparent;
@@ -282,8 +286,8 @@ function isActive(href: string) {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     border-radius: var(--radius-md);
     border: 1px solid var(--color-border);
     background: transparent;
@@ -325,9 +329,10 @@ function isActive(href: string) {
     flex-direction: column;
     padding: 12px 24px 20px;
     border-top: 1px solid var(--color-border);
-    background-color: color-mix(in srgb, var(--color-bg) 92%, transparent);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--color-border);
+    background-color: var(--color-bg);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
     max-height: 0;
     overflow: hidden;
     opacity: 0;

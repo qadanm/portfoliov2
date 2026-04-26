@@ -13,6 +13,8 @@ placeholder:
   sublabel: AI Diagnostics System
   angle: 135
   labelTone: light
+coverImage: /images/chatobd2/hero.webp
+coverAlt: ChatOBD2 marketing site hero — "Your car is talking. ChatOBD-2 translates." with phone mockup showing a live diagnostic chat on a 2010 Toyota Prius.
 featured: true
 order: 1
 ---
@@ -43,8 +45,10 @@ This is where AI earns its keep. The model's job is reducing complexity, not gen
 
 **Confidence is part of the answer.** A partial scan changes what the verdict means. Showing scan quality as a fixed bar instead of hiding it costs a small piece of optimism, but earns a much larger piece of trust. It's the kind of decision a less-confident product wouldn't make.
 
-**Prompts live in the system, not in components.** No part of the UI hardcodes an AI prompt string. All next-best-actions derive from verdict tier and code context, in a single module. When the language changes, it changes everywhere. The analytics stay clean across the product.
+**Prompts live in the system, not in components.** When prompts get scattered across components, every copy change is a hunt across N files, and the analytics taxonomy quietly drifts behind it. Pulling them into one module, keyed by verdict tier and code context, means a single change updates the whole product, and the analytics stay coherent across it.
 
-## What the system does, in short
+## The shape of the system
 
-It turns vehicle data into something a person can act on. The chat surface is the home screen. The verdict card is the unit of output. AI sits in the middle of the pipeline, constrained by structure on either side.
+Chat surface as the home screen. Verdict card as the unit of output. AI in the middle of the pipeline, constrained by structure on either side.
+
+The interface stops asking the driver to interpret data and starts telling them what to do next.
