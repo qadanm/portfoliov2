@@ -7,8 +7,8 @@ export const identity = {
   location: 'Los Angeles',
   email: 'moe@qadan.co',
   site: 'https://qadan.co',
-  linkedin: 'https://linkedin.com/in/muhammedqadan',
-  github: 'https://github.com/muhammedqadan',
+  linkedin: 'https://linkedin.com/in/mqadan',
+  github: 'https://github.com/qadanm',
 } as const;
 
 export type Identity = typeof identity;
