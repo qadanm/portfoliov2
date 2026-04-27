@@ -46,12 +46,26 @@ function safeParse<T>(raw: string | null, fallback: T): T {
 
 function read<T>(key: string, fallback: T): T {
   if (typeof window === 'undefined') return fallback;
-  return safeParse<T>(localStorage.getItem(key), fallback);
+  try {
+    return safeParse<T>(localStorage.getItem(key), fallback);
+  } catch {
+    return fallback;
+  }
 }
 
 function write<T>(key: string, value: T): void {
   if (typeof window === 'undefined') return;
-  localStorage.setItem(key, JSON.stringify(value));
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (err: unknown) {
+    try {
+      const message = err instanceof Error ? err.message : String(err);
+      window.dispatchEvent(new CustomEvent('qa-storage-error', { detail: { key, message } }));
+      // eslint-disable-next-line no-console
+      console.error(`[qa-storage] discovery write failed for ${key}:`, message);
+    } catch { /* no-op */ }
+    return;
+  }
   try {
     window.dispatchEvent(new CustomEvent('qa-data-changed', { detail: { key } }));
   } catch { /* no-op */ }

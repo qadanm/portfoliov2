@@ -16,7 +16,11 @@ import Admin from '@/layouts/Admin.astro';
   </section>
 
   <section class="card" style="margin-top: 24px;">
-    <h2 class="dash__h2">Today's queue</h2>
+    <h2 class="dash__h2">Action items</h2>
+    <p class="muted" style="margin-top:-6px;margin-bottom:12px;">
+      Overdue follow-ups, stale conversations, and recruiter nudges. Saved jobs ready to apply live in
+      <a href="/today" style="border-bottom:1px solid var(--c-border);">→ Today</a>.
+    </p>
     <div id="queue" class="dash__queue">
       <p class="muted">Loading…</p>
     </div>
@@ -180,16 +184,21 @@ import Admin from '@/layouts/Admin.astro';
       href: `/recruiters`,
     });
   }
+  function esc(s: string): string {
+    return s.replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]!));
+  }
   if (items.length === 0) {
-    queueEl.innerHTML = '<p class="muted">Nothing on the queue. Add a job, analyze a JD, or draft a recruiter message.</p>';
+    queueEl.innerHTML = '<p class="muted">No follow-ups or stale jobs. Saved jobs to apply: <a href="/today" style="border-bottom:1px solid var(--c-border);">→ Today</a>.</p>';
   } else {
+    // Escape every interpolated field — company/role/recruiter name come
+    // from user-pasted JD text and must not run as HTML.
     queueEl.innerHTML = items.slice(0, 8).map(i => `
-      <a class="queue-item${i.overdue ? ' is-overdue' : ''}" href="${i.href}" style="text-decoration:none;color:inherit;">
+      <a class="queue-item${i.overdue ? ' is-overdue' : ''}" href="${esc(i.href)}" style="text-decoration:none;color:inherit;">
         <div>
-          <div style="font-size:13px;color:var(--c-text);">${i.label}</div>
-          <div style="font-size:11px;color:var(--c-text-subtle);font-family:var(--font-mono);">${i.sub}</div>
+          <div style="font-size:13px;color:var(--c-text);">${esc(i.label)}</div>
+          <div style="font-size:11px;color:var(--c-text-subtle);font-family:var(--font-mono);">${esc(i.sub)}</div>
         </div>
-        <span class="q-action">${i.action}</span>
+        <span class="q-action">${esc(i.action)}</span>
       </a>
     `).join('');
   }

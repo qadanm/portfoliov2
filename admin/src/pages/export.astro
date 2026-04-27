@@ -8,7 +8,7 @@ import Admin from '@/layouts/Admin.astro';
 >
   <section class="card">
     <h2 class="h2">Backup (JSON)</h2>
-    <p class="muted">Download everything: jobs, recruiters, saved letters. Keep this file safe — it's the only way to restore.</p>
+    <p class="muted">Download everything: jobs, recruiters, saved letters, discovered jobs, watched companies, source configs, and discovery preferences. Keep this file safe — it's the only way to restore.</p>
     <div class="row" style="margin-top:12px;">
       <button class="btn btn--primary" id="export-json">Download backup.json</button>
     </div>
@@ -88,18 +88,30 @@ import Admin from '@/layouts/Admin.astro';
     const input = document.getElementById('restore-file') as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) { alert('Pick a backup.json file first.'); return null; }
-    try { return JSON.parse(await file.text()) as Backup; } catch { alert('Could not parse JSON.'); return null; }
+    let text: string;
+    try { text = await file.text(); }
+    catch (err) { alert(`Could not read file: ${(err as Error).message}`); return null; }
+    try { return JSON.parse(text) as Backup; }
+    catch (err) { alert(`Could not parse JSON: ${(err as Error).message.slice(0, 120)}`); return null; }
   }
 
   document.getElementById('restore-merge')?.addEventListener('click', async () => {
     const b = await readBackup();
     if (!b) return;
     importAll(b, 'merge');
-    alert(`Merged. Jobs: ${b.jobs?.length ?? 0}, recruiters: ${b.recruiters?.length ?? 0}, letters: ${b.letters?.length ?? 0}.`);
+    alert(
+      `Merged.\n\n` +
+      `Jobs: ${b.jobs?.length ?? 0}\n` +
+      `Recruiters: ${b.recruiters?.length ?? 0}\n` +
+      `Letters: ${b.letters?.length ?? 0}\n` +
+      `Discovered: ${(b.discoveredJobs as unknown[] | undefined)?.length ?? 0}\n` +
+      `Sources: ${(b.discoverySources as unknown[] | undefined)?.length ?? 0}\n` +
+      `Watched: ${(b.watchedCompanies as unknown[] | undefined)?.length ?? 0}`,
+    );
   });
 
   document.getElementById('restore-replace')?.addEventListener('click', async () => {
-    if (!confirm('Replace will overwrite all local data. Continue?')) return;
+    if (!confirm('Replace will overwrite all local data — including discovered jobs, watched companies, and source configs. Continue?')) return;
     const b = await readBackup();
     if (!b) return;
     importAll(b, 'replace');
