@@ -1218,12 +1218,14 @@ import Admin from '@/layouts/Admin.astro';
       ? (j.filterReasons ?? []).slice(0, 2).map(r => `<span class="disc__pill disc__pill--filter">${escape(r)}</span>`).join('')
       : '';
 
-    // Quick actions live inline; primary "Today" is always visible enough
-    // to invite a click without overwhelming the row.
+    // Quick actions live inline. NOTE: do NOT add `onclick="event.stopPropagation()"`
+    // on the wrapper — the listEl delegate already routes [data-act] clicks
+    // through act() and returns before falling through to the row-open path.
+    // stopPropagation here would silently kill every quick button.
     let quick = '';
     if (j.status === 'new') {
       quick = `
-        <div class="disc__row-quick" onclick="event.stopPropagation()">
+        <div class="disc__row-quick">
           <button class="quick-add" data-act="queue" data-id="${j.id}" title="Add to today (T)">Today</button>
           <button data-act="open" data-id="${j.id}" title="Open source (O)">↗</button>
           <button data-act="save" data-id="${j.id}" title="Save for later (S)">Later</button>
@@ -1232,7 +1234,7 @@ import Admin from '@/layouts/Admin.astro';
       `;
     } else if (j.status === 'filtered') {
       quick = `
-        <div class="disc__row-quick" onclick="event.stopPropagation()">
+        <div class="disc__row-quick">
           <button class="quick-add" data-act="restore" data-id="${j.id}" title="Restore to To-decide">↺ Restore</button>
           <button data-act="open" data-id="${j.id}" title="Open source (O)">↗</button>
           <button data-act="dismiss" data-id="${j.id}" title="Pass (X)">Pass</button>
@@ -1240,7 +1242,7 @@ import Admin from '@/layouts/Admin.astro';
       `;
     } else {
       quick = `
-        <div class="disc__row-quick" onclick="event.stopPropagation()">
+        <div class="disc__row-quick">
           <button data-act="open" data-id="${j.id}" title="Open source (O)">↗</button>
           <button data-act="undo" data-id="${j.id}" title="Undo">↺ Undo</button>
         </div>
@@ -1496,18 +1498,18 @@ import Admin from '@/layouts/Admin.astro';
       const updated = decideSave(id);
       if (updated) {
         recordUndo(id, before);
-        flash(`Saved for later · ${updated.company}`, { label: 'Undo', onClick: performUndo });
+        flash(`Moved ${updated.company} → Later`, { label: 'Undo', onClick: performUndo });
       }
     } else if (action === 'dismiss') {
       const updated = decideDismiss(id);
       if (updated) {
         recordUndo(id, before);
-        flash(`Passed on ${updated.company}`, { label: 'Undo', onClick: performUndo });
+        flash(`Passed on ${updated.company} → Passed`, { label: 'Undo', onClick: performUndo });
       }
     } else if (action === 'restore') {
       const updated = decideRestore(id);
       if (updated) {
-        flash(`Restored ${updated.company} to To-decide`);
+        flash(`Restored ${updated.company} → To decide`);
       }
     } else if (action === 'undo') {
       const updated = decideUndo(id);
