@@ -171,6 +171,80 @@ export async function tryFetchJD(url: string, timeoutMs = 4000): Promise<string 
   }
 }
 
+// ── Server-side proxy fetch (Cloudflare Pages Function) ──────────────
+// /api/fetch-job runs at the edge and bypasses CORS / auth walls for
+// LinkedIn (via the public guest endpoint) and best-effort for other
+// boards. Falls back gracefully when unreachable (dev mode, no Pages
+// Functions runtime, network blip).
+
+export interface FetchedJob {
+  source: string;
+  url: string;
+  title?: string;
+  company?: string;
+  location?: string;
+  salaryMin?: number;
+  salaryMax?: number;
+  description?: string;
+  via: 'json-ld' | 'og' | 'pattern' | 'guest-api';
+}
+
+export type ProxyFetchOutcome =
+  | { kind: 'ok'; data: FetchedJob }
+  | { kind: 'fail'; error: string; message: string; hint?: string; statusCode?: number }
+  | { kind: 'unavailable'; message: string }; // proxy itself was unreachable (dev mode, etc.)
+
+export async function fetchJobViaProxy(url: string, timeoutMs = 12_000): Promise<ProxyFetchOutcome> {
+  if (typeof window === 'undefined') {
+    return { kind: 'unavailable', message: 'Not in a browser.' };
+  }
+  let res: Response;
+  try {
+    const controller = new AbortController();
+    const t = setTimeout(() => controller.abort(), timeoutMs);
+    res = await fetch('/api/fetch-job', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url }),
+      signal: controller.signal,
+    });
+    clearTimeout(t);
+  } catch (e: any) {
+    return { kind: 'unavailable', message: e?.name === 'AbortError' ? 'Proxy fetch timed out.' : 'Proxy fetch failed (network error).' };
+  }
+
+  // 404 with HTML almost certainly means the Pages Function isn't running
+  // (e.g. `astro dev` instead of `wrangler pages dev`). Treat as unavailable
+  // so the UI can degrade gracefully.
+  const ct = res.headers.get('content-type') ?? '';
+  if (!ct.includes('application/json')) {
+    return {
+      kind: 'unavailable',
+      message: res.status === 404
+        ? 'Proxy endpoint /api/fetch-job is not running (deploy or use wrangler).'
+        : `Proxy returned non-JSON response (${res.status}).`,
+    };
+  }
+
+  let body: any;
+  try {
+    body = await res.json();
+  } catch {
+    return { kind: 'unavailable', message: `Proxy returned malformed JSON (${res.status}).` };
+  }
+
+  if (body?.ok === true) {
+    return { kind: 'ok', data: body as FetchedJob };
+  }
+  return {
+    kind: 'fail',
+    error: body?.error ?? 'unknown',
+    message: body?.message ?? 'Fetch failed.',
+    hint: body?.hint,
+    statusCode: body?.statusCode,
+  };
+}
+
 // ── Orchestrator ──────────────────────────────────────────────────────
 
 export interface IntakeInput {
@@ -225,4 +299,100 @@ export function runIntake({ urlText, jdText }: IntakeInput): IntakeResult {
   ];
 
   return { url, cleanUrl, analyzer, extracted, score, draft, nextSteps };
+}
+
+// ── Async orchestrator (uses the server proxy) ────────────────────────
+// Lightweight wrapper around runIntake() that consults /api/fetch-job for
+// boards where URL alone is not enough to extract the company and role.
+// If the proxy succeeds, its title/company/JD become the inputs to
+// runIntake — so the scoring/analyzer/draft logic stays in one place.
+
+export interface IntakeAsyncOutcome {
+  result: IntakeResult;
+  // What the proxy did (if anything). Lets the UI surface specific feedback
+  // when an automated fetch failed and the user needs to step in.
+  proxy?:
+    | { kind: 'skipped'; reason: 'no-url' | 'jd-already-pasted' | 'low-value-board' }
+    | { kind: 'ok'; via: FetchedJob['via']; source: string }
+    | { kind: 'fail'; error: string; message: string; hint?: string; statusCode?: number }
+    | { kind: 'unavailable'; message: string };
+}
+
+// Boards where calling the proxy is worth the latency. LinkedIn and other
+// auth-walled / CORS-blocked boards always benefit. Greenhouse/Lever URLs
+// already encode the company in the path, but the proxy can still fill in
+// the role + description, so include them. Skip 'unknown' to avoid
+// unnecessary network calls on garbage input.
+const BOARDS_WORTH_FETCHING = new Set([
+  'linkedin',
+  'greenhouse',
+  'lever',
+  'ashby',
+  'workday',
+  'smartrecruiters',
+  'workable',
+  'indeed',
+  'builtin',
+  'wellfound',
+  'company-site',
+]);
+
+export async function runIntakeAsync(input: IntakeInput): Promise<IntakeAsyncOutcome> {
+  const urlText = input.urlText?.trim();
+  const jdText = (input.jdText ?? '').trim();
+
+  // No URL → nothing for the proxy to do; just run the local intake.
+  if (!urlText) {
+    return { result: runIntake(input), proxy: { kind: 'skipped', reason: 'no-url' } };
+  }
+
+  // If the user already pasted a substantive JD, trust it and skip the
+  // round-trip — the proxy adds latency and could overwrite their text.
+  if (jdText.length >= 200) {
+    return { result: runIntake(input), proxy: { kind: 'skipped', reason: 'jd-already-pasted' } };
+  }
+
+  const parsed = parseJobUrl(urlText);
+  if (!parsed.isUrl || !BOARDS_WORTH_FETCHING.has(parsed.board)) {
+    return { result: runIntake(input), proxy: { kind: 'skipped', reason: 'low-value-board' } };
+  }
+
+  const outcome = await fetchJobViaProxy(urlText);
+
+  if (outcome.kind === 'ok') {
+    // Build a synthetic JD from the structured response so the analyzer can
+    // score it and the heuristic extractors can pick out anything we missed.
+    const merged = mergeFetchedIntoJD(outcome.data, jdText);
+    const result = runIntake({ urlText, jdText: merged });
+
+    // Fill in any field the proxy gave us that the heuristic missed.
+    const d = result.draft;
+    if (!d.company && outcome.data.company) d.company = outcome.data.company;
+    if (!d.role && outcome.data.title) d.role = outcome.data.title;
+    if (!d.location && outcome.data.location) d.location = outcome.data.location;
+    if (!d.salaryMin && outcome.data.salaryMin) d.salaryMin = outcome.data.salaryMin;
+    if (!d.salaryMax && outcome.data.salaryMax) d.salaryMax = outcome.data.salaryMax;
+    if (!d.source && outcome.data.source) d.source = outcome.data.source;
+
+    return {
+      result,
+      proxy: { kind: 'ok', via: outcome.data.via, source: outcome.data.source },
+    };
+  }
+
+  // Proxy didn't work. Run intake with whatever we have; the UI will use
+  // the `proxy` field to show a specific error and a helpful next step.
+  return { result: runIntake(input), proxy: outcome };
+}
+
+function mergeFetchedIntoJD(d: FetchedJob, existing: string): string {
+  const parts: string[] = [];
+  if (d.title) parts.push(`Title: ${d.title}`);
+  if (d.company) parts.push(`Company: ${d.company}`);
+  if (d.location) parts.push(`Location: ${d.location}`);
+  if (d.description) parts.push('', d.description);
+  const synthesized = parts.join('\n').trim();
+  if (!existing) return synthesized;
+  if (!synthesized) return existing;
+  return `${existing}\n\n${synthesized}`;
 }

@@ -229,21 +229,45 @@ Another…"></textarea>
   .mode-tab.is-active { background: var(--c-bg-muted); color: var(--c-text); }
   .mode-tab:hover:not(.is-active) { color: var(--c-text); }
 
-  #bulk-results :global(.bulk-result) { padding: 8px 12px; border: 1px solid var(--c-border-subtle); border-radius: var(--r-md); margin-bottom: 6px; display: grid; grid-template-columns: auto 1fr auto auto; gap: 12px; align-items: center; font-size: 12px; }
-  #bulk-results :global(.bulk-result__co) { color: var(--c-text); }
-  #bulk-results :global(.bulk-result__role) { color: var(--c-text-muted); font-family: var(--font-mono); font-size: 11px; }
+  #bulk-results :global(.bulk-result) { padding: 10px 12px; border: 1px solid var(--c-border-subtle); border-radius: var(--r-md); margin-bottom: 6px; display: grid; grid-template-columns: 90px 1fr auto auto auto; gap: 12px; align-items: center; font-size: 12px; }
+  #bulk-results :global(.bulk-result--err) { border-color: rgba(239,68,68,0.25); background: rgba(239,68,68,0.04); grid-template-columns: 90px 1fr auto auto; }
+  #bulk-results :global(.bulk-result--dup) { opacity: 0.78; }
+  #bulk-results :global(.bulk-result__board) { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--c-text-subtle); padding: 2px 7px; border: 1px solid var(--c-border-subtle); border-radius: var(--r-full); white-space: nowrap; text-align: center; }
+  #bulk-results :global(.bulk-result__main) { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  #bulk-results :global(.bulk-result__co) { color: var(--c-text); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #bulk-results :global(.bulk-result__role) { color: var(--c-text-muted); font-family: var(--font-mono); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #bulk-results :global(.bulk-result__url) { color: var(--c-text-subtle); font-family: var(--font-mono); font-size: 10.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-decoration: none; }
+  #bulk-results :global(.bulk-result__url:hover) { color: var(--c-accent); text-decoration: underline; }
+  #bulk-results :global(.bulk-result__reason) { color: #F87171; font-size: 11.5px; line-height: 1.4; }
+  #bulk-results :global(.bulk-result__hint) { color: var(--c-text-muted); font-size: 11px; line-height: 1.4; }
   #bulk-results :global(.bulk-result__score) { font-family: var(--font-display); font-size: 18px; min-width: 32px; text-align: right; }
   #bulk-results :global(.bulk-result__status) { font-family: var(--font-mono); font-size: 10px; padding: 2px 7px; border-radius: var(--r-full); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
   #bulk-results :global(.bulk-result__status--added) { color: var(--c-success); border: 1px solid rgba(16,185,129,0.4); background: rgba(16,185,129,0.08); }
   #bulk-results :global(.bulk-result__status--dup) { color: var(--c-text-subtle); border: 1px solid var(--c-border-subtle); background: transparent; }
   #bulk-results :global(.bulk-result__status--err) { color: #F87171; border: 1px solid rgba(239,68,68,0.4); background: rgba(239,68,68,0.08); }
+  #bulk-results :global(.bulk-result__actions) { display: flex; gap: 6px; align-items: center; }
+  #bulk-results :global(.bulk-result__action) { font-family: var(--font-mono); font-size: 10.5px; padding: 4px 9px; border-radius: var(--r-md); border: 1px solid var(--c-border); background: var(--c-bg-elev); color: var(--c-text); cursor: pointer; text-decoration: none; white-space: nowrap; line-height: 1; }
+  #bulk-results :global(.bulk-result__action:hover) { border-color: var(--c-accent); color: var(--c-accent); }
+  #bulk-results :global(.bulk-result__action--primary) { background: var(--c-accent); color: var(--c-bg); border-color: var(--c-accent); }
+  #bulk-results :global(.bulk-result__action--primary:hover) { color: var(--c-bg); opacity: 0.85; }
+  #bulk-results :global(.bulk-fix) { grid-column: 1 / -1; padding: 12px; margin-top: 8px; background: var(--c-bg); border: 1px solid var(--c-border); border-radius: var(--r-md); display: flex; flex-direction: column; gap: 8px; }
+  #bulk-results :global(.bulk-fix .row) { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  #bulk-results :global(.bulk-fix label) { display: flex; flex-direction: column; gap: 4px; font-size: 11px; color: var(--c-text-subtle); }
+  #bulk-results :global(.bulk-fix input), #bulk-results :global(.bulk-fix textarea) { font-family: inherit; font-size: 12.5px; }
+  #bulk-results :global(.bulk-fix textarea) { font-family: var(--font-mono); font-size: 11.5px; min-height: 100px; }
+  #bulk-results :global(.bulk-fix .actions) { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
   #bulk-results :global(.bulk-summary) { display: flex; gap: 14px; padding: 10px 14px; background: var(--c-bg-muted); border: 1px solid var(--c-border); border-radius: var(--r-md); margin-bottom: 12px; font-size: 13px; align-items: center; flex-wrap: wrap; }
   #bulk-results :global(.bulk-summary strong) { color: var(--c-text); font-family: var(--font-display); font-size: 18px; line-height: 1; margin-right: 4px; }
   #bulk-results :global(.bulk-summary .label) { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-text-subtle); }
+  @media (max-width: 720px) {
+    #bulk-results :global(.bulk-result) { grid-template-columns: 1fr auto; }
+    #bulk-results :global(.bulk-result__board), #bulk-results :global(.bulk-result__score), #bulk-results :global(.bulk-result__actions) { grid-column: 1 / -1; justify-self: start; }
+  }
 </style>
 
 <script>
-  import { runIntake, tryFetchJD, type IntakeResult } from '@/lib/job-intake';
+  import { runIntake, runIntakeAsync, tryFetchJD, fetchJobViaProxy, type IntakeResult, type IntakeAsyncOutcome } from '@/lib/job-intake';
+  import { parseJobUrl } from '@/lib/job-url-parser';
   import { jobsStore, ensureSchema, type Job, type JobStatus } from '@/lib/storage';
 
   ensureSchema();
@@ -354,14 +378,37 @@ Another…"></textarea>
     }
     showInputError('');
     status.style.display = 'block';
-    status.textContent = 'Trying to fetch the page (most boards block this — expect to paste manually)…';
-    const text = await tryFetchJD(urlText);
-    if (text) {
-      ($<HTMLTextAreaElement>('jd-text')).value = text;
-      status.textContent = 'Fetched. Review the text above and hit Analyze.';
-    } else {
-      status.textContent = 'Couldn’t fetch the page (CORS or auth blocked it). Paste the job description into the box above.';
+    status.textContent = 'Fetching via the edge proxy…';
+
+    // 1. Try the server-side proxy (works for LinkedIn + most boards).
+    const proxy = await fetchJobViaProxy(urlText);
+    if (proxy.kind === 'ok') {
+      const d = proxy.data;
+      const merged: string[] = [];
+      if (d.title) merged.push(`Title: ${d.title}`);
+      if (d.company) merged.push(`Company: ${d.company}`);
+      if (d.location) merged.push(`Location: ${d.location}`);
+      if (d.description) merged.push('', d.description);
+      ($<HTMLTextAreaElement>('jd-text')).value = merged.join('\n').trim();
+      status.textContent = `Fetched from ${d.source} (${d.via}). Review the text above and hit Analyze.`;
+      return;
     }
+
+    // 2. Proxy unavailable (dev mode without wrangler) — try client-side fetch.
+    if (proxy.kind === 'unavailable') {
+      status.textContent = 'Proxy not running, trying client-side fetch…';
+      const text = await tryFetchJD(urlText);
+      if (text) {
+        ($<HTMLTextAreaElement>('jd-text')).value = text;
+        status.textContent = 'Fetched directly. Review the text above and hit Analyze.';
+        return;
+      }
+      status.textContent = `${proxy.message} Open the URL in a tab and paste the JD into the box.`;
+      return;
+    }
+
+    // 3. Proxy ran but the upstream failed — give a specific reason.
+    status.textContent = `${proxy.message}${proxy.hint ? ' ' + proxy.hint : ''}`;
   });
 
   $('reset-btn').addEventListener('click', () => {
@@ -433,11 +480,11 @@ Another…"></textarea>
   tabs.forEach(t => t.addEventListener('click', () => setMode(t.dataset.mode as 'single' | 'bulk')));
 
   // ── Bulk intake ──────────────────────────────────────────────────────
-  type BulkItem = { source: string; kind: 'url' | 'jd' };
+  type BulkItem = { id: string; source: string; kind: 'url' | 'jd' };
   type BulkOutcome =
-    | { status: 'added'; job: Job; score?: number }
-    | { status: 'duplicate'; matched: Job; source: string }
-    | { status: 'error'; reason: string; source: string };
+    | { id: string; status: 'added'; job: Job; score?: number; source: string; board?: string }
+    | { id: string; status: 'duplicate'; matched: Job; source: string; board?: string }
+    | { id: string; status: 'error'; reason: string; hint?: string; source: string; board?: string; statusCode?: number };
 
   function looksLikeUrl(line: string): boolean {
     return /^https?:\/\//i.test(line.trim());
@@ -451,12 +498,12 @@ Another…"></textarea>
       for (const raw of urlBlock.split(/\r?\n/)) {
         const line = raw.trim();
         if (!line) continue;
-        if (looksLikeUrl(line)) items.push({ source: line, kind: 'url' });
+        if (looksLikeUrl(line)) items.push({ id: crypto.randomUUID(), source: line, kind: 'url' });
       }
     }
     if (jdBlock) {
       const chunks = jdBlock.split(/^\s*-{3,}\s*$/m).map(c => c.trim()).filter(c => c.length > 50);
-      for (const chunk of chunks) items.push({ source: chunk, kind: 'jd' });
+      for (const chunk of chunks) items.push({ id: crypto.randomUUID(), source: chunk, kind: 'jd' });
     }
     return items;
   }
@@ -482,30 +529,18 @@ Another…"></textarea>
     return null;
   }
 
-  async function processBulkItem(item: BulkItem, existingJobs: Job[]): Promise<BulkOutcome> {
-    let intake: IntakeResult;
-    try {
-      intake = runIntake({
-        urlText: item.kind === 'url' ? item.source : undefined,
-        jdText: item.kind === 'jd' ? item.source : undefined,
-      });
-    } catch (e: any) {
-      return { status: 'error', reason: e?.message ?? 'analyze failed', source: item.source };
-    }
+  function boardLabelForItem(item: BulkItem): string | undefined {
+    if (item.kind !== 'url') return 'JD paste';
+    try { return parseJobUrl(item.source).boardLabel; } catch { return undefined; }
+  }
 
-    const dup = findDuplicate(existingJobs, item, intake);
-    if (dup) return { status: 'duplicate', matched: dup, source: item.source };
-
+  function buildJobFromIntake(intake: IntakeResult, fallbackUrl: string | undefined): Job {
     const d = intake.draft;
-    if (!d.company && !d.role) {
-      return { status: 'error', reason: 'could not extract company or role', source: item.source };
-    }
-
-    const job: Job = {
+    return {
       id: crypto.randomUUID(),
-      company: d.company ?? '(unknown)',
-      role: d.role ?? '(unknown)',
-      url: d.url,
+      company: d.company || '(unknown)',
+      role: d.role || '(unknown)',
+      url: d.url ?? fallbackUrl,
       source: d.source,
       location: d.location,
       salaryMin: d.salaryMin,
@@ -520,11 +555,62 @@ Another…"></textarea>
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
-    jobsStore.upsert(job);
-    return { status: 'added', job, score: intake.score?.total };
   }
 
-  function renderBulkResults(outcomes: BulkOutcome[]) {
+  async function processBulkItem(item: BulkItem, existingJobs: Job[]): Promise<BulkOutcome> {
+    const board = boardLabelForItem(item);
+    let outcome: IntakeAsyncOutcome;
+    try {
+      outcome = await runIntakeAsync({
+        urlText: item.kind === 'url' ? item.source : undefined,
+        jdText: item.kind === 'jd' ? item.source : undefined,
+      });
+    } catch (e: any) {
+      return { id: item.id, status: 'error', reason: e?.message ?? 'analyze failed', source: item.source, board };
+    }
+
+    const intake = outcome.result;
+    const dup = findDuplicate(existingJobs, item, intake);
+    if (dup) return { id: item.id, status: 'duplicate', matched: dup, source: item.source, board };
+
+    const d = intake.draft;
+    if (!d.company && !d.role) {
+      // Build a specific reason + hint so the user knows what to do next.
+      const p = outcome.proxy;
+      let reason = 'Could not extract company or role.';
+      let hint = 'Open the URL and paste the JD below.';
+      let statusCode: number | undefined;
+      if (p?.kind === 'fail') {
+        reason = p.message;
+        if (p.hint) hint = p.hint;
+        statusCode = p.statusCode;
+      } else if (p?.kind === 'unavailable') {
+        reason = 'Edge proxy is not reachable from this environment.';
+        hint = `${p.message} Open the URL and paste the JD below.`;
+      }
+      return { id: item.id, status: 'error', reason, hint, source: item.source, board, statusCode };
+    }
+
+    const job = buildJobFromIntake(intake, item.kind === 'url' ? item.source : undefined);
+    jobsStore.upsert(job);
+    return { id: item.id, status: 'added', job, score: intake.score?.total, source: item.source, board };
+  }
+
+  // Track the most recent set of outcomes so per-row inline-fix can mutate it.
+  let lastOutcomes: BulkOutcome[] = [];
+
+  function shortenUrl(url: string, max = 70): string {
+    try {
+      const u = new URL(url);
+      const tail = (u.pathname + (u.search || '')).slice(0, max - u.hostname.length - 3);
+      return `${u.hostname}${tail}${(u.pathname + (u.search || '')).length > tail.length ? '…' : ''}`;
+    } catch {
+      return url.length > max ? url.slice(0, max - 1) + '…' : url;
+    }
+  }
+
+  function renderBulkResults() {
+    const outcomes = lastOutcomes;
     const added = outcomes.filter(o => o.status === 'added').length;
     const dup = outcomes.filter(o => o.status === 'duplicate').length;
     const err = outcomes.filter(o => o.status === 'error').length;
@@ -537,43 +623,175 @@ Another…"></textarea>
         <span><strong>${p1}</strong><span class="label">P1</span></span>
         <span><strong>${p2}</strong><span class="label">P2</span></span>
         <span><strong>${dup}</strong><span class="label">duplicates</span></span>
-        <span><strong>${err}</strong><span class="label">errors</span></span>
+        <span><strong>${err}</strong><span class="label">need attention</span></span>
         <span style="margin-left:auto;"><a class="btn" href="/today">→ Open /today</a></span>
       </div>
     `;
 
     const rows = outcomes.map(o => {
+      const board = escape(o.board ?? '—');
+      const sourceUrl = o.source && /^https?:\/\//i.test(o.source) ? o.source : null;
+
       if (o.status === 'added') {
         const j = o.job;
         const co = escape(j.company ?? '');
         const role = escape(j.role ?? '');
         const score = j.fitScore != null ? Math.round(j.fitScore) : '—';
-        return `<div class="bulk-result">
-          <span class="bulk-result__co">${co}</span>
-          <span class="bulk-result__role">${role}</span>
+        const urlLine = sourceUrl
+          ? `<a class="bulk-result__url" href="${escape(sourceUrl)}" target="_blank" rel="noopener noreferrer">${escape(shortenUrl(sourceUrl))}</a>`
+          : '';
+        const openSource = sourceUrl
+          ? `<a class="bulk-result__action" href="${escape(sourceUrl)}" target="_blank" rel="noopener noreferrer">Open ↗</a>`
+          : '';
+        return `<div class="bulk-result" data-row-id="${escape(o.id)}">
+          <span class="bulk-result__board">${board}</span>
+          <div class="bulk-result__main">
+            <span class="bulk-result__co">${co}</span>
+            <span class="bulk-result__role">${role}</span>
+            ${urlLine}
+          </div>
           <span class="bulk-result__score">${score}</span>
           <span class="bulk-result__status bulk-result__status--added">added · P${j.priority ?? '–'}</span>
-        </div>`;
-      } else if (o.status === 'duplicate') {
-        const j = o.matched;
-        return `<div class="bulk-result">
-          <span class="bulk-result__co">${escape(j.company ?? '')}</span>
-          <span class="bulk-result__role">${escape(j.role ?? '')}</span>
-          <span class="bulk-result__score">—</span>
-          <span class="bulk-result__status bulk-result__status--dup">duplicate</span>
+          <div class="bulk-result__actions">${openSource}</div>
         </div>`;
       }
-      return `<div class="bulk-result">
-        <span class="bulk-result__co">—</span>
-        <span class="bulk-result__role">${escape((o.source ?? '').slice(0, 80))}</span>
-        <span class="bulk-result__score">—</span>
-        <span class="bulk-result__status bulk-result__status--err">${escape(o.reason ?? 'error')}</span>
+
+      if (o.status === 'duplicate') {
+        const j = o.matched;
+        const urlLine = sourceUrl
+          ? `<a class="bulk-result__url" href="${escape(sourceUrl)}" target="_blank" rel="noopener noreferrer">${escape(shortenUrl(sourceUrl))}</a>`
+          : '';
+        const openTracker = `<a class="bulk-result__action" href="/jobs">In tracker →</a>`;
+        return `<div class="bulk-result bulk-result--dup" data-row-id="${escape(o.id)}">
+          <span class="bulk-result__board">${board}</span>
+          <div class="bulk-result__main">
+            <span class="bulk-result__co">${escape(j.company ?? '')}</span>
+            <span class="bulk-result__role">${escape(j.role ?? '')}</span>
+            ${urlLine}
+          </div>
+          <span class="bulk-result__score">—</span>
+          <span class="bulk-result__status bulk-result__status--dup">duplicate</span>
+          <div class="bulk-result__actions">${openTracker}</div>
+        </div>`;
+      }
+
+      // Error row — make it actionable.
+      const urlLine = sourceUrl
+        ? `<a class="bulk-result__url" href="${escape(sourceUrl)}" target="_blank" rel="noopener noreferrer" title="${escape(sourceUrl)}">${escape(shortenUrl(sourceUrl))}</a>`
+        : `<span class="bulk-result__url">${escape((o.source ?? '').slice(0, 100))}${(o.source ?? '').length > 100 ? '…' : ''}</span>`;
+      const reasonLine = `<span class="bulk-result__reason">${escape(o.reason ?? 'error')}</span>`;
+      const hintLine = o.hint ? `<span class="bulk-result__hint">${escape(o.hint)}</span>` : '';
+      const openBtn = sourceUrl
+        ? `<a class="bulk-result__action" href="${escape(sourceUrl)}" target="_blank" rel="noopener noreferrer">Open ↗</a>`
+        : '';
+      const fixBtn = `<button class="bulk-result__action bulk-result__action--primary" data-action="fix" data-row-id="${escape(o.id)}">Add manually</button>`;
+      const skipBtn = `<button class="bulk-result__action" data-action="skip" data-row-id="${escape(o.id)}">Skip</button>`;
+      return `<div class="bulk-result bulk-result--err" data-row-id="${escape(o.id)}">
+        <span class="bulk-result__board">${board}</span>
+        <div class="bulk-result__main">
+          ${urlLine}
+          ${reasonLine}
+          ${hintLine}
+        </div>
+        <span class="bulk-result__status bulk-result__status--err">needs review</span>
+        <div class="bulk-result__actions">${openBtn}${fixBtn}${skipBtn}</div>
       </div>`;
     }).join('');
 
     const wrap = $('bulk-results');
     wrap.style.display = 'block';
     wrap.innerHTML = summary + rows;
+    wireBulkResultActions(wrap);
+  }
+
+  function wireBulkResultActions(wrap: HTMLElement) {
+    wrap.querySelectorAll<HTMLButtonElement>('button[data-action="fix"]').forEach(btn => {
+      btn.addEventListener('click', () => openInlineFix(btn.dataset.rowId!));
+    });
+    wrap.querySelectorAll<HTMLButtonElement>('button[data-action="skip"]').forEach(btn => {
+      btn.addEventListener('click', () => skipOutcome(btn.dataset.rowId!));
+    });
+  }
+
+  function findOutcomeById(id: string): BulkOutcome | undefined {
+    return lastOutcomes.find(o => o.id === id);
+  }
+
+  function skipOutcome(id: string) {
+    lastOutcomes = lastOutcomes.filter(o => o.id !== id);
+    renderBulkResults();
+  }
+
+  function openInlineFix(id: string) {
+    const o = findOutcomeById(id);
+    if (!o || o.status !== 'error') return;
+    const row = document.querySelector<HTMLElement>(`[data-row-id="${CSS.escape(id)}"]`);
+    if (!row) return;
+    // If already open, close it.
+    if (row.querySelector('.bulk-fix')) {
+      row.querySelector('.bulk-fix')?.remove();
+      return;
+    }
+    const sourceUrl = /^https?:\/\//i.test(o.source) ? o.source : '';
+    const fix = document.createElement('div');
+    fix.className = 'bulk-fix';
+    fix.innerHTML = `
+      <div class="row">
+        <label>Company<input type="text" data-fix-field="company" placeholder="Acme" /></label>
+        <label>Role<input type="text" data-fix-field="role" placeholder="Senior Product Designer" /></label>
+      </div>
+      <label>JD <span style="color:var(--c-text-subtle);">(optional · improves scoring)</span>
+        <textarea data-fix-field="jd" placeholder="Paste the job description for accurate scoring…"></textarea>
+      </label>
+      <div class="actions">
+        <button class="btn" data-fix-action="cancel">Cancel</button>
+        <button class="btn btn--primary" data-fix-action="save">Save with these fields</button>
+      </div>
+    `;
+    row.appendChild(fix);
+
+    const coInput = fix.querySelector<HTMLInputElement>('[data-fix-field="company"]')!;
+    const roleInput = fix.querySelector<HTMLInputElement>('[data-fix-field="role"]')!;
+    const jdInput = fix.querySelector<HTMLTextAreaElement>('[data-fix-field="jd"]')!;
+    coInput.focus();
+
+    fix.querySelector<HTMLButtonElement>('[data-fix-action="cancel"]')!.addEventListener('click', () => {
+      fix.remove();
+    });
+    fix.querySelector<HTMLButtonElement>('[data-fix-action="save"]')!.addEventListener('click', () => {
+      const company = coInput.value.trim();
+      const role = roleInput.value.trim();
+      const jd = jdInput.value.trim();
+      if (!company || !role) {
+        coInput.style.borderColor = company ? '' : '#F87171';
+        roleInput.style.borderColor = role ? '' : '#F87171';
+        return;
+      }
+      // Re-run intake with the typed JD if present (so scoring works), then
+      // overlay the manual company/role on top so they win.
+      const intake = runIntake({
+        urlText: sourceUrl || undefined,
+        jdText: jd || undefined,
+      });
+      intake.draft.company = company;
+      intake.draft.role = role;
+      const job = buildJobFromIntake(intake, sourceUrl || undefined);
+      jobsStore.upsert(job);
+
+      // Replace the error row with a success row in lastOutcomes.
+      const idx = lastOutcomes.findIndex(x => x.id === id);
+      if (idx >= 0) {
+        lastOutcomes[idx] = {
+          id,
+          status: 'added',
+          job,
+          score: intake.score?.total,
+          source: o.source,
+          board: o.board,
+        };
+      }
+      renderBulkResults();
+    });
   }
 
   $('bulk-analyze-btn').addEventListener('click', async () => {
@@ -587,17 +805,20 @@ Another…"></textarea>
     status.style.display = 'block';
     status.textContent = `Analyzing 0 / ${items.length}…`;
 
-    const outcomes: BulkOutcome[] = [];
+    lastOutcomes = [];
     for (let i = 0; i < items.length; i++) {
       const existing = jobsStore.list(); // re-read each iteration so duplicates within batch are caught
       const out = await processBulkItem(items[i], existing);
-      outcomes.push(out);
-      status.textContent = `Analyzing ${i + 1} / ${items.length}…`;
-      // Yield to the UI between items so the count visibly updates.
+      lastOutcomes.push(out);
+      const addedSoFar = lastOutcomes.filter(o => o.status === 'added').length;
+      status.textContent = `Analyzing ${i + 1} / ${items.length} · ${addedSoFar} added so far…`;
+      // Render incrementally so the user sees progress, not a frozen block.
+      renderBulkResults();
       await new Promise(r => setTimeout(r, 0));
     }
-    status.textContent = `Done. ${outcomes.filter(o => o.status === 'added').length} added.`;
-    renderBulkResults(outcomes);
+    const addedFinal = lastOutcomes.filter(o => o.status === 'added').length;
+    const errFinal = lastOutcomes.filter(o => o.status === 'error').length;
+    status.textContent = `Done. ${addedFinal} added${errFinal ? ` · ${errFinal} need attention` : ''}.`;
   });
 
   $('bulk-clear-btn').addEventListener('click', () => {
@@ -606,5 +827,6 @@ Another…"></textarea>
     $('bulk-status').style.display = 'none';
     $('bulk-results').style.display = 'none';
     $('bulk-results').innerHTML = '';
+    lastOutcomes = [];
   });
 </script>
