@@ -176,10 +176,18 @@ import HowIWorkLoop from '@/components/diagrams/HowIWorkLoop.astro';
 
 <style>
   .about__hero {
-    padding-top: calc(64px + var(--space-16));
-    padding-bottom: var(--space-12);
+    padding-top: calc(60px + var(--space-10));
+    padding-bottom: var(--space-10);
     border-bottom: 1px solid var(--color-border-subtle);
-    margin-bottom: var(--space-12);
+    margin-bottom: var(--space-10);
+  }
+
+  @media (min-width: 768px) {
+    .about__hero {
+      padding-top: calc(64px + var(--space-16));
+      padding-bottom: var(--space-12);
+      margin-bottom: var(--space-12);
+    }
   }
 
   .about__eyebrow {
@@ -194,7 +202,7 @@ import HowIWorkLoop from '@/components/diagrams/HowIWorkLoop.astro';
 
   .about__title {
     font-family: var(--font-display);
-    font-size: clamp(40px, 6vw, 80px);
+    font-size: clamp(40px, 9.5vw, 80px);
     font-weight: 400;
     letter-spacing: -0.025em;
     line-height: 1.05;
@@ -210,8 +218,15 @@ import HowIWorkLoop from '@/components/diagrams/HowIWorkLoop.astro';
   .about__body {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--space-12);
-    padding-bottom: var(--space-24);
+    gap: var(--space-10);
+    padding-bottom: var(--space-16);
+  }
+
+  @media (min-width: 768px) {
+    .about__body {
+      gap: var(--space-12);
+      padding-bottom: var(--space-24);
+    }
   }
 
   @media (min-width: 1024px) {

@@ -151,8 +151,14 @@ const { data, slug } = project;
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
-    padding: var(--space-5) var(--space-5) var(--space-5);
+    padding: var(--space-4);
     flex: 1;
+  }
+
+  @media (min-width: 600px) {
+    .project-card__body {
+      padding: var(--space-5);
+    }
   }
 
   .project-card__meta {
@@ -167,6 +173,8 @@ const { data, slug } = project;
     align-items: center;
     gap: 6px;
     flex-wrap: wrap;
+    min-width: 0;
+    flex: 1;
   }
 
   .project-card__tag {
@@ -250,17 +258,29 @@ const { data, slug } = project;
   }
 
   .project-card__title {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 700;
     letter-spacing: -0.02em;
     line-height: 1.15;
     color: var(--color-text);
   }
 
+  @media (min-width: 600px) {
+    .project-card__title {
+      font-size: 22px;
+    }
+  }
+
   .project-card__short {
     font-size: 14px;
     line-height: 1.6;
     color: var(--color-text-muted);
+  }
+
+  @media (min-width: 600px) {
+    .project-card__short {
+      font-size: 15px;
+    }
   }
 
   .project-card__focus {

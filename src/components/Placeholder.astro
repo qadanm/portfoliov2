@@ -48,11 +48,19 @@ const ringColor = labelTone === 'light' ? 'rgba(255,255,255,0.10)' : 'rgba(15,15
   .placeholder {
     position: relative;
     width: 100%;
-    aspect-ratio: 16 / 9;
+    /* Slightly shorter on phones — 16/9 reads almost cinematic on a narrow card.
+       Restore on larger viewports where the lead card spans more horizontal area. */
+    aspect-ratio: 5 / 3;
     overflow: hidden;
     display: block;
     isolation: isolate;
     container-type: inline-size;
+  }
+
+  @media (min-width: 600px) {
+    .placeholder {
+      aspect-ratio: 16 / 9;
+    }
   }
 
   .placeholder--rounded {

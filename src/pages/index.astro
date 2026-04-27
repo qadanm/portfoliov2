@@ -151,8 +151,8 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
 <style>
   /* About / How I work — comes first now */
   .home-about {
-    padding-top: var(--space-20);
-    padding-bottom: var(--space-20);
+    padding-top: var(--space-12);
+    padding-bottom: var(--space-16);
     border-top: 1px solid var(--color-border-subtle);
   }
 
@@ -240,8 +240,8 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
 
   /* Work — comes second now */
   .home-work {
-    padding-top: var(--space-24);
-    padding-bottom: var(--space-20);
+    padding-top: var(--space-16);
+    padding-bottom: var(--space-16);
     border-top: 1px solid var(--color-border-subtle);
   }
 
@@ -253,8 +253,14 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
   }
 
   .home-work__head {
-    margin-bottom: var(--space-12);
+    margin-bottom: var(--space-8);
     max-width: 720px;
+  }
+
+  @media (min-width: 768px) {
+    .home-work__head {
+      margin-bottom: var(--space-12);
+    }
   }
 
   .home-work__eyebrow,
@@ -309,8 +315,8 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
 
   /* Design workflow — comes third */
   .home-design {
-    padding-top: var(--space-24);
-    padding-bottom: var(--space-20);
+    padding-top: var(--space-16);
+    padding-bottom: var(--space-16);
     border-top: 1px solid var(--color-border-subtle);
   }
 
@@ -444,8 +450,8 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
 
   /* Contact — close */
   .home-contact {
-    padding-top: var(--space-24);
-    padding-bottom: var(--space-20);
+    padding-top: var(--space-16);
+    padding-bottom: var(--space-16);
     border-top: 1px solid var(--color-border-subtle);
   }
 
@@ -512,7 +518,7 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
   }
 
   .home-contact__form {
-    padding: var(--space-6);
+    padding: var(--space-5);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-xl);
     background-color: var(--color-bg-elevated);

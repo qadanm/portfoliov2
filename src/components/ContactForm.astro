@@ -240,21 +240,34 @@ const projectTypes = [
   .cf__select {
     width: 100%;
     font-family: var(--font-body);
-    font-size: 15px;
+    /* 16px keeps iOS Safari from zooming when an input gains focus.
+       Drop to 15px once the viewport is comfortably wider than a phone. */
+    font-size: 16px;
     line-height: 1.5;
     color: var(--color-text);
     background-color: var(--color-bg);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
-    padding: 12px 14px;
+    padding: 14px 14px;
     transition: border-color 150ms, box-shadow 150ms;
     appearance: none;
     -webkit-appearance: none;
+    min-height: 48px;
+  }
+
+  @media (min-width: 600px) {
+    .cf input[type='text'],
+    .cf input[type='email'],
+    .cf textarea,
+    .cf__select {
+      font-size: 15px;
+      padding: 12px 14px;
+    }
   }
 
   .cf textarea {
     resize: vertical;
-    min-height: 96px;
+    min-height: 112px;
     font-family: var(--font-body);
   }
 
@@ -299,19 +312,29 @@ const projectTypes = [
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--space-4);
+    gap: var(--space-3);
     flex-wrap: wrap;
     margin-top: var(--space-2);
+  }
+
+  @media (max-width: 480px) {
+    .cf__footer {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-3);
+    }
   }
 
   .cf__submit {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
-    padding: 12px 22px;
+    padding: 14px 24px;
+    min-height: 48px;
     border-radius: 9999px;
     font-family: var(--font-body);
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     letter-spacing: -0.01em;
     color: var(--color-bg);
@@ -320,6 +343,13 @@ const projectTypes = [
     cursor: pointer;
     transition: transform 200ms var(--ease-out), box-shadow 200ms;
     position: relative;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  @media (max-width: 480px) {
+    .cf__submit {
+      width: 100%;
+    }
   }
 
   .cf__submit:hover:not(:disabled) {

@@ -507,8 +507,15 @@ const next = allProjects[(currentIndex + 1) % allProjects.length];
 
 <style>
   .cs__header {
-    padding-top: calc(64px + var(--space-12));
-    padding-bottom: var(--space-10);
+    padding-top: calc(60px + var(--space-8));
+    padding-bottom: var(--space-8);
+  }
+
+  @media (min-width: 768px) {
+    .cs__header {
+      padding-top: calc(64px + var(--space-12));
+      padding-bottom: var(--space-10);
+    }
   }
 
   .cs__back {
@@ -519,8 +526,10 @@ const next = allProjects[(currentIndex + 1) % allProjects.length];
     font-weight: 500;
     color: var(--color-text-muted);
     text-decoration: none;
-    margin-bottom: var(--space-8);
+    margin-bottom: var(--space-6);
+    padding: 6px 0;
     transition: color 150ms;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .cs__back:hover { color: var(--color-accent); }
@@ -554,21 +563,34 @@ const next = allProjects[(currentIndex + 1) % allProjects.length];
 
   .cs__title {
     font-family: var(--font-display);
-    font-size: clamp(40px, 7vw, 88px);
+    font-size: clamp(38px, 9vw, 88px);
     font-weight: 400;
     letter-spacing: -0.025em;
-    line-height: 1.02;
+    line-height: 1.05;
     color: var(--color-text);
-    margin-bottom: var(--space-5);
+    margin-bottom: var(--space-4);
     max-width: 16ch;
   }
 
+  @media (min-width: 768px) {
+    .cs__title {
+      line-height: 1.02;
+      margin-bottom: var(--space-5);
+    }
+  }
+
   .cs__short {
-    font-size: clamp(17px, 2vw, 21px);
+    font-size: clamp(16px, 1.8vw, 21px);
     line-height: 1.55;
     color: var(--color-text-muted);
     max-width: 56ch;
-    margin-bottom: var(--space-8);
+    margin-bottom: var(--space-6);
+  }
+
+  @media (min-width: 768px) {
+    .cs__short {
+      margin-bottom: var(--space-8);
+    }
   }
 
   .cs__meta {
@@ -576,8 +598,14 @@ const next = allProjects[(currentIndex + 1) % allProjects.length];
     padding-top: var(--space-5);
     border-top: 1px solid var(--color-border);
     display: flex;
-    gap: var(--space-12);
+    gap: var(--space-6);
     flex-wrap: wrap;
+  }
+
+  @media (min-width: 768px) {
+    .cs__meta {
+      gap: var(--space-12);
+    }
   }
 
   .cs__meta div {
@@ -643,21 +671,35 @@ const next = allProjects[(currentIndex + 1) % allProjects.length];
   }
 
   .cs__cover {
-    padding-bottom: var(--space-12);
+    padding-bottom: var(--space-8);
+  }
+
+  @media (min-width: 768px) {
+    .cs__cover {
+      padding-bottom: var(--space-12);
+    }
   }
 
   .cs__cover :global(.placeholder) {
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-lg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
   }
 
   .cs__cover-image {
     display: block;
     width: 100%;
     height: auto;
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     border: 1px solid var(--color-border);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-md);
+  }
+
+  @media (min-width: 600px) {
+    .cs__cover :global(.placeholder),
+    .cs__cover-image {
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+    }
   }
 
   .cs__content {
@@ -673,7 +715,7 @@ const next = allProjects[(currentIndex + 1) % allProjects.length];
   }
 
   .cs__post {
-    padding-block: var(--space-16) var(--space-12);
+    padding-block: var(--space-12) var(--space-10);
     border-top: 1px solid var(--color-border-subtle);
   }
 
@@ -689,7 +731,13 @@ const next = allProjects[(currentIndex + 1) % allProjects.length];
 
   .cs__post-head {
     max-width: 64ch;
-    margin-bottom: var(--space-10);
+    margin-bottom: var(--space-8);
+  }
+
+  @media (min-width: 768px) {
+    .cs__post-head {
+      margin-bottom: var(--space-10);
+    }
   }
 
   .cs__post-eyebrow {
@@ -848,17 +896,26 @@ const next = allProjects[(currentIndex + 1) % allProjects.length];
     align-items: center;
     justify-content: space-between;
     gap: var(--space-4);
-    padding: var(--space-6) var(--space-7);
+    padding: var(--space-5);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     background-color: var(--color-bg-elevated);
     text-decoration: none;
     color: var(--color-text);
-    margin-bottom: var(--space-8);
+    margin-bottom: var(--space-6);
     transition:
       border-color 200ms,
       transform 200ms var(--ease-out),
       box-shadow 200ms;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  @media (min-width: 600px) {
+    .cs__next {
+      padding: var(--space-6) var(--space-7);
+      border-radius: var(--radius-xl);
+      margin-bottom: var(--space-8);
+    }
   }
 
   .cs__next:hover {
@@ -916,10 +973,19 @@ const next = allProjects[(currentIndex + 1) % allProjects.length];
     flex-wrap: wrap;
   }
 
+  @media (max-width: 480px) {
+    .cs__footer-actions {
+      flex-direction: column-reverse;
+      align-items: stretch;
+    }
+  }
+
   .cs__btn-secondary {
     display: inline-flex;
     align-items: center;
-    padding: 12px 22px;
+    justify-content: center;
+    padding: 14px 24px;
+    min-height: 48px;
     border-radius: 9999px;
     font-size: 14px;
     font-weight: 500;
@@ -927,6 +993,7 @@ const next = allProjects[(currentIndex + 1) % allProjects.length];
     border: 1px solid var(--color-border);
     text-decoration: none;
     transition: all 200ms;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .cs__btn-secondary:hover {
@@ -938,8 +1005,10 @@ const next = allProjects[(currentIndex + 1) % allProjects.length];
   .cs__btn-primary {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
-    padding: 12px 22px;
+    padding: 14px 24px;
+    min-height: 48px;
     border-radius: 9999px;
     font-size: 14px;
     font-weight: 600;
@@ -948,6 +1017,7 @@ const next = allProjects[(currentIndex + 1) % allProjects.length];
     text-decoration: none;
     transition: all 200ms var(--ease-out);
     letter-spacing: -0.01em;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .cs__btn-primary:hover {

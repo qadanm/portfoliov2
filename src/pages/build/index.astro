@@ -37,10 +37,18 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
 
 <style>
   .work-index__hero {
-    padding-top: calc(64px + var(--space-16));
-    padding-bottom: var(--space-12);
+    padding-top: calc(60px + var(--space-10));
+    padding-bottom: var(--space-10);
     border-bottom: 1px solid var(--color-border-subtle);
-    margin-bottom: var(--space-12);
+    margin-bottom: var(--space-10);
+  }
+
+  @media (min-width: 768px) {
+    .work-index__hero {
+      padding-top: calc(64px + var(--space-16));
+      padding-bottom: var(--space-12);
+      margin-bottom: var(--space-12);
+    }
   }
 
   .work-index__eyebrow {
@@ -58,7 +66,7 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
 
   .work-index__title {
     font-family: var(--font-display);
-    font-size: clamp(40px, 6vw, 80px);
+    font-size: clamp(38px, 9vw, 80px);
     font-weight: 400;
     letter-spacing: -0.025em;
     line-height: 1.05;
@@ -80,6 +88,12 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
   }
 
   .work-index__body {
-    padding-bottom: var(--space-24);
+    padding-bottom: var(--space-16);
+  }
+
+  @media (min-width: 768px) {
+    .work-index__body {
+      padding-bottom: var(--space-24);
+    }
   }
 </style>

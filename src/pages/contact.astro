@@ -86,9 +86,16 @@ const channels = [
 
 <style>
   .contact {
-    padding-top: calc(64px + var(--space-20));
-    padding-bottom: var(--space-24);
+    padding-top: calc(60px + var(--space-10));
+    padding-bottom: var(--space-16);
     min-height: 80vh;
+  }
+
+  @media (min-width: 768px) {
+    .contact {
+      padding-top: calc(64px + var(--space-20));
+      padding-bottom: var(--space-24);
+    }
   }
 
   .contact__content {
@@ -107,12 +114,18 @@ const channels = [
 
   .contact__title {
     font-family: var(--font-display);
-    font-size: clamp(36px, 5.5vw, 64px);
+    font-size: clamp(36px, 8vw, 64px);
     font-weight: 400;
     letter-spacing: -0.025em;
     line-height: 1.1;
     color: var(--color-text);
-    margin-bottom: var(--space-6);
+    margin-bottom: var(--space-5);
+  }
+
+  @media (min-width: 768px) {
+    .contact__title {
+      margin-bottom: var(--space-6);
+    }
   }
 
   .contact__title em {
@@ -130,11 +143,18 @@ const channels = [
 
   .contact__form-wrap {
     margin-bottom: var(--space-10);
-    padding: var(--space-6);
+    padding: var(--space-5);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     background-color: var(--color-bg-elevated);
     max-width: 640px;
+  }
+
+  @media (min-width: 600px) {
+    .contact__form-wrap {
+      padding: var(--space-6);
+      border-radius: var(--radius-xl);
+    }
   }
 
   @media (min-width: 720px) {
@@ -181,7 +201,8 @@ const channels = [
     display: flex;
     align-items: center;
     gap: var(--space-4);
-    padding: var(--space-5);
+    padding: var(--space-4) var(--space-5);
+    min-height: 64px;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
     background-color: var(--color-bg-elevated);
@@ -191,6 +212,7 @@ const channels = [
       border-color 200ms,
       transform 200ms var(--ease-out),
       box-shadow 200ms;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .contact__channel:hover {
@@ -240,15 +262,33 @@ const channels = [
     transform: translate(2px, -2px);
   }
 
-  @media (max-width: 480px) {
+  @media (max-width: 560px) {
+    /* Stack label + value on the left, keep the chevron locked to the right edge.
+       Without this, the arrow drops under the value and the row loses its right-rail anchor. */
     .contact__channel {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: var(--space-2);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      grid-template-areas:
+        "label icon"
+        "value icon";
+      align-items: center;
+      column-gap: var(--space-3);
+      row-gap: 4px;
+      padding: var(--space-4);
     }
 
     .contact__channel-label {
+      grid-area: label;
       width: auto;
+    }
+
+    .contact__channel-value {
+      grid-area: value;
+      font-size: 16px;
+    }
+
+    .contact__channel-icon {
+      grid-area: icon;
     }
   }
 

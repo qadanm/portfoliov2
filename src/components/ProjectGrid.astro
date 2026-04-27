@@ -56,7 +56,7 @@ const sections: SectionProps[] = [
   .pg {
     display: flex;
     flex-direction: column;
-    gap: var(--space-16);
+    gap: var(--space-12);
   }
 
   @media (min-width: 768px) {
@@ -68,7 +68,13 @@ const sections: SectionProps[] = [
   .pg__section {
     display: flex;
     flex-direction: column;
-    gap: var(--space-6);
+    gap: var(--space-5);
+  }
+
+  @media (min-width: 600px) {
+    .pg__section {
+      gap: var(--space-6);
+    }
   }
 
   .pg__head {
@@ -107,7 +113,13 @@ const sections: SectionProps[] = [
   .pg__rest {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--space-5);
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 600px) {
+    .pg__rest {
+      gap: var(--space-5);
+    }
   }
 
   @media (min-width: 720px) {
