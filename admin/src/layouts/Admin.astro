@@ -35,6 +35,7 @@ function isActive(href: string) {
       </div>
       <nav id="admin-nav" class="admin__nav" aria-label="Admin navigation" data-nav>
         <a href="/" class:list={{ 'is-active': isActive('/') }}>Dashboard</a>
+        <a href="/today" class:list={['admin__nav-primary', { 'is-active': isActive('/today') }]}>→ Today</a>
 
         <h4>Workflow</h4>
         <a href="/jobs/new" class:list={{ 'is-active': activePath === '/jobs/new' }}>+ Add job (smart intake)</a>

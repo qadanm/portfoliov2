@@ -6,9 +6,14 @@ import { JOB_STATUSES } from '@/lib/storage';
 
 <Admin
   title="Add job"
-  intro="Paste a job link or the full job description. The system extracts what it can, scores the opportunity, and recommends a resume angle. Edit anything before saving."
+  intro="Paste one job to review carefully, or switch to bulk mode to drop in 10–30 links and queue them all at once. Bulk-added jobs land directly in /today as Saved."
 >
-  <!-- Step 1: input ─────────────────────────────────────────────── -->
+  <div class="mode-tabs no-print" role="tablist" aria-label="intake mode">
+    <button class="mode-tab is-active" role="tab" aria-selected="true" data-mode="single" type="button">Single (review &amp; edit)</button>
+    <button class="mode-tab" role="tab" aria-selected="false" data-mode="bulk" type="button">Bulk (paste &amp; queue)</button>
+  </div>
+
+  <!-- Step 1: single input ─────────────────────────────────────── -->
   <section class="card" id="step-input">
     <label class="lbl">Job URL <span class="hint">optional</span></label>
     <input id="jd-url" type="url" placeholder="https://… (LinkedIn, Greenhouse, Lever, Workday, company career site)" />
@@ -23,6 +28,31 @@ import { JOB_STATUSES } from '@/lib/storage';
     </div>
     <p id="input-error" class="err" style="display:none;"></p>
     <p id="fetch-status" class="hint" style="margin-top:6px;display:none;"></p>
+  </section>
+
+  <!-- Step 1B: bulk input ──────────────────────────────────────── -->
+  <section class="card" id="step-bulk" style="display:none;">
+    <label class="lbl">Job URLs <span class="hint">one per line · 10–30 at a time</span></label>
+    <textarea id="bulk-urls" rows="12" placeholder="https://www.linkedin.com/jobs/view/1234567
+https://boards.greenhouse.io/acme/jobs/12345
+https://jobs.lever.co/example/abc-123
+…"></textarea>
+
+    <details style="margin-top:10px;">
+      <summary class="lbl" style="cursor:pointer; display:inline;">Or paste full JDs <span class="hint">separate each with <code>---</code> on its own line</span></summary>
+      <textarea id="bulk-jds" rows="10" style="margin-top:8px;" placeholder="Full job description text…
+---
+Another full job description…
+---
+Another…"></textarea>
+    </details>
+
+    <div class="actions-row">
+      <button class="btn btn--primary" id="bulk-analyze-btn">Analyze all &amp; queue</button>
+      <button class="btn" id="bulk-clear-btn">Clear</button>
+    </div>
+    <p id="bulk-status" class="hint" style="margin-top:8px; display:none;"></p>
+    <div id="bulk-results" style="margin-top:12px; display:none;"></div>
   </section>
 
   <!-- Step 2: results + editable preview ────────────────────────── -->
@@ -191,6 +221,25 @@ import { JOB_STATUSES } from '@/lib/storage';
 
   .bullet-list { padding-left: 18px; }
   .bullet-list :global(li) { margin-bottom: 4px; }
+
+  /* Bulk mode tabs and results */
+  .mode-tabs { display: inline-flex; gap: 0; margin-bottom: 14px; border: 1px solid var(--c-border); border-radius: var(--r-md); overflow: hidden; background: var(--c-bg-elev); }
+  .mode-tab { background: transparent; border: none; color: var(--c-text-muted); padding: 8px 14px; font-size: 13px; font-family: inherit; cursor: pointer; border-right: 1px solid var(--c-border); }
+  .mode-tab:last-child { border-right: none; }
+  .mode-tab.is-active { background: var(--c-bg-muted); color: var(--c-text); }
+  .mode-tab:hover:not(.is-active) { color: var(--c-text); }
+
+  #bulk-results :global(.bulk-result) { padding: 8px 12px; border: 1px solid var(--c-border-subtle); border-radius: var(--r-md); margin-bottom: 6px; display: grid; grid-template-columns: auto 1fr auto auto; gap: 12px; align-items: center; font-size: 12px; }
+  #bulk-results :global(.bulk-result__co) { color: var(--c-text); }
+  #bulk-results :global(.bulk-result__role) { color: var(--c-text-muted); font-family: var(--font-mono); font-size: 11px; }
+  #bulk-results :global(.bulk-result__score) { font-family: var(--font-display); font-size: 18px; min-width: 32px; text-align: right; }
+  #bulk-results :global(.bulk-result__status) { font-family: var(--font-mono); font-size: 10px; padding: 2px 7px; border-radius: var(--r-full); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+  #bulk-results :global(.bulk-result__status--added) { color: var(--c-success); border: 1px solid rgba(16,185,129,0.4); background: rgba(16,185,129,0.08); }
+  #bulk-results :global(.bulk-result__status--dup) { color: var(--c-text-subtle); border: 1px solid var(--c-border-subtle); background: transparent; }
+  #bulk-results :global(.bulk-result__status--err) { color: #F87171; border: 1px solid rgba(239,68,68,0.4); background: rgba(239,68,68,0.08); }
+  #bulk-results :global(.bulk-summary) { display: flex; gap: 14px; padding: 10px 14px; background: var(--c-bg-muted); border: 1px solid var(--c-border); border-radius: var(--r-md); margin-bottom: 12px; font-size: 13px; align-items: center; flex-wrap: wrap; }
+  #bulk-results :global(.bulk-summary strong) { color: var(--c-text); font-family: var(--font-display); font-size: 18px; line-height: 1; margin-right: 4px; }
+  #bulk-results :global(.bulk-summary .label) { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-text-subtle); }
 </style>
 
 <script>
@@ -364,5 +413,198 @@ import { JOB_STATUSES } from '@/lib/storage';
 
     showStep('saved');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // ── Mode tabs (single vs bulk) ───────────────────────────────────────
+  const tabs = document.querySelectorAll<HTMLButtonElement>('.mode-tab');
+  function setMode(mode: 'single' | 'bulk') {
+    tabs.forEach(t => {
+      const active = t.dataset.mode === mode;
+      t.classList.toggle('is-active', active);
+      t.setAttribute('aria-selected', String(active));
+    });
+    ($('step-input') as HTMLElement).style.display = mode === 'single' ? 'block' : 'none';
+    ($('step-bulk') as HTMLElement).style.display = mode === 'bulk' ? 'block' : 'none';
+    if (mode === 'bulk') {
+      ($('step-preview') as HTMLElement).style.display = 'none';
+      ($('step-saved') as HTMLElement).style.display = 'none';
+    }
+  }
+  tabs.forEach(t => t.addEventListener('click', () => setMode(t.dataset.mode as 'single' | 'bulk')));
+
+  // ── Bulk intake ──────────────────────────────────────────────────────
+  type BulkItem = { source: string; kind: 'url' | 'jd' };
+  type BulkOutcome =
+    | { status: 'added'; job: Job; score?: number }
+    | { status: 'duplicate'; matched: Job; source: string }
+    | { status: 'error'; reason: string; source: string };
+
+  function looksLikeUrl(line: string): boolean {
+    return /^https?:\/\//i.test(line.trim());
+  }
+
+  function parseBulkInputs(): BulkItem[] {
+    const urlBlock = ($<HTMLTextAreaElement>('bulk-urls')).value.trim();
+    const jdBlock = ($<HTMLTextAreaElement>('bulk-jds')).value.trim();
+    const items: BulkItem[] = [];
+    if (urlBlock) {
+      for (const raw of urlBlock.split(/\r?\n/)) {
+        const line = raw.trim();
+        if (!line) continue;
+        if (looksLikeUrl(line)) items.push({ source: line, kind: 'url' });
+      }
+    }
+    if (jdBlock) {
+      const chunks = jdBlock.split(/^\s*-{3,}\s*$/m).map(c => c.trim()).filter(c => c.length > 50);
+      for (const chunk of chunks) items.push({ source: chunk, kind: 'jd' });
+    }
+    return items;
+  }
+
+  function findDuplicate(existingJobs: Job[], item: BulkItem, intake: IntakeResult): Job | null {
+    if (item.kind === 'url') {
+      const a = item.source.replace(/[?#].*$/, '').replace(/\/$/, '').toLowerCase();
+      for (const ex of existingJobs) {
+        if (!ex.url) continue;
+        const b = ex.url.replace(/[?#].*$/, '').replace(/\/$/, '').toLowerCase();
+        if (a === b) return ex;
+      }
+    }
+    // Fallback: company + role match (case-insensitive)
+    const co = (intake.draft.company ?? '').trim().toLowerCase();
+    const role = (intake.draft.role ?? '').trim().toLowerCase();
+    if (co && role) {
+      for (const ex of existingJobs) {
+        if ((ex.company ?? '').trim().toLowerCase() === co
+            && (ex.role ?? '').trim().toLowerCase() === role) return ex;
+      }
+    }
+    return null;
+  }
+
+  async function processBulkItem(item: BulkItem, existingJobs: Job[]): Promise<BulkOutcome> {
+    let intake: IntakeResult;
+    try {
+      intake = runIntake({
+        urlText: item.kind === 'url' ? item.source : undefined,
+        jdText: item.kind === 'jd' ? item.source : undefined,
+      });
+    } catch (e: any) {
+      return { status: 'error', reason: e?.message ?? 'analyze failed', source: item.source };
+    }
+
+    const dup = findDuplicate(existingJobs, item, intake);
+    if (dup) return { status: 'duplicate', matched: dup, source: item.source };
+
+    const d = intake.draft;
+    if (!d.company && !d.role) {
+      return { status: 'error', reason: 'could not extract company or role', source: item.source };
+    }
+
+    const job: Job = {
+      id: crypto.randomUUID(),
+      company: d.company ?? '(unknown)',
+      role: d.role ?? '(unknown)',
+      url: d.url,
+      source: d.source,
+      location: d.location,
+      salaryMin: d.salaryMin,
+      salaryMax: d.salaryMax,
+      status: 'Saved',
+      resumeAngle: d.resumeAngle,
+      priority: d.priority,
+      fitScore: intake.score?.total,
+      jdText: d.jdText,
+      nextStep: d.nextStep,
+      dateFound: d.dateFound ?? Date.now(),
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+    jobsStore.upsert(job);
+    return { status: 'added', job, score: intake.score?.total };
+  }
+
+  function renderBulkResults(outcomes: BulkOutcome[]) {
+    const added = outcomes.filter(o => o.status === 'added').length;
+    const dup = outcomes.filter(o => o.status === 'duplicate').length;
+    const err = outcomes.filter(o => o.status === 'error').length;
+    const p1 = outcomes.filter(o => o.status === 'added' && (o as any).job.priority === 1).length;
+    const p2 = outcomes.filter(o => o.status === 'added' && (o as any).job.priority === 2).length;
+
+    const summary = `
+      <div class="bulk-summary">
+        <span><strong>${added}</strong><span class="label">added</span></span>
+        <span><strong>${p1}</strong><span class="label">P1</span></span>
+        <span><strong>${p2}</strong><span class="label">P2</span></span>
+        <span><strong>${dup}</strong><span class="label">duplicates</span></span>
+        <span><strong>${err}</strong><span class="label">errors</span></span>
+        <span style="margin-left:auto;"><a class="btn" href="/today">→ Open /today</a></span>
+      </div>
+    `;
+
+    const rows = outcomes.map(o => {
+      if (o.status === 'added') {
+        const j = o.job;
+        const co = escape(j.company ?? '');
+        const role = escape(j.role ?? '');
+        const score = j.fitScore != null ? Math.round(j.fitScore) : '—';
+        return `<div class="bulk-result">
+          <span class="bulk-result__co">${co}</span>
+          <span class="bulk-result__role">${role}</span>
+          <span class="bulk-result__score">${score}</span>
+          <span class="bulk-result__status bulk-result__status--added">added · P${j.priority ?? '–'}</span>
+        </div>`;
+      } else if (o.status === 'duplicate') {
+        const j = o.matched;
+        return `<div class="bulk-result">
+          <span class="bulk-result__co">${escape(j.company ?? '')}</span>
+          <span class="bulk-result__role">${escape(j.role ?? '')}</span>
+          <span class="bulk-result__score">—</span>
+          <span class="bulk-result__status bulk-result__status--dup">duplicate</span>
+        </div>`;
+      }
+      return `<div class="bulk-result">
+        <span class="bulk-result__co">—</span>
+        <span class="bulk-result__role">${escape((o.source ?? '').slice(0, 80))}</span>
+        <span class="bulk-result__score">—</span>
+        <span class="bulk-result__status bulk-result__status--err">${escape(o.reason ?? 'error')}</span>
+      </div>`;
+    }).join('');
+
+    const wrap = $('bulk-results');
+    wrap.style.display = 'block';
+    wrap.innerHTML = summary + rows;
+  }
+
+  $('bulk-analyze-btn').addEventListener('click', async () => {
+    const items = parseBulkInputs();
+    const status = $<HTMLElement>('bulk-status');
+    if (items.length === 0) {
+      status.style.display = 'block';
+      status.textContent = 'Paste at least one URL or JD chunk.';
+      return;
+    }
+    status.style.display = 'block';
+    status.textContent = `Analyzing 0 / ${items.length}…`;
+
+    const outcomes: BulkOutcome[] = [];
+    for (let i = 0; i < items.length; i++) {
+      const existing = jobsStore.list(); // re-read each iteration so duplicates within batch are caught
+      const out = await processBulkItem(items[i], existing);
+      outcomes.push(out);
+      status.textContent = `Analyzing ${i + 1} / ${items.length}…`;
+      // Yield to the UI between items so the count visibly updates.
+      await new Promise(r => setTimeout(r, 0));
+    }
+    status.textContent = `Done. ${outcomes.filter(o => o.status === 'added').length} added.`;
+    renderBulkResults(outcomes);
+  });
+
+  $('bulk-clear-btn').addEventListener('click', () => {
+    ($<HTMLTextAreaElement>('bulk-urls')).value = '';
+    ($<HTMLTextAreaElement>('bulk-jds')).value = '';
+    $('bulk-status').style.display = 'none';
+    $('bulk-results').style.display = 'none';
+    $('bulk-results').innerHTML = '';
   });
 </script>

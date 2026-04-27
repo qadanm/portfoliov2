@@ -1,0 +1,666 @@
+---
+import Admin from '@/layouts/Admin.astro';
+---
+
+<Admin title="Today">
+  <div class="today">
+    <header class="today__bar" id="today-bar">
+      <div class="today__count">
+        <strong id="today-applied">0</strong>
+        <span class="today__count-label">applied today</span>
+      </div>
+      <div class="today__queue-stat">
+        <strong id="today-queue-count">0</strong>
+        <span class="today__count-label">in queue</span>
+      </div>
+      <div class="today__hints" aria-label="keyboard shortcuts">
+        <kbd>j</kbd><kbd>k</kbd> navigate
+        <span class="today__hint-sep">·</span>
+        <kbd>r</kbd> copy resume
+        <span class="today__hint-sep">·</span>
+        <kbd>l</kbd> copy letter
+        <span class="today__hint-sep">·</span>
+        <kbd>space</kbd> open
+        <span class="today__hint-sep">·</span>
+        <kbd>a</kbd> apply
+        <span class="today__hint-sep">·</span>
+        <kbd>d</kbd> defer
+      </div>
+    </header>
+
+    <div class="today__split">
+      <ol class="today__queue" id="today-queue" aria-label="application queue"></ol>
+      <aside class="today__detail" id="today-detail" aria-live="polite">
+        <p class="today__empty">Select a job. Press <kbd>j</kbd>/<kbd>k</kbd> to navigate.</p>
+      </aside>
+    </div>
+
+    <div class="today__toast" id="today-toast" aria-live="polite"></div>
+  </div>
+</Admin>
+
+<style>
+  .today {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    /* fill the viewport minus the admin chrome */
+    height: calc(100vh - 180px);
+    min-height: 480px;
+  }
+
+  .today__bar {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 10px 14px;
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    background: var(--c-bg-elev);
+    flex-wrap: wrap;
+  }
+  .today__count, .today__queue-stat {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+  .today__count strong, .today__queue-stat strong {
+    font-family: var(--font-display);
+    font-size: 22px;
+    line-height: 1;
+    color: var(--c-text);
+  }
+  .today__count-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--c-text-subtle);
+  }
+  .today__hints {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--c-text-subtle);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .today__hint-sep { opacity: 0.5; }
+  .today__bar kbd, .today__detail kbd, .today__empty kbd {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    border: 1px solid var(--c-border);
+    background: var(--c-bg-muted);
+    color: var(--c-text);
+    line-height: 1.4;
+  }
+
+  .today__split {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 12px;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+  @media (max-width: 900px) {
+    .today__split { grid-template-columns: 1fr; height: auto; }
+    .today { height: auto; }
+  }
+
+  .today__queue {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    background: var(--c-bg-elev);
+  }
+  .today__queue:empty::after {
+    content: 'No saved jobs in the queue. Add some via /jobs/new.';
+    display: block;
+    padding: 24px;
+    color: var(--c-text-subtle);
+    font-size: 13px;
+  }
+  .today__queue :global(li.today__row) {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) auto auto;
+    gap: 10px;
+    align-items: center;
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--c-border-subtle);
+    cursor: pointer;
+    user-select: none;
+  }
+  .today__queue :global(li.today__row:last-child) { border-bottom: none; }
+  .today__queue :global(li.today__row:hover) { background: var(--c-bg-muted); }
+  .today__queue :global(li.today__row.is-selected) {
+    background: var(--c-accent-dim);
+    border-left: 2px solid var(--c-accent);
+    padding-left: 10px;
+  }
+  .today__queue :global(li.today__row.is-deferred) { opacity: 0.45; }
+
+  .today__queue :global(.today__rank) {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--c-text-subtle);
+    text-align: right;
+  }
+  .today__queue :global(.today__row-main) {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .today__queue :global(.today__row-co) {
+    font-size: 14px;
+    color: var(--c-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .today__queue :global(.today__row-role) {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--c-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .today__queue :global(.today__pill) {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: var(--r-full);
+    background: var(--c-bg-muted);
+    border: 1px solid var(--c-border-subtle);
+    color: var(--c-text-muted);
+    white-space: nowrap;
+  }
+  .today__queue :global(.today__pill--p1) { color: var(--c-accent); border-color: var(--c-accent); }
+  .today__queue :global(.today__score) {
+    font-family: var(--font-display);
+    font-size: 18px;
+    color: var(--c-text);
+    line-height: 1;
+    min-width: 28px;
+    text-align: right;
+  }
+
+  .today__detail {
+    overflow-y: auto;
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    background: var(--c-bg-elev);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+  }
+  .today__empty {
+    color: var(--c-text-subtle);
+    font-size: 13px;
+    margin: auto;
+    text-align: center;
+  }
+
+  .today__detail :global(.detail__head) {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--c-border-subtle);
+    margin-bottom: 14px;
+  }
+  .today__detail :global(.detail__co) {
+    font-family: var(--font-display);
+    font-size: 22px;
+    line-height: 1.15;
+    color: var(--c-text);
+  }
+  .today__detail :global(.detail__role) {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--c-text-muted);
+    margin-top: 4px;
+  }
+  .today__detail :global(.detail__score-block) {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-shrink: 0;
+    text-align: right;
+  }
+  .today__detail :global(.detail__score) {
+    font-family: var(--font-display);
+    font-size: 36px;
+    line-height: 1;
+    color: var(--c-text);
+  }
+  .today__detail :global(.detail__score-meta) {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--c-text-subtle);
+  }
+
+  .today__detail :global(.detail__angle) {
+    font-size: 12px;
+    color: var(--c-text-muted);
+    margin-bottom: 14px;
+  }
+  .today__detail :global(.detail__angle strong) { color: var(--c-text); font-weight: 500; }
+
+  .today__detail :global(.detail__actions) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .today__detail :global(.detail__action) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 12px;
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    background: var(--c-bg-muted);
+    color: var(--c-text);
+    font-size: 13px;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+  }
+  .today__detail :global(.detail__action:hover) { border-color: var(--c-accent); color: var(--c-accent); }
+  .today__detail :global(.detail__action--primary) {
+    background: var(--c-accent);
+    color: var(--c-bg);
+    border-color: var(--c-accent);
+    grid-column: 1 / -1;
+    justify-content: center;
+    font-weight: 500;
+  }
+  .today__detail :global(.detail__action--primary:hover) { color: var(--c-bg); filter: brightness(1.1); }
+  .today__detail :global(.detail__action kbd) {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    border: 1px solid var(--c-border-subtle);
+    background: rgba(0,0,0,0.25);
+    color: inherit;
+    opacity: 0.7;
+  }
+  .today__detail :global(.detail__action--primary kbd) { background: rgba(0,0,0,0.3); border-color: rgba(0,0,0,0.4); color: var(--c-bg); }
+
+  .today__toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translate(-50%, 12px);
+    background: var(--c-text);
+    color: var(--c-bg);
+    padding: 9px 14px;
+    border-radius: var(--r-md);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    z-index: 1000;
+  }
+  .today__toast.is-visible {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  /* Hide intro chrome on this page if present */
+  :global(main:has(.today)) :global(header.admin__page-head) { display: none; }
+</style>
+
+<script>
+  import { jobsStore, type Job, type JobStatus } from '@/lib/storage';
+  import { scoreOpportunity } from '@/lib/scoring';
+  import { buildResume, resumeToText } from '@/lib/engine';
+  import { generateCoverLetter, type Tone } from '@/lib/letters';
+  import { angleById } from '@/data/angles';
+
+  // ── State ────────────────────────────────────────────────────────────
+  type State = {
+    queue: Job[];
+    selectedIdx: number;
+    deferredIds: Set<string>;
+  };
+
+  const state: State = {
+    queue: [],
+    selectedIdx: -1,
+    deferredIds: new Set(),
+  };
+
+  // ── DOM ──────────────────────────────────────────────────────────────
+  const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
+  const queueEl = $('today-queue');
+  const detailEl = $('today-detail');
+  const toastEl = $('today-toast');
+  const appliedEl = $<HTMLElement>('today-applied');
+  const queueCountEl = $<HTMLElement>('today-queue-count');
+
+  // ── Sorting ──────────────────────────────────────────────────────────
+  // Priority asc (1 = highest), then fitScore desc, then updatedAt desc.
+  function sortQueue(jobs: Job[]): Job[] {
+    return jobs.slice().sort((a, b) => {
+      const pa = a.priority ?? 9, pb = b.priority ?? 9;
+      if (pa !== pb) return pa - pb;
+      const sa = a.fitScore ?? 0, sb = b.fitScore ?? 0;
+      if (sa !== sb) return sb - sa;
+      return (b.updatedAt ?? 0) - (a.updatedAt ?? 0);
+    });
+  }
+
+  function loadQueue() {
+    const all = jobsStore.list();
+    const saved = all.filter(j => j.status === 'Saved');
+    const sorted = sortQueue(saved);
+    // Deferred jobs go to the bottom but stay visible (subtle)
+    const undef = sorted.filter(j => !state.deferredIds.has(j.id));
+    const def = sorted.filter(j => state.deferredIds.has(j.id));
+    state.queue = [...undef, ...def];
+    if (state.queue.length === 0) state.selectedIdx = -1;
+    else if (state.selectedIdx < 0 || state.selectedIdx >= state.queue.length) state.selectedIdx = 0;
+  }
+
+  function appliedToday(): number {
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    const startMs = start.getTime();
+    return jobsStore.list().filter(j =>
+      j.status === 'Applied' && j.dateApplied != null && j.dateApplied >= startMs
+    ).length;
+  }
+
+  // ── Render ───────────────────────────────────────────────────────────
+  function renderHeader() {
+    appliedEl.textContent = String(appliedToday());
+    queueCountEl.textContent = String(state.queue.length);
+  }
+
+  function escape(s: string): string {
+    return s.replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]!));
+  }
+
+  function renderQueue() {
+    if (state.queue.length === 0) {
+      queueEl.innerHTML = '';
+      return;
+    }
+    queueEl.innerHTML = state.queue.map((j, i) => {
+      const sel = i === state.selectedIdx ? 'is-selected' : '';
+      const def = state.deferredIds.has(j.id) ? 'is-deferred' : '';
+      const score = j.fitScore != null ? Math.round(j.fitScore) : '—';
+      const pri = j.priority ? `<span class="today__pill ${j.priority === 1 ? 'today__pill--p1' : ''}">P${j.priority}</span>` : '';
+      const role = j.role ?? '';
+      const co = j.company ?? '(no company)';
+      return `
+        <li class="today__row ${sel} ${def}" data-idx="${i}">
+          <span class="today__rank">${i + 1}</span>
+          <div class="today__row-main">
+            <span class="today__row-co">${escape(co)}</span>
+            <span class="today__row-role">${escape(role)}</span>
+          </div>
+          ${pri}
+          <span class="today__score">${score}</span>
+        </li>
+      `;
+    }).join('');
+    // Click to select
+    queueEl.querySelectorAll<HTMLElement>('.today__row').forEach(row => {
+      row.addEventListener('click', () => {
+        const idx = Number(row.dataset.idx);
+        select(idx);
+      });
+    });
+    // Scroll selected into view
+    const sel = queueEl.querySelector<HTMLElement>('.today__row.is-selected');
+    if (sel) sel.scrollIntoView({ block: 'nearest' });
+  }
+
+  function pickToneForAngle(angleId: string | undefined): Tone {
+    if (!angleId) return 'direct';
+    if (/ai-product-designer|design-engineer|product-designer/.test(angleId)) return 'design';
+    if (/ux-engineer|frontend-ux-engineer|design-systems-engineer/.test(angleId)) return 'technical';
+    if (/senior-product-designer|web-experience-manager|ux-product-lead/.test(angleId)) return 'senior';
+    return 'direct';
+  }
+
+  function renderDetail() {
+    if (state.selectedIdx < 0 || !state.queue[state.selectedIdx]) {
+      detailEl.innerHTML = `<p class="today__empty">No job selected.</p>`;
+      return;
+    }
+    const job = state.queue[state.selectedIdx];
+    const angleId = job.resumeAngle ?? 'product-designer';
+    const angle = angleById(angleId);
+    const angleLabel = angle?.label ?? angleId;
+
+    // Re-score from jdText if available, else show stored score
+    let breakdownHtml = '';
+    if (job.jdText) {
+      try {
+        // Re-run scoring is heavy. Use stored fitScore for now; show jdText link only.
+      } catch {}
+    }
+
+    const co = escape(job.company ?? '(no company)');
+    const role = escape(job.role ?? '');
+    const score = job.fitScore != null ? Math.round(job.fitScore) : '—';
+    const conf = job.priority === 1 ? 'high confidence' : job.priority === 2 ? 'medium' : 'low';
+    const url = job.url ?? '';
+    const urlBtn = url
+      ? `<button class="detail__action" data-act="open" type="button"><span>Open job <span class="hint">↗</span></span><kbd>space</kbd></button>`
+      : `<button class="detail__action" type="button" disabled style="opacity:0.5; cursor:not-allowed;"><span>Open job <span class="hint">(no URL)</span></span></button>`;
+
+    const pri = job.priority ? `P${job.priority}` : '—';
+
+    detailEl.innerHTML = `
+      <div class="detail__head">
+        <div>
+          <div class="detail__co">${co}</div>
+          <div class="detail__role">${role}</div>
+        </div>
+        <div class="detail__score-block">
+          <span class="detail__score">${score}</span>
+          <span class="detail__score-meta">${pri}<br>${conf}</span>
+        </div>
+      </div>
+
+      <p class="detail__angle">Recommended angle: <strong>${escape(angleLabel)}</strong></p>
+
+      <div class="detail__actions">
+        <button class="detail__action" data-act="resume" type="button"><span>Copy resume</span><kbd>r</kbd></button>
+        <button class="detail__action" data-act="letter" type="button"><span>Copy cover letter</span><kbd>l</kbd></button>
+        ${urlBtn}
+        <button class="detail__action" data-act="defer" type="button"><span>${state.deferredIds.has(job.id) ? 'Undefer' : 'Defer'}</span><kbd>d</kbd></button>
+        <button class="detail__action detail__action--primary" data-act="apply" type="button"><span>Mark applied</span><kbd>a</kbd></button>
+      </div>
+
+      ${job.jdText ? `<details><summary class="detail__angle" style="cursor:pointer;">Show JD text</summary><pre style="margin-top:8px; padding:10px; background:var(--c-bg-muted); border-radius:6px; font-size:11px; line-height:1.5; white-space:pre-wrap; max-height:240px; overflow:auto; font-family:var(--font-mono);">${escape(job.jdText.slice(0, 4000))}</pre></details>` : ''}
+    `;
+
+    detailEl.querySelectorAll<HTMLButtonElement>('[data-act]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const act = btn.dataset.act!;
+        runAction(act);
+      });
+    });
+  }
+
+  // ── Actions ──────────────────────────────────────────────────────────
+  function select(idx: number) {
+    if (idx < 0 || idx >= state.queue.length) return;
+    state.selectedIdx = idx;
+    renderQueue();
+    renderDetail();
+  }
+
+  function move(delta: number) {
+    if (state.queue.length === 0) return;
+    let next = state.selectedIdx + delta;
+    if (next < 0) next = 0;
+    if (next >= state.queue.length) next = state.queue.length - 1;
+    select(next);
+  }
+
+  async function writeClipboard(text: string): Promise<boolean> {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      // Fallback for older browsers / contexts without permission: hidden textarea + execCommand
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch {
+        return false;
+      }
+    }
+  }
+
+  async function copyResume() {
+    const job = state.queue[state.selectedIdx];
+    if (!job) return;
+    const angleId = job.resumeAngle ?? 'product-designer';
+    const resume = buildResume(angleId);
+    if (!resume) { toast('No resume for this angle.'); return; }
+    const text = resumeToText(resume);
+    const ok = await writeClipboard(text);
+    toast(ok ? 'Resume copied' : 'Copy blocked — focus the page first');
+  }
+
+  async function copyLetter() {
+    const job = state.queue[state.selectedIdx];
+    if (!job) return;
+    const angleId = job.resumeAngle ?? 'product-designer';
+    const tone = pickToneForAngle(angleId);
+    const letter = generateCoverLetter({
+      angleId,
+      company: job.company ?? '',
+      role: job.role ?? '',
+      jobUrl: job.url,
+    }, tone);
+    if (!letter) { toast('No letter template for this angle.'); return; }
+    const ok = await writeClipboard(letter);
+    toast(ok ? 'Cover letter copied' : 'Copy blocked — focus the page first');
+  }
+
+  function openJob() {
+    const job = state.queue[state.selectedIdx];
+    if (!job?.url) { toast('No URL on this job.'); return; }
+    window.open(job.url, '_blank', 'noopener');
+  }
+
+  function markApplied() {
+    const job = state.queue[state.selectedIdx];
+    if (!job) return;
+    const updated: Job = {
+      ...job,
+      status: 'Applied' as JobStatus,
+      dateApplied: Date.now(),
+      updatedAt: Date.now(),
+    };
+    jobsStore.upsert(updated);
+    state.deferredIds.delete(job.id); // applied jobs no longer deferred
+    const prevIdx = state.selectedIdx;
+    loadQueue();
+    state.selectedIdx = Math.min(prevIdx, state.queue.length - 1);
+    renderHeader();
+    renderQueue();
+    renderDetail();
+    toast(`Applied: ${job.company ?? job.role ?? 'job'}`);
+  }
+
+  function toggleDefer() {
+    const job = state.queue[state.selectedIdx];
+    if (!job) return;
+    if (state.deferredIds.has(job.id)) state.deferredIds.delete(job.id);
+    else state.deferredIds.add(job.id);
+    const prevIdx = state.selectedIdx;
+    loadQueue();
+    state.selectedIdx = Math.min(prevIdx, state.queue.length - 1);
+    renderQueue();
+    renderDetail();
+  }
+
+  function runAction(act: string) {
+    switch (act) {
+      case 'resume': copyResume(); break;
+      case 'letter': copyLetter(); break;
+      case 'open': openJob(); break;
+      case 'apply': markApplied(); break;
+      case 'defer': toggleDefer(); break;
+    }
+  }
+
+  // ── Toast ────────────────────────────────────────────────────────────
+  let toastTimeout: number | null = null;
+  function toast(msg: string) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('is-visible');
+    if (toastTimeout) window.clearTimeout(toastTimeout);
+    toastTimeout = window.setTimeout(() => {
+      toastEl.classList.remove('is-visible');
+    }, 1500);
+  }
+
+  // ── Keyboard ─────────────────────────────────────────────────────────
+  document.addEventListener('keydown', (e) => {
+    // Ignore when typing in inputs/textareas (shouldn't happen on this page,
+    // but be safe in case future fields get added).
+    const tgt = e.target as HTMLElement;
+    if (tgt && (tgt.tagName === 'INPUT' || tgt.tagName === 'TEXTAREA' || tgt.isContentEditable)) return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+    switch (e.key) {
+      case 'j':
+      case 'ArrowDown':
+        e.preventDefault(); move(1); break;
+      case 'k':
+      case 'ArrowUp':
+        e.preventDefault(); move(-1); break;
+      case ' ':
+        e.preventDefault(); openJob(); break;
+      case 'r':
+        e.preventDefault(); copyResume(); break;
+      case 'l':
+        e.preventDefault(); copyLetter(); break;
+      case 'a':
+        e.preventDefault(); markApplied(); break;
+      case 'd':
+        e.preventDefault(); toggleDefer(); break;
+    }
+  });
+
+  // ── Init ─────────────────────────────────────────────────────────────
+  loadQueue();
+  if (state.queue.length > 0) state.selectedIdx = 0;
+  renderHeader();
+  renderQueue();
+  renderDetail();
+</script>
