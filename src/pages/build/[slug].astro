@@ -6,6 +6,8 @@ import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
 import AdvisorVisual from '@/components/diagrams/AdvisorVisual.astro';
 import ReadingProgress from '@/components/ReadingProgress.astro';
 import Thesis from '@/components/Thesis.astro';
+import SchemaArticle from '@/components/seo/SchemaArticle.astro';
+import SchemaBreadcrumb from '@/components/seo/SchemaBreadcrumb.astro';
 import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
@@ -24,13 +26,39 @@ const allProjects = (await getCollection('build', ({ data }) => !data.draft))
   .sort((a, b) => a.data.order - b.data.order);
 const currentIndex = allProjects.findIndex(p => p.slug === project.slug);
 const next = allProjects[(currentIndex + 1) % allProjects.length];
+
+const pageUrl = new URL(Astro.url.pathname, Astro.site);
+const ogImage = data.coverImage ? new URL(data.coverImage, Astro.site).toString() : undefined;
+const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
 ---
 
 <BaseLayout
-  title={`${data.title} — Build`}
+  title={`${data.title} — Case Study by Moe Qadan`}
   description={data.short}
   article={true}
+  image={data.coverImage ?? '/og.png'}
+  imageAlt={ogAlt}
+  keywords={[data.title, data.category, ...data.keyFocus, 'case study', 'product design', 'UX engineering']}
 >
+  <Fragment slot="head">
+    <SchemaArticle
+      title={data.title}
+      description={data.short}
+      url={pageUrl}
+      image={ogImage}
+      imageAlt={ogAlt}
+      category={data.category}
+      keywords={data.keyFocus}
+    />
+    <SchemaBreadcrumb
+      items={[
+        { name: 'Home', url: new URL('/', Astro.site) },
+        { name: 'Build', url: new URL('/build', Astro.site) },
+        { name: data.title, url: pageUrl },
+      ]}
+    />
+  </Fragment>
+
   <ReadingProgress />
 
   <article class="cs">
@@ -478,7 +506,14 @@ const next = allProjects[(currentIndex + 1) % allProjects.length];
 
     <footer class="cs__footer">
       <div class="container-site">
-        <a href={`/build/${next.slug}`} class="cs__next">
+        <a
+          href={`/build/${next.slug}`}
+          class="cs__next"
+          data-track="cta_click"
+          data-track-cta="next-project"
+          data-track-project={next.slug}
+          data-track-from={project.slug}
+        >
           <div class="cs__next-meta">
             <span class="cs__next-label">Next project</span>
             <span class="cs__next-title">{next.data.title}</span>
@@ -492,8 +527,22 @@ const next = allProjects[(currentIndex + 1) % allProjects.length];
         </a>
 
         <div class="cs__footer-actions">
-          <a href="/build" class="cs__btn-secondary">All projects</a>
-          <a href="/contact" class="cs__btn-primary">
+          <a
+            href="/build"
+            class="cs__btn-secondary"
+            data-track="cta_click"
+            data-track-cta="all-projects"
+            data-track-loc="case-study-footer"
+            data-track-from={project.slug}
+          >All projects</a>
+          <a
+            href="/contact"
+            class="cs__btn-primary"
+            data-track="cta_click"
+            data-track-cta="get-in-touch"
+            data-track-loc="case-study-footer"
+            data-track-from={project.slug}
+          >
             Get in touch
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>

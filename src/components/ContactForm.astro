@@ -121,6 +121,13 @@ const projectTypes = [
       const statusEl = form.querySelector<HTMLDivElement>('[data-cf-status]');
       const successTpl = form.parentElement?.querySelector<HTMLTemplateElement>('[data-cf-success]')
         ?? document.querySelector<HTMLTemplateElement>('[data-cf-success]');
+      const formId = form.id || 'unknown-form';
+
+      function emit(event: 'form_submit_attempt' | 'form_submit_success' | 'form_submit_error', extra?: Record<string, string>) {
+        if (typeof window.plausible === 'function') {
+          window.plausible(event, { props: { form: formId, ...(extra ?? {}) } });
+        }
+      }
 
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -132,6 +139,7 @@ const projectTypes = [
             statusEl.classList.add('cf__status--error');
             statusEl.textContent = 'Form not configured yet. Set PUBLIC_WEB3FORMS_KEY in your environment.';
           }
+          emit('form_submit_error', { reason: 'no_access_key' });
           return;
         }
 
@@ -146,6 +154,7 @@ const projectTypes = [
           statusEl.classList.remove('cf__status--error');
           statusEl.textContent = '';
         }
+        emit('form_submit_attempt');
 
         try {
           const res = await fetch('https://api.web3forms.com/submit', {
@@ -160,6 +169,7 @@ const projectTypes = [
           const data: Web3FormsResponse = await res.json();
 
           if (data.success) {
+            emit('form_submit_success');
             if (successTpl) {
               const cloned = successTpl.content.cloneNode(true);
               form.replaceWith(cloned as Node);
@@ -168,12 +178,14 @@ const projectTypes = [
               if (statusEl) statusEl.textContent = 'Message sent.';
             }
           } else {
+            emit('form_submit_error', { reason: 'api_error' });
             if (statusEl) {
               statusEl.classList.add('cf__status--error');
               statusEl.textContent = data.message || 'Something went wrong. Try email instead?';
             }
           }
         } catch {
+          emit('form_submit_error', { reason: 'network' });
           if (statusEl) {
             statusEl.classList.add('cf__status--error');
             statusEl.textContent = 'Network issue. Try email instead?';

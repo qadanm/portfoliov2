@@ -1,0 +1,44 @@
+---
+/**
+ * Analytics — Plausible loader + global event binding.
+ *
+ * Plausible was chosen over GA4 because the site is a portfolio, not a
+ * commerce funnel: GA4's depth costs a cookie banner, ~45kB of script, and
+ * a privacy footprint we don't need. Plausible is ~1kB, sets no cookies,
+ * needs no consent UI under GDPR/ePrivacy, and exposes a custom-events API
+ * that maps cleanly to the small taxonomy we care about.
+ *
+ * The loader runs only when PUBLIC_PLAUSIBLE_DOMAIN is set so dev/preview
+ * builds stay clean. The script uses manual mode because Astro
+ * ViewTransitions break the auto pageview heuristic.
+ */
+const domain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN;
+---
+
+{domain && (
+  <>
+    <script
+      is:inline
+      defer
+      data-domain={domain}
+      src="https://plausible.io/js/script.manual.outbound-links.tagged-events.js"
+    />
+    <script is:inline>
+      // Queue stub — `track()` calls made before the deferred script loads
+      // are pushed onto window.plausible.q and replayed once it's ready.
+      window.plausible = window.plausible || function() {
+        (window.plausible.q = window.plausible.q || []).push(arguments);
+      };
+    </script>
+  </>
+)}
+
+<script>
+  import { initAnalytics } from '@/utils/analytics-bind';
+
+  // First run on initial load, then re-run on every ViewTransition swap.
+  // initAnalytics() is idempotent for the global listeners — only the
+  // per-page work (pageview, project_view, scroll-depth reset) repeats.
+  initAnalytics();
+  document.addEventListener('astro:page-load', initAnalytics);
+</script>

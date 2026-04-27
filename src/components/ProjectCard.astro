@@ -17,6 +17,11 @@ const { data, slug } = project;
   class:list={['project-card', `project-card--${size}`, { 'project-card--flagship': data.category === 'Flagship' }]}
   style={`animation-delay: ${index * 60}ms;`}
   data-category={data.category}
+  data-track="cta_click"
+  data-track-cta="project-card"
+  data-track-project={slug}
+  data-track-category={data.category.toLowerCase()}
+  data-track-size={size}
 >
   <div class="project-card__media">
     <Placeholder

@@ -1,0 +1,50 @@
+---
+/**
+ * Article schema for case-study pages. Pairs with the Person schema in
+ * BaseLayout — author/publisher reference the same entity.
+ *
+ * Use Article (not CreativeWork) because Google's Article rich-result
+ * eligibility is more useful for portfolio surfaces than the more abstract
+ * CreativeWork type, and the data overlaps cleanly.
+ */
+interface Props {
+  title: string;
+  description: string;
+  url: URL | string;
+  image?: URL | string;
+  imageAlt?: string;
+  category?: string;
+  keywords?: string[];
+}
+
+const { title, description, url, image, imageAlt, category, keywords } = Astro.props;
+
+const author = {
+  '@type': 'Person',
+  name: 'Moe Qadan',
+  url: 'https://qadan.co',
+};
+
+const data = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: title,
+  description,
+  url: url.toString(),
+  mainEntityOfPage: url.toString(),
+  ...(image && {
+    image: {
+      '@type': 'ImageObject',
+      url: image.toString(),
+      ...(imageAlt && { caption: imageAlt }),
+    },
+  }),
+  author,
+  publisher: author,
+  ...(category && { articleSection: category }),
+  ...(keywords && keywords.length > 0 && { keywords: keywords.join(', ') }),
+  inLanguage: 'en',
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(data)} />

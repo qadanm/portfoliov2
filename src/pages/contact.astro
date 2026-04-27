@@ -25,8 +25,15 @@ const channels = [
 ---
 
 <BaseLayout
-  title="Contact — Qadan"
-  description="Get in touch. Open to interesting work in UX, frontend systems, and AI-native products."
+  title="Contact Moe Qadan — Product Design & UX Engineering"
+  description="Get in touch with Moe Qadan. Open to interesting work in UX engineering, frontend systems, design engineering, and AI-native products."
+  keywords={[
+    'contact Moe Qadan',
+    'hire UX engineer',
+    'hire product designer',
+    'design engineer for hire',
+    'AI product design',
+  ]}
 >
   <div class="contact">
     <div class="container-site contact__inner">
@@ -57,6 +64,9 @@ const channels = [
                 class:list={['contact__channel', { 'contact__channel--primary': c.primary }]}
                 target={c.external ? '_blank' : undefined}
                 rel={c.external ? 'noopener noreferrer' : undefined}
+                data-track="contact_click"
+                data-track-channel={c.label.toLowerCase()}
+                data-track-loc="contact-page"
               >
                 <span class="contact__channel-label">{c.label}</span>
                 <span class="contact__channel-value">{c.value}</span>

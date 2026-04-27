@@ -1,4 +1,23 @@
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /api/
 
-Sitemap: https://muhammedqadan.com/sitemap-index.xml
+# Block legacy /work paths — redirected to /build, no need to index both.
+Disallow: /work/
+Disallow: /work
+
+# Most LLM crawlers are welcome — opt them out only by exception below.
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://qadan.co/sitemap-index.xml

@@ -25,6 +25,9 @@ const links = [
             class="footer-link"
             target={link.external ? '_blank' : undefined}
             rel={link.external ? 'noopener noreferrer' : undefined}
+            data-track="contact_click"
+            data-track-channel={link.label.toLowerCase()}
+            data-track-loc="footer"
           >
             {link.label}
             {link.external && (

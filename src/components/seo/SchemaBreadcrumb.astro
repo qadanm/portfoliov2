@@ -1,0 +1,31 @@
+---
+/**
+ * BreadcrumbList schema — feeds Google the trail behind a leaf page so the
+ * SERP shows "qadan.co › Build › ChatOBD2" instead of the raw URL.
+ *
+ * Items are accepted as a list of {name, url} pairs, ordered from root.
+ */
+interface Crumb {
+  name: string;
+  url: URL | string;
+}
+
+interface Props {
+  items: Crumb[];
+}
+
+const { items } = Astro.props;
+
+const data = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: items.map((item, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: item.name,
+    item: item.url.toString(),
+  })),
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(data)} />

@@ -3,26 +3,97 @@ import { ViewTransitions } from 'astro:transitions';
 import { themeScript } from '@/utils/theme';
 import Header from './Header.astro';
 import Footer from './Footer.astro';
+import Analytics from '@/components/analytics/Analytics.astro';
 import '@/styles/global.css';
 
 interface Props {
   title?: string;
   description?: string;
   image?: string;
+  imageAlt?: string;
   article?: boolean;
   noindex?: boolean;
+  keywords?: string[];
+  publishedTime?: string;
 }
 
 const {
-  title = 'Qadan — Product Design & UX Engineering',
-  description = 'I design and build product systems end to end. Product UX, frontend architecture, and the constraints they live inside.',
+  title = 'Moe Qadan — Product Design & UX Engineering',
+  description = "Moe Qadan designs and builds product systems end to end — UX engineering, frontend architecture, and AI-native products inside long-running platforms.",
   image = '/og.png',
+  imageAlt = 'Moe Qadan — Product Designer & UX Engineer. Diagram of a constrained AI pipeline with the model held between deterministic stages.',
   article = false,
   noindex = false,
+  keywords,
+  publishedTime,
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const fullTitle = title.includes('Qadan') ? title : `${title} — Qadan`;
+const fullTitle = title.includes('Qadan') || title.includes('Moe ') ? title : `${title} — Qadan`;
+const ogImage = new URL(image, Astro.site).toString();
+const ogType = article ? 'article' : 'website';
+const ogImageType = image.endsWith('.webp') ? 'image/webp'
+  : image.endsWith('.jpg') || image.endsWith('.jpeg') ? 'image/jpeg'
+  : 'image/png';
+
+// WebSite schema describes the *site*, not the page — keep its description
+// stable across navigations so Google's site card stays coherent.
+const SITE_DESCRIPTION = "Moe Qadan designs and builds product systems end to end — UX engineering, frontend architecture, and AI-native products inside long-running platforms.";
+
+const defaultKeywords = [
+  'Moe Qadan',
+  'product designer',
+  'UX engineer',
+  'design engineer',
+  'frontend architecture',
+  'design systems',
+  'AI product design',
+  'AI-native products',
+  'platform UX',
+];
+const metaKeywords = (keywords && keywords.length > 0 ? keywords : defaultKeywords).join(', ');
+
+// Person schema is global — every page asserts the same author identity so
+// Google can collapse mentions across the site into one entity card.
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Moe Qadan',
+  alternateName: 'Muhammed Qadan',
+  url: Astro.site?.toString(),
+  jobTitle: 'Product Designer & UX Engineer',
+  description: 'Product design and UX engineering for long-running platforms and AI-native products.',
+  knowsAbout: [
+    'Product Design',
+    'UX Engineering',
+    'Design Systems',
+    'Frontend Architecture',
+    'AI-Native Products',
+    'Platform UX',
+  ],
+  sameAs: [
+    'https://linkedin.com/in/mqadan',
+    'https://github.com/qadanm',
+  ],
+};
+
+// WebSite schema with SearchAction is the standard pattern for a site root —
+// even without a search box it tells crawlers this is a coherent site, not
+// a stack of pages. Description must stay stable per-navigation.
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Qadan',
+  alternateName: 'Moe Qadan Portfolio',
+  url: Astro.site?.toString(),
+  description: SITE_DESCRIPTION,
+  publisher: {
+    '@type': 'Person',
+    name: 'Moe Qadan',
+    url: Astro.site?.toString(),
+  },
+  inLanguage: 'en',
+};
 ---
 
 <!DOCTYPE html>
@@ -31,47 +102,54 @@ const fullTitle = title.includes('Qadan') ? title : `${title} — Qadan`;
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="dark light" />
+  <meta name="theme-color" content="#FAFAF9" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#09090B" media="(prefers-color-scheme: dark)" />
 
   <script set:html={themeScript} />
 
   <title>{fullTitle}</title>
   <meta name="description" content={description} />
+  <meta name="keywords" content={metaKeywords} />
+  <meta name="author" content="Moe Qadan" />
   <link rel="canonical" href={canonicalURL} />
-  {noindex && <meta name="robots" content="noindex" />}
+  {noindex
+    ? <meta name="robots" content="noindex, nofollow" />
+    : <meta name="robots" content="index, follow, max-image-preview:large" />}
 
-  <meta property="og:type" content={article ? 'article' : 'website'} />
+  <meta property="og:type" content={ogType} />
   <meta property="og:url" content={canonicalURL} />
   <meta property="og:title" content={fullTitle} />
   <meta property="og:description" content={description} />
-  <meta property="og:image" content={new URL(image, Astro.site)} />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:image:secure_url" content={ogImage} />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:type" content="image/png" />
-  <meta property="og:image:alt" content="Moe Qadan — Product Designer & UX Engineer. Diagram of a constrained AI pipeline with the model held between deterministic stages." />
+  <meta property="og:image:type" content={ogImageType} />
+  <meta property="og:image:alt" content={imageAlt} />
   <meta property="og:site_name" content="Qadan" />
+  <meta property="og:locale" content="en_US" />
+  {article && publishedTime && <meta property="article:published_time" content={publishedTime} />}
+  {article && <meta property="article:author" content="Moe Qadan" />}
 
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content={fullTitle} />
   <meta name="twitter:description" content={description} />
-  <meta name="twitter:image" content={new URL(image, Astro.site)} />
-  <meta name="twitter:image:alt" content="Moe Qadan — Product Designer & UX Engineer. Diagram of a constrained AI pipeline with the model held between deterministic stages." />
+  <meta name="twitter:image" content={ogImage} />
+  <meta name="twitter:image:alt" content={imageAlt} />
 
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
 
   <ViewTransitions />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-  <script type="application/ld+json" set:html={JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "Person",
-    "name": "Moe Qadan",
-    "url": Astro.site,
-    "jobTitle": "Product Designer & UX Engineer",
-    "description": description,
-    "knowsAbout": ["Product Design", "UX Engineering", "Design Systems", "Platform UX", "AI-Native Products", "Front-End Architecture"],
-  })} />
+  <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
+  <slot name="head" />
+
+  <Analytics />
 </head>
 <body>
   <Header />

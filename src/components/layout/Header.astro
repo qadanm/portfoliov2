@@ -86,7 +86,13 @@ function isActive(href: string) {
         ))}
       </ul>
       <div class="nav-mobile__foot">
-        <a href="mailto:moe@qadan.co" class="nav-mobile__email">moe@qadan.co</a>
+        <a
+          href="mailto:moe@qadan.co"
+          class="nav-mobile__email"
+          data-track="contact_click"
+          data-track-channel="email"
+          data-track-loc="mobile-nav"
+        >moe@qadan.co</a>
         <span class="nav-mobile__sig">© Moe Qadan</span>
       </div>
     </nav>
@@ -112,7 +118,14 @@ function isActive(href: string) {
   }
 
   toggle?.addEventListener('click', () => {
-    setTheme(getTheme() === 'dark' ? 'light' : 'dark');
+    const from = getTheme();
+    const to = from === 'dark' ? 'light' : 'dark';
+    setTheme(to);
+    // Theme preference is signal: a visitor's first action is often to switch
+    // to the mode that matches their actual environment. Track the direction.
+    if (typeof window.plausible === 'function') {
+      window.plausible('theme_toggle', { props: { from, to } });
+    }
   });
 
   const mobileToggle = document.getElementById('mobile-menu-toggle');
@@ -154,6 +167,9 @@ function isActive(href: string) {
     mobileBackdrop?.classList.add('nav-mobile-backdrop--open');
     mobileToggle?.classList.add('is-open');
     lockScroll();
+    if (typeof window.plausible === 'function') {
+      window.plausible('nav_open', { props: { page: location.pathname } });
+    }
   }
 
   function closeMenu() {

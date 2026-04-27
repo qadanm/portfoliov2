@@ -8,7 +8,14 @@ export default defineConfig({
   integrations: [
     tailwind({ applyBaseStyles: false }),
     mdx(),
-    sitemap(),
+    sitemap({
+      // /work/* are 301 redirects to /build/* — keep the canonical URLs in
+      // the sitemap and let crawlers discover the redirect via the live site.
+      filter: (page) => !page.includes('/work'),
+      changefreq: 'monthly',
+      priority: 0.8,
+      lastmod: new Date(),
+    }),
   ],
   redirects: {
     '/work': '/build',
