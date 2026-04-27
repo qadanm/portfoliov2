@@ -16,7 +16,7 @@ import { fetchLever } from './sources/lever';
 import { parsePastedAlerts } from './sources/manual-paste';
 import { normalize } from './normalize';
 import { applyFilters } from './filter';
-import { discoveredStore, sourceStore, runStore, prefsStore } from './store';
+import { discoveredStore, sourceStore, runStore, prefsStore, watchedStore } from './store';
 import { jobsStore, type Job } from '../storage';
 import { angleById } from '@/data/angles';
 
@@ -25,8 +25,11 @@ export type {
   SourceConfig,
   DiscoveryRun,
   DiscoveryPreferences,
+  WatchedCompany,
 } from './types';
-export { discoveredStore, sourceStore, runStore, prefsStore } from './store';
+export { discoveredStore, sourceStore, runStore, prefsStore, watchedStore } from './store';
+export { watchCompany, promoteWatched, detectPlatform } from './watch';
+export { CURATED_BOARDS } from './curated';
 
 // ── Source dispatch ───────────────────────────────────────────────────
 
@@ -46,62 +49,95 @@ async function fetchSource(source: SourceConfig): Promise<RawSourceJob[]> {
 export interface RunOptions {
   /** Limit to specific source ids (default: all enabled). */
   sourceIds?: string[];
+  /** Only run sources flagged `watched: true`. */
+  watchedOnly?: boolean;
+  /** Only run sources flagged `curated: true`. */
+  curatedOnly?: boolean;
 }
 
+/** Single in-flight run guard so auto-poll cannot overlap a manual run. */
+let _isRunning = false;
+export function isRunning(): boolean { return _isRunning; }
+
 export async function runDiscovery(opts: RunOptions = {}): Promise<DiscoveryRun> {
-  const allSources = sourceStore.list();
-  const sources = (opts.sourceIds
-    ? allSources.filter(s => opts.sourceIds!.includes(s.id))
-    : allSources.filter(s => s.enabled)
-  ).filter(s => s.type !== 'manual-paste'); // manual paste runs through importPastedAlerts
+  if (_isRunning) {
+    // Caller should treat this as a no-op; surface the prior run as the result.
+    const last = runStore.last();
+    if (last) return last;
+  }
+  _isRunning = true;
+  try {
+    const allSources = sourceStore.list();
+    let candidates = opts.sourceIds
+      ? allSources.filter(s => opts.sourceIds!.includes(s.id))
+      : allSources.filter(s => s.enabled);
+    if (opts.watchedOnly) candidates = candidates.filter(s => s.watched);
+    if (opts.curatedOnly) candidates = candidates.filter(s => s.curated);
+    const sources = candidates.filter(s => s.type !== 'manual-paste');
 
-  const run: DiscoveryRun = {
-    id: `run-${Date.now()}`,
-    startedAt: Date.now(),
-    sources: sources.map(s => s.id),
-    fetched: 0,
-    found: 0,
-    filtered: 0,
-    errors: [],
-  };
+    const run: DiscoveryRun = {
+      id: `run-${Date.now()}`,
+      startedAt: Date.now(),
+      sources: sources.map(s => s.id),
+      fetched: 0,
+      found: 0,
+      filtered: 0,
+      errors: [],
+    };
 
-  // Run sources in parallel; one source's error must not block the others.
-  const results = await Promise.all(
-    sources.map(async (source) => {
-      try {
-        const raw = await fetchSource(source);
-        // Update per-source last-run metadata regardless of outcome.
-        sourceStore.upsert({
-          ...source,
-          lastRunAt: Date.now(),
-          lastResultCount: raw.length,
-          lastError: undefined,
-        });
-        return { source, raw };
-      } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : String(err);
-        sourceStore.upsert({ ...source, lastRunAt: Date.now(), lastError: msg });
-        run.errors.push({ source: source.id, message: msg });
-        return { source, raw: [] as RawSourceJob[] };
-      }
-    }),
-  );
+    // Run sources in parallel; one source's error must not block the others.
+    const results = await Promise.all(
+      sources.map(async (source) => {
+        try {
+          const raw = await fetchSource(source);
+          sourceStore.recordOutcome(source.id, true, undefined, raw.length);
+          return { source, raw };
+        } catch (err: unknown) {
+          const msg = err instanceof Error ? err.message : String(err);
+          sourceStore.recordOutcome(source.id, false, msg, 0);
+          run.errors.push({ source: source.id, message: msg });
+          return { source, raw: [] as RawSourceJob[] };
+        }
+      }),
+    );
 
-  const allRaw = results.flatMap(r => r.raw);
-  run.fetched = allRaw.length;
+    // Normalize → score → dedupe via stable id (handled by upsertMany).
+    // We tag each row with its sourceConfigId + reliability snapshot.
+    const allRaw = results.flatMap(({ source, raw }) =>
+      raw.map(r => ({
+        raw: r,
+        sourceConfigId: source.id,
+        sourceReliability: source.reliability ?? 1,
+      })),
+    );
+    run.fetched = allRaw.length;
 
-  // Normalize → score → dedupe via stable id (handled by upsertMany).
-  const normalized = allRaw.map(normalize);
-  const prefs = prefsStore.get();
-  const { kept, dropped } = applyFilters(normalized, prefs);
-  run.filtered = dropped.length;
+    const normalized = allRaw.map(({ raw, sourceConfigId, sourceReliability }) =>
+      normalize(raw, { sourceConfigId, sourceReliability }),
+    );
 
-  const { inserted } = discoveredStore.upsertMany(kept);
-  run.found = inserted;
-  run.completedAt = Date.now();
+    const prefs = prefsStore.get();
+    const { kept, dropped } = applyFilters(normalized, prefs);
+    run.filtered = dropped.length;
 
-  runStore.add(run);
-  return run;
+    // Persist kept jobs as `new`; persist dropped jobs as `filtered` so they
+    // remain inspectable. `upsertMany` preserves prior user decisions.
+    const filteredAt = Date.now();
+    const filteredJobs: DiscoveredJob[] = dropped.map(({ job, reasons }) => ({
+      ...job,
+      status: 'filtered',
+      filteredAt,
+      filterReasons: reasons.map(r => r.label),
+    }));
+    const { inserted } = discoveredStore.upsertMany([...kept, ...filteredJobs]);
+    run.found = inserted;
+    run.completedAt = Date.now();
+
+    runStore.add(run);
+    return run;
+  } finally {
+    _isRunning = false;
+  }
 }
 
 // ── Manual paste import ───────────────────────────────────────────────
@@ -114,12 +150,18 @@ export interface PasteImportResult {
 
 export function importPastedAlerts(text: string): PasteImportResult {
   const raw = parsePastedAlerts(text);
-  const normalized = raw.map(normalize);
+  const normalized = raw.map(r => normalize(r, { sourceConfigId: 'manual-paste' }));
   const prefs = prefsStore.get();
   const { kept, dropped } = applyFilters(normalized, prefs);
-  const { inserted } = discoveredStore.upsertMany(kept);
+  const filteredAt = Date.now();
+  const filteredJobs: DiscoveredJob[] = dropped.map(({ job, reasons }) => ({
+    ...job,
+    status: 'filtered',
+    filteredAt,
+    filterReasons: reasons.map(r => r.label),
+  }));
+  const { inserted } = discoveredStore.upsertMany([...kept, ...filteredJobs]);
 
-  // Record a run entry so the dashboard reflects manual imports too.
   runStore.add({
     id: `run-${Date.now()}`,
     startedAt: Date.now(),
@@ -148,7 +190,6 @@ export function decideQueue(jobId: string): DiscoveredJob | null {
   const dj = discoveredStore.get(jobId);
   if (!dj) return null;
   if (dj.status === 'queued' && dj.queuedJobId) {
-    // Already in the queue. Return current state.
     return dj;
   }
 
@@ -182,6 +223,7 @@ export function decideQueue(jobId: string): DiscoveredJob | null {
     queuedJobId: newJob.id,
     dismissedAt: undefined,
     savedAt: undefined,
+    filteredAt: undefined,
   };
   discoveredStore.upsert(updated);
   return updated;
@@ -203,14 +245,33 @@ export function decideDismiss(jobId: string): DiscoveredJob | null {
   return updated;
 }
 
+/**
+ * Restore a filtered job back to 'new' so it shows up in the To-decide
+ * tab. Used when the user inspects the Filtered tab and disagrees with
+ * the system.
+ */
+export function decideRestore(jobId: string): DiscoveredJob | null {
+  const dj = discoveredStore.get(jobId);
+  if (!dj) return null;
+  const updated: DiscoveredJob = {
+    ...dj,
+    status: 'new',
+    filteredAt: undefined,
+    dismissedAt: undefined,
+    savedAt: undefined,
+    queuedAt: undefined,
+    queuedJobId: undefined,
+  };
+  discoveredStore.upsert(updated);
+  return updated;
+}
+
 /** Reverse any decision back to 'new'. If the job had been queued, also
  * removes the Saved Job record so /today doesn't show a ghost entry. */
 export function decideUndo(jobId: string): DiscoveredJob | null {
   const dj = discoveredStore.get(jobId);
   if (!dj) return null;
   if (dj.status === 'queued' && dj.queuedJobId) {
-    // Only remove the Saved Job we created. Don't touch jobs the user has
-    // since moved into Applied/Interview/etc.
     const job = jobsStore.get(dj.queuedJobId);
     if (job && job.status === 'Saved') jobsStore.remove(dj.queuedJobId);
   }

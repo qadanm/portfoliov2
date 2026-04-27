@@ -7,13 +7,16 @@ import type {
   SourceConfig,
   DiscoveryRun,
   DiscoveryPreferences,
+  WatchedCompany,
 } from './types';
+import { CURATED_BOARDS } from './curated';
 
 const KEYS = {
   discovered: 'qa_discovered_jobs',
   sources: 'qa_discovery_sources',
   runs: 'qa_discovery_runs',
   prefs: 'qa_discovery_prefs',
+  watched: 'qa_watched_companies',
 } as const;
 
 const DEFAULT_PREFS: DiscoveryPreferences = {
@@ -30,6 +33,10 @@ const DEFAULT_PREFS: DiscoveryPreferences = {
     'entry-level',
   ],
   autoQueueThreshold: 75,
+  excludeContract: false,
+  excludeJunior: true,
+  autoPollEnabled: false,
+  autoPollIntervalMinutes: 180,
 };
 
 function safeParse<T>(raw: string | null, fallback: T): T {
@@ -122,7 +129,19 @@ export const sourceStore = {
       this.save(seeded);
       return seeded;
     }
-    return raw;
+    // Backward-compat: graft curated entries onto stores that pre-date them.
+    // Existing user toggles are preserved (we only add ids that aren't there).
+    let needsSave = false;
+    const ids = new Set(raw.map(s => s.id));
+    const merged = [...raw];
+    for (const s of defaultSources()) {
+      if (!ids.has(s.id) && s.curated) {
+        merged.push(s);
+        needsSave = true;
+      }
+    }
+    if (needsSave) this.save(merged);
+    return merged;
   },
   save(sources: SourceConfig[]): void {
     write(KEYS.sources, sources);
@@ -133,15 +152,79 @@ export const sourceStore = {
     if (idx >= 0) all[idx] = source; else all.push(source);
     this.save(all);
   },
+  remove(id: string): void {
+    this.save(this.list().filter(s => s.id !== id));
+  },
+  /**
+   * Update health metrics after a run. Reliability is an exponential
+   * moving average so a single failure dings it but doesn't crash the
+   * whole signal.
+   */
+  recordOutcome(id: string, success: boolean, error?: string, resultCount?: number): void {
+    const list = this.list();
+    const s = list.find(x => x.id === id);
+    if (!s) return;
+    const prev = s.reliability ?? 1;
+    s.reliability = Math.max(0, Math.min(1, prev * 0.7 + (success ? 1 : 0) * 0.3));
+    s.lastRunAt = Date.now();
+    s.lastResultCount = resultCount;
+    s.lastError = success ? undefined : error;
+    if (success) {
+      s.consecutiveSuccesses = (s.consecutiveSuccesses ?? 0) + 1;
+      s.consecutiveErrors = 0;
+    } else {
+      s.consecutiveErrors = (s.consecutiveErrors ?? 0) + 1;
+      s.consecutiveSuccesses = 0;
+    }
+    if ((s.consecutiveErrors ?? 0) >= 3) s.status = 'failing';
+    else if (success) s.status = 'active';
+    this.save(list);
+  },
   /** Reset to the curated defaults. */
   reseed(): void {
     this.save(defaultSources());
   },
+  /** Reset only curated sources (preserve user-added watched + non-curated). */
+  reseedCurated(): void {
+    const existing = this.list().filter(s => !s.curated);
+    const fresh = defaultSources().filter(s => s.curated);
+    this.save([...existing, ...fresh]);
+  },
+};
+
+// ── WatchedCompany ────────────────────────────────────────────────────
+
+export const watchedStore = {
+  list(): WatchedCompany[] {
+    return read<WatchedCompany[]>(KEYS.watched, []);
+  },
+  save(rows: WatchedCompany[]): void {
+    write(KEYS.watched, rows);
+  },
+  upsert(row: WatchedCompany): void {
+    const all = this.list();
+    const idx = all.findIndex(x => x.id === row.id);
+    if (idx >= 0) all[idx] = row; else all.push(row);
+    this.save(all);
+  },
+  remove(id: string): void {
+    this.save(this.list().filter(x => x.id !== id));
+  },
+  get(id: string): WatchedCompany | undefined {
+    return this.list().find(x => x.id === id);
+  },
 };
 
 function defaultSources(): SourceConfig[] {
-  return [
+  const now: Partial<SourceConfig> = {
+    status: 'active',
+    reliability: 1,
+    consecutiveSuccesses: 0,
+    consecutiveErrors: 0,
+  };
+  const base: SourceConfig[] = [
     {
+      ...now,
       id: 'remotive-design',
       type: 'remotive',
       name: 'Remotive · Design',
@@ -150,6 +233,7 @@ function defaultSources(): SourceConfig[] {
       notes: 'Public API. Remote-first design roles.',
     },
     {
+      ...now,
       id: 'remotive-software-dev',
       type: 'remotive',
       name: 'Remotive · Software Dev',
@@ -158,6 +242,7 @@ function defaultSources(): SourceConfig[] {
       notes: 'Public API. Catches Frontend/Design Engineer roles.',
     },
     {
+      ...now,
       id: 'hn-hiring',
       type: 'hn-hiring',
       name: 'HN — Who is hiring',
@@ -166,6 +251,7 @@ function defaultSources(): SourceConfig[] {
       notes: 'Algolia-backed search of the latest "Who is hiring?" thread.',
     },
     {
+      ...now,
       id: 'manual-paste',
       type: 'manual-paste',
       name: 'Email alert paste',
@@ -173,6 +259,25 @@ function defaultSources(): SourceConfig[] {
       notes: 'Paste a block of email-alert text. Parses URLs and titles.',
     },
   ];
+  // Curated boards are seeded as sources but disabled by default to avoid
+  // overloading the first run. Moe enables what they want from the panel.
+  const curated: SourceConfig[] = CURATED_BOARDS.map(b => ({
+    id: `${b.type}-${b.slug}`,
+    type: b.type,
+    name: `${b.type === 'greenhouse' ? 'Greenhouse' : 'Lever'} · ${b.companyName}`,
+    companyName: b.companyName,
+    slug: b.slug,
+    boardUrl: b.boardUrl,
+    params: { slug: b.slug },
+    enabled: false,
+    curated: true,
+    status: 'active',
+    reliability: 1,
+    consecutiveSuccesses: 0,
+    consecutiveErrors: 0,
+    notes: b.notes,
+  }));
+  return [...base, ...curated];
 }
 
 // ── DiscoveryRun ──────────────────────────────────────────────────────

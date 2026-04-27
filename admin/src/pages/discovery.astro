@@ -23,6 +23,10 @@ import Admin from '@/layouts/Admin.astro';
           <strong id="disc-count-dismissed">0</strong>
           <span>Passed</span>
         </button>
+        <button type="button" class="disc__count disc__count--quiet" data-tab="filtered" aria-pressed="false" title="Jobs the filter dropped — review to tune thresholds">
+          <strong id="disc-count-filtered">0</strong>
+          <span>Filtered</span>
+        </button>
       </div>
 
       <div class="disc__bar-actions">
@@ -30,6 +34,11 @@ import Admin from '@/layouts/Admin.astro';
           <span>Run discovery</span>
           <kbd>R</kbd>
         </button>
+        <label class="disc__autopoll" id="disc-autopoll-wrap" title="Auto-rerun discovery while this tab is open">
+          <input type="checkbox" id="disc-autopoll-toggle" />
+          <span>Auto-refresh</span>
+          <span class="disc__autopoll-meta" id="disc-autopoll-meta">Off</span>
+        </label>
         <button type="button" class="disc__btn" id="disc-batch-queue" title="Add every new job at or above the auto-queue threshold to /today">
           Auto-queue 75+
         </button>
@@ -57,6 +66,8 @@ import Admin from '@/layouts/Admin.astro';
         <span>·</span>
         <kbd>X</kbd> pass
         <span>·</span>
+        <kbd>W</kbd> watch
+        <span>·</span>
         <kbd>⌘Z</kbd> undo
       </div>
     </header>
@@ -79,9 +90,36 @@ import Admin from '@/layouts/Admin.astro';
 
     <section class="disc__panel" id="disc-sources-panel" hidden>
       <h3 class="disc__panel-h">Sources</h3>
-      <ul class="disc__sources" id="disc-sources-list"></ul>
+
+      <div class="disc__sources-section">
+        <div class="disc__sources-section-h">
+          <span>Active</span>
+          <span class="disc__sources-section-meta">Always-on feeds + your watched companies</span>
+        </div>
+        <ul class="disc__sources" id="disc-sources-active"></ul>
+      </div>
+
+      <details class="disc__sources-section disc__sources-fold">
+        <summary>
+          <span>Curated boards</span>
+          <span class="disc__sources-section-meta" id="disc-curated-meta">— enable what you care about</span>
+        </summary>
+        <ul class="disc__sources" id="disc-sources-curated"></ul>
+        <div class="disc__sources-foot">
+          <button type="button" class="disc__btn disc__btn--ghost" id="disc-curated-reset">Reset curated to defaults</button>
+        </div>
+      </details>
+
+      <details class="disc__sources-section disc__sources-fold" id="disc-watched-fold">
+        <summary>
+          <span>Watched (needs setup)</span>
+          <span class="disc__sources-section-meta" id="disc-watched-meta">Companies you saved without a board URL</span>
+        </summary>
+        <ul class="disc__watched" id="disc-watched-list"></ul>
+      </details>
+
       <div class="disc__panel-help">
-        Add a Greenhouse or Lever public board by company slug to watch a specific company.
+        Add a Greenhouse or Lever public board by company slug — or use "Watch company" from a discovered job to do it in one click.
       </div>
       <div class="disc__panel-add">
         <select id="disc-add-type">
@@ -167,6 +205,29 @@ import Admin from '@/layouts/Admin.astro';
     background: var(--c-accent-dim);
     color: var(--c-text);
   }
+  .disc__count--quiet { opacity: 0.7; }
+  .disc__count--quiet[aria-pressed="true"] { opacity: 1; }
+
+  .disc__autopoll {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    background: var(--c-bg-muted);
+    cursor: pointer;
+    font-size: 12px;
+    user-select: none;
+  }
+  .disc__autopoll input { margin: 0; cursor: pointer; }
+  .disc__autopoll-meta {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--c-text-subtle);
+  }
+  .disc__autopoll.is-on { border-color: var(--c-accent); background: var(--c-accent-dim); }
+  .disc__autopoll.is-on .disc__autopoll-meta { color: var(--c-accent); }
   .disc__count strong {
     font-family: var(--font-display);
     font-size: 18px;
@@ -299,6 +360,53 @@ import Admin from '@/layouts/Admin.astro';
     justify-content: flex-end;
   }
 
+  .disc__sources-section {
+    border-top: 1px solid var(--c-border-subtle);
+    padding-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .disc__sources-section:first-of-type { border-top: none; padding-top: 0; }
+  .disc__sources-section-h {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--c-text);
+  }
+  .disc__sources-section-meta {
+    font-size: 10.5px;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--c-text-subtle);
+    font-weight: normal;
+  }
+  .disc__sources-fold > summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--c-text);
+  }
+  .disc__sources-fold > summary::marker { display: none; content: ''; }
+  .disc__sources-fold > summary::-webkit-details-marker { display: none; }
+  .disc__sources-fold > summary::before { content: '▸'; color: var(--c-text-subtle); margin-right: 4px; transition: transform 0.12s ease; display: inline-block; }
+  .disc__sources-fold[open] > summary::before { transform: rotate(90deg); }
+  .disc__sources-foot {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 4px;
+  }
+
   .disc__sources {
     list-style: none;
     margin: 0;
@@ -306,9 +414,17 @@ import Admin from '@/layouts/Admin.astro';
     display: grid;
     gap: 8px;
   }
-  .disc__sources li {
+  .disc__sources-empty {
+    padding: 8px 4px;
+    font-size: 12px;
+    color: var(--c-text-subtle);
+    font-style: italic;
+  }
+  /* JS injects <li> rows into these <ul>s, so the row + child rules need
+     :global() to escape Astro's scope. */
+  .disc__sources :global(li) {
     display: grid;
-    grid-template-columns: 1fr auto auto;
+    grid-template-columns: minmax(0, 1fr) auto auto;
     gap: 10px;
     align-items: center;
     padding: 8px 10px;
@@ -316,15 +432,19 @@ import Admin from '@/layouts/Admin.astro';
     border-radius: var(--r-md);
     background: var(--c-bg);
   }
-  .disc__sources .src-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .disc__sources .src-name { font-size: 13px; color: var(--c-text); }
-  .disc__sources .src-meta {
+  .disc__sources :global(.src-info) { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .disc__sources :global(.src-name) { font-size: 13px; color: var(--c-text); }
+  .disc__sources :global(.src-meta) {
     font-family: var(--font-mono);
     font-size: 10px;
     color: var(--c-text-subtle);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
   }
-  .disc__sources .src-meta .err { color: #F87171; }
-  .disc__sources button.src-toggle {
+  .disc__sources :global(.src-meta .err) { color: #F87171; }
+  .disc__sources :global(button.src-toggle) {
     font: inherit;
     font-size: 11px;
     padding: 4px 10px;
@@ -334,12 +454,12 @@ import Admin from '@/layouts/Admin.astro';
     color: var(--c-text);
     cursor: pointer;
   }
-  .disc__sources button.src-toggle.is-on {
+  .disc__sources :global(button.src-toggle.is-on) {
     background: var(--c-accent-dim);
     border-color: var(--c-accent);
     color: var(--c-accent);
   }
-  .disc__sources button.src-remove {
+  .disc__sources :global(button.src-remove) {
     font: inherit;
     font-size: 11px;
     padding: 4px 8px;
@@ -348,7 +468,60 @@ import Admin from '@/layouts/Admin.astro';
     color: var(--c-text-subtle);
     cursor: pointer;
   }
-  .disc__sources button.src-remove:hover { color: #F87171; }
+  .disc__sources :global(button.src-remove:hover) { color: #F87171; }
+  .disc__sources :global(.src-health) {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: var(--r-full);
+    line-height: 1.6;
+  }
+  .disc__sources :global(.src-health--active)      { background: var(--c-accent-dim); color: var(--c-accent); border: 1px solid var(--c-accent-muted); }
+  .disc__sources :global(.src-health--failing)     { background: rgba(248,113,113,0.1); color: #F87171; border: 1px solid rgba(248,113,113,0.3); }
+  .disc__sources :global(.src-health--needs-setup) { background: var(--c-bg-muted); color: var(--c-text-subtle); border: 1px solid var(--c-border-subtle); }
+
+  .disc__watched {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+  }
+  .disc__watched :global(li) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(220px, auto) auto auto;
+    gap: 10px;
+    align-items: center;
+    padding: 8px 10px;
+    border: 1px solid var(--c-border-subtle);
+    border-radius: var(--r-md);
+    background: var(--c-bg);
+  }
+  .disc__watched :global(.wc-name) { font-size: 13px; color: var(--c-text); }
+  .disc__watched :global(.wc-meta) { font-family: var(--font-mono); font-size: 10px; color: var(--c-text-subtle); }
+  .disc__watched :global(input.wc-url) {
+    font: inherit;
+    font-size: 12px;
+    padding: 5px 9px;
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    background: var(--c-bg-elev);
+    color: var(--c-text);
+    min-width: 220px;
+  }
+  .disc__watched :global(input.wc-url:focus) { outline: none; border-color: var(--c-accent); }
+  .disc__watched :global(button) {
+    font: inherit;
+    font-size: 11px;
+    padding: 5px 10px;
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    background: var(--c-bg-muted);
+    color: var(--c-text);
+    cursor: pointer;
+  }
+  .disc__watched :global(button.wc-remove) { color: var(--c-text-subtle); border: none; background: transparent; }
+  .disc__watched :global(button.wc-remove:hover) { color: #F87171; }
 
   .disc__panel-add {
     display: grid;
@@ -507,6 +680,22 @@ import Admin from '@/layouts/Admin.astro';
   .disc__list :global(.disc__pill--queued) { color: var(--c-accent); border-color: var(--c-accent); }
   .disc__list :global(.disc__pill--saved) { color: var(--c-text); }
   .disc__list :global(.disc__pill--passed) { opacity: 0.6; }
+  /* Match chip: positive signal — solid accent dim background. */
+  .disc__list :global(.disc__pill--match) {
+    color: var(--c-accent);
+    background: var(--c-accent-dim);
+    border-color: var(--c-accent-muted);
+  }
+  /* Concern chip: dashed border to look softer than red flags. */
+  .disc__list :global(.disc__pill--concern) {
+    border-style: dashed;
+    color: var(--c-text-subtle);
+  }
+  .disc__list :global(.disc__pill--filter) {
+    border-style: dashed;
+    color: #F87171;
+    border-color: rgba(248, 113, 113, 0.3);
+  }
 
   .disc__list :global(.disc__row-quick) {
     display: flex;
@@ -727,6 +916,30 @@ import Admin from '@/layouts/Admin.astro';
   }
   .disc__focus :global(.f-tag--gap) { color: var(--c-text-subtle); border-style: dashed; }
   .disc__focus :global(.f-tag--flag) { color: #F87171; border-color: rgba(248, 113, 113, 0.4); }
+  .disc__focus :global(.f-tag--match) { color: var(--c-accent); background: var(--c-accent-dim); border-color: var(--c-accent-muted); }
+  .disc__focus :global(.f-tag--concern) { color: var(--c-text-subtle); border-style: dashed; }
+  .disc__focus :global(.f-tag--filter-reason) { color: #F87171; border-style: dashed; border-color: rgba(248, 113, 113, 0.4); }
+  .disc__focus :global(.f-source-health) {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding: 6px 10px;
+    background: var(--c-bg);
+    border: 1px solid var(--c-border-subtle);
+    border-radius: var(--r-md);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--c-text-subtle);
+  }
+  .disc__focus :global(.f-source-health-dot) {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--c-accent);
+  }
+  .disc__focus :global(.f-source-health.is-failing .f-source-health-dot) { background: #F87171; }
+  .disc__focus :global(.f-source-health.is-failing) { color: #F87171; }
 
   .disc__focus :global(.f-breakdown) {
     display: grid;
@@ -850,23 +1063,29 @@ import Admin from '@/layouts/Admin.astro';
 <script>
   import {
     runDiscovery,
+    isRunning,
     importPastedAlerts,
     decideQueue,
     decideSave,
     decideDismiss,
     decideUndo,
+    decideRestore,
     batchQueueAbove,
     batchDismissBelow,
     discoveredStore,
     sourceStore,
     runStore,
     prefsStore,
+    watchedStore,
+    watchCompany,
+    promoteWatched,
     type DiscoveredJob,
     type SourceConfig,
+    type WatchedCompany,
   } from '@/lib/discovery';
 
   // ── State ────────────────────────────────────────────────────────────
-  type Tab = 'new' | 'saved' | 'queued' | 'dismissed';
+  type Tab = 'new' | 'saved' | 'queued' | 'dismissed' | 'filtered';
 
   type State = {
     tab: Tab;
@@ -900,16 +1119,23 @@ import Admin from '@/layouts/Admin.astro';
   const pasteCancel = $<HTMLButtonElement>('disc-paste-cancel');
   const sourcesToggle = $<HTMLButtonElement>('disc-sources-toggle');
   const sourcesPanel = $('disc-sources-panel');
-  const sourcesListEl = $('disc-sources-list');
+  const sourcesActiveEl = $('disc-sources-active');
+  const sourcesCuratedEl = $('disc-sources-curated');
+  const watchedListEl = $('disc-watched-list');
+  const watchedFold = $<HTMLDetailsElement>('disc-watched-fold');
+  const curatedReset = $<HTMLButtonElement>('disc-curated-reset');
   const addType = $<HTMLSelectElement>('disc-add-type');
   const addSlug = $<HTMLInputElement>('disc-add-slug');
   const addBtn = $<HTMLButtonElement>('disc-add-source');
+  const autopollWrap = $('disc-autopoll-wrap');
+  const autopollToggle = $<HTMLInputElement>('disc-autopoll-toggle');
+  const autopollMeta = $('disc-autopoll-meta');
 
   // ── Data plumbing ───────────────────────────────────────────────────
   function loadVisible() {
     const all = discoveredStore.list();
     const filtered = all.filter(j => j.status === state.tab);
-    // Newest first within saved/dismissed; for "new", strongest score first.
+    // Newest first within saved/dismissed/filtered; for "new", strongest score first.
     if (state.tab === 'new') {
       filtered.sort((a, b) => (b.fitScore ?? 0) - (a.fitScore ?? 0));
     } else {
@@ -924,6 +1150,7 @@ import Admin from '@/layouts/Admin.astro';
     if (tab === 'queued') return j.queuedAt;
     if (tab === 'saved') return j.savedAt;
     if (tab === 'dismissed') return j.dismissedAt;
+    if (tab === 'filtered') return j.filteredAt;
     return j.discoveredAt;
   }
 
@@ -934,6 +1161,7 @@ import Admin from '@/layouts/Admin.astro';
       saved: all.filter(j => j.status === 'saved').length,
       queued: all.filter(j => j.status === 'queued').length,
       dismissed: all.filter(j => j.status === 'dismissed').length,
+      filtered: all.filter(j => j.status === 'filtered').length,
     };
   }
 
@@ -954,6 +1182,7 @@ import Admin from '@/layouts/Admin.astro';
     $('disc-count-saved').textContent = String(c.saved);
     $('disc-count-queued').textContent = String(c.queued);
     $('disc-count-dismissed').textContent = String(c.dismissed);
+    $('disc-count-filtered').textContent = String(c.filtered);
     document.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach(b => {
       b.setAttribute('aria-pressed', b.getAttribute('data-tab') === state.tab ? 'true' : 'false');
     });
@@ -970,29 +1199,53 @@ import Admin from '@/layouts/Admin.astro';
       j.status === 'queued' ? '<span class="disc__pill disc__pill--queued">Today</span>' :
       j.status === 'saved' ? '<span class="disc__pill disc__pill--saved">Later</span>' :
       j.status === 'dismissed' ? '<span class="disc__pill disc__pill--passed">Passed</span>' :
+      j.status === 'filtered' ? '<span class="disc__pill disc__pill--filter">Filtered</span>' :
       '';
 
     const flagsPill = j.redFlags.length
       ? `<span class="disc__pill disc__pill--flag" title="${escape(j.redFlags.join(' · '))}">⚑ ${j.redFlags.length}</span>`
       : '';
 
-    const strength = j.matchedStrengths.slice(0, 2).map(s => `<span class="disc__pill">${escape(s)}</span>`).join('');
+    // Reasons: prefer the most informative 1-2 chips.
+    // For filtered jobs we lead with the filter reason so it's obvious why
+    // it was dropped. Otherwise lead with strongest matches and follow with
+    // up to one concern.
+    const matchChips = (j.matchReasons ?? []).slice(0, 2)
+      .map(r => `<span class="disc__pill disc__pill--match">${escape(r)}</span>`).join('');
+    const concernChips = (j.downrankReasons ?? []).slice(0, 1)
+      .map(r => `<span class="disc__pill disc__pill--concern">${escape(r)}</span>`).join('');
+    const filterChips = j.status === 'filtered'
+      ? (j.filterReasons ?? []).slice(0, 2).map(r => `<span class="disc__pill disc__pill--filter">${escape(r)}</span>`).join('')
+      : '';
 
     // Quick actions live inline; primary "Today" is always visible enough
     // to invite a click without overwhelming the row.
-    const quick = j.status === 'new' ? `
-      <div class="disc__row-quick" onclick="event.stopPropagation()">
-        <button class="quick-add" data-act="queue" data-id="${j.id}" title="Add to today (T)">Today</button>
-        <button data-act="open" data-id="${j.id}" title="Open source (O)">↗</button>
-        <button data-act="save" data-id="${j.id}" title="Save for later (S)">Later</button>
-        <button data-act="dismiss" data-id="${j.id}" title="Pass (X)">Pass</button>
-      </div>
-    ` : `
-      <div class="disc__row-quick" onclick="event.stopPropagation()">
-        <button data-act="open" data-id="${j.id}" title="Open source (O)">↗</button>
-        <button data-act="undo" data-id="${j.id}" title="Undo">↺ Undo</button>
-      </div>
-    `;
+    let quick = '';
+    if (j.status === 'new') {
+      quick = `
+        <div class="disc__row-quick" onclick="event.stopPropagation()">
+          <button class="quick-add" data-act="queue" data-id="${j.id}" title="Add to today (T)">Today</button>
+          <button data-act="open" data-id="${j.id}" title="Open source (O)">↗</button>
+          <button data-act="save" data-id="${j.id}" title="Save for later (S)">Later</button>
+          <button data-act="dismiss" data-id="${j.id}" title="Pass (X)">Pass</button>
+        </div>
+      `;
+    } else if (j.status === 'filtered') {
+      quick = `
+        <div class="disc__row-quick" onclick="event.stopPropagation()">
+          <button class="quick-add" data-act="restore" data-id="${j.id}" title="Restore to To-decide">↺ Restore</button>
+          <button data-act="open" data-id="${j.id}" title="Open source (O)">↗</button>
+          <button data-act="dismiss" data-id="${j.id}" title="Pass (X)">Pass</button>
+        </div>
+      `;
+    } else {
+      quick = `
+        <div class="disc__row-quick" onclick="event.stopPropagation()">
+          <button data-act="open" data-id="${j.id}" title="Open source (O)">↗</button>
+          <button data-act="undo" data-id="${j.id}" title="Undo">↺ Undo</button>
+        </div>
+      `;
+    }
 
     return `<li class="disc__row${sel}${acted}" role="button" data-id="${j.id}" data-idx="${idx}" tabindex="-1">
       <div class="disc__row-score ${scoreClass}">${j.fitScore}</div>
@@ -1005,7 +1258,8 @@ import Admin from '@/layouts/Admin.astro';
           <span class="disc__pill ${remoteCls}">${escape(j.remoteStatus)}</span>
           ${sal ? `<span class="disc__pill">${escape(sal)}</span>` : ''}
           <span class="disc__pill disc__pill--angle">→ ${escape(j.recommendedAngleLabel)}</span>
-          ${strength}
+          ${filterChips || matchChips}
+          ${j.status === 'filtered' ? '' : concernChips}
           ${flagsPill}
           ${statusPill}
         </div>
@@ -1033,6 +1287,19 @@ import Admin from '@/layouts/Admin.astro';
 
     const sal = fmtSalary(j);
     const breakdown = buildBreakdown(j);
+
+    // Reasons sections — match / concern / filter shown distinctly so it's
+    // obvious why a job rose or fell.
+    const matchReasons = (j.matchReasons ?? []).length
+      ? `<div class="f-section-h">Why this matched</div><div class="f-tags">${j.matchReasons!.map(s => `<span class="f-tag f-tag--match">${escape(s)}</span>`).join('')}</div>`
+      : '';
+    const concernReasons = (j.downrankReasons ?? []).length
+      ? `<div class="f-section-h">Concerns</div><div class="f-tags">${j.downrankReasons!.map(s => `<span class="f-tag f-tag--concern">${escape(s)}</span>`).join('')}</div>`
+      : '';
+    const filterReasons = j.status === 'filtered' && (j.filterReasons ?? []).length
+      ? `<div class="f-section-h">Why it was filtered</div><div class="f-tags">${j.filterReasons!.map(s => `<span class="f-tag f-tag--filter-reason">${escape(s)}</span>`).join('')}</div>`
+      : '';
+
     const strengths = j.matchedStrengths.length
       ? `<div class="f-section-h">Strengths matched</div><div class="f-tags">${j.matchedStrengths.map(s => `<span class="f-tag">${escape(s)}</span>`).join('')}</div>`
       : '';
@@ -1043,28 +1310,67 @@ import Admin from '@/layouts/Admin.astro';
       ? `<div class="f-section-h">Red flags</div><div class="f-tags">${j.redFlags.map(f => `<span class="f-tag f-tag--flag">⚑ ${escape(f)}</span>`).join('')}</div>`
       : '';
 
-    const statusActions = j.status === 'new' ? `
-      <button type="button" class="f-action f-action--primary" data-act="queue" data-id="${j.id}">
-        Add to Today <kbd>T</kbd>
-      </button>
-      <a class="f-action" href="${escape(j.applyUrl ?? j.sourceUrl)}" target="_blank" rel="noopener" data-act="open" data-id="${j.id}">
-        Open source <kbd>O</kbd>
-      </a>
-      <button type="button" class="f-action" data-act="save" data-id="${j.id}">
-        Save for later <kbd>S</kbd>
-      </button>
-      <button type="button" class="f-action f-action--quiet" data-act="dismiss" data-id="${j.id}">
-        Pass <kbd>X</kbd>
-      </button>
-    ` : `
-      <button type="button" class="f-action f-action--primary" data-act="undo" data-id="${j.id}">
-        Undo decision
-      </button>
-      <a class="f-action" href="${escape(j.applyUrl ?? j.sourceUrl)}" target="_blank" rel="noopener" data-act="open" data-id="${j.id}">
-        Open source <kbd>O</kbd>
-      </a>
-      ${j.queuedJobId ? `<a class="f-action" href="/today" data-act="goto-today">Open in Today →</a>` : ''}
-    `;
+    // Source health chip — only render when we have a meaningful number.
+    const src = j.sourceConfigId ? sourceStore.list().find(s => s.id === j.sourceConfigId) : undefined;
+    const reliability = src?.reliability ?? j.sourceReliability;
+    const sourceHealth = (src && reliability != null)
+      ? `<div class="f-source-health ${src.status === 'failing' ? 'is-failing' : ''}">
+          <span class="f-source-health-dot"></span>
+          <span>${escape(src.companyName ?? src.name)}</span>
+          <span>·</span>
+          <span>${Math.round(reliability * 100)}% success</span>
+          ${src.lastError ? `<span>·</span><span title="${escape(src.lastError)}">last error: ${escape(src.lastError.slice(0, 60))}</span>` : ''}
+        </div>`
+      : '';
+
+    let statusActions = '';
+    if (j.status === 'new') {
+      statusActions = `
+        <button type="button" class="f-action f-action--primary" data-act="queue" data-id="${j.id}">
+          Add to Today <kbd>T</kbd>
+        </button>
+        <a class="f-action" href="${escape(j.applyUrl ?? j.sourceUrl)}" target="_blank" rel="noopener" data-act="open" data-id="${j.id}">
+          Open source <kbd>O</kbd>
+        </a>
+        <button type="button" class="f-action" data-act="save" data-id="${j.id}">
+          Save for later <kbd>S</kbd>
+        </button>
+        <button type="button" class="f-action" data-act="watch" data-id="${j.id}">
+          Watch company <kbd>W</kbd>
+        </button>
+        <button type="button" class="f-action f-action--quiet" data-act="dismiss" data-id="${j.id}">
+          Pass <kbd>X</kbd>
+        </button>
+      `;
+    } else if (j.status === 'filtered') {
+      statusActions = `
+        <button type="button" class="f-action f-action--primary" data-act="restore" data-id="${j.id}">
+          Restore to To-decide
+        </button>
+        <a class="f-action" href="${escape(j.applyUrl ?? j.sourceUrl)}" target="_blank" rel="noopener" data-act="open" data-id="${j.id}">
+          Open source <kbd>O</kbd>
+        </a>
+        <button type="button" class="f-action" data-act="watch" data-id="${j.id}">
+          Watch company <kbd>W</kbd>
+        </button>
+        <button type="button" class="f-action f-action--quiet" data-act="dismiss" data-id="${j.id}">
+          Pass <kbd>X</kbd>
+        </button>
+      `;
+    } else {
+      statusActions = `
+        <button type="button" class="f-action f-action--primary" data-act="undo" data-id="${j.id}">
+          Undo decision
+        </button>
+        <a class="f-action" href="${escape(j.applyUrl ?? j.sourceUrl)}" target="_blank" rel="noopener" data-act="open" data-id="${j.id}">
+          Open source <kbd>O</kbd>
+        </a>
+        <button type="button" class="f-action" data-act="watch" data-id="${j.id}">
+          Watch company <kbd>W</kbd>
+        </button>
+        ${j.queuedJobId ? `<a class="f-action" href="/today" data-act="goto-today">Open in Today →</a>` : ''}
+      `;
+    }
 
     focusEl.innerHTML = `
       <button type="button" class="f-close" aria-label="Close" data-act="close-focus">×</button>
@@ -1091,9 +1397,15 @@ import Admin from '@/layouts/Admin.astro';
         <div class="f-fact"><span class="f-fact-label">Seniority</span><span class="f-fact-value">${escape(j.seniority ?? 'unclear')}</span></div>
       </div>
 
+      ${sourceHealth}
+
       <div class="f-actions">
         ${statusActions}
       </div>
+
+      ${matchReasons}
+      ${concernReasons}
+      ${filterReasons}
 
       <div class="f-section-h">Score breakdown</div>
       <div class="f-breakdown">${breakdown}</div>
@@ -1192,9 +1504,20 @@ import Admin from '@/layouts/Admin.astro';
         recordUndo(id, before);
         flash(`Passed on ${updated.company}`, { label: 'Undo', onClick: performUndo });
       }
+    } else if (action === 'restore') {
+      const updated = decideRestore(id);
+      if (updated) {
+        flash(`Restored ${updated.company} to To-decide`);
+      }
     } else if (action === 'undo') {
       const updated = decideUndo(id);
       if (updated) flash(`Decision reset`);
+    } else if (action === 'watch') {
+      const outcome = watchCompany(before);
+      flash(outcome.message);
+      // Re-render the sources panel if it's open so the new entry appears.
+      if (!sourcesPanel.hidden) renderSources();
+      return; // watch does not advance selection
     } else if (action === 'open') {
       const target = before.applyUrl ?? before.sourceUrl;
       if (target) window.open(target, '_blank', 'noopener,noreferrer');
@@ -1203,7 +1526,7 @@ import Admin from '@/layouts/Admin.astro';
 
     // After any state-changing action, advance to the next visible row so
     // the user can continue triaging without lifting their hand.
-    if (action === 'queue' || action === 'save' || action === 'dismiss') {
+    if (action === 'queue' || action === 'save' || action === 'dismiss' || action === 'restore') {
       const idxBefore = state.selectedIdx;
       refresh();
       // Stay at the same idx so the next item slides into the slot.
@@ -1257,6 +1580,7 @@ import Admin from '@/layouts/Admin.astro';
       statusEl.innerHTML = errs ? `<span class="ok">${summary}</span> · ${errs}` : `<span class="ok">${summary}</span>`;
       flash(`Discovery: ${run.found} new`, undefined, 3500);
       refresh();
+      renderAutopoll();
     } catch (err: any) {
       statusEl.innerHTML = `<span class="err">Discovery failed: ${escape(err?.message ?? String(err))}</span>`;
     } finally {
@@ -1278,20 +1602,68 @@ import Admin from '@/layouts/Admin.astro';
 
   function renderSources() {
     const list = sourceStore.list();
-    sourcesListEl.innerHTML = list.map(s => sourceRowHTML(s)).join('');
+    // Active = enabled OR non-curated baseline (always-on feeds + watched companies).
+    const active = list.filter(s => s.enabled || (!s.curated && s.type !== 'manual-paste'));
+    const curated = list.filter(s => s.curated);
+    sourcesActiveEl.innerHTML = active.length
+      ? active.map(s => sourceRowHTML(s)).join('')
+      : '<li class="disc__sources-empty">No active sources. Toggle one on below.</li>';
+    sourcesCuratedEl.innerHTML = curated.length
+      ? curated.map(s => sourceRowHTML(s)).join('')
+      : '<li class="disc__sources-empty">No curated boards.</li>';
+    const enabledCurated = curated.filter(c => c.enabled).length;
+    const curatedMeta = $('disc-curated-meta');
+    if (curatedMeta) curatedMeta.textContent = `— ${enabledCurated}/${curated.length} enabled`;
+
+    renderWatched();
   }
   function sourceRowHTML(s: SourceConfig): string {
     const last = s.lastRunAt ? new Date(s.lastRunAt).toLocaleString() : 'never';
+    const reliability = s.reliability != null ? Math.round(s.reliability * 100) : null;
+    const healthClass =
+      s.status === 'failing' ? 'src-health--failing' :
+      s.status === 'needs-setup' ? 'src-health--needs-setup' :
+      'src-health--active';
+    const healthLabel =
+      s.status === 'failing' ? `failing (${reliability ?? 0}%)` :
+      s.status === 'needs-setup' ? 'needs setup' :
+      reliability != null ? `${reliability}%` : 'new';
     const stat = s.lastError
-      ? `<span class="src-meta err">last: ${escape(s.lastError)}</span>`
-      : `<span class="src-meta">last: ${escape(last)} · ${s.lastResultCount ?? 0} jobs</span>`;
+      ? `<span class="src-meta err">${escape(s.lastError.slice(0, 80))}</span>`
+      : `<span class="src-meta">last: ${escape(last)} · ${s.lastResultCount ?? 0} jobs <span class="src-health ${healthClass}">${escape(healthLabel)}</span></span>`;
     return `<li>
       <div class="src-info">
-        <span class="src-name">${escape(s.name)}</span>
+        <span class="src-name">${escape(s.name)}${s.watched ? ' <span style="color:var(--c-accent)">●</span>' : ''}</span>
         ${stat}
       </div>
       <button type="button" class="src-toggle ${s.enabled ? 'is-on' : ''}" data-src-toggle="${s.id}">${s.enabled ? 'On' : 'Off'}</button>
-      ${s.type === 'greenhouse' || s.type === 'lever' ? `<button type="button" class="src-remove" data-src-remove="${s.id}">Remove</button>` : '<span></span>'}
+      ${s.type === 'greenhouse' || s.type === 'lever' || s.watched ? `<button type="button" class="src-remove" data-src-remove="${s.id}">Remove</button>` : '<span></span>'}
+    </li>`;
+  }
+
+  function renderWatched() {
+    const list = watchedStore.list();
+    const meta = $('disc-watched-meta');
+    if (meta) meta.textContent = list.length
+      ? `${list.length} compan${list.length === 1 ? 'y' : 'ies'} waiting for a board URL`
+      : 'No companies pending. Use "Watch company" on a discovered job.';
+    if (list.length === 0) {
+      watchedFold.removeAttribute('open');
+      watchedListEl.innerHTML = '';
+      return;
+    }
+    watchedListEl.innerHTML = list.map(w => watchedRowHTML(w)).join('');
+  }
+
+  function watchedRowHTML(w: WatchedCompany): string {
+    return `<li data-watched-id="${escape(w.id)}">
+      <div class="src-info">
+        <span class="wc-name">${escape(w.companyName)}</span>
+        <span class="wc-meta">from ${escape(new URL(w.originalJobUrl).hostname)}</span>
+      </div>
+      <input type="url" class="wc-url" placeholder="boards.greenhouse.io/{slug} or jobs.lever.co/{slug}" />
+      <button type="button" class="wc-promote">Watch</button>
+      <button type="button" class="wc-remove" title="Remove">×</button>
     </li>`;
   }
 
@@ -1370,24 +1742,56 @@ import Admin from '@/layouts/Admin.astro';
     if (!sourcesPanel.hidden) renderSources();
   });
 
-  // Source list mutations (delegated)
-  sourcesListEl.addEventListener('click', (e) => {
+  // Source list mutations (delegated across both active + curated lists).
+  function bindSourceListEvents(el: HTMLElement) {
+    el.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      const toggle = target.closest<HTMLElement>('[data-src-toggle]');
+      if (toggle) {
+        const id = toggle.getAttribute('data-src-toggle')!;
+        const list = sourceStore.list();
+        const s = list.find(x => x.id === id);
+        if (s) { s.enabled = !s.enabled; sourceStore.upsert(s); renderSources(); }
+        return;
+      }
+      const remove = target.closest<HTMLElement>('[data-src-remove]');
+      if (remove) {
+        const id = remove.getAttribute('data-src-remove')!;
+        sourceStore.remove(id);
+        renderSources();
+      }
+    });
+  }
+  bindSourceListEvents(sourcesActiveEl);
+  bindSourceListEvents(sourcesCuratedEl);
+
+  // Watched companies — promote with a board URL or remove.
+  watchedListEl.addEventListener('click', (e) => {
     const target = e.target as HTMLElement;
-    const toggle = target.closest<HTMLElement>('[data-src-toggle]');
-    if (toggle) {
-      const id = toggle.getAttribute('data-src-toggle')!;
-      const list = sourceStore.list();
-      const s = list.find(x => x.id === id);
-      if (s) { s.enabled = !s.enabled; sourceStore.upsert(s); renderSources(); }
+    const li = target.closest<HTMLElement>('[data-watched-id]');
+    if (!li) return;
+    const id = li.getAttribute('data-watched-id')!;
+    if (target.matches('.wc-promote')) {
+      const input = li.querySelector<HTMLInputElement>('.wc-url');
+      const url = input?.value.trim();
+      if (!url) { flash('Paste a Greenhouse or Lever URL first'); return; }
+      const outcome = promoteWatched(id, url);
+      flash(outcome.message);
+      renderSources();
       return;
     }
-    const remove = target.closest<HTMLElement>('[data-src-remove]');
-    if (remove) {
-      const id = remove.getAttribute('data-src-remove')!;
-      const list = sourceStore.list().filter(s => s.id !== id);
-      sourceStore.save(list);
+    if (target.matches('.wc-remove')) {
+      watchedStore.remove(id);
       renderSources();
     }
+  });
+
+  // Reset curated to defaults — only resets curated entries, leaves your
+  // own watched/added sources alone.
+  curatedReset.addEventListener('click', () => {
+    sourceStore.reseedCurated();
+    renderSources();
+    flash('Curated boards reset to defaults (still disabled)');
   });
 
   // Add Greenhouse / Lever source
@@ -1401,8 +1805,14 @@ import Admin from '@/layouts/Admin.astro';
       id,
       type,
       name: `${type === 'greenhouse' ? 'Greenhouse' : 'Lever'} · ${company}`,
-      enabled: true,
+      companyName: company,
+      slug,
       params: { slug },
+      enabled: true,
+      status: 'active',
+      reliability: 1,
+      consecutiveErrors: 0,
+      consecutiveSuccesses: 0,
     });
     addSlug.value = '';
     renderSources();
@@ -1442,6 +1852,7 @@ import Admin from '@/layouts/Admin.astro';
     if (k === 's' || k === 'S')         { e.preventDefault(); act('save', sel.id); return; }
     if (k === 'x' || k === 'X')         { e.preventDefault(); act('dismiss', sel.id); return; }
     if (k === 'o' || k === 'O')         { e.preventDefault(); act('open', sel.id); return; }
+    if (k === 'w' || k === 'W')         { e.preventDefault(); act('watch', sel.id); return; }
   });
 
   // ── Mobile swipe gestures ───────────────────────────────────────────
@@ -1500,11 +1911,83 @@ import Admin from '@/layouts/Admin.astro';
     swipe = null;
   });
 
+  // ── Auto-poll ────────────────────────────────────────────────────────
+  // The Discovery page may sit open on a second monitor. Auto-poll keeps the
+  // queue fresh without forcing the user to keep pressing R, but only when
+  // the tab is actually visible — never in a background tab.
+  let pollTimer: number | null = null;
+  function intervalMs(): number {
+    const prefs = prefsStore.get();
+    const m = prefs.autoPollIntervalMinutes ?? 180;
+    return Math.max(30, Math.min(480, m)) * 60_000;
+  }
+  function nextRunAt(): number | null {
+    const prefs = prefsStore.get();
+    if (!prefs.autoPollEnabled) return null;
+    const last = runStore.last();
+    return (last?.startedAt ?? Date.now()) + intervalMs();
+  }
+  function fmtCountdown(ms: number): string {
+    if (ms <= 0) return 'now';
+    const totalMin = Math.round(ms / 60_000);
+    if (totalMin >= 60) {
+      const h = Math.floor(totalMin / 60);
+      const m = totalMin % 60;
+      return m ? `${h}h ${m}m` : `${h}h`;
+    }
+    return `${totalMin}m`;
+  }
+  function renderAutopoll() {
+    const prefs = prefsStore.get();
+    const on = !!prefs.autoPollEnabled;
+    autopollToggle.checked = on;
+    autopollWrap.classList.toggle('is-on', on);
+    if (!on) { autopollMeta.textContent = 'Off'; return; }
+    const next = nextRunAt();
+    autopollMeta.textContent = next ? `next in ${fmtCountdown(next - Date.now())}` : 'idle';
+  }
+  function startPolling() {
+    stopPolling();
+    const prefs = prefsStore.get();
+    if (!prefs.autoPollEnabled) return;
+    pollTimer = window.setInterval(() => {
+      // Safety: never run in a hidden tab and never overlap a manual run.
+      if (document.hidden) return;
+      if (isRunning() || running) return;
+      const next = nextRunAt();
+      if (next == null || Date.now() < next) return;
+      runNow();
+    }, 30_000); // re-check every 30s; this is a tick, not the poll period itself.
+  }
+  function stopPolling() {
+    if (pollTimer != null) {
+      clearInterval(pollTimer);
+      pollTimer = null;
+    }
+  }
+  autopollToggle.addEventListener('change', () => {
+    const prefs = prefsStore.get();
+    prefs.autoPollEnabled = autopollToggle.checked;
+    prefsStore.set(prefs);
+    renderAutopoll();
+    if (prefs.autoPollEnabled) startPolling(); else stopPolling();
+  });
+  document.addEventListener('visibilitychange', () => {
+    // Pause cleanly when the tab is hidden so we don't burn CPU; resume on
+    // wake. The countdown updates via the per-30s interval.
+    if (document.hidden) stopPolling();
+    else { startPolling(); renderAutopoll(); }
+  });
+  // Refresh the countdown label every 30s independent of the poll tick.
+  window.setInterval(renderAutopoll, 30_000);
+
   // ── Boot ────────────────────────────────────────────────────────────
   refresh();
   if (state.visible.length > 0) state.selectedIdx = 0;
   renderList();
   renderFocus();
+  renderAutopoll();
+  startPolling();
 
   // Surface the most recent run summary on first load.
   const last = runStore.last();
@@ -1517,8 +2000,9 @@ import Admin from '@/layouts/Admin.astro';
 
   // Keep the page in sync if another tab modifies discovered jobs.
   window.addEventListener('storage', (e) => {
-    if (e.key && (e.key === 'qa_discovered_jobs' || e.key === 'qa_discovery_sources')) {
+    if (e.key && (e.key === 'qa_discovered_jobs' || e.key === 'qa_discovery_sources' || e.key === 'qa_discovery_prefs' || e.key === 'qa_watched_companies')) {
       refresh();
+      renderAutopoll();
     }
   });
 </script>

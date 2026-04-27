@@ -8,6 +8,7 @@ import type { RawSourceJob } from './sources/types';
 import { analyzeJD } from '../analyzer';
 import { scoreOpportunity } from '../scoring';
 import { parseJobUrl } from '../job-url-parser';
+import { REASONS, DOWNRANK_PATTERNS, type Reason } from './reasons';
 
 /** Stable id derived from the source. Survives re-runs so dedupe works. */
 export function discoveryId(raw: RawSourceJob): string {
@@ -91,7 +92,92 @@ function synthesizeJD(raw: RawSourceJob): string {
   return parts.join('\n');
 }
 
-export function normalize(raw: RawSourceJob): DiscoveredJob {
+function detectMatchReasons(args: {
+  raw: RawSourceJob;
+  remoteStatus: RemoteStatus;
+  seniority: DiscoveredJob['seniority'];
+  salaryMin?: number;
+  salaryMax?: number;
+  fitScore: number;
+  confidence: 'low' | 'medium' | 'high';
+  matchedStrengths: string[];
+  recommendedAngleId: string;
+}): Reason[] {
+  const out: Reason[] = [];
+  const haystack = `${args.raw.title} ${args.raw.description ?? ''}`.toLowerCase();
+
+  if (args.remoteStatus === 'remote') out.push(REASONS.REMOTE_ALIGNED);
+  if (args.salaryMax && args.salaryMax >= 180_000) out.push(REASONS.SALARY_ALIGNED);
+  if (args.seniority === 'senior' || args.seniority === 'lead') out.push(REASONS.SENIOR_ALIGNED);
+
+  const angle = args.recommendedAngleId;
+  if (angle === 'ai-product-designer' || /\b(ai|llm|claude|gpt|prompt|agent)\b/.test(haystack)) {
+    out.push(REASONS.AI_RELEVANT);
+  }
+  if (angle === 'design-systems-engineer' || /design system|design tokens|component library/.test(haystack)) {
+    out.push(REASONS.DESIGN_SYSTEMS);
+  }
+  if (angle === 'frontend-ux-engineer' || angle === 'design-engineer') {
+    out.push(REASONS.FRONTEND_SYSTEMS);
+  }
+  if (angle === 'product-designer' || angle === 'senior-product-designer') {
+    out.push(REASONS.PRODUCT_DESIGN);
+  }
+  if (angle === 'web-experience-manager' || /\b(multi[- ]site|multi[- ]tenant|web platform|cms)\b/.test(haystack)) {
+    out.push(REASONS.PLATFORM_UX);
+  }
+  if (args.matchedStrengths.length >= 4) out.push(REASONS.STRONG_SKILL_MATCH);
+  if (args.confidence === 'high') out.push(REASONS.HIGH_CONFIDENCE);
+
+  // Dedupe by code, preserving first-seen order.
+  const seen = new Set<string>();
+  return out.filter(r => {
+    if (seen.has(r.code)) return false;
+    seen.add(r.code);
+    return true;
+  });
+}
+
+function detectDownrankReasons(args: {
+  raw: RawSourceJob;
+  remoteStatus: RemoteStatus;
+  salaryMin?: number;
+  salaryMax?: number;
+  matchedStrengths: string[];
+  redFlagsCount: number;
+  confidence: 'low' | 'medium' | 'high';
+  location?: string;
+}): Reason[] {
+  const out: Reason[] = [];
+  const haystack = `${args.raw.title} ${args.raw.description ?? ''} ${args.raw.location ?? ''}`.toLowerCase();
+
+  if (!args.salaryMax) out.push(REASONS.SALARY_MISSING);
+  if (args.remoteStatus === 'unclear') out.push(REASONS.REMOTE_UNCLEAR);
+  if (args.remoteStatus === 'hybrid') out.push(REASONS.HYBRID_LOCATION);
+  if (args.matchedStrengths.length <= 1) out.push(REASONS.LOW_SKILL_MATCH);
+  if (args.redFlagsCount > 0) out.push(REASONS.RISK_FLAGS);
+  if (args.confidence === 'low') out.push(REASONS.LOW_CONFIDENCE);
+
+  for (const p of DOWNRANK_PATTERNS) {
+    if (p.test(haystack)) out.push(p.reason);
+  }
+
+  const seen = new Set<string>();
+  return out.filter(r => {
+    if (seen.has(r.code)) return false;
+    seen.add(r.code);
+    return true;
+  });
+}
+
+export interface NormalizeOptions {
+  /** SourceConfig.id this row came from. Recorded on the DiscoveredJob. */
+  sourceConfigId?: string;
+  /** SourceConfig.reliability snapshot at run time. */
+  sourceReliability?: number;
+}
+
+export function normalize(raw: RawSourceJob, opts: NormalizeOptions = {}): DiscoveredJob {
   const synthesized = synthesizeJD(raw);
   const analyzer = analyzeJD(synthesized);
   const url = parseJobUrl(raw.sourceUrl);
@@ -106,6 +192,28 @@ export function normalize(raw: RawSourceJob): DiscoveredJob {
 
   const remoteStatus = detectRemoteStatus(raw);
   const seniority = detectSeniority(raw.title, raw.description);
+
+  const matchReasons = detectMatchReasons({
+    raw,
+    remoteStatus,
+    seniority,
+    salaryMin: sal.min,
+    salaryMax: sal.max,
+    fitScore: score.total,
+    confidence: score.confidence,
+    matchedStrengths: score.topStrengths,
+    recommendedAngleId: score.suggestedAngleId,
+  });
+  const downrankReasons = detectDownrankReasons({
+    raw,
+    remoteStatus,
+    salaryMin: sal.min,
+    salaryMax: sal.max,
+    matchedStrengths: score.topStrengths,
+    redFlagsCount: analyzer?.riskFlags.length ?? 0,
+    confidence: score.confidence,
+    location: raw.location,
+  });
 
   return {
     id: discoveryId(raw),
@@ -133,6 +241,10 @@ export function normalize(raw: RawSourceJob): DiscoveredJob {
     matchedStrengths: score.topStrengths,
     missingSignals: score.gaps,
     redFlags: analyzer?.riskFlags ?? [],
+    matchReasons: matchReasons.map(r => r.label),
+    downrankReasons: downrankReasons.map(r => r.label),
+    sourceConfigId: opts.sourceConfigId,
+    sourceReliability: opts.sourceReliability,
     discoveredAt: raw.publishedAt ?? Date.now(),
     status: 'new',
   };
