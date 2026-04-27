@@ -1578,9 +1578,18 @@ import Admin from '@/layouts/Admin.astro';
     try {
       const run = await runDiscovery();
       const errs = run.errors.map(e => `<span class="err">${escape(e.source)}: ${escape(e.message)}</span>`).join(' · ');
-      const summary = `Fetched ${run.fetched} · Added ${run.found} · Filtered ${run.filtered}`;
+      // Be explicit about dedupe so "Added 0" doesn't read as a failure when
+      // the user re-runs on unchanged source data.
+      const refreshed = run.refreshed ?? 0;
+      const dedupeNote = run.found === 0 && refreshed > 0
+        ? ` (all ${refreshed} already in your queue)`
+        : refreshed > 0 ? ` · ${refreshed} already seen` : '';
+      const summary = `Fetched ${run.fetched} · ${run.found} new${dedupeNote} · ${run.filtered} below filters`;
       statusEl.innerHTML = errs ? `<span class="ok">${summary}</span> · ${errs}` : `<span class="ok">${summary}</span>`;
-      flash(`Discovery: ${run.found} new`, undefined, 3500);
+      const toastMsg = run.found === 0
+        ? `No new jobs — sources unchanged since last run`
+        : `Discovery: ${run.found} new`;
+      flash(toastMsg, undefined, 3500);
       refresh();
       renderAutopoll();
     } catch (err: any) {

@@ -129,6 +129,8 @@ export interface DiscoveryRun {
   found: number;
   /** Filtered out by preferences. */
   filtered: number;
+  /** Re-encountered jobs whose lifecycle status was preserved (dedupe). */
+  refreshed?: number;
   /** Errors per source. */
   errors: { source: string; message: string }[];
 }

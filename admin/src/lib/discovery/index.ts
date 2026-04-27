@@ -129,8 +129,9 @@ export async function runDiscovery(opts: RunOptions = {}): Promise<DiscoveryRun>
       filteredAt,
       filterReasons: reasons.map(r => r.label),
     }));
-    const { inserted } = discoveredStore.upsertMany([...kept, ...filteredJobs]);
+    const { inserted, updated } = discoveredStore.upsertMany([...kept, ...filteredJobs]);
     run.found = inserted;
+    run.refreshed = updated;
     run.completedAt = Date.now();
 
     runStore.add(run);
