@@ -13,7 +13,7 @@
 // (Workday/Ashby/SmartRecruiters) blocked by CORS are NOT seeded — manual
 // paste handles those. We do not fake an active source.
 
-export type CuratedBoardType = 'greenhouse' | 'lever';
+export type CuratedBoardType = 'greenhouse' | 'lever' | 'ashby';
 
 export interface CuratedBoard {
   type: CuratedBoardType;
@@ -132,6 +132,20 @@ export const CURATED_BOARDS: CuratedBoard[] = [
     boardUrl: 'https://boards.greenhouse.io/figma',
     notes: 'Design tools · product/design (verify if Workday)',
   },
+  {
+    type: 'greenhouse',
+    slug: 'huggingface',
+    companyName: 'Hugging Face',
+    boardUrl: 'https://boards.greenhouse.io/huggingface',
+    notes: 'AI · ML platform · developer UX',
+  },
+  {
+    type: 'greenhouse',
+    slug: 'replicate',
+    companyName: 'Replicate',
+    boardUrl: 'https://boards.greenhouse.io/replicate',
+    notes: 'AI inference platform · developer tools',
+  },
 
   // ── Lever ──────────────────────────────────────────────────────────
   {
@@ -147,5 +161,42 @@ export const CURATED_BOARDS: CuratedBoard[] = [
     companyName: 'Lyft',
     boardUrl: 'https://jobs.lever.co/lyft',
     notes: 'Transportation · product design',
+  },
+
+  // ── Ashby (lots of AI-native companies host here) ─────────────────
+  {
+    type: 'ashby',
+    slug: 'anysphere',
+    companyName: 'Cursor (Anysphere)',
+    boardUrl: 'https://jobs.ashbyhq.com/anysphere',
+    notes: 'AI-native code editor · design + frontend',
+  },
+  {
+    type: 'ashby',
+    slug: 'perplexity',
+    companyName: 'Perplexity',
+    boardUrl: 'https://jobs.ashbyhq.com/perplexity',
+    notes: 'AI search · product design · frontend',
+  },
+  {
+    type: 'ashby',
+    slug: 'inflection-ai',
+    companyName: 'Inflection AI',
+    boardUrl: 'https://jobs.ashbyhq.com/inflection-ai',
+    notes: 'AI · personal AI · product design',
+  },
+  {
+    type: 'ashby',
+    slug: 'suno',
+    companyName: 'Suno',
+    boardUrl: 'https://jobs.ashbyhq.com/suno',
+    notes: 'AI · music generation · product design',
+  },
+  {
+    type: 'ashby',
+    slug: 'mistral',
+    companyName: 'Mistral AI',
+    boardUrl: 'https://jobs.ashbyhq.com/mistral',
+    notes: 'AI · open-weight LLMs · product/frontend',
   },
 ];

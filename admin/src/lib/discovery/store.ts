@@ -21,13 +21,12 @@ const KEYS = {
 
 const DEFAULT_PREFS: DiscoveryPreferences = {
   remoteOnly: true,
-  minSalary: 150_000,
-  minScore: 50,
+  minSalary: 120_000,
+  minScore: 25,
   excludeKeywords: [
     'graphic designer',
     'print designer',
     'social media designer',
-    'junior',
     'intern',
     'entry level',
     'entry-level',
@@ -38,6 +37,14 @@ const DEFAULT_PREFS: DiscoveryPreferences = {
   autoPollEnabled: false,
   autoPollIntervalMinutes: 180,
 };
+
+// Old defaults — kept to detect users still on them so we can migrate
+// them forward when we change the floor. If the user has explicitly
+// customised any of these, we leave their values alone.
+const OLD_PREFS_DEFAULTS = {
+  minSalary: 150_000,
+  minScore: 50,
+} as const;
 
 function safeParse<T>(raw: string | null, fallback: T): T {
   if (!raw) return fallback;
@@ -143,13 +150,19 @@ export const sourceStore = {
       this.save(seeded);
       return seeded;
     }
-    // Backward-compat: graft curated entries onto stores that pre-date them.
-    // Existing user toggles are preserved (we only add ids that aren't there).
+    // Backward-compat: graft any default source (curated or always-on)
+    // that doesn't already exist on the user's store. Existing user toggles
+    // are preserved — we only add ids that aren't there. If a user has
+    // explicitly removed a base source, it stays removed because remove()
+    // would also need to record a tombstone (out of scope for now); they'd
+    // see it return after a clear-and-restore. Acceptable trade-off for
+    // letting new always-on feeds (Remote OK, future additions) reach
+    // existing installations.
     let needsSave = false;
     const ids = new Set(raw.map(s => s.id));
     const merged = [...raw];
     for (const s of defaultSources()) {
-      if (!ids.has(s.id) && s.curated) {
+      if (!ids.has(s.id)) {
         merged.push(s);
         needsSave = true;
       }
@@ -257,11 +270,31 @@ function defaultSources(): SourceConfig[] {
     },
     {
       ...now,
+      id: 'remoteok',
+      type: 'remoteok',
+      name: 'Remote OK',
+      enabled: true,
+      params: {
+        tags: 'design,frontend,front-end,ux,ui,product designer,design engineer,react,typescript',
+      },
+      notes: 'Public JSON feed. Tag-filtered to design + frontend roles.',
+    },
+    {
+      ...now,
       id: 'hn-hiring',
       type: 'hn-hiring',
       name: 'HN — Who is hiring',
       enabled: true,
-      params: { keywords: 'design,frontend,ux,product designer,design engineer,react' },
+      params: {
+        keywords: [
+          'design', 'designer', 'frontend', 'front-end', 'front end',
+          'ux', 'ui', 'product designer', 'design engineer', 'design systems',
+          'ux engineer', 'ux developer', 'ux designer', 'ui designer',
+          'ui engineer', 'ui developer', 'interaction designer',
+          'ux lead', 'design lead', 'product design',
+          'react', 'typescript',
+        ].join(','),
+      },
       notes: 'Algolia-backed search of the latest "Who is hiring?" thread.',
     },
     {
@@ -317,7 +350,22 @@ export const runStore = {
 
 export const prefsStore = {
   get(): DiscoveryPreferences {
-    return { ...DEFAULT_PREFS, ...read<Partial<DiscoveryPreferences>>(KEYS.prefs, {}) };
+    const stored = read<Partial<DiscoveryPreferences>>(KEYS.prefs, {});
+    // Forward-migrate users still on the previous floor values. We treat
+    // exact equality as "they never moved off the default" — if they've
+    // customised either number, we leave it alone.
+    const migrated: Partial<DiscoveryPreferences> = { ...stored };
+    let didMigrate = false;
+    if (stored.minScore === OLD_PREFS_DEFAULTS.minScore) {
+      migrated.minScore = DEFAULT_PREFS.minScore;
+      didMigrate = true;
+    }
+    if (stored.minSalary === OLD_PREFS_DEFAULTS.minSalary) {
+      migrated.minSalary = DEFAULT_PREFS.minSalary;
+      didMigrate = true;
+    }
+    if (didMigrate) write(KEYS.prefs, { ...DEFAULT_PREFS, ...migrated });
+    return { ...DEFAULT_PREFS, ...migrated };
   },
   set(prefs: DiscoveryPreferences): void {
     write(KEYS.prefs, prefs);

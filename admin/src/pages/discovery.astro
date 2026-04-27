@@ -125,6 +125,7 @@ import Admin from '@/layouts/Admin.astro';
         <select id="disc-add-type">
           <option value="greenhouse">Greenhouse board</option>
           <option value="lever">Lever postings</option>
+          <option value="ashby">Ashby board</option>
         </select>
         <input id="disc-add-slug" type="text" placeholder="company-slug (e.g. anthropic)" />
         <button type="button" class="disc__btn" id="disc-add-source">Add</button>
@@ -1805,17 +1806,18 @@ import Admin from '@/layouts/Admin.astro';
     flash('Curated boards reset to defaults (still disabled)');
   });
 
-  // Add Greenhouse / Lever source
+  // Add Greenhouse / Lever / Ashby source
   addBtn.addEventListener('click', () => {
     const slug = addSlug.value.trim().toLowerCase();
     if (!slug) return;
     const type = addType.value as SourceConfig['type'];
     const id = `${type}-${slug}`;
     const company = slug.split(/[-_]+/).map(w => w[0]?.toUpperCase() + w.slice(1)).join(' ');
+    const platformLabel = type === 'greenhouse' ? 'Greenhouse' : type === 'lever' ? 'Lever' : type === 'ashby' ? 'Ashby' : type;
     sourceStore.upsert({
       id,
       type,
-      name: `${type === 'greenhouse' ? 'Greenhouse' : 'Lever'} · ${company}`,
+      name: `${platformLabel} · ${company}`,
       companyName: company,
       slug,
       params: { slug },

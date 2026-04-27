@@ -4,9 +4,11 @@
 
 export type DiscoverySourceType =
   | 'remotive'
+  | 'remoteok'
   | 'hn-hiring'
   | 'greenhouse'
   | 'lever'
+  | 'ashby'
   | 'manual-paste';
 
 export type RemoteStatus = 'remote' | 'hybrid' | 'onsite' | 'unclear';
@@ -164,7 +166,7 @@ export interface WatchedCompany {
   /** The job URL the user clicked "Watch" on. */
   originalJobUrl: string;
   /** Best-guess platform from URL inspection. */
-  detectedPlatform: 'greenhouse' | 'lever' | 'unsupported';
+  detectedPlatform: 'greenhouse' | 'lever' | 'ashby' | 'unsupported';
   /** Direct URL to the public board, when known. */
   boardUrl?: string;
   status: 'needs-setup' | 'active' | 'unsupported';

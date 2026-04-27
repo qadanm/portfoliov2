@@ -12,7 +12,7 @@ import type {
 import { sourceStore, watchedStore } from './store';
 
 interface PlatformDetect {
-  platform: 'greenhouse' | 'lever' | 'unsupported';
+  platform: 'greenhouse' | 'lever' | 'ashby' | 'unsupported';
   slug?: string;
   boardUrl?: string;
 }
@@ -45,6 +45,19 @@ export function detectPlatform(url: string | undefined): PlatformDetect {
         platform: 'lever',
         slug,
         boardUrl: `https://jobs.lever.co/${slug}`,
+      };
+    }
+  }
+
+  if (host.endsWith('ashbyhq.com')) {
+    // jobs.ashbyhq.com/{slug}/{maybe-job-id}
+    const m = path.match(/^\/([^/]+)/);
+    if (m && m[1]) {
+      const slug = m[1];
+      return {
+        platform: 'ashby',
+        slug,
+        boardUrl: `https://jobs.ashbyhq.com/${slug}`,
       };
     }
   }
@@ -87,10 +100,13 @@ export function watchCompany(job: DiscoveredJob): WatchOutcome {
       };
     }
 
+    const platformLabel = source.platform === 'greenhouse' ? 'Greenhouse'
+      : source.platform === 'lever' ? 'Lever'
+      : 'Ashby';
     const fresh: SourceConfig = {
       id,
       type: source.platform as DiscoverySourceType,
-      name: `${source.platform === 'greenhouse' ? 'Greenhouse' : 'Lever'} · ${job.company}`,
+      name: `${platformLabel} · ${job.company}`,
       companyName: job.company,
       slug: source.slug,
       boardUrl: source.boardUrl,
@@ -107,7 +123,7 @@ export function watchCompany(job: DiscoveredJob): WatchOutcome {
     return {
       kind: 'watching',
       source: fresh,
-      message: `Now watching ${job.company} via ${source.platform === 'greenhouse' ? 'Greenhouse' : 'Lever'}.`,
+      message: `Now watching ${job.company} via ${platformLabel}.`,
     };
   }
 
@@ -149,15 +165,18 @@ export function promoteWatched(id: string, boardUrl: string): WatchOutcome {
   if (detected.platform === 'unsupported' || !detected.slug) {
     return {
       kind: 'error',
-      message: 'That URL is not a supported Greenhouse or Lever board.',
+      message: 'That URL is not a supported Greenhouse, Lever, or Ashby board.',
     };
   }
 
   const sourceId = `${detected.platform}-${detected.slug}`;
+  const platformLabel = detected.platform === 'greenhouse' ? 'Greenhouse'
+    : detected.platform === 'lever' ? 'Lever'
+    : 'Ashby';
   const fresh: SourceConfig = {
     id: sourceId,
     type: detected.platform as DiscoverySourceType,
-    name: `${detected.platform === 'greenhouse' ? 'Greenhouse' : 'Lever'} · ${wc.companyName}`,
+    name: `${platformLabel} · ${wc.companyName}`,
     companyName: wc.companyName,
     slug: detected.slug,
     boardUrl: detected.boardUrl,

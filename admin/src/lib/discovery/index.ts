@@ -10,9 +10,11 @@ import type {
 } from './types';
 import type { RawSourceJob } from './sources/types';
 import { fetchRemotive } from './sources/remotive';
+import { fetchRemoteOk } from './sources/remoteok';
 import { fetchHNHiring } from './sources/hn-hiring';
 import { fetchGreenhouse } from './sources/greenhouse';
 import { fetchLever } from './sources/lever';
+import { fetchAshby } from './sources/ashby';
 import { parsePastedAlerts } from './sources/manual-paste';
 import { normalize } from './normalize';
 import { applyFilters } from './filter';
@@ -36,9 +38,11 @@ export { CURATED_BOARDS } from './curated';
 async function fetchSource(source: SourceConfig): Promise<RawSourceJob[]> {
   switch (source.type) {
     case 'remotive': return fetchRemotive(source);
+    case 'remoteok': return fetchRemoteOk(source);
     case 'hn-hiring': return fetchHNHiring(source);
     case 'greenhouse': return fetchGreenhouse(source);
     case 'lever': return fetchLever(source);
+    case 'ashby': return fetchAshby(source);
     case 'manual-paste': return []; // populated via importPastedAlerts() instead
     default: return [];
   }

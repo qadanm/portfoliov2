@@ -8,21 +8,25 @@ import { skills } from '@/data/skills';
 const ANGLE_SIGNALS: Record<string, string[]> = {
   'product-designer': [
     'product designer', 'product design', 'user experience', 'ux design',
+    'ui designer', 'ui design', 'visual designer', 'interaction designer',
     'figma', 'prototyping', 'user research', 'flows', 'wireframes',
     'product thinking', 'cross-functional',
   ],
   'senior-product-designer': [
     'senior product designer', 'senior designer', 'staff designer',
-    'lead designer', 'mentorship', 'cross-functional', 'roadmap',
+    'lead designer', 'senior ux designer', 'senior ui designer',
+    'mentorship', 'cross-functional', 'roadmap',
     'product strategy', 'design strategy', 'principal',
   ],
   'ux-engineer': [
-    'ux engineer', 'design technologist', 'design implementation',
+    'ux engineer', 'ux developer', 'ui engineer', 'ui developer',
+    'design technologist', 'design implementation',
     'frontend', 'react', 'typescript', 'css', 'design system', 'tokens',
     'figma to code', 'production-ready',
   ],
   'frontend-ux-engineer': [
     'frontend engineer', 'front-end engineer', 'frontend developer',
+    'front end developer', 'ui developer', 'ui engineer',
     'react', 'typescript', 'next', 'astro', 'css', 'html',
     'performance', 'accessibility', 'ssr', 'web vitals',
   ],
@@ -47,7 +51,8 @@ const ANGLE_SIGNALS: Record<string, string[]> = {
     'agent', 'rag', 'prompt',
   ],
   'ux-product-lead': [
-    'lead designer', 'design lead', 'product lead', 'manager',
+    'lead designer', 'design lead', 'product lead', 'ux lead',
+    'head of design', 'head of ux', 'design manager', 'manager',
     'team lead', 'people management', 'roadmap', 'strategy',
     'cross-functional', 'mentorship', 'hiring',
   ],
