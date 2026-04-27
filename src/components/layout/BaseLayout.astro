@@ -16,7 +16,7 @@ interface Props {
 const {
   title = 'Qadan — Product Design & UX Engineering',
   description = 'I design and build product systems end to end. Product UX, frontend architecture, and the constraints they live inside.',
-  image = '/images/chatobd2/hero.webp',
+  image = '/og.png',
   article = false,
   noindex = false,
 } = Astro.props;
@@ -44,12 +44,17 @@ const fullTitle = title.includes('Qadan') ? title : `${title} — Qadan`;
   <meta property="og:title" content={fullTitle} />
   <meta property="og:description" content={description} />
   <meta property="og:image" content={new URL(image, Astro.site)} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:alt" content="Moe Qadan — Product Designer & UX Engineer. Diagram of a constrained AI pipeline with the model held between deterministic stages." />
   <meta property="og:site_name" content="Qadan" />
 
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content={fullTitle} />
   <meta name="twitter:description" content={description} />
   <meta name="twitter:image" content={new URL(image, Astro.site)} />
+  <meta name="twitter:image:alt" content="Moe Qadan — Product Designer & UX Engineer. Diagram of a constrained AI pipeline with the model held between deterministic stages." />
 
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
