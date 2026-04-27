@@ -64,6 +64,12 @@ function isActive(href: string) {
           ))}
         </details>
       </nav>
+
+      <div class="admin__sync no-print" id="admin-sync" hidden>
+        <span class="admin__sync-dot" data-sync-dot></span>
+        <span class="admin__sync-label" data-sync-label>Sync</span>
+        <button type="button" class="admin__sync-btn" data-sync-action="pull" title="Force re-sync now">↻</button>
+      </div>
     </aside>
 
     <script is:inline>
@@ -113,5 +119,62 @@ function isActive(href: string) {
       <slot />
     </main>
   </div>
+
+  <script>
+    // Boot the cross-device sync layer. Pulls from /api/sync on load,
+    // pushes on every local write (debounced), polls every 60s while the
+    // tab is visible. The status indicator in the sidebar reflects state.
+    import sync, { type SyncStatusEvent } from '@/lib/sync';
+
+    const wrap = document.getElementById('admin-sync');
+    const dot = wrap?.querySelector<HTMLElement>('[data-sync-dot]');
+    const label = wrap?.querySelector<HTMLElement>('[data-sync-label]');
+    const btn = wrap?.querySelector<HTMLButtonElement>('[data-sync-action="pull"]');
+
+    function fmtRelative(ms: number): string {
+      if (!ms) return 'never';
+      const dt = Date.now() - ms;
+      if (dt < 5_000) return 'just now';
+      if (dt < 60_000) return `${Math.round(dt / 1000)}s ago`;
+      if (dt < 3_600_000) return `${Math.round(dt / 60_000)}m ago`;
+      if (dt < 86_400_000) return `${Math.round(dt / 3_600_000)}h ago`;
+      return `${Math.round(dt / 86_400_000)}d ago`;
+    }
+
+    function render(e: SyncStatusEvent) {
+      if (!wrap || !dot || !label) return;
+      wrap.hidden = false;
+      dot.dataset.state = e.status;
+      const last = e.lastSyncedAt ?? sync.lastSyncedAt();
+      switch (e.status) {
+        case 'idle': label.textContent = 'Sync ready'; break;
+        case 'pulling': label.textContent = 'Pulling…'; break;
+        case 'pushing': label.textContent = 'Pushing…'; break;
+        case 'synced':
+          label.textContent = `Synced ${fmtRelative(last)}`;
+          break;
+        case 'offline':
+          label.textContent = `Offline · ${fmtRelative(last)}`;
+          break;
+        case 'unconfigured':
+          label.textContent = 'Sync not set up';
+          break;
+        case 'error':
+          label.textContent = `Sync error · ${fmtRelative(last)}`;
+          break;
+      }
+      if (e.message) wrap.title = e.message;
+      else wrap.title = '';
+    }
+
+    sync.subscribe(render);
+    btn?.addEventListener('click', () => { sync.forcePull(); });
+
+    // Refresh the relative timestamp every 30 seconds even if status doesn't change.
+    setInterval(() => render(sync.status()), 30_000);
+
+    // Kick off the sync. Errors are surfaced via render(); never throw out.
+    sync.init().catch(() => { /* surfaced via status */ });
+  </script>
 </body>
 </html>

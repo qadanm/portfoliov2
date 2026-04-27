@@ -122,6 +122,22 @@ function read<T>(key: string, fallback: T): T {
 function write<T>(key: string, value: T): void {
   if (typeof window === 'undefined') return;
   localStorage.setItem(key, JSON.stringify(value));
+  // Notify the sync layer (and any other subscribers) that data changed
+  // so it can debounce a push to the cloud. This is event-based so
+  // storage.ts has no compile-time dependency on sync.ts.
+  try {
+    window.dispatchEvent(new CustomEvent('qa-data-changed', { detail: { key } }));
+  } catch { /* no-op */ }
+}
+
+// Fire a "record was deleted" event so the sync layer can record a
+// tombstone. Without tombstones, a deleted record would resurrect itself
+// the next time the other device pushed.
+function notifyDeleted(type: 'job' | 'recruiter' | 'letter', id: string): void {
+  if (typeof window === 'undefined') return;
+  try {
+    window.dispatchEvent(new CustomEvent('qa-record-deleted', { detail: { type, id } }));
+  } catch { /* no-op */ }
 }
 
 // ── Schema migration ───────────────────────────────────────────────────
@@ -168,7 +184,10 @@ export const jobsStore = {
     if (idx >= 0) all[idx] = job; else all.push(job);
     this.save(all);
   },
-  remove(id: string): void { this.save(this.list().filter(j => j.id !== id)); },
+  remove(id: string): void {
+    this.save(this.list().filter(j => j.id !== id));
+    notifyDeleted('job', id);
+  },
   get(id: string): Job | undefined { return this.list().find(j => j.id === id); },
 };
 
@@ -182,7 +201,10 @@ export const recruitersStore = {
     if (idx >= 0) all[idx] = r; else all.push(r);
     this.save(all);
   },
-  remove(id: string): void { this.save(this.list().filter(r => r.id !== id)); },
+  remove(id: string): void {
+    this.save(this.list().filter(r => r.id !== id));
+    notifyDeleted('recruiter', id);
+  },
   get(id: string): Recruiter | undefined { return this.list().find(r => r.id === id); },
 };
 
@@ -195,7 +217,10 @@ export const lettersStore = {
     if (idx >= 0) all[idx] = l; else all.push(l);
     this.save(all);
   },
-  remove(id: string): void { this.save(this.list().filter(l => l.id !== id)); },
+  remove(id: string): void {
+    this.save(this.list().filter(l => l.id !== id));
+    notifyDeleted('letter', id);
+  },
 };
 
 // ── Backup / restore ───────────────────────────────────────────────────

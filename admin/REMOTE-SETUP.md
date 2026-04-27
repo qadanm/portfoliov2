@@ -109,9 +109,72 @@ your data to `admin.qadan.co`:
 1. On the local instance: open `/export` → **Download backup.json**.
 2. On `admin.qadan.co`: open `/export` → choose the file → **Restore (replace)**.
 
-After this point, the remote instance is the source of truth. If you keep
-working locally too, periodically export from one and import into the other.
-(Cross-device live sync is a future Supabase migration — see below.)
+After this point, the remote instance is the source of truth. Once Step 6
+(KV sync) is enabled, all your devices stay in sync automatically.
+
+## Step 6 — Cross-device sync (Cloudflare KV)
+
+The admin includes a `/api/sync` Pages Function that mirrors your local
+data into a single Cloudflare KV key. Every browser tab pulls on load,
+debounces a push on every write, and polls every 60s while visible. The
+sidebar shows a status indicator (`Synced 12s ago` / `Pulling…` / `Offline`).
+
+This stage is one-time setup. Once the binding is in place, it just works.
+
+### One-time setup in the Cloudflare dashboard
+
+1. **Create a KV namespace.** Workers & Pages → **KV** → **Create a namespace**.
+   - Name: `qadan-admin-data` (any name; only the binding matters).
+2. **Bind it to the Pages project.** Workers & Pages → your Pages project
+   (`qadan-admin`) → **Settings** → **Functions** → **KV namespace bindings** →
+   **Add binding**.
+   - **Variable name:** `KV` (must match this exactly; the function looks
+     for `env.KV`)
+   - **KV namespace:** the one you just created
+   - Apply to **Production** (and Preview if you want).
+3. **Trigger a redeploy.** Either push a commit or hit "Retry deployment"
+   in the Pages dashboard. Functions only pick up new bindings on rebuild.
+
+### Verifying it works
+
+| Check | Expected |
+|---|---|
+| `curl https://admin.qadan.co/api/sync` (signed in) | `{"ok":true,"empty":true,...}` on first run; populated state after first save |
+| Sidebar status indicator on `admin.qadan.co` | Green dot, "Synced Xs ago" |
+| Save a job on laptop, refresh phone within 60s | Job appears on phone |
+| Delete a job on laptop, refresh phone | Job disappears (tombstone propagated) |
+
+If the sidebar shows **"Sync not set up"**, the KV binding is missing — go
+back to step 2 above and confirm the variable name is exactly `KV`.
+
+### Local testing
+
+`astro dev` does **not** run Pages Functions. To test sync locally, build
+and serve through wrangler:
+
+```bash
+npm run build
+npx wrangler pages dev dist --kv KV --port 8788
+```
+
+Wrangler creates an in-memory KV that the function reads/writes against.
+Open http://127.0.0.1:8788 to use the admin against the local KV.
+
+### How conflicts are handled
+
+- **Per-record updatedAt wins.** Each Job/Recruiter has an `updatedAt`
+  timestamp. On merge, the side with the higher timestamp wins per record.
+- **Tombstones for deletes.** When you delete a record, a tombstone
+  `{ type, id, deletedAt }` is recorded locally and synced. Without this,
+  a deleted record would resurrect itself the next time the other device
+  pushed (because that device still had a copy). Tombstones expire after
+  90 days.
+- **Last-write-wins on the blob itself.** If two devices push within
+  milliseconds, one push silently overwrites the other on KV — but the
+  next pull on either device merges everything correctly via per-record
+  timestamps.
+- **Letters are immutable.** Saved letter drafts are union-merged by id
+  (no overwrites); they have `createdAt` only, no `updatedAt`.
 
 ## Verifying everything
 
@@ -138,13 +201,17 @@ working locally too, periodically export from one and import into the other.
 None of the above is private — it's all derived from the same content already
 on the public portfolio.
 
-**Local-only (per-device localStorage):**
+**Local-first, cross-device-synced (via Cloudflare KV when configured):**
 - Your saved jobs (`qa_jobs`)
 - Recruiters CRM (`qa_recruiters`)
 - Saved letter drafts (`qa_letters`)
+- Tombstones for propagating deletes (`qa_tombstones`)
 - Schema version (`qa_schema_version`)
 
-These never enter the build, never sync, never leave the browser they're typed in.
+These live in browser localStorage as the working copy. With the KV binding
+configured (Step 6), they also mirror into a single Cloudflare KV value
+keyed `admin-data-v1`, gated by Cloudflare Access. Without the binding,
+they stay per-device only and the sync indicator shows "Sync not set up".
 
 ## Threat model — what this defends against
 
@@ -170,20 +237,18 @@ These never enter the build, never sync, never leave the browser they're typed i
   configured the raw `pages.dev` URL would be public. (It is configured; keep
   it that way.)
 
-## Future: real cross-device sync (Supabase)
+## Future: scaling beyond KV
 
-When export/import gets old, here's the migration path:
+KV stores the entire admin state as one ~10–50KB JSON blob today. That's
+fine for one user with a few hundred jobs. If you ever hit ~5MB or want
+real query power, the migration path is Cloudflare D1 (serverless SQLite,
+same Cloudflare account, same Access gate). Three tables (`jobs`,
+`recruiters`, `letters`) mirroring the TypeScript types in
+[`lib/storage.ts`](src/lib/storage.ts), and replace the GET/PUT in
+`functions/api/sync.ts` with per-table queries. The client `lib/sync.ts`
+merge logic stays the same.
 
-1. Add Supabase project (free tier).
-2. Create three tables: `jobs`, `recruiters`, `letters`. Schema mirrors the
-   TypeScript types in `lib/storage.ts`.
-3. Enable RLS, write policies keyed to `auth.uid()`.
-4. Add Supabase Auth (email magic link). Cloudflare Access stays in front as a
-   second factor — you'd need both your email AND to log in with Supabase.
-5. Replace the `jobsStore` / `recruitersStore` / `lettersStore` accessors in
-   `lib/storage.ts` with Supabase queries. UI doesn't change.
-
-Estimated effort: 4–6 hours when you actually need it. Don't pre-build.
+Don't pre-build. Ship KV first; migrate when the blob actually gets fat.
 
 ## Day-to-day
 

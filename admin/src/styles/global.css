@@ -59,7 +59,56 @@ a {
   top: 0;
   height: 100vh;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
+
+.admin__sync {
+  margin-top: auto;
+  padding-top: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--c-text-subtle);
+  border-top: 1px solid var(--c-border-subtle);
+}
+.admin__sync-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--c-text-subtle);
+  flex-shrink: 0;
+  transition: background-color 0.2s ease;
+}
+.admin__sync-dot[data-state="synced"] { background: var(--c-success); box-shadow: 0 0 0 2px rgba(16,185,129,0.15); }
+.admin__sync-dot[data-state="pulling"], .admin__sync-dot[data-state="pushing"] { background: var(--c-accent); animation: admin-sync-pulse 1.2s ease-in-out infinite; }
+.admin__sync-dot[data-state="offline"] { background: #A1A1AA; }
+.admin__sync-dot[data-state="error"] { background: #F87171; }
+.admin__sync-dot[data-state="unconfigured"] { background: #A1A1AA; }
+@keyframes admin-sync-pulse {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
+}
+.admin__sync-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.admin__sync-btn {
+  background: transparent;
+  border: 1px solid var(--c-border-subtle);
+  color: var(--c-text-subtle);
+  border-radius: var(--r-md);
+  padding: 2px 7px;
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  line-height: 1;
+}
+.admin__sync-btn:hover { color: var(--c-accent); border-color: var(--c-accent); }
 
 .admin__brand-row {
   display: flex;

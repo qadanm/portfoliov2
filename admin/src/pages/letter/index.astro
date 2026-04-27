@@ -1,0 +1,492 @@
+---
+// Branded cover-letter view + PDF download. Reads ?id=<jobId> on load and
+// renders the letter in a print-ready layout that matches the public site
+// (Instrument Serif + Inter + amber accent). "Save as PDF" uses browser
+// print-to-PDF; the print stylesheet hides everything except the letter.
+import '@/styles/global.css';
+import { identity } from '@/data/identity';
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Cover letter · Qadan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" />
+</head>
+<body>
+  <div class="letter-page">
+    <header class="letter-bar no-print">
+      <a class="letter-bar__back" href="/today">← Back to Today</a>
+      <span class="letter-bar__spacer"></span>
+      <button class="letter-bar__btn" type="button" id="copy-btn">Copy text</button>
+      <button class="letter-bar__btn letter-bar__btn--primary" type="button" id="print-btn">Save as PDF</button>
+    </header>
+
+    <article class="letter" id="letter-output">
+      <div class="letter__loading">Loading letter…</div>
+    </article>
+
+    <footer class="letter-foot no-print" id="letter-foot" hidden>
+      <div class="letter-foot__row">
+        <label>Tone
+          <select id="letter-tone">
+            <option value="design">Design-focused</option>
+            <option value="warm">Warm professional</option>
+            <option value="direct">Direct</option>
+            <option value="technical">Technical</option>
+            <option value="senior">Senior / executive</option>
+          </select>
+        </label>
+        <label>Recruiter first name <span class="letter-foot__hint">optional</span>
+          <input type="text" id="letter-recruiter" placeholder="" />
+        </label>
+      </div>
+      <label>Custom line <span class="letter-foot__hint">one sentence to weave in (specific hook for this company)</span>
+        <input type="text" id="letter-hook" placeholder="" />
+      </label>
+      <p class="letter-foot__note">Edits regenerate the letter instantly. They aren't saved unless you re-open from /today.</p>
+    </footer>
+
+    <div class="letter-toast" id="letter-toast" aria-live="polite"></div>
+  </div>
+</body>
+</html>
+
+<style is:global>
+  /* ─── Page chrome ──────────────────────────────────────────────── */
+  body {
+    margin: 0;
+    background: #fafaf9;
+    color: #09090b;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .letter-page {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 32px 24px 96px;
+  }
+  .letter-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+    font-size: 13px;
+  }
+  .letter-bar__back {
+    color: #52525b;
+    text-decoration: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .letter-bar__back:hover { color: #d97706; }
+  .letter-bar__spacer { flex: 1; }
+  .letter-bar__btn {
+    font-family: inherit;
+    font-size: 13px;
+    padding: 8px 14px;
+    border: 1px solid #e4e4e7;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #09090b;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .letter-bar__btn:hover { border-color: #d97706; color: #d97706; }
+  .letter-bar__btn--primary {
+    background: #d97706;
+    border-color: #d97706;
+    color: #ffffff;
+  }
+  .letter-bar__btn--primary:hover {
+    background: #b45309;
+    border-color: #b45309;
+    color: #ffffff;
+  }
+
+  /* ─── The letter itself ────────────────────────────────────────── */
+  .letter {
+    background: #ffffff;
+    border: 1px solid #e4e4e7;
+    border-radius: 12px;
+    padding: 64px 72px;
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: #18181b;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03);
+  }
+  .letter__loading {
+    color: #a1a1aa;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    text-align: center;
+    padding: 48px 0;
+  }
+
+  .letter__head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 32px;
+    border-bottom: 1px solid rgba(217, 119, 6, 0.25);
+    padding-bottom: 18px;
+    margin-bottom: 28px;
+  }
+  .letter__name {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: 32px;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: #09090b;
+    margin: 0;
+    font-weight: 400;
+  }
+  .letter__contact {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    line-height: 1.6;
+    color: #52525b;
+    text-align: right;
+  }
+  .letter__contact a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid #e4e4e7;
+    padding-bottom: 1px;
+  }
+  .letter__contact a:hover { color: #d97706; border-color: #d97706; }
+  .letter__contact > div { margin-bottom: 2px; }
+
+  .letter__meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #71717a;
+    margin-bottom: 28px;
+  }
+  .letter__meta-label {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #a1a1aa;
+    font-size: 10px;
+    margin-bottom: 2px;
+  }
+
+  .letter__greeting {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: 22px;
+    line-height: 1.3;
+    color: #09090b;
+    margin: 0 0 24px;
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  .letter__body p {
+    margin: 0 0 18px;
+  }
+  .letter__body p:last-of-type {
+    margin-bottom: 0;
+  }
+
+  .letter__sign {
+    margin-top: 36px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(217, 119, 6, 0.18);
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-style: italic;
+    font-size: 18px;
+    color: #09090b;
+  }
+
+  /* ─── Tone footer ──────────────────────────────────────────────── */
+  .letter-foot {
+    margin-top: 24px;
+    padding: 18px;
+    background: rgba(217, 119, 6, 0.04);
+    border: 1px dashed rgba(217, 119, 6, 0.3);
+    border-radius: 8px;
+    font-size: 13px;
+  }
+  .letter-foot__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .letter-foot label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 11px;
+    color: #52525b;
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .letter-foot__hint { text-transform: none; letter-spacing: normal; color: #a1a1aa; }
+  .letter-foot input, .letter-foot select {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    padding: 7px 10px;
+    border: 1px solid #e4e4e7;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #09090b;
+  }
+  .letter-foot input:focus, .letter-foot select:focus {
+    outline: none;
+    border-color: #d97706;
+  }
+  .letter-foot__note {
+    margin: 8px 0 0;
+    font-size: 11px;
+    color: #71717a;
+  }
+
+  /* ─── Toast ────────────────────────────────────────────────────── */
+  .letter-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translate(-50%, 12px);
+    background: #09090b;
+    color: #fafaf9;
+    padding: 9px 14px;
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    z-index: 1000;
+  }
+  .letter-toast.is-visible {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  /* ─── Print ────────────────────────────────────────────────────── */
+  .no-print { /* base */ }
+  @media print {
+    @page {
+      size: letter;
+      margin: 0.85in 0.95in;
+    }
+    body { background: #ffffff; }
+    .letter-page {
+      max-width: none;
+      padding: 0;
+      margin: 0;
+    }
+    .no-print, .letter-toast { display: none !important; }
+    .letter {
+      border: none;
+      box-shadow: none;
+      padding: 0;
+      border-radius: 0;
+      max-width: none;
+      font-size: 11pt;
+      line-height: 1.55;
+    }
+    .letter__name { font-size: 22pt; }
+    .letter__greeting { font-size: 14pt; }
+    .letter__sign { font-size: 13pt; }
+    .letter__head { padding-bottom: 12px; margin-bottom: 18px; }
+    .letter__meta { margin-bottom: 18px; }
+    .letter__body p { margin-bottom: 11px; }
+  }
+
+  @media (max-width: 720px) {
+    .letter-page { padding: 16px 12px 64px; }
+    .letter { padding: 32px 24px; font-size: 14px; }
+    .letter__head { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .letter__contact { text-align: left; }
+    .letter__meta { flex-direction: column; gap: 6px; }
+    .letter-foot__row { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+  import { jobsStore, ensureSchema, type Job } from '@/lib/storage';
+  import { generateCoverLetter, type Tone } from '@/lib/letters';
+  import { identity } from '@/data/identity';
+
+  ensureSchema();
+
+  const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
+  const params = new URLSearchParams(window.location.search);
+  const jobId = params.get('id');
+  const initialTone = (params.get('tone') ?? '').toLowerCase();
+
+  const out = $('letter-output');
+  const foot = $('letter-foot');
+  const toneSel = $<HTMLSelectElement>('letter-tone');
+  const recruiterInput = $<HTMLInputElement>('letter-recruiter');
+  const hookInput = $<HTMLInputElement>('letter-hook');
+  const toastEl = $('letter-toast');
+
+  let job: Job | null = null;
+
+  function renderError(msg: string) {
+    out.innerHTML = `<div class="letter__loading">${msg}</div>`;
+  }
+
+  function escape(s: string): string {
+    return s.replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]!));
+  }
+
+  function formatDate(d: Date): string {
+    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
+  function pickToneForAngle(angleId: string | undefined): Tone {
+    if (!angleId) return 'design';
+    if (/ai-product-designer|design-engineer|product-designer/.test(angleId)) return 'design';
+    if (/ux-engineer|frontend-ux-engineer|design-systems-engineer/.test(angleId)) return 'technical';
+    if (/senior-product-designer|web-experience-manager|ux-product-lead/.test(angleId)) return 'senior';
+    return 'design';
+  }
+
+  function paragraphsFromText(text: string): string[] {
+    return text.split(/\n{2,}/).map(p => p.trim()).filter(Boolean);
+  }
+
+  function renderLetter() {
+    if (!job) return;
+    const tone = (toneSel.value as Tone) || pickToneForAngle(job.resumeAngle);
+    const text = generateCoverLetter({
+      angleId: job.resumeAngle ?? 'product-designer',
+      company: job.company || '(company)',
+      role: job.role || '(role)',
+      recruiterFirstName: recruiterInput.value.trim() || undefined,
+      jobUrl: job.url,
+      jdText: job.jdText,
+      customLine: hookInput.value.trim() || undefined,
+    }, tone);
+
+    if (!text) {
+      renderError('Could not generate letter for this angle.');
+      return;
+    }
+
+    const paras = paragraphsFromText(text);
+    // Convention: first para is the greeting, last is the sign-off,
+    // everything between is the body.
+    const greeting = paras[0] ?? `Hi ${recruiterInput.value.trim() || 'there'},`;
+    const signoff = paras[paras.length - 1] ?? `— ${identity.name}`;
+    const body = paras.slice(1, -1);
+
+    const sitePretty = identity.site.replace(/^https?:\/\//, '');
+    const linkedinPretty = identity.linkedin.replace(/^https?:\/\//, '');
+    const githubPretty = identity.github.replace(/^https?:\/\//, '');
+
+    out.innerHTML = `
+      <header class="letter__head">
+        <h1 class="letter__name">${escape(identity.fullName)}</h1>
+        <div class="letter__contact">
+          <div>${escape(identity.location)}</div>
+          <div><a href="mailto:${escape(identity.email)}">${escape(identity.email)}</a></div>
+          <div><a href="${escape(identity.site)}">${escape(sitePretty)}</a></div>
+          <div><a href="${escape(identity.linkedin)}">${escape(linkedinPretty)}</a></div>
+          <div><a href="${escape(identity.github)}">${escape(githubPretty)}</a></div>
+        </div>
+      </header>
+
+      <div class="letter__meta">
+        <div>
+          <div class="letter__meta-label">Date</div>
+          ${escape(formatDate(new Date()))}
+        </div>
+        <div style="text-align:right;">
+          <div class="letter__meta-label">Re</div>
+          ${escape(job.role || '')} · ${escape(job.company || '')}
+        </div>
+      </div>
+
+      <p class="letter__greeting">${escape(greeting)}</p>
+      <div class="letter__body">
+        ${body.map(p => `<p>${escape(p)}</p>`).join('')}
+      </div>
+      <div class="letter__sign">${escape(signoff)}</div>
+    `;
+
+    foot.hidden = false;
+  }
+
+  function getLetterPlainText(): string {
+    if (!job) return '';
+    const tone = (toneSel.value as Tone) || pickToneForAngle(job.resumeAngle);
+    return generateCoverLetter({
+      angleId: job.resumeAngle ?? 'product-designer',
+      company: job.company || '',
+      role: job.role || '',
+      recruiterFirstName: recruiterInput.value.trim() || undefined,
+      jobUrl: job.url,
+      jdText: job.jdText,
+      customLine: hookInput.value.trim() || undefined,
+    }, tone);
+  }
+
+  function toast(msg: string) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('is-visible');
+    setTimeout(() => toastEl.classList.remove('is-visible'), 1500);
+  }
+
+  // ── Init ───────────────────────────────────────────────────────────
+  if (!jobId) {
+    renderError('No job id in URL. Open a letter from /today.');
+  } else {
+    job = jobsStore.get(jobId) ?? null;
+    if (!job) {
+      renderError(`No job found with id ${jobId}.`);
+    } else {
+      // Set initial tone based on the angle, or honor ?tone= override.
+      const initial = ['direct', 'warm', 'design', 'technical', 'senior'].includes(initialTone)
+        ? (initialTone as Tone)
+        : pickToneForAngle(job.resumeAngle);
+      toneSel.value = initial;
+      renderLetter();
+      // Update document title.
+      document.title = `Cover letter — ${job.company || job.role || 'job'} · Qadan`;
+    }
+  }
+
+  // ── Reactive editing ──────────────────────────────────────────────
+  toneSel.addEventListener('change', renderLetter);
+  recruiterInput.addEventListener('input', renderLetter);
+  hookInput.addEventListener('input', renderLetter);
+
+  // ── Actions ───────────────────────────────────────────────────────
+  $('print-btn').addEventListener('click', () => window.print());
+  $('copy-btn').addEventListener('click', async () => {
+    const text = getLetterPlainText();
+    if (!text) {
+      toast('Nothing to copy yet.');
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      toast('Letter copied');
+    } catch {
+      // Fallback
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      toast('Letter copied');
+    }
+  });
+</script>

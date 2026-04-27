@@ -16,13 +16,15 @@ import Admin from '@/layouts/Admin.astro';
       <div class="today__hints" aria-label="keyboard shortcuts">
         <kbd>j</kbd><kbd>k</kbd> navigate
         <span class="today__hint-sep">·</span>
-        <kbd>r</kbd> copy resume
+        <kbd>r</kbd> resume
         <span class="today__hint-sep">·</span>
-        <kbd>l</kbd> copy letter
+        <kbd>l</kbd> letter
         <span class="today__hint-sep">·</span>
         <kbd>space</kbd> open
         <span class="today__hint-sep">·</span>
         <kbd>a</kbd> apply
+        <span class="today__hint-sep">·</span>
+        <kbd>e</kbd> edit
         <span class="today__hint-sep">·</span>
         <kbd>d</kbd> defer
       </div>
@@ -257,6 +259,36 @@ import Admin from '@/layouts/Admin.astro';
     margin-bottom: 14px;
   }
   .today__detail :global(.detail__angle strong) { color: var(--c-text); font-weight: 500; }
+  .today__detail :global(.detail__angle a) { color: var(--c-accent); text-decoration: underline; text-decoration-color: var(--c-border); text-underline-offset: 2px; }
+  .today__detail :global(.detail__angle a:hover) { text-decoration-color: var(--c-accent); }
+
+  .today__detail :global(.detail__facts) {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 8px 14px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+    background: var(--c-bg);
+    border: 1px solid var(--c-border-subtle);
+    border-radius: var(--r-md);
+    font-size: 12px;
+  }
+  .today__detail :global(.detail__fact) { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .today__detail :global(.detail__fact-label) {
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--c-text-subtle);
+  }
+  .today__detail :global(.detail__fact-value) {
+    color: var(--c-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .today__detail :global(.detail__fact-value a) { color: var(--c-accent); text-decoration: none; }
+  .today__detail :global(.detail__fact-value a:hover) { text-decoration: underline; }
 
   .today__detail :global(.detail__actions) {
     display: grid;
@@ -278,8 +310,10 @@ import Admin from '@/layouts/Admin.astro';
     cursor: pointer;
     text-align: left;
     font-family: inherit;
+    text-decoration: none;
   }
   .today__detail :global(.detail__action:hover) { border-color: var(--c-accent); color: var(--c-accent); }
+  .today__detail :global(.detail__action[disabled]) { opacity: 0.5; cursor: not-allowed; }
   .today__detail :global(.detail__action--primary) {
     background: var(--c-accent);
     color: var(--c-bg);
@@ -300,6 +334,70 @@ import Admin from '@/layouts/Admin.astro';
     opacity: 0.7;
   }
   .today__detail :global(.detail__action--primary kbd) { background: rgba(0,0,0,0.3); border-color: rgba(0,0,0,0.4); color: var(--c-bg); }
+  .today__detail :global(.detail__action .hint) { color: var(--c-text-subtle); font-size: 11px; }
+
+  .today__detail :global(.detail__section-h) {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--c-text-subtle);
+    margin: 16px 0 8px;
+  }
+
+  /* Status transitions row */
+  .today__detail :global(.detail__transitions) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .today__detail :global(.detail__transition) {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    padding: 5px 10px;
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-full);
+    background: var(--c-bg);
+    color: var(--c-text-muted);
+    cursor: pointer;
+    line-height: 1;
+  }
+  .today__detail :global(.detail__transition:hover) { border-color: var(--c-accent); color: var(--c-accent); }
+  .today__detail :global(.detail__transition--danger:hover) { border-color: #F87171; color: #F87171; }
+
+  /* Inline edit form for company/role */
+  .today__detail :global(.detail__edit) {
+    display: grid;
+    gap: 8px;
+    padding: 12px;
+    margin-bottom: 14px;
+    background: var(--c-bg);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+  }
+  .today__detail :global(.detail__edit .row) { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .today__detail :global(.detail__edit label) { display: flex; flex-direction: column; gap: 4px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--c-text-subtle); }
+  .today__detail :global(.detail__edit input) { font-family: inherit; font-size: 13px; padding: 7px 10px; border: 1px solid var(--c-border); border-radius: 6px; background: var(--c-bg-elev); color: var(--c-text); }
+  .today__detail :global(.detail__edit input:focus) { outline: none; border-color: var(--c-accent); }
+  .today__detail :global(.detail__edit-actions) { display: flex; gap: 8px; justify-content: flex-end; }
+
+  .today__detail :global(.detail__jd) {
+    margin-top: 4px;
+    padding: 10px 12px;
+    background: var(--c-bg);
+    border: 1px solid var(--c-border-subtle);
+    border-radius: var(--r-md);
+    font-size: 11.5px;
+    line-height: 1.55;
+    color: var(--c-text-muted);
+    max-height: 220px;
+    overflow: auto;
+    white-space: pre-wrap;
+    font-family: var(--font-mono);
+  }
+  .today__detail :global(.detail__jd-toggle) { cursor: pointer; color: var(--c-text-muted); font-size: 12px; }
+  .today__detail :global(.detail__jd-toggle:hover) { color: var(--c-accent); }
 
   .today__toast {
     position: fixed;
@@ -329,9 +427,6 @@ import Admin from '@/layouts/Admin.astro';
 
 <script>
   import { jobsStore, type Job, type JobStatus } from '@/lib/storage';
-  import { scoreOpportunity } from '@/lib/scoring';
-  import { buildResume, resumeToText } from '@/lib/engine';
-  import { generateCoverLetter, type Tone } from '@/lib/letters';
   import { angleById } from '@/data/angles';
 
   // ── State ────────────────────────────────────────────────────────────
@@ -434,12 +529,21 @@ import Admin from '@/layouts/Admin.astro';
     if (sel) sel.scrollIntoView({ block: 'nearest' });
   }
 
-  function pickToneForAngle(angleId: string | undefined): Tone {
-    if (!angleId) return 'direct';
-    if (/ai-product-designer|design-engineer|product-designer/.test(angleId)) return 'design';
-    if (/ux-engineer|frontend-ux-engineer|design-systems-engineer/.test(angleId)) return 'technical';
-    if (/senior-product-designer|web-experience-manager|ux-product-lead/.test(angleId)) return 'senior';
-    return 'direct';
+  // Track which jobs the user has expanded the JD on or is currently editing.
+  const expandedJDIds = new Set<string>();
+  const editingIds = new Set<string>();
+
+  function formatSalary(min?: number, max?: number): string | undefined {
+    const fmt = (n: number) => n >= 1000 ? `$${Math.round(n / 1000)}k` : `$${n}`;
+    if (min && max && min !== max) return `${fmt(min)}–${fmt(max)}`;
+    if (min) return fmt(min);
+    if (max) return fmt(max);
+    return undefined;
+  }
+
+  function shortHost(url: string): string {
+    try { return new URL(url).hostname.replace(/^www\./, ''); }
+    catch { return url; }
   }
 
   function renderDetail() {
@@ -452,24 +556,58 @@ import Admin from '@/layouts/Admin.astro';
     const angle = angleById(angleId);
     const angleLabel = angle?.label ?? angleId;
 
-    // Re-score from jdText if available, else show stored score
-    let breakdownHtml = '';
-    if (job.jdText) {
-      try {
-        // Re-run scoring is heavy. Use stored fitScore for now; show jdText link only.
-      } catch {}
-    }
-
     const co = escape(job.company ?? '(no company)');
     const role = escape(job.role ?? '');
-    const score = job.fitScore != null ? Math.round(job.fitScore) : '—';
+    const score = job.fitScore != null ? Math.round(job.fitScore) : 'n/a';
     const conf = job.priority === 1 ? 'high confidence' : job.priority === 2 ? 'medium' : 'low';
     const url = job.url ?? '';
-    const urlBtn = url
-      ? `<button class="detail__action" data-act="open" type="button"><span>Open job <span class="hint">↗</span></span><kbd>space</kbd></button>`
-      : `<button class="detail__action" type="button" disabled style="opacity:0.5; cursor:not-allowed;"><span>Open job <span class="hint">(no URL)</span></span></button>`;
+    const pri = job.priority ? `P${job.priority}` : 'no priority';
 
-    const pri = job.priority ? `P${job.priority}` : '—';
+    // ── Facts row ────────────────────────────────────────────────────
+    const salary = formatSalary(job.salaryMin, job.salaryMax);
+    const facts: string[] = [];
+    if (job.location) facts.push(factCell('Location', escape(job.location)));
+    if (salary) facts.push(factCell('Salary', escape(salary)));
+    if (job.source) facts.push(factCell('Source', escape(job.source)));
+    if (url) facts.push(factCell('Link', `<a href="${escape(url)}" target="_blank" rel="noopener noreferrer">${escape(shortHost(url))} ↗</a>`));
+    if (job.dateFound) {
+      const days = Math.floor((Date.now() - job.dateFound) / 86_400_000);
+      facts.push(factCell('Found', days === 0 ? 'today' : days === 1 ? 'yesterday' : `${days}d ago`));
+    }
+    const factsHtml = facts.length
+      ? `<div class="detail__facts">${facts.join('')}</div>`
+      : '';
+
+    // ── Inline edit form (toggled by 'e' / button) ─────────────────
+    const isEditing = editingIds.has(job.id);
+    const editHtml = isEditing
+      ? `<div class="detail__edit">
+          <div class="row">
+            <label>Company<input data-edit="company" value="${escape(job.company ?? '')}" /></label>
+            <label>Role<input data-edit="role" value="${escape(job.role ?? '')}" /></label>
+          </div>
+          <div class="row">
+            <label>Location<input data-edit="location" value="${escape(job.location ?? '')}" /></label>
+            <label>URL<input data-edit="url" type="url" value="${escape(job.url ?? '')}" /></label>
+          </div>
+          <div class="detail__edit-actions">
+            <button class="detail__transition" data-act="edit-cancel" type="button">Cancel</button>
+            <button class="detail__transition" data-act="edit-save" type="button" style="background:var(--c-accent); color:var(--c-bg); border-color:var(--c-accent);">Save</button>
+          </div>
+        </div>`
+      : '';
+
+    // ── Action buttons ──────────────────────────────────────────────
+    const urlBtn = url
+      ? `<button class="detail__action" data-act="open" type="button"><span>Open posting <span class="hint">↗</span></span><kbd>space</kbd></button>`
+      : `<button class="detail__action" type="button" disabled><span>Open posting <span class="hint">no URL</span></span></button>`;
+
+    const editBtn = isEditing
+      ? ''
+      : `<button class="detail__action" data-act="edit" type="button"><span>Edit details</span><kbd>e</kbd></button>`;
+
+    // ── JD excerpt ──────────────────────────────────────────────────
+    const jdHtml = renderJDExcerpt(job);
 
     detailEl.innerHTML = `
       <div class="detail__head">
@@ -479,29 +617,77 @@ import Admin from '@/layouts/Admin.astro';
         </div>
         <div class="detail__score-block">
           <span class="detail__score">${score}</span>
-          <span class="detail__score-meta">${pri}<br>${conf}</span>
+          <span class="detail__score-meta">${escape(pri)}<br>${escape(conf)}</span>
         </div>
       </div>
 
-      <p class="detail__angle">Recommended angle: <strong>${escape(angleLabel)}</strong></p>
+      ${factsHtml}
+
+      <p class="detail__angle">Resume angle: <a href="/resume/${escape(angleId)}" target="_blank" rel="noopener"><strong>${escape(angleLabel)}</strong> ↗</a></p>
+
+      ${editHtml}
 
       <div class="detail__actions">
-        <button class="detail__action" data-act="resume" type="button"><span>Copy resume</span><kbd>r</kbd></button>
-        <button class="detail__action" data-act="letter" type="button"><span>Copy cover letter</span><kbd>l</kbd></button>
+        <a class="detail__action" href="/resume/${escape(angleId)}" target="_blank" rel="noopener"><span>Open resume <span class="hint">↗</span></span><kbd>r</kbd></a>
+        <a class="detail__action" href="/letter/?id=${encodeURIComponent(job.id)}" target="_blank" rel="noopener"><span>Open cover letter <span class="hint">↗</span></span><kbd>l</kbd></a>
         ${urlBtn}
+        ${editBtn}
         <button class="detail__action" data-act="defer" type="button"><span>${state.deferredIds.has(job.id) ? 'Undefer' : 'Defer'}</span><kbd>d</kbd></button>
         <button class="detail__action detail__action--primary" data-act="apply" type="button"><span>Mark applied</span><kbd>a</kbd></button>
       </div>
 
-      ${job.jdText ? `<details><summary class="detail__angle" style="cursor:pointer;">Show JD text</summary><pre style="margin-top:8px; padding:10px; background:var(--c-bg-muted); border-radius:6px; font-size:11px; line-height:1.5; white-space:pre-wrap; max-height:240px; overflow:auto; font-family:var(--font-mono);">${escape(job.jdText.slice(0, 4000))}</pre></details>` : ''}
+      <h3 class="detail__section-h">Move to status</h3>
+      <div class="detail__transitions">
+        <button class="detail__transition" data-status="Applying" type="button">Applying</button>
+        <button class="detail__transition" data-status="Recruiter Screen" type="button">Recruiter screen</button>
+        <button class="detail__transition" data-status="Hiring Manager" type="button">Hiring manager</button>
+        <button class="detail__transition" data-status="Interview Loop" type="button">Interview loop</button>
+        <button class="detail__transition" data-status="Take-home" type="button">Take-home</button>
+        <button class="detail__transition detail__transition--danger" data-status="Rejected" type="button">Rejected</button>
+        <button class="detail__transition detail__transition--danger" data-status="Archived" type="button">Archive</button>
+      </div>
+
+      ${jdHtml}
     `;
 
+    // Wire up dynamic actions
     detailEl.querySelectorAll<HTMLButtonElement>('[data-act]').forEach(btn => {
       btn.addEventListener('click', () => {
         const act = btn.dataset.act!;
         runAction(act);
       });
     });
+    detailEl.querySelectorAll<HTMLButtonElement>('[data-status]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const status = btn.dataset.status as JobStatus;
+        moveToStatus(status);
+      });
+    });
+    const jdToggle = detailEl.querySelector<HTMLElement>('.detail__jd-toggle');
+    if (jdToggle) {
+      jdToggle.addEventListener('click', () => {
+        if (expandedJDIds.has(job.id)) expandedJDIds.delete(job.id);
+        else expandedJDIds.add(job.id);
+        renderDetail();
+      });
+    }
+  }
+
+  function factCell(label: string, value: string): string {
+    return `<div class="detail__fact"><span class="detail__fact-label">${escape(label)}</span><span class="detail__fact-value" title="${value.replace(/"/g, '&quot;')}">${value}</span></div>`;
+  }
+
+  function renderJDExcerpt(job: Job): string {
+    if (!job.jdText) return '';
+    const expanded = expandedJDIds.has(job.id);
+    const text = job.jdText.trim();
+    const preview = text.length > 320 ? text.slice(0, 320).trim() + '…' : text;
+    if (expanded) {
+      return `<h3 class="detail__section-h">Job description <span class="detail__jd-toggle" style="float:right; font-weight:normal; text-transform:none; letter-spacing:0;">collapse</span></h3>
+        <pre class="detail__jd">${escape(text.slice(0, 6000))}</pre>`;
+    }
+    return `<h3 class="detail__section-h">Job description <span class="detail__jd-toggle" style="float:right; font-weight:normal; text-transform:none; letter-spacing:0;">expand</span></h3>
+      <p style="font-size:12px; color:var(--c-text-muted); line-height:1.55; margin:0;">${escape(preview)}</p>`;
   }
 
   // ── Actions ──────────────────────────────────────────────────────────
@@ -520,54 +706,17 @@ import Admin from '@/layouts/Admin.astro';
     select(next);
   }
 
-  async function writeClipboard(text: string): Promise<boolean> {
-    try {
-      await navigator.clipboard.writeText(text);
-      return true;
-    } catch {
-      // Fallback for older browsers / contexts without permission: hidden textarea + execCommand
-      try {
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        ta.setAttribute('readonly', '');
-        ta.style.position = 'fixed';
-        ta.style.left = '-9999px';
-        document.body.appendChild(ta);
-        ta.select();
-        const ok = document.execCommand('copy');
-        document.body.removeChild(ta);
-        return ok;
-      } catch {
-        return false;
-      }
-    }
-  }
-
-  async function copyResume() {
+  function openResume() {
     const job = state.queue[state.selectedIdx];
     if (!job) return;
     const angleId = job.resumeAngle ?? 'product-designer';
-    const resume = buildResume(angleId);
-    if (!resume) { toast('No resume for this angle.'); return; }
-    const text = resumeToText(resume);
-    const ok = await writeClipboard(text);
-    toast(ok ? 'Resume copied' : 'Copy blocked — focus the page first');
+    window.open(`/resume/${encodeURIComponent(angleId)}`, '_blank', 'noopener');
   }
 
-  async function copyLetter() {
+  function openLetter() {
     const job = state.queue[state.selectedIdx];
     if (!job) return;
-    const angleId = job.resumeAngle ?? 'product-designer';
-    const tone = pickToneForAngle(angleId);
-    const letter = generateCoverLetter({
-      angleId,
-      company: job.company ?? '',
-      role: job.role ?? '',
-      jobUrl: job.url,
-    }, tone);
-    if (!letter) { toast('No letter template for this angle.'); return; }
-    const ok = await writeClipboard(letter);
-    toast(ok ? 'Cover letter copied' : 'Copy blocked — focus the page first');
+    window.open(`/letter/?id=${encodeURIComponent(job.id)}`, '_blank', 'noopener');
   }
 
   function openJob() {
@@ -579,21 +728,27 @@ import Admin from '@/layouts/Admin.astro';
   function markApplied() {
     const job = state.queue[state.selectedIdx];
     if (!job) return;
+    moveToStatus('Applied' as JobStatus);
+  }
+
+  function moveToStatus(status: JobStatus) {
+    const job = state.queue[state.selectedIdx];
+    if (!job) return;
     const updated: Job = {
       ...job,
-      status: 'Applied' as JobStatus,
-      dateApplied: Date.now(),
+      status,
+      ...(status === 'Applied' ? { dateApplied: Date.now() } : {}),
       updatedAt: Date.now(),
     };
     jobsStore.upsert(updated);
-    state.deferredIds.delete(job.id); // applied jobs no longer deferred
+    state.deferredIds.delete(job.id);
     const prevIdx = state.selectedIdx;
     loadQueue();
     state.selectedIdx = Math.min(prevIdx, state.queue.length - 1);
     renderHeader();
     renderQueue();
     renderDetail();
-    toast(`Applied: ${job.company ?? job.role ?? 'job'}`);
+    toast(`Moved to ${status}: ${job.company ?? job.role ?? 'job'}`);
   }
 
   function toggleDefer() {
@@ -608,13 +763,57 @@ import Admin from '@/layouts/Admin.astro';
     renderDetail();
   }
 
+  function startEdit() {
+    const job = state.queue[state.selectedIdx];
+    if (!job) return;
+    editingIds.add(job.id);
+    renderDetail();
+    // Focus the company input
+    requestAnimationFrame(() => {
+      const input = detailEl.querySelector<HTMLInputElement>('input[data-edit="company"]');
+      input?.focus();
+      input?.select();
+    });
+  }
+
+  function cancelEdit() {
+    const job = state.queue[state.selectedIdx];
+    if (!job) return;
+    editingIds.delete(job.id);
+    renderDetail();
+  }
+
+  function saveEdit() {
+    const job = state.queue[state.selectedIdx];
+    if (!job) return;
+    const get = (field: string): string =>
+      (detailEl.querySelector<HTMLInputElement>(`input[data-edit="${field}"]`)?.value ?? '').trim();
+    const updated: Job = {
+      ...job,
+      company: get('company') || job.company,
+      role: get('role') || job.role,
+      location: get('location') || undefined,
+      url: get('url') || undefined,
+      updatedAt: Date.now(),
+    };
+    jobsStore.upsert(updated);
+    editingIds.delete(job.id);
+    loadQueue();
+    renderQueue();
+    renderDetail();
+    toast('Saved');
+  }
+
   function runAction(act: string) {
     switch (act) {
-      case 'resume': copyResume(); break;
-      case 'letter': copyLetter(); break;
+      case 'resume': openResume(); break;
+      case 'letter': openLetter(); break;
       case 'open': openJob(); break;
       case 'apply': markApplied(); break;
       case 'defer': toggleDefer(); break;
+      case 'edit': startEdit(); break;
+      case 'edit-cancel': cancelEdit(); break;
+      case 'edit-save': saveEdit(); break;
     }
   }
 
@@ -647,13 +846,15 @@ import Admin from '@/layouts/Admin.astro';
       case ' ':
         e.preventDefault(); openJob(); break;
       case 'r':
-        e.preventDefault(); copyResume(); break;
+        e.preventDefault(); openResume(); break;
       case 'l':
-        e.preventDefault(); copyLetter(); break;
+        e.preventDefault(); openLetter(); break;
       case 'a':
         e.preventDefault(); markApplied(); break;
       case 'd':
         e.preventDefault(); toggleDefer(); break;
+      case 'e':
+        e.preventDefault(); startEdit(); break;
     }
   });
 

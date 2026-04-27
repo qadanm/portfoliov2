@@ -1,0 +1,17 @@
+# Cloudflare Pages config. Used by `wrangler pages dev` for local testing
+# of Pages Functions and by Cloudflare Pages at deploy time.
+#
+# In production: bind a KV namespace named "KV" via the Pages dashboard
+# (Settings → Functions → KV namespace bindings → Variable name: KV).
+# This file declares the same binding for local dev so `wrangler pages dev`
+# spins up an in-memory KV that the /api/sync function can read/write.
+name = "qadan-admin"
+compatibility_date = "2025-04-01"
+pages_build_output_dir = "dist"
+
+# Local-only KV binding. Wrangler creates an in-memory KV when `--local`
+# (the default for `wrangler pages dev`). Production uses the dashboard
+# binding and ignores this id.
+[[kv_namespaces]]
+binding = "KV"
+id = "00000000000000000000000000000000"

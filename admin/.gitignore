@@ -3,6 +3,9 @@ dist/
 .astro/
 node_modules/
 
+# Local wrangler dev state (in-memory KV cache, dev session)
+.wrangler/
+
 # Local data — never commit
 .env
 .env.local
