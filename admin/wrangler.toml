@@ -1,17 +1,21 @@
 # Cloudflare Pages config. Used by `wrangler pages dev` for local testing
 # of Pages Functions and by Cloudflare Pages at deploy time.
 #
-# In production: bind a KV namespace named "KV" via the Pages dashboard
-# (Settings → Functions → KV namespace bindings → Variable name: KV).
-# This file declares the same binding for local dev so `wrangler pages dev`
-# spins up an in-memory KV that the /api/sync function can read/write.
+# KV BINDING — production:
+#   Bind a KV namespace named "KV" via the Pages dashboard:
+#     Settings → Functions → KV namespace bindings → Variable name: KV
+#   This is the only place the production binding is configured. Earlier
+#   versions of this file declared a placeholder `[[kv_namespaces]] id = "00..."`
+#   block here as well, but Cloudflare's deploy step now validates kv_namespaces
+#   ids strictly, so the placeholder caused every Function publish to fail with
+#   "KV namespace '00..00' not found" — even though the dashboard binding was
+#   set. Keep the binding in the dashboard only.
+#
+# KV BINDING — local dev:
+#   `wrangler pages dev dist --kv KV` spins up an in-memory KV that the
+#   /api/sync function can read/write without needing a real namespace.
+#   Or just use `npm run dev` — the function isn't reachable in pure astro
+#   dev, but the rest of the admin works fine without it.
 name = "qadan-admin"
 compatibility_date = "2025-04-01"
 pages_build_output_dir = "dist"
-
-# Local-only KV binding. Wrangler creates an in-memory KV when `--local`
-# (the default for `wrangler pages dev`). Production uses the dashboard
-# binding and ignores this id.
-[[kv_namespaces]]
-binding = "KV"
-id = "00000000000000000000000000000000"
