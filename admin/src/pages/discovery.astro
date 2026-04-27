@@ -1,0 +1,1524 @@
+---
+import Admin from '@/layouts/Admin.astro';
+---
+
+<Admin title="Discovery">
+  <div class="disc">
+    <!-- ── Top control bar ──────────────────────────────────────────── -->
+    <header class="disc__bar" id="disc-bar">
+      <div class="disc__counts">
+        <button type="button" class="disc__count" data-tab="new" aria-pressed="true">
+          <strong id="disc-count-new">0</strong>
+          <span>To decide</span>
+        </button>
+        <button type="button" class="disc__count" data-tab="saved" aria-pressed="false">
+          <strong id="disc-count-saved">0</strong>
+          <span>Later</span>
+        </button>
+        <button type="button" class="disc__count" data-tab="queued" aria-pressed="false">
+          <strong id="disc-count-queued">0</strong>
+          <span>Queued</span>
+        </button>
+        <button type="button" class="disc__count" data-tab="dismissed" aria-pressed="false">
+          <strong id="disc-count-dismissed">0</strong>
+          <span>Passed</span>
+        </button>
+      </div>
+
+      <div class="disc__bar-actions">
+        <button type="button" class="disc__btn disc__btn--primary" id="disc-run">
+          <span>Run discovery</span>
+          <kbd>R</kbd>
+        </button>
+        <button type="button" class="disc__btn" id="disc-batch-queue" title="Add every new job at or above the auto-queue threshold to /today">
+          Auto-queue 75+
+        </button>
+        <button type="button" class="disc__btn disc__btn--quiet" id="disc-batch-dismiss" title="Pass on every new job below the score floor">
+          Pass &lt;50
+        </button>
+        <button type="button" class="disc__btn disc__btn--ghost" id="disc-paste-toggle" title="Paste an email-alert dump">
+          Paste alerts
+        </button>
+        <button type="button" class="disc__btn disc__btn--ghost" id="disc-sources-toggle" title="Source configuration">
+          Sources
+        </button>
+      </div>
+
+      <div class="disc__hints" aria-label="keyboard shortcuts">
+        <kbd>j</kbd><kbd>k</kbd> nav
+        <span>·</span>
+        <kbd>↵</kbd> focus
+        <span>·</span>
+        <kbd>T</kbd> today
+        <span>·</span>
+        <kbd>S</kbd> later
+        <span>·</span>
+        <kbd>O</kbd> open
+        <span>·</span>
+        <kbd>X</kbd> pass
+        <span>·</span>
+        <kbd>⌘Z</kbd> undo
+      </div>
+    </header>
+
+    <!-- ── Run/state strip ──────────────────────────────────────────── -->
+    <div class="disc__status" id="disc-status" aria-live="polite"></div>
+
+    <!-- ── Optional panels (toggleable) ─────────────────────────────── -->
+    <section class="disc__panel" id="disc-paste-panel" hidden>
+      <h3 class="disc__panel-h">Paste alerts</h3>
+      <p class="disc__panel-help">
+        Drop in a block of email text. URLs and surrounding titles/companies get parsed and scored.
+      </p>
+      <textarea id="disc-paste-text" rows="6" placeholder="Paste LinkedIn / Built In / Indeed alert content here…"></textarea>
+      <div class="disc__panel-actions">
+        <button type="button" class="disc__btn disc__btn--primary" id="disc-paste-submit">Import</button>
+        <button type="button" class="disc__btn disc__btn--ghost" id="disc-paste-cancel">Cancel</button>
+      </div>
+    </section>
+
+    <section class="disc__panel" id="disc-sources-panel" hidden>
+      <h3 class="disc__panel-h">Sources</h3>
+      <ul class="disc__sources" id="disc-sources-list"></ul>
+      <div class="disc__panel-help">
+        Add a Greenhouse or Lever public board by company slug to watch a specific company.
+      </div>
+      <div class="disc__panel-add">
+        <select id="disc-add-type">
+          <option value="greenhouse">Greenhouse board</option>
+          <option value="lever">Lever postings</option>
+        </select>
+        <input id="disc-add-slug" type="text" placeholder="company-slug (e.g. anthropic)" />
+        <button type="button" class="disc__btn" id="disc-add-source">Add</button>
+      </div>
+    </section>
+
+    <!-- ── Two-pane layout: list + focus ────────────────────────────── -->
+    <div class="disc__split">
+      <ol class="disc__list" id="disc-list" aria-label="Discovered jobs"></ol>
+      <aside class="disc__focus" id="disc-focus" aria-live="polite">
+        <p class="disc__empty">
+          No selection. Press <kbd>↵</kbd> on a row to inspect, or <kbd>j</kbd>/<kbd>k</kbd> to navigate.
+        </p>
+      </aside>
+    </div>
+
+    <div class="disc__toast" id="disc-toast" role="status" aria-live="polite"></div>
+  </div>
+</Admin>
+
+<style>
+  .disc {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    height: calc(100vh - 180px);
+    min-height: 480px;
+  }
+
+  .disc__bar {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      'counts actions'
+      'hints  hints';
+    align-items: center;
+    column-gap: 18px;
+    row-gap: 10px;
+    padding: 10px 14px;
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    background: var(--c-bg-elev);
+  }
+
+  @media (max-width: 900px) {
+    .disc__bar {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        'counts'
+        'actions'
+        'hints';
+    }
+  }
+
+  .disc__counts {
+    grid-area: counts;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .disc__count {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: var(--r-full);
+    border: 1px solid var(--c-border);
+    background: var(--c-bg);
+    color: var(--c-text-muted);
+    font: inherit;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .disc__count:hover { border-color: var(--c-accent); color: var(--c-text); }
+  .disc__count[aria-pressed="true"] {
+    border-color: var(--c-accent);
+    background: var(--c-accent-dim);
+    color: var(--c-text);
+  }
+  .disc__count strong {
+    font-family: var(--font-display);
+    font-size: 18px;
+    color: var(--c-text);
+  }
+  .disc__count span {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--c-text-subtle);
+  }
+
+  .disc__bar-actions {
+    grid-area: actions;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .disc__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    background: var(--c-bg-muted);
+    color: var(--c-text);
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    line-height: 1.2;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .disc__btn:hover { border-color: var(--c-accent); color: var(--c-accent); }
+  .disc__btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .disc__btn--primary {
+    background: var(--c-accent);
+    color: var(--c-bg);
+    border-color: var(--c-accent);
+    font-weight: 500;
+  }
+  .disc__btn--primary:hover { color: var(--c-bg); filter: brightness(1.08); }
+  .disc__btn--ghost { background: transparent; }
+  .disc__btn--quiet { color: var(--c-text-subtle); }
+
+  .disc__btn kbd {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    background: rgba(0,0,0,0.2);
+    color: inherit;
+    opacity: 0.8;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .disc__btn--primary kbd { background: rgba(0,0,0,0.25); border-color: rgba(0,0,0,0.3); }
+
+  .disc__hints {
+    grid-area: hints;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--c-text-subtle);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .disc__hints span { opacity: 0.5; }
+  .disc__hints kbd, .disc__bar kbd, .disc__focus kbd, .disc__empty kbd {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    border: 1px solid var(--c-border);
+    background: var(--c-bg-muted);
+    color: var(--c-text);
+    line-height: 1.4;
+  }
+
+  .disc__status {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--c-text-subtle);
+    padding: 0 4px;
+    min-height: 16px;
+  }
+  .disc__status .ok { color: var(--c-text); }
+  .disc__status .err { color: #F87171; }
+
+  .disc__panel {
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    background: var(--c-bg-elev);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  /* Class display:flex would otherwise win over the hidden attribute. */
+  .disc__panel[hidden] { display: none; }
+  .disc__panel-h {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 16px;
+  }
+  .disc__panel-help {
+    font-size: 12px;
+    color: var(--c-text-subtle);
+    line-height: 1.5;
+  }
+  .disc__panel textarea {
+    width: 100%;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 10px 12px;
+    border-radius: var(--r-md);
+    border: 1px solid var(--c-border);
+    background: var(--c-bg);
+    color: var(--c-text);
+    resize: vertical;
+    min-height: 120px;
+  }
+  .disc__panel textarea:focus { outline: none; border-color: var(--c-accent); }
+  .disc__panel-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+
+  .disc__sources {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+  }
+  .disc__sources li {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 10px;
+    align-items: center;
+    padding: 8px 10px;
+    border: 1px solid var(--c-border-subtle);
+    border-radius: var(--r-md);
+    background: var(--c-bg);
+  }
+  .disc__sources .src-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .disc__sources .src-name { font-size: 13px; color: var(--c-text); }
+  .disc__sources .src-meta {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--c-text-subtle);
+  }
+  .disc__sources .src-meta .err { color: #F87171; }
+  .disc__sources button.src-toggle {
+    font: inherit;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: var(--r-full);
+    border: 1px solid var(--c-border);
+    background: var(--c-bg-muted);
+    color: var(--c-text);
+    cursor: pointer;
+  }
+  .disc__sources button.src-toggle.is-on {
+    background: var(--c-accent-dim);
+    border-color: var(--c-accent);
+    color: var(--c-accent);
+  }
+  .disc__sources button.src-remove {
+    font: inherit;
+    font-size: 11px;
+    padding: 4px 8px;
+    border: none;
+    background: transparent;
+    color: var(--c-text-subtle);
+    cursor: pointer;
+  }
+  .disc__sources button.src-remove:hover { color: #F87171; }
+
+  .disc__panel-add {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 8px;
+    align-items: center;
+  }
+  .disc__panel-add select,
+  .disc__panel-add input {
+    font: inherit;
+    font-size: 13px;
+    padding: 7px 10px;
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    background: var(--c-bg);
+    color: var(--c-text);
+  }
+
+  /* ── List + focus split ─────────────────────────────────────────── */
+  .disc__split {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    gap: 12px;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  /* On phone the split collapses; focus mode renders as a fullscreen
+     overlay instead of taking column space. */
+  @media (max-width: 900px) {
+    .disc__split { grid-template-columns: 1fr; }
+    .disc__focus {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      border: none;
+      border-radius: 0;
+      padding: 18px 16px 24px;
+      transform: translateY(100%);
+      transition: transform 0.22s ease;
+      background: var(--c-bg);
+      overflow-y: auto;
+    }
+    .disc__focus.is-open { transform: translateY(0); }
+  }
+
+  .disc__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    background: var(--c-bg-elev);
+    /* Lock the list height at the viewport so internal scroll feels native. */
+    max-height: 100%;
+  }
+  .disc__list:empty::after {
+    content: 'No jobs in this view. Run discovery, paste alerts, or switch tabs.';
+    display: block;
+    padding: 24px;
+    color: var(--c-text-subtle);
+    font-size: 13px;
+    text-align: center;
+  }
+
+  /* Row + nested row classes are injected via JS, so they don't pick up
+     Astro's auto-scope. Wrap in :global() so the rules still apply. */
+  .disc__list :global(.disc__row) {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--c-border-subtle);
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+    background: var(--c-bg-elev);
+  }
+  .disc__list :global(.disc__row:last-child) { border-bottom: none; }
+  .disc__list :global(.disc__row:hover) { background: var(--c-bg-muted); }
+  .disc__list :global(.disc__row.is-selected) {
+    background: var(--c-accent-dim);
+    border-left: 2px solid var(--c-accent);
+    padding-left: 12px;
+  }
+  .disc__list :global(.disc__row.is-acted) { opacity: 0.45; }
+
+  .disc__list :global(.disc__row-score) {
+    font-family: var(--font-display);
+    font-size: 22px;
+    line-height: 1;
+    color: var(--c-text);
+    min-width: 36px;
+    text-align: right;
+  }
+  .disc__list :global(.disc__row-score.is-strong) { color: var(--c-accent); }
+  .disc__list :global(.disc__row-score.is-weak) { color: var(--c-text-subtle); }
+
+  .disc__list :global(.disc__row-main) {
+    display: grid;
+    grid-template-rows: auto auto;
+    gap: 4px;
+    min-width: 0;
+  }
+  .disc__list :global(.disc__row-headline) {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    min-width: 0;
+  }
+  .disc__list :global(.disc__row-co) {
+    font-size: 14px;
+    color: var(--c-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 50%;
+  }
+  .disc__list :global(.disc__row-title) {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--c-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .disc__list :global(.disc__row-meta) {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--c-text-subtle);
+  }
+  .disc__list :global(.disc__pill) {
+    padding: 1px 7px;
+    border-radius: var(--r-full);
+    border: 1px solid var(--c-border-subtle);
+    background: var(--c-bg);
+    color: var(--c-text-muted);
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+  .disc__list :global(.disc__pill--remote) { color: var(--c-accent); border-color: var(--c-accent-muted); background: var(--c-accent-dim); }
+  .disc__list :global(.disc__pill--hybrid) { color: var(--c-text); }
+  .disc__list :global(.disc__pill--onsite) { opacity: 0.55; }
+  .disc__list :global(.disc__pill--angle) { font-style: italic; opacity: 0.85; }
+  .disc__list :global(.disc__pill--flag) { color: #F87171; border-color: rgba(248, 113, 113, 0.3); }
+  .disc__list :global(.disc__pill--queued) { color: var(--c-accent); border-color: var(--c-accent); }
+  .disc__list :global(.disc__pill--saved) { color: var(--c-text); }
+  .disc__list :global(.disc__pill--passed) { opacity: 0.6; }
+
+  .disc__list :global(.disc__row-quick) {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.12s ease;
+  }
+  .disc__list :global(.disc__row:hover .disc__row-quick),
+  .disc__list :global(.disc__row.is-selected .disc__row-quick) { opacity: 1; }
+  /* Touch devices: always show, since :hover doesn't fire reliably. */
+  @media (hover: none) {
+    .disc__list :global(.disc__row-quick) { opacity: 1; }
+  }
+  .disc__list :global(.disc__row-quick button) {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 5px 9px;
+    border-radius: var(--r-full);
+    border: 1px solid var(--c-border);
+    background: var(--c-bg);
+    color: var(--c-text-muted);
+    cursor: pointer;
+    line-height: 1;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .disc__list :global(.disc__row-quick button:hover) { color: var(--c-accent); border-color: var(--c-accent); }
+  .disc__list :global(.disc__row-quick .quick-add) {
+    background: var(--c-accent);
+    color: var(--c-bg);
+    border-color: var(--c-accent);
+    font-weight: 500;
+  }
+  .disc__list :global(.disc__row-quick .quick-add:hover) { color: var(--c-bg); filter: brightness(1.08); }
+
+  /* Swipe layer for mobile. Sits behind the row and shows the action
+     hint as the row drags. */
+  .disc__list :global(.disc__row-swipe) {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 18px;
+    pointer-events: none;
+    opacity: 0;
+    z-index: -1;
+  }
+  .disc__list :global(.disc__row-swipe .left),
+  .disc__list :global(.disc__row-swipe .right) {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .disc__list :global(.disc__row-swipe .right) { color: var(--c-accent); }
+  .disc__list :global(.disc__row-swipe .left) { color: var(--c-text-subtle); }
+
+  /* ── Focus pane ─────────────────────────────────────────────────── */
+  .disc__focus {
+    overflow-y: auto;
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    background: var(--c-bg-elev);
+    padding: 18px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .disc__empty {
+    color: var(--c-text-subtle);
+    font-size: 13px;
+    margin: auto;
+    text-align: center;
+  }
+
+  .disc__focus :global(.f-head) {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--c-border-subtle);
+    margin-bottom: 14px;
+  }
+  .disc__focus :global(.f-co) {
+    font-family: var(--font-display);
+    font-size: 22px;
+    line-height: 1.15;
+  }
+  .disc__focus :global(.f-role) {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--c-text-muted);
+    margin-top: 4px;
+  }
+  .disc__focus :global(.f-score-block) {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+  }
+  .disc__focus :global(.f-score) {
+    font-family: var(--font-display);
+    font-size: 38px;
+    line-height: 1;
+  }
+  .disc__focus :global(.f-score-meta) {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--c-text-subtle);
+  }
+
+  .disc__focus :global(.f-meta) {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px 14px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+    background: var(--c-bg);
+    border: 1px solid var(--c-border-subtle);
+    border-radius: var(--r-md);
+    font-size: 12px;
+  }
+  .disc__focus :global(.f-fact) { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .disc__focus :global(.f-fact-label) {
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--c-text-subtle);
+  }
+  .disc__focus :global(.f-fact-value) {
+    color: var(--c-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .disc__focus :global(.f-fact-value a) { color: var(--c-accent); text-decoration: none; }
+
+  .disc__focus :global(.f-actions) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .disc__focus :global(.f-action) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 12px 14px;
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    background: var(--c-bg-muted);
+    color: var(--c-text);
+    font-size: 13px;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    text-decoration: none;
+    line-height: 1.2;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .disc__focus :global(.f-action:hover) { border-color: var(--c-accent); color: var(--c-accent); }
+  .disc__focus :global(.f-action[disabled]) { opacity: 0.45; cursor: not-allowed; }
+  .disc__focus :global(.f-action--primary) {
+    background: var(--c-accent);
+    color: var(--c-bg);
+    border-color: var(--c-accent);
+    grid-column: 1 / -1;
+    justify-content: center;
+    font-weight: 500;
+    padding: 14px;
+  }
+  .disc__focus :global(.f-action--primary:hover) { color: var(--c-bg); filter: brightness(1.08); }
+  .disc__focus :global(.f-action--quiet) {
+    background: transparent;
+    color: var(--c-text-subtle);
+    border-color: var(--c-border-subtle);
+  }
+  .disc__focus :global(.f-action--quiet:hover) { color: #F87171; border-color: #F87171; }
+  .disc__focus :global(.f-action kbd) {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    border: 1px solid var(--c-border-subtle);
+    background: rgba(0,0,0,0.2);
+    color: inherit;
+    opacity: 0.8;
+  }
+  .disc__focus :global(.f-action--primary kbd) { background: rgba(0,0,0,0.3); border-color: rgba(0,0,0,0.3); color: var(--c-bg); }
+
+  .disc__focus :global(.f-section-h) {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--c-text-subtle);
+    margin: 14px 0 6px;
+  }
+  .disc__focus :global(.f-tags) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .disc__focus :global(.f-tag) {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 3px 9px;
+    border-radius: var(--r-full);
+    border: 1px solid var(--c-border);
+    background: var(--c-bg);
+    color: var(--c-text);
+  }
+  .disc__focus :global(.f-tag--gap) { color: var(--c-text-subtle); border-style: dashed; }
+  .disc__focus :global(.f-tag--flag) { color: #F87171; border-color: rgba(248, 113, 113, 0.4); }
+
+  .disc__focus :global(.f-breakdown) {
+    display: grid;
+    gap: 4px;
+    margin-bottom: 14px;
+  }
+  .disc__focus :global(.f-breakdown-row) {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 10px;
+    font-size: 12px;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--c-border-subtle);
+  }
+  .disc__focus :global(.f-breakdown-row:last-child) { border-bottom: none; }
+  .disc__focus :global(.f-breakdown-label) { color: var(--c-text); }
+  .disc__focus :global(.f-breakdown-note) { font-family: var(--font-mono); font-size: 10.5px; color: var(--c-text-subtle); }
+  .disc__focus :global(.f-breakdown-bar) {
+    width: 80px;
+    height: 4px;
+    border-radius: var(--r-full);
+    background: var(--c-bg-muted);
+    position: relative;
+    align-self: center;
+  }
+  .disc__focus :global(.f-breakdown-bar > span) {
+    position: absolute;
+    inset: 0;
+    background: var(--c-accent);
+    border-radius: inherit;
+    transform-origin: left;
+  }
+
+  .disc__focus :global(.f-jd) {
+    margin-top: 4px;
+    padding: 10px 12px;
+    background: var(--c-bg);
+    border: 1px solid var(--c-border-subtle);
+    border-radius: var(--r-md);
+    font-size: 11.5px;
+    line-height: 1.55;
+    color: var(--c-text-muted);
+    max-height: 220px;
+    overflow: auto;
+    white-space: pre-wrap;
+    font-family: var(--font-mono);
+  }
+  .disc__focus :global(.f-jd-toggle) {
+    cursor: pointer;
+    color: var(--c-text-muted);
+    font-size: 12px;
+    background: none;
+    border: none;
+    padding: 2px 0;
+    font-family: inherit;
+  }
+  .disc__focus :global(.f-jd-toggle:hover) { color: var(--c-accent); }
+
+  .disc__focus :global(.f-close) {
+    display: none;
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    font: inherit;
+    font-size: 20px;
+    line-height: 1;
+    background: var(--c-bg-muted);
+    color: var(--c-text);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-full);
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+  }
+  @media (max-width: 900px) {
+    .disc__focus :global(.f-close) { display: inline-flex; }
+  }
+
+  .disc__toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translate(-50%, 12px);
+    background: var(--c-text);
+    color: var(--c-bg);
+    padding: 10px 14px;
+    border-radius: var(--r-md);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .disc__toast.is-visible {
+    opacity: 1;
+    transform: translate(-50%, 0);
+    pointer-events: auto;
+  }
+  .disc__toast button {
+    font: inherit;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: var(--r-full);
+    border: 1px solid rgba(255,255,255,0.2);
+    background: transparent;
+    color: var(--c-bg);
+    cursor: pointer;
+  }
+  .disc__toast button:hover { border-color: var(--c-bg); }
+
+  /* Hide intro chrome on this page */
+  :global(main:has(.disc)) :global(header.admin__page-head) { display: none; }
+</style>
+
+<script>
+  import {
+    runDiscovery,
+    importPastedAlerts,
+    decideQueue,
+    decideSave,
+    decideDismiss,
+    decideUndo,
+    batchQueueAbove,
+    batchDismissBelow,
+    discoveredStore,
+    sourceStore,
+    runStore,
+    prefsStore,
+    type DiscoveredJob,
+    type SourceConfig,
+  } from '@/lib/discovery';
+
+  // ── State ────────────────────────────────────────────────────────────
+  type Tab = 'new' | 'saved' | 'queued' | 'dismissed';
+
+  type State = {
+    tab: Tab;
+    visible: DiscoveredJob[];
+    selectedIdx: number;
+    focusOpen: boolean;
+    lastUndo: { jobId: string; previous: DiscoveredJob } | null;
+  };
+
+  const state: State = {
+    tab: 'new',
+    visible: [],
+    selectedIdx: -1,
+    focusOpen: false,
+    lastUndo: null,
+  };
+
+  // ── DOM ──────────────────────────────────────────────────────────────
+  const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
+  const listEl = $('disc-list');
+  const focusEl = $('disc-focus');
+  const toastEl = $('disc-toast');
+  const statusEl = $('disc-status');
+  const runBtn = $<HTMLButtonElement>('disc-run');
+  const batchQueueBtn = $<HTMLButtonElement>('disc-batch-queue');
+  const batchDismissBtn = $<HTMLButtonElement>('disc-batch-dismiss');
+  const pasteToggle = $<HTMLButtonElement>('disc-paste-toggle');
+  const pastePanel = $('disc-paste-panel');
+  const pasteText = $<HTMLTextAreaElement>('disc-paste-text');
+  const pasteSubmit = $<HTMLButtonElement>('disc-paste-submit');
+  const pasteCancel = $<HTMLButtonElement>('disc-paste-cancel');
+  const sourcesToggle = $<HTMLButtonElement>('disc-sources-toggle');
+  const sourcesPanel = $('disc-sources-panel');
+  const sourcesListEl = $('disc-sources-list');
+  const addType = $<HTMLSelectElement>('disc-add-type');
+  const addSlug = $<HTMLInputElement>('disc-add-slug');
+  const addBtn = $<HTMLButtonElement>('disc-add-source');
+
+  // ── Data plumbing ───────────────────────────────────────────────────
+  function loadVisible() {
+    const all = discoveredStore.list();
+    const filtered = all.filter(j => j.status === state.tab);
+    // Newest first within saved/dismissed; for "new", strongest score first.
+    if (state.tab === 'new') {
+      filtered.sort((a, b) => (b.fitScore ?? 0) - (a.fitScore ?? 0));
+    } else {
+      filtered.sort((a, b) => (timestampFor(b, state.tab) ?? 0) - (timestampFor(a, state.tab) ?? 0));
+    }
+    state.visible = filtered;
+    if (state.selectedIdx >= state.visible.length) state.selectedIdx = state.visible.length - 1;
+    if (state.selectedIdx < -1) state.selectedIdx = -1;
+  }
+
+  function timestampFor(j: DiscoveredJob, tab: Tab): number | undefined {
+    if (tab === 'queued') return j.queuedAt;
+    if (tab === 'saved') return j.savedAt;
+    if (tab === 'dismissed') return j.dismissedAt;
+    return j.discoveredAt;
+  }
+
+  function counts(): Record<Tab, number> {
+    const all = discoveredStore.list();
+    return {
+      new: all.filter(j => j.status === 'new').length,
+      saved: all.filter(j => j.status === 'saved').length,
+      queued: all.filter(j => j.status === 'queued').length,
+      dismissed: all.filter(j => j.status === 'dismissed').length,
+    };
+  }
+
+  // ── Render ──────────────────────────────────────────────────────────
+  function escape(s: string): string {
+    return s.replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]!));
+  }
+
+  function fmtSalary(j: DiscoveredJob): string | null {
+    if (j.salaryMin && j.salaryMax) return `$${Math.round(j.salaryMin/1000)}–${Math.round(j.salaryMax/1000)}k`;
+    if (j.salaryMin) return `$${Math.round(j.salaryMin/1000)}k+`;
+    return null;
+  }
+
+  function renderHeader() {
+    const c = counts();
+    $('disc-count-new').textContent = String(c.new);
+    $('disc-count-saved').textContent = String(c.saved);
+    $('disc-count-queued').textContent = String(c.queued);
+    $('disc-count-dismissed').textContent = String(c.dismissed);
+    document.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach(b => {
+      b.setAttribute('aria-pressed', b.getAttribute('data-tab') === state.tab ? 'true' : 'false');
+    });
+  }
+
+  function rowHTML(j: DiscoveredJob, idx: number): string {
+    const sel = idx === state.selectedIdx ? ' is-selected' : '';
+    const acted = j.status !== 'new' ? ' is-acted' : '';
+    const scoreClass = j.fitScore >= 75 ? 'is-strong' : j.fitScore < 50 ? 'is-weak' : '';
+    const remoteCls = `disc__pill--${j.remoteStatus}`;
+    const sal = fmtSalary(j);
+
+    const statusPill =
+      j.status === 'queued' ? '<span class="disc__pill disc__pill--queued">Today</span>' :
+      j.status === 'saved' ? '<span class="disc__pill disc__pill--saved">Later</span>' :
+      j.status === 'dismissed' ? '<span class="disc__pill disc__pill--passed">Passed</span>' :
+      '';
+
+    const flagsPill = j.redFlags.length
+      ? `<span class="disc__pill disc__pill--flag" title="${escape(j.redFlags.join(' · '))}">⚑ ${j.redFlags.length}</span>`
+      : '';
+
+    const strength = j.matchedStrengths.slice(0, 2).map(s => `<span class="disc__pill">${escape(s)}</span>`).join('');
+
+    // Quick actions live inline; primary "Today" is always visible enough
+    // to invite a click without overwhelming the row.
+    const quick = j.status === 'new' ? `
+      <div class="disc__row-quick" onclick="event.stopPropagation()">
+        <button class="quick-add" data-act="queue" data-id="${j.id}" title="Add to today (T)">Today</button>
+        <button data-act="open" data-id="${j.id}" title="Open source (O)">↗</button>
+        <button data-act="save" data-id="${j.id}" title="Save for later (S)">Later</button>
+        <button data-act="dismiss" data-id="${j.id}" title="Pass (X)">Pass</button>
+      </div>
+    ` : `
+      <div class="disc__row-quick" onclick="event.stopPropagation()">
+        <button data-act="open" data-id="${j.id}" title="Open source (O)">↗</button>
+        <button data-act="undo" data-id="${j.id}" title="Undo">↺ Undo</button>
+      </div>
+    `;
+
+    return `<li class="disc__row${sel}${acted}" role="button" data-id="${j.id}" data-idx="${idx}" tabindex="-1">
+      <div class="disc__row-score ${scoreClass}">${j.fitScore}</div>
+      <div class="disc__row-main">
+        <div class="disc__row-headline">
+          <span class="disc__row-co">${escape(j.company)}</span>
+          <span class="disc__row-title">${escape(j.title)}</span>
+        </div>
+        <div class="disc__row-meta">
+          <span class="disc__pill ${remoteCls}">${escape(j.remoteStatus)}</span>
+          ${sal ? `<span class="disc__pill">${escape(sal)}</span>` : ''}
+          <span class="disc__pill disc__pill--angle">→ ${escape(j.recommendedAngleLabel)}</span>
+          ${strength}
+          ${flagsPill}
+          ${statusPill}
+        </div>
+      </div>
+      ${quick}
+      <div class="disc__row-swipe" aria-hidden="true">
+        <span class="left">← Pass</span>
+        <span class="right">Today →</span>
+      </div>
+    </li>`;
+  }
+
+  function renderList() {
+    listEl.innerHTML = state.visible.map(rowHTML).join('');
+  }
+
+  function renderFocus() {
+    const j = state.visible[state.selectedIdx];
+    if (!j) {
+      focusEl.classList.remove('is-open');
+      focusEl.innerHTML = `<p class="disc__empty">No selection. Press <kbd>↵</kbd> on a row to inspect, or <kbd>j</kbd>/<kbd>k</kbd> to navigate.</p>`;
+      return;
+    }
+    if (state.focusOpen) focusEl.classList.add('is-open');
+
+    const sal = fmtSalary(j);
+    const breakdown = buildBreakdown(j);
+    const strengths = j.matchedStrengths.length
+      ? `<div class="f-section-h">Strengths matched</div><div class="f-tags">${j.matchedStrengths.map(s => `<span class="f-tag">${escape(s)}</span>`).join('')}</div>`
+      : '';
+    const gaps = j.missingSignals.length
+      ? `<div class="f-section-h">Gaps</div><div class="f-tags">${j.missingSignals.map(s => `<span class="f-tag f-tag--gap">${escape(s)}</span>`).join('')}</div>`
+      : '';
+    const flags = j.redFlags.length
+      ? `<div class="f-section-h">Red flags</div><div class="f-tags">${j.redFlags.map(f => `<span class="f-tag f-tag--flag">⚑ ${escape(f)}</span>`).join('')}</div>`
+      : '';
+
+    const statusActions = j.status === 'new' ? `
+      <button type="button" class="f-action f-action--primary" data-act="queue" data-id="${j.id}">
+        Add to Today <kbd>T</kbd>
+      </button>
+      <a class="f-action" href="${escape(j.applyUrl ?? j.sourceUrl)}" target="_blank" rel="noopener" data-act="open" data-id="${j.id}">
+        Open source <kbd>O</kbd>
+      </a>
+      <button type="button" class="f-action" data-act="save" data-id="${j.id}">
+        Save for later <kbd>S</kbd>
+      </button>
+      <button type="button" class="f-action f-action--quiet" data-act="dismiss" data-id="${j.id}">
+        Pass <kbd>X</kbd>
+      </button>
+    ` : `
+      <button type="button" class="f-action f-action--primary" data-act="undo" data-id="${j.id}">
+        Undo decision
+      </button>
+      <a class="f-action" href="${escape(j.applyUrl ?? j.sourceUrl)}" target="_blank" rel="noopener" data-act="open" data-id="${j.id}">
+        Open source <kbd>O</kbd>
+      </a>
+      ${j.queuedJobId ? `<a class="f-action" href="/today" data-act="goto-today">Open in Today →</a>` : ''}
+    `;
+
+    focusEl.innerHTML = `
+      <button type="button" class="f-close" aria-label="Close" data-act="close-focus">×</button>
+      <div class="f-head">
+        <div>
+          <div class="f-co">${escape(j.company)}</div>
+          <div class="f-role">${escape(j.title)}</div>
+        </div>
+        <div class="f-score-block">
+          <div class="f-score">${j.fitScore}</div>
+          <div class="f-score-meta">${escape(j.confidence)} · P${j.priorityScore}</div>
+        </div>
+      </div>
+
+      <div class="f-meta">
+        <div class="f-fact">
+          <span class="f-fact-label">Remote</span>
+          <span class="f-fact-value">${escape(j.remoteStatus)}</span>
+        </div>
+        ${j.location ? `<div class="f-fact"><span class="f-fact-label">Location</span><span class="f-fact-value">${escape(j.location)}</span></div>` : ''}
+        ${sal ? `<div class="f-fact"><span class="f-fact-label">Salary</span><span class="f-fact-value">${escape(sal)}</span></div>` : '<div class="f-fact"><span class="f-fact-label">Salary</span><span class="f-fact-value">—</span></div>'}
+        <div class="f-fact"><span class="f-fact-label">Angle</span><span class="f-fact-value">${escape(j.recommendedAngleLabel)}</span></div>
+        <div class="f-fact"><span class="f-fact-label">Source</span><span class="f-fact-value">${escape(j.sourceLabel)}</span></div>
+        <div class="f-fact"><span class="f-fact-label">Seniority</span><span class="f-fact-value">${escape(j.seniority ?? 'unclear')}</span></div>
+      </div>
+
+      <div class="f-actions">
+        ${statusActions}
+      </div>
+
+      <div class="f-section-h">Score breakdown</div>
+      <div class="f-breakdown">${breakdown}</div>
+
+      ${strengths}
+      ${gaps}
+      ${flags}
+
+      ${j.description ? `
+        <div class="f-section-h">Description</div>
+        <div class="f-jd">${escape(j.description.slice(0, 4000))}${j.description.length > 4000 ? '\n\n…(truncated)' : ''}</div>
+      ` : ''}
+    `;
+  }
+
+  function buildBreakdown(j: DiscoveredJob): string {
+    // We don't store the full breakdown — we estimate from the high-level
+    // signals so the focus view explains the score without a re-run.
+    const rows = [
+      { label: 'Role match', score: clamp(j.matchedStrengths.length * 14), note: `${j.matchedStrengths.length} strengths matched` },
+      { label: 'Remote fit', score: j.remoteStatus === 'remote' ? 95 : j.remoteStatus === 'hybrid' ? 65 : j.remoteStatus === 'onsite' ? 25 : 50, note: j.remoteStatus },
+      { label: 'Salary fit', score: j.salaryMax ? (j.salaryMax >= 180_000 ? 90 : j.salaryMax >= 150_000 ? 65 : 35) : 50, note: j.salaryMax ? `$${Math.round(j.salaryMax/1000)}k top` : 'not stated' },
+      { label: 'Seniority', score: j.seniority === 'senior' || j.seniority === 'lead' ? 95 : j.seniority === 'principal' ? 80 : j.seniority === 'ic' ? 35 : 60, note: j.seniority ?? 'unclear' },
+      { label: 'Risk flags', score: 100 - Math.min(80, j.redFlags.length * 25), note: j.redFlags.length ? `${j.redFlags.length} flag${j.redFlags.length === 1 ? '' : 's'}` : 'none' },
+    ];
+    return rows.map(r => `
+      <div class="f-breakdown-row">
+        <span class="f-breakdown-label">${escape(r.label)}</span>
+        <span class="f-breakdown-bar"><span style="transform: scaleX(${(r.score / 100).toFixed(2)})"></span></span>
+        <span class="f-breakdown-note">${escape(r.note)}</span>
+      </div>
+    `).join('');
+  }
+
+  function clamp(n: number) { return Math.max(0, Math.min(100, Math.round(n))); }
+
+  // ── Actions ──────────────────────────────────────────────────────────
+  function flash(msg: string, action?: { label: string; onClick: () => void }, ms = 4500) {
+    toastEl.innerHTML = action
+      ? `<span>${escape(msg)}</span><button type="button" id="disc-toast-action">${escape(action.label)}</button>`
+      : `<span>${escape(msg)}</span>`;
+    toastEl.classList.add('is-visible');
+    if (action) {
+      const btn = $('disc-toast-action') as HTMLButtonElement;
+      btn?.addEventListener('click', () => { action.onClick(); hideToast(); }, { once: true });
+    }
+    clearTimeout((flash as any)._t);
+    (flash as any)._t = setTimeout(hideToast, ms);
+  }
+  function hideToast() {
+    toastEl.classList.remove('is-visible');
+  }
+
+  function recordUndo(jobId: string, previous: DiscoveredJob) {
+    state.lastUndo = { jobId, previous };
+  }
+
+  function performUndo() {
+    if (!state.lastUndo) return;
+    const previous = state.lastUndo.previous;
+    // Decideundo handles the queue removal (for queued jobs) and resets
+    // status, but we want to restore exactly the previous lifecycle, not
+    // necessarily 'new'. Easiest path: undo to 'new' first, then re-apply
+    // any prior decision (rare — undo is meant for accidental presses).
+    decideUndo(state.lastUndo.jobId);
+    if (previous.status !== 'new') {
+      // Re-apply the prior decision so undoing twice puts the world back.
+      // This branch is unreachable through the normal UI but kept defensive.
+      if (previous.status === 'queued') decideQueue(state.lastUndo.jobId);
+      else if (previous.status === 'saved') decideSave(state.lastUndo.jobId);
+      else if (previous.status === 'dismissed') decideDismiss(state.lastUndo.jobId);
+    }
+    state.lastUndo = null;
+    refresh();
+  }
+
+  function act(action: string, id: string) {
+    const before = discoveredStore.get(id);
+    if (!before) return;
+
+    if (action === 'queue') {
+      const updated = decideQueue(id);
+      if (updated) {
+        recordUndo(id, before);
+        flash(`Queued · ${updated.company}`, { label: 'Undo', onClick: performUndo });
+      }
+    } else if (action === 'save') {
+      const updated = decideSave(id);
+      if (updated) {
+        recordUndo(id, before);
+        flash(`Saved for later · ${updated.company}`, { label: 'Undo', onClick: performUndo });
+      }
+    } else if (action === 'dismiss') {
+      const updated = decideDismiss(id);
+      if (updated) {
+        recordUndo(id, before);
+        flash(`Passed on ${updated.company}`, { label: 'Undo', onClick: performUndo });
+      }
+    } else if (action === 'undo') {
+      const updated = decideUndo(id);
+      if (updated) flash(`Decision reset`);
+    } else if (action === 'open') {
+      const target = before.applyUrl ?? before.sourceUrl;
+      if (target) window.open(target, '_blank', 'noopener,noreferrer');
+      return; // no refresh needed
+    }
+
+    // After any state-changing action, advance to the next visible row so
+    // the user can continue triaging without lifting their hand.
+    if (action === 'queue' || action === 'save' || action === 'dismiss') {
+      const idxBefore = state.selectedIdx;
+      refresh();
+      // Stay at the same idx so the next item slides into the slot.
+      state.selectedIdx = Math.min(idxBefore, state.visible.length - 1);
+      renderList();
+      renderFocus();
+      scrollSelectedIntoView();
+    } else {
+      refresh();
+    }
+  }
+
+  // ── Selection / focus ───────────────────────────────────────────────
+  function selectIndex(i: number) {
+    if (state.visible.length === 0) { state.selectedIdx = -1; return; }
+    state.selectedIdx = Math.max(0, Math.min(i, state.visible.length - 1));
+  }
+  function move(delta: number) {
+    selectIndex(state.selectedIdx + delta);
+    renderList();
+    renderFocus();
+    scrollSelectedIntoView();
+  }
+  function scrollSelectedIntoView() {
+    const el = listEl.children[state.selectedIdx] as HTMLElement | undefined;
+    if (el) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+
+  function openFocus() {
+    state.focusOpen = true;
+    focusEl.classList.add('is-open');
+    renderFocus();
+  }
+  function closeFocus() {
+    state.focusOpen = false;
+    focusEl.classList.remove('is-open');
+    renderFocus();
+  }
+
+  // ── Run + paste + sources ───────────────────────────────────────────
+  let running = false;
+  async function runNow() {
+    if (running) return;
+    running = true;
+    runBtn.disabled = true;
+    statusEl.innerHTML = 'Running discovery…';
+    try {
+      const run = await runDiscovery();
+      const errs = run.errors.map(e => `<span class="err">${escape(e.source)}: ${escape(e.message)}</span>`).join(' · ');
+      const summary = `Fetched ${run.fetched} · Added ${run.found} · Filtered ${run.filtered}`;
+      statusEl.innerHTML = errs ? `<span class="ok">${summary}</span> · ${errs}` : `<span class="ok">${summary}</span>`;
+      flash(`Discovery: ${run.found} new`, undefined, 3500);
+      refresh();
+    } catch (err: any) {
+      statusEl.innerHTML = `<span class="err">Discovery failed: ${escape(err?.message ?? String(err))}</span>`;
+    } finally {
+      runBtn.disabled = false;
+      running = false;
+    }
+  }
+
+  function importPaste() {
+    const text = pasteText.value.trim();
+    if (!text) return;
+    const result = importPastedAlerts(text);
+    statusEl.innerHTML = `<span class="ok">Paste: parsed ${result.parsed} · added ${result.inserted} · filtered ${result.filtered}</span>`;
+    pasteText.value = '';
+    pastePanel.hidden = true;
+    refresh();
+    flash(`Imported ${result.inserted} jobs`);
+  }
+
+  function renderSources() {
+    const list = sourceStore.list();
+    sourcesListEl.innerHTML = list.map(s => sourceRowHTML(s)).join('');
+  }
+  function sourceRowHTML(s: SourceConfig): string {
+    const last = s.lastRunAt ? new Date(s.lastRunAt).toLocaleString() : 'never';
+    const stat = s.lastError
+      ? `<span class="src-meta err">last: ${escape(s.lastError)}</span>`
+      : `<span class="src-meta">last: ${escape(last)} · ${s.lastResultCount ?? 0} jobs</span>`;
+    return `<li>
+      <div class="src-info">
+        <span class="src-name">${escape(s.name)}</span>
+        ${stat}
+      </div>
+      <button type="button" class="src-toggle ${s.enabled ? 'is-on' : ''}" data-src-toggle="${s.id}">${s.enabled ? 'On' : 'Off'}</button>
+      ${s.type === 'greenhouse' || s.type === 'lever' ? `<button type="button" class="src-remove" data-src-remove="${s.id}">Remove</button>` : '<span></span>'}
+    </li>`;
+  }
+
+  // ── Wire up events ─────────────────────────────────────────────────
+  function refresh() {
+    loadVisible();
+    renderHeader();
+    renderList();
+    renderFocus();
+  }
+
+  // Tab switching
+  document.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach(b => {
+    b.addEventListener('click', () => {
+      state.tab = b.getAttribute('data-tab') as Tab;
+      state.selectedIdx = state.visible.length > 0 ? 0 : -1;
+      state.focusOpen = false;
+      refresh();
+    });
+  });
+
+  // Row click (delegated)
+  listEl.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    const actBtn = target.closest<HTMLElement>('[data-act]');
+    if (actBtn) {
+      const action = actBtn.getAttribute('data-act')!;
+      const id = actBtn.getAttribute('data-id')!;
+      act(action, id);
+      return;
+    }
+    const row = target.closest<HTMLElement>('.disc__row');
+    if (row) {
+      const idx = Number(row.getAttribute('data-idx'));
+      selectIndex(idx);
+      renderList();
+      openFocus();
+    }
+  });
+
+  // Focus-pane action buttons (delegated)
+  focusEl.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    const closeBtn = target.closest('[data-act="close-focus"]');
+    if (closeBtn) { closeFocus(); return; }
+    const actBtn = target.closest<HTMLElement>('[data-act]');
+    if (!actBtn) return;
+    const action = actBtn.getAttribute('data-act')!;
+    const id = actBtn.getAttribute('data-id') ?? state.visible[state.selectedIdx]?.id;
+    if (action === 'goto-today') return; // let the link navigate
+    if (id) { e.preventDefault(); act(action, id); }
+  });
+
+  // Buttons
+  runBtn.addEventListener('click', runNow);
+  batchQueueBtn.addEventListener('click', () => {
+    const prefs = prefsStore.get();
+    const result = batchQueueAbove(prefs.autoQueueThreshold);
+    refresh();
+    flash(`Auto-queued ${result.affected} jobs (≥${prefs.autoQueueThreshold})`);
+  });
+  batchDismissBtn.addEventListener('click', () => {
+    const prefs = prefsStore.get();
+    const result = batchDismissBelow(prefs.minScore);
+    refresh();
+    flash(`Passed on ${result.affected} jobs (<${prefs.minScore})`);
+  });
+  pasteToggle.addEventListener('click', () => {
+    pastePanel.hidden = !pastePanel.hidden;
+    if (!pastePanel.hidden) pasteText.focus();
+  });
+  pasteCancel.addEventListener('click', () => { pastePanel.hidden = true; pasteText.value = ''; });
+  pasteSubmit.addEventListener('click', importPaste);
+  sourcesToggle.addEventListener('click', () => {
+    sourcesPanel.hidden = !sourcesPanel.hidden;
+    if (!sourcesPanel.hidden) renderSources();
+  });
+
+  // Source list mutations (delegated)
+  sourcesListEl.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    const toggle = target.closest<HTMLElement>('[data-src-toggle]');
+    if (toggle) {
+      const id = toggle.getAttribute('data-src-toggle')!;
+      const list = sourceStore.list();
+      const s = list.find(x => x.id === id);
+      if (s) { s.enabled = !s.enabled; sourceStore.upsert(s); renderSources(); }
+      return;
+    }
+    const remove = target.closest<HTMLElement>('[data-src-remove]');
+    if (remove) {
+      const id = remove.getAttribute('data-src-remove')!;
+      const list = sourceStore.list().filter(s => s.id !== id);
+      sourceStore.save(list);
+      renderSources();
+    }
+  });
+
+  // Add Greenhouse / Lever source
+  addBtn.addEventListener('click', () => {
+    const slug = addSlug.value.trim().toLowerCase();
+    if (!slug) return;
+    const type = addType.value as SourceConfig['type'];
+    const id = `${type}-${slug}`;
+    const company = slug.split(/[-_]+/).map(w => w[0]?.toUpperCase() + w.slice(1)).join(' ');
+    sourceStore.upsert({
+      id,
+      type,
+      name: `${type === 'greenhouse' ? 'Greenhouse' : 'Lever'} · ${company}`,
+      enabled: true,
+      params: { slug },
+    });
+    addSlug.value = '';
+    renderSources();
+  });
+
+  // ── Keyboard shortcuts ──────────────────────────────────────────────
+  function isTyping(): boolean {
+    const el = document.activeElement;
+    if (!el) return false;
+    const tag = el.tagName.toLowerCase();
+    return tag === 'input' || tag === 'textarea' || tag === 'select' || (el as HTMLElement).isContentEditable;
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (isTyping()) return;
+
+    // Cmd/Ctrl + Z = undo
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') {
+      e.preventDefault();
+      performUndo();
+      return;
+    }
+
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+    const k = e.key;
+    const sel = state.visible[state.selectedIdx];
+
+    if (k === 'j' || k === 'ArrowDown') { e.preventDefault(); move(1); return; }
+    if (k === 'k' || k === 'ArrowUp')   { e.preventDefault(); move(-1); return; }
+    if (k === 'Enter')                  { e.preventDefault(); if (sel) openFocus(); return; }
+    if (k === 'Escape')                 { e.preventDefault(); closeFocus(); return; }
+    if (!sel) return;
+
+    if (k === 'r' || k === 'R')         { e.preventDefault(); runNow(); return; }
+    if (k === 't' || k === 'T')         { e.preventDefault(); act('queue', sel.id); return; }
+    if (k === 's' || k === 'S')         { e.preventDefault(); act('save', sel.id); return; }
+    if (k === 'x' || k === 'X')         { e.preventDefault(); act('dismiss', sel.id); return; }
+    if (k === 'o' || k === 'O')         { e.preventDefault(); act('open', sel.id); return; }
+  });
+
+  // ── Mobile swipe gestures ───────────────────────────────────────────
+  // Horizontal-only swipes; vertical drags fall through to native scroll.
+  // > 90px in either direction triggers the action; < 30px snaps back.
+  type SwipeState = { id: string; startX: number; startY: number; deltaX: number; rowEl: HTMLElement; locked: 'h' | 'v' | null };
+  let swipe: SwipeState | null = null;
+
+  listEl.addEventListener('touchstart', (e) => {
+    const target = e.target as HTMLElement;
+    if (target.closest('button, a')) return; // taps on buttons stay native
+    const row = target.closest<HTMLElement>('.disc__row');
+    if (!row) return;
+    const id = row.getAttribute('data-id')!;
+    const t = e.touches[0];
+    swipe = { id, startX: t.clientX, startY: t.clientY, deltaX: 0, rowEl: row, locked: null };
+  }, { passive: true });
+
+  listEl.addEventListener('touchmove', (e) => {
+    if (!swipe) return;
+    const t = e.touches[0];
+    const dx = t.clientX - swipe.startX;
+    const dy = t.clientY - swipe.startY;
+    if (swipe.locked === null) {
+      if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
+        swipe.locked = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v';
+      }
+    }
+    if (swipe.locked !== 'h') return;
+    swipe.deltaX = dx;
+    swipe.rowEl.style.transform = `translateX(${dx}px)`;
+    const swipeLayer = swipe.rowEl.querySelector<HTMLElement>('.disc__row-swipe');
+    if (swipeLayer) {
+      swipeLayer.style.zIndex = '0';
+      swipeLayer.style.opacity = String(Math.min(1, Math.abs(dx) / 100));
+    }
+  }, { passive: true });
+
+  listEl.addEventListener('touchend', () => {
+    if (!swipe) return;
+    const { id, deltaX, rowEl } = swipe;
+    rowEl.style.transition = 'transform 0.18s ease';
+    rowEl.style.transform = '';
+    setTimeout(() => { rowEl.style.transition = ''; }, 200);
+    const layer = rowEl.querySelector<HTMLElement>('.disc__row-swipe');
+    if (layer) { layer.style.opacity = '0'; layer.style.zIndex = '-1'; }
+    if (Math.abs(deltaX) >= 90) {
+      if (deltaX > 0) act('queue', id); else act('dismiss', id);
+    }
+    swipe = null;
+  });
+
+  listEl.addEventListener('touchcancel', () => {
+    if (!swipe) return;
+    swipe.rowEl.style.transform = '';
+    swipe = null;
+  });
+
+  // ── Boot ────────────────────────────────────────────────────────────
+  refresh();
+  if (state.visible.length > 0) state.selectedIdx = 0;
+  renderList();
+  renderFocus();
+
+  // Surface the most recent run summary on first load.
+  const last = runStore.last();
+  if (last) {
+    const when = new Date(last.startedAt).toLocaleString();
+    statusEl.innerHTML = `<span class="ok">Last run ${escape(when)} · ${last.found} added · ${last.filtered} filtered${last.errors.length ? ` · ${last.errors.length} error${last.errors.length === 1 ? '' : 's'}` : ''}</span>`;
+  } else {
+    statusEl.innerHTML = `<span>No runs yet. Press <kbd>R</kbd> or click <strong>Run discovery</strong>.</span>`;
+  }
+
+  // Keep the page in sync if another tab modifies discovered jobs.
+  window.addEventListener('storage', (e) => {
+    if (e.key && (e.key === 'qa_discovered_jobs' || e.key === 'qa_discovery_sources')) {
+      refresh();
+    }
+  });
+</script>

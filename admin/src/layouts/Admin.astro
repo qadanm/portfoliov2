@@ -38,6 +38,7 @@ function isActive(href: string) {
         <a href="/today" class:list={['admin__nav-primary', { 'is-active': isActive('/today') }]}>→ Today</a>
 
         <h4>Workflow</h4>
+        <a href="/discovery" class:list={{ 'is-active': isActive('/discovery') }}>⌕ Discovery</a>
         <a href="/jobs/new" class:list={{ 'is-active': activePath === '/jobs/new' }}>+ Add job (smart intake)</a>
         <a href="/jobs" class:list={{ 'is-active': activePath === '/jobs' || activePath.startsWith('/jobs?') }}>Job tracker</a>
         <a href="/analyzer" class:list={{ 'is-active': isActive('/analyzer') }}>JD analyzer</a>
