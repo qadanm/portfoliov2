@@ -57,22 +57,32 @@ const tags = ['Product design', 'System design', 'AI workflows'];
   .hero {
     position: relative;
     /* Header is 60px on mobile, 64 on desktop. Keep generous breathing room
-       without dominating the first viewport. */
+       without dominating the first viewport. CTAs at the bottom now provide
+       visual closure, so the desktop top padding can be tighter than the
+       headline-only original — 240px+160px left an empty band above the
+       label that read as dead space, not breathing room. */
     padding-top: calc(60px + var(--space-12));
     padding-bottom: var(--space-16);
   }
 
   @media (min-width: 600px) {
     .hero {
-      padding-top: calc(64px + var(--space-20));
+      padding-top: calc(64px + var(--space-16));
       padding-bottom: var(--space-20);
     }
   }
 
   @media (min-width: 768px) {
     .hero {
-      padding-top: calc(64px + 176px);
-      padding-bottom: 160px;
+      padding-top: calc(64px + var(--space-20));
+      padding-bottom: var(--space-24);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .hero {
+      padding-top: calc(64px + 112px);
+      padding-bottom: 128px;
     }
   }
 
