@@ -1,0 +1,275 @@
+---
+import Admin from '@/layouts/Admin.astro';
+import { variantOptions, ctaOptions } from '@/lib/email-template';
+
+const variants = variantOptions();
+const ctas = ctaOptions();
+---
+
+<Admin
+  title="Outreach emails"
+  intro="Branded HTML email matching qadan.co. Pick a variant, edit the copy, then copy to Gmail. Cmd+V into compose."
+>
+  <div class="ox">
+    <section class="card ox__form">
+      <h2 class="ox__h2">Compose</h2>
+
+      <label>Variant
+        <select id="variant">
+          {variants.map((v) => <option value={v.value}>{v.label}</option>)}
+        </select>
+      </label>
+
+      <div class="row">
+        <label>Recipient first name
+          <input id="firstName" placeholder="Jane" />
+        </label>
+        <label>Sign-off
+          <input id="signOff" placeholder="Best" />
+        </label>
+      </div>
+
+      <div class="row">
+        <label>Company
+          <input id="company" placeholder="Acme" />
+        </label>
+        <label>Role
+          <input id="role" placeholder="Senior Product Designer" />
+        </label>
+      </div>
+
+      <label>Suggested subject
+        <input id="subject" placeholder="Auto-generated. Edit freely." />
+      </label>
+
+      <label>Body
+        <textarea id="body" rows="10" placeholder="Paragraphs separated by a blank line."></textarea>
+      </label>
+
+      <fieldset class="ox__ctas">
+        <legend>Call-to-action buttons</legend>
+        {ctas.map((c, i) => (
+          <label class="ox__cta">
+            <input type="checkbox" data-cta={c.value} checked={i < 2} />
+            <span>{c.label}</span>
+          </label>
+        ))}
+        <p class="ox__hint">First checked CTA renders as the primary (filled) button.</p>
+      </fieldset>
+
+      <div class="ox__actions">
+        <button class="btn btn--primary" id="copyRich" type="button">Copy to Gmail</button>
+        <button class="btn" id="copyHtml" type="button">Copy HTML</button>
+        <button class="btn" id="copyText" type="button">Copy plain text</button>
+        <button class="btn" id="copySig" type="button">Copy signature only</button>
+        <button class="btn" id="copySubject" type="button">Copy subject</button>
+      </div>
+      <p class="ox__hint" id="status" aria-live="polite"></p>
+
+      <details class="ox__howto">
+        <summary>How to send from Gmail</summary>
+        <ol>
+          <li>Open Gmail compose. Set From to <code>moe@qadan.co</code> and add the recipient.</li>
+          <li>Click <strong>Copy subject</strong>, paste into Gmail's subject field.</li>
+          <li>Click <strong>Copy to Gmail</strong>, click into the body, paste (Cmd+V).</li>
+          <li>If the rich paste ever loses formatting (rare), use <strong>Copy HTML</strong>, open Chrome DevTools on the compose body, and replace the <code>contenteditable</code> div's <code>innerHTML</code>.</li>
+        </ol>
+      </details>
+    </section>
+
+    <section class="card ox__preview-card">
+      <div class="ox__preview-head">
+        <h2 class="ox__h2">Preview</h2>
+        <div class="ox__device">
+          <button type="button" class="chip is-active" data-device="desktop">Desktop</button>
+          <button type="button" class="chip" data-device="mobile">Mobile</button>
+        </div>
+      </div>
+      <div class="ox__preview" id="previewWrap">
+        <iframe id="preview" title="Email preview" sandbox="allow-same-origin"></iframe>
+      </div>
+    </section>
+  </div>
+</Admin>
+
+<style>
+  .ox { display: grid; grid-template-columns: 380px 1fr; gap: 16px; align-items: start; }
+  @media (max-width: 980px) { .ox { grid-template-columns: 1fr; } }
+
+  .ox__h2 { font-family: var(--font-display); font-size: 22px; font-weight: 400; letter-spacing: -0.01em; margin-bottom: 14px; }
+
+  .ox__form label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--c-text-subtle); margin-bottom: 12px; }
+  .ox__form .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ox__form textarea { font-family: var(--font-mono); font-size: 12.5px; line-height: 1.55; min-height: 200px; resize: vertical; }
+
+  .ox__ctas { border: 1px solid var(--c-border-subtle); border-radius: var(--r-md); padding: 12px; margin: 4px 0 14px; }
+  .ox__ctas legend { padding: 0 6px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--c-text-subtle); }
+  .ox__cta { display: flex !important; flex-direction: row !important; align-items: center; gap: 8px; margin: 0 !important; padding: 4px 0; font-size: 13px; color: var(--c-text); }
+  .ox__cta input { width: auto; margin: 0; accent-color: var(--c-accent); }
+
+  .ox__actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  .ox__hint { color: var(--c-text-subtle); font-size: 11.5px; margin-top: 8px; min-height: 1em; }
+
+  .ox__howto { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--c-border-subtle); font-size: 13px; color: var(--c-text-muted); }
+  .ox__howto summary { cursor: pointer; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-text-subtle); margin-bottom: 10px; }
+  .ox__howto ol { padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+  .ox__howto code { font-family: var(--font-mono); font-size: 12px; background: var(--c-bg-muted); padding: 1px 5px; border-radius: 3px; }
+
+  .ox__preview-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 12px; }
+  .ox__preview-head .ox__h2 { margin-bottom: 0; }
+  .ox__device { display: inline-flex; gap: 6px; }
+  .ox__device .chip { cursor: pointer; }
+  .ox__device .chip.is-active { color: var(--c-accent); background: var(--c-accent-dim); border-color: var(--c-accent); }
+
+  .ox__preview { background: #FAFAF9; border: 1px solid var(--c-border-subtle); border-radius: var(--r-lg); overflow: hidden; padding: 0; }
+  .ox__preview iframe { display: block; width: 100%; height: 720px; border: 0; background: #FAFAF9; }
+  .ox__preview[data-device="mobile"] { padding: 16px; display: flex; justify-content: center; }
+  .ox__preview[data-device="mobile"] iframe { width: 380px; max-width: 100%; height: 720px; border-radius: var(--r-md); box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+</style>
+
+<script>
+  import { render, defaultsFor, type Variant, type CtaKey } from '@/lib/email-template';
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const variantEl = $<HTMLSelectElement>('variant');
+  const firstNameEl = $<HTMLInputElement>('firstName');
+  const signOffEl = $<HTMLInputElement>('signOff');
+  const companyEl = $<HTMLInputElement>('company');
+  const roleEl = $<HTMLInputElement>('role');
+  const subjectEl = $<HTMLInputElement>('subject');
+  const bodyEl = $<HTMLTextAreaElement>('body');
+  const previewEl = $<HTMLIFrameElement>('preview');
+  const previewWrap = $<HTMLDivElement>('previewWrap');
+  const status = $<HTMLParagraphElement>('status');
+
+  const ctaInputs = () =>
+    Array.from(document.querySelectorAll<HTMLInputElement>('input[data-cta]'));
+
+  const setStatus = (msg: string) => {
+    status.textContent = msg;
+    if (msg) setTimeout(() => { if (status.textContent === msg) status.textContent = ''; }, 2400);
+  };
+
+  function readInput() {
+    const checkedCtas = ctaInputs().filter((i) => i.checked).map((i) => i.dataset.cta as CtaKey);
+    return {
+      variant: variantEl.value as Variant,
+      recipientFirstName: firstNameEl.value,
+      company: companyEl.value,
+      role: roleEl.value,
+      body: bodyEl.value,
+      ctas: checkedCtas,
+      signOff: signOffEl.value,
+    };
+  }
+
+  function rerender() {
+    const out = render(readInput());
+    // Wrap in a minimal HTML doc for the iframe so the bg renders edge-to-edge.
+    const doc = `<!doctype html><html><head><meta charset="utf-8" /><base target="_blank" /></head><body style="margin:0;padding:0;background:#FAFAF9;">${out.html}</body></html>`;
+    previewEl.srcdoc = doc;
+  }
+
+  function applyVariantDefaults(force = false) {
+    const variant = variantEl.value as Variant;
+    const ctx = { recipientFirstName: firstNameEl.value, company: companyEl.value, role: roleEl.value };
+    const d = defaultsFor(variant, ctx);
+    if (force || !subjectEl.dataset.touched) subjectEl.value = d.subject;
+    if (force || !bodyEl.dataset.touched) bodyEl.value = d.body;
+    if (force) {
+      ctaInputs().forEach((i) => { i.checked = d.ctas.includes(i.dataset.cta as CtaKey); });
+    }
+    rerender();
+  }
+
+  variantEl.addEventListener('change', () => applyVariantDefaults(true));
+  [firstNameEl, companyEl, roleEl].forEach((el) => {
+    el.addEventListener('input', () => {
+      if (!subjectEl.dataset.touched || !bodyEl.dataset.touched) applyVariantDefaults(false);
+      else rerender();
+    });
+  });
+  [signOffEl].forEach((el) => el.addEventListener('input', rerender));
+  bodyEl.addEventListener('input', () => { bodyEl.dataset.touched = '1'; rerender(); });
+  subjectEl.addEventListener('input', () => { subjectEl.dataset.touched = '1'; });
+  ctaInputs().forEach((i) => i.addEventListener('change', rerender));
+
+  // Device toggle
+  document.querySelectorAll<HTMLButtonElement>('.ox__device .chip').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.ox__device .chip').forEach((b) => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      const mode = btn.dataset.device;
+      if (mode === 'mobile') previewWrap.dataset.device = 'mobile';
+      else delete previewWrap.dataset.device;
+    });
+  });
+
+  async function copyRich(html: string, plain: string) {
+    if (typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
+      const item = new ClipboardItem({
+        'text/html': new Blob([html], { type: 'text/html' }),
+        'text/plain': new Blob([plain], { type: 'text/plain' }),
+      });
+      await navigator.clipboard.write([item]);
+      return;
+    }
+    // Fallback: select-and-execCommand
+    const div = document.createElement('div');
+    div.contentEditable = 'true';
+    div.innerHTML = html;
+    div.style.position = 'fixed';
+    div.style.left = '-9999px';
+    document.body.appendChild(div);
+    const range = document.createRange();
+    range.selectNode(div);
+    const sel = window.getSelection();
+    sel?.removeAllRanges();
+    sel?.addRange(range);
+    document.execCommand('copy');
+    sel?.removeAllRanges();
+    document.body.removeChild(div);
+  }
+
+  async function copyText(text: string) {
+    await navigator.clipboard.writeText(text);
+  }
+
+  $<HTMLButtonElement>('copyRich').addEventListener('click', async () => {
+    const out = render(readInput());
+    try {
+      await copyRich(out.html, out.plainText);
+      setStatus('Copied — paste into Gmail compose.');
+    } catch (err) {
+      setStatus('Rich copy failed; try Copy HTML instead.');
+      console.error(err);
+    }
+  });
+  $<HTMLButtonElement>('copyHtml').addEventListener('click', async () => {
+    const out = render(readInput());
+    await copyText(out.html);
+    setStatus('HTML copied.');
+  });
+  $<HTMLButtonElement>('copyText').addEventListener('click', async () => {
+    const out = render(readInput());
+    await copyText(out.plainText);
+    setStatus('Plain text copied.');
+  });
+  $<HTMLButtonElement>('copySig').addEventListener('click', async () => {
+    const out = render(readInput());
+    try {
+      await copyRich(out.signatureHtml, '');
+      setStatus('Signature copied.');
+    } catch {
+      await copyText(out.signatureHtml);
+      setStatus('Signature HTML copied.');
+    }
+  });
+  $<HTMLButtonElement>('copySubject').addEventListener('click', async () => {
+    await copyText(subjectEl.value);
+    setStatus('Subject copied.');
+  });
+
+  // Initial render with variant defaults applied.
+  applyVariantDefaults(true);
+</script>
