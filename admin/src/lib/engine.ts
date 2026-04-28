@@ -3,6 +3,7 @@ import { projects, type Project, type Bullet } from '@/data/projects';
 import { skills, type Skill } from '@/data/skills';
 import { headlines, summaries, kickers } from '@/data/content';
 import { identity } from '@/data/identity';
+import { education, type EducationEntry } from '@/data/education';
 
 export interface ResumeProject {
   id: string;
@@ -28,6 +29,7 @@ export interface Resume {
   kicker: string;
   projects: ResumeProject[];
   skillGroups: ResumeSkillGroup[];
+  education: EducationEntry[];
 }
 
 const CATEGORY_LABELS: Record<Skill['category'], string> = {
@@ -144,6 +146,7 @@ export function buildResume(angleId: string): Resume | null {
     kicker: kickers[angleId] ?? '',
     projects: selectProjects(angle),
     skillGroups: selectSkills(angle),
+    education,
   };
 }
 
@@ -174,6 +177,19 @@ export function resumeToText(r: Resume): string {
   out.push('SKILLS');
   for (const g of r.skillGroups) {
     out.push(`${g.label}: ${g.items.join(', ')}`);
+  }
+
+  if (r.education.length > 0) {
+    out.push(sep);
+    out.push('EDUCATION');
+    for (const e of r.education) {
+      out.push('');
+      const inst = e.type ? `${e.institution} · ${e.type}` : e.institution;
+      out.push(inst);
+      out.push(e.degree);
+      const meta = e.location ? `${e.period} · ${e.location}` : e.period;
+      out.push(meta);
+    }
   }
 
   return out.join('\n');

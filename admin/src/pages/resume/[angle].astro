@@ -73,6 +73,23 @@ const textBody = resumeToText(resume);
           ))}
         </dl>
       </section>
+
+      {resume.education.length > 0 && (
+        <section class="resume__section">
+          <h2 class="resume__h2">Education</h2>
+          {resume.education.map(e => (
+            <div class="resume__edu">
+              <div class="resume__edu-head">
+                <div>
+                  <h3 class="resume__edu-school">{e.institution}{e.type && <span class="resume__edu-type"> · {e.type}</span>}</h3>
+                  <p class="resume__edu-degree">{e.degree}</p>
+                </div>
+                <span class="resume__edu-period">{e.period}{e.location && <span> · {e.location}</span>}</span>
+              </div>
+            </div>
+          ))}
+        </section>
+      )}
     </article>
   </div>
 
@@ -102,6 +119,19 @@ const textBody = resumeToText(resume);
       {resume.skillGroups.map(g => (
         <p><strong>{g.label}:</strong> {g.items.join(', ')}</p>
       ))}
+
+      {resume.education.length > 0 && (
+        <>
+          <h2>Education</h2>
+          {resume.education.map(e => (
+            <div>
+              <h3>{e.institution}{e.type ? ` — ${e.type}` : ''}</h3>
+              <p>{e.degree}</p>
+              <p>{e.period}{e.location ? ` | ${e.location}` : ''}</p>
+            </div>
+          ))}
+        </>
+      )}
     </article>
   </div>
 
@@ -188,6 +218,13 @@ const textBody = resumeToText(resume);
   .resume__skills-row { display: contents; }
   .resume__skills dt { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-text-subtle); padding-top: 1px; }
   .resume__skills dd { font-size: 13px; color: var(--c-text-muted); }
+  .resume__edu { margin-bottom: 12px; break-inside: avoid; }
+  .resume__edu:last-child { margin-bottom: 0; }
+  .resume__edu-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
+  .resume__edu-school { font-family: var(--font-display); font-size: 16px; font-weight: 400; letter-spacing: -0.01em; line-height: 1.25; }
+  .resume__edu-type { color: var(--c-text-muted); font-size: 14px; }
+  .resume__edu-degree { font-size: 13px; color: var(--c-text-muted); margin-top: 2px; }
+  .resume__edu-period { font-family: var(--font-mono); font-size: 11px; color: var(--c-text-subtle); white-space: nowrap; }
 
   /* ─── ATS resume ───────────────────────────────────────────────────── */
   .resume--ats {
