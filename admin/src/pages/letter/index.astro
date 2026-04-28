@@ -432,6 +432,17 @@ import { identity } from '@/data/identity';
       renderLetter();
       // Update document title.
       document.title = `Cover letter — ${job.company || job.role || 'job'} · Qadan`;
+      // Autoprint hook — see lib/pdf-download.ts. When loaded in the
+      // print iframe with ?autoprint=1, signal the parent that the
+      // letter is fully rendered so it can fire print() now.
+      const aprParams = new URLSearchParams(location.search);
+      if (aprParams.get('autoprint') === '1') {
+        const filename = aprParams.get('filename');
+        if (filename) document.title = filename;
+        setTimeout(() => {
+          window.parent?.postMessage({ type: 'qa-print-ready' }, location.origin);
+        }, 50);
+      }
     }
   }
 
