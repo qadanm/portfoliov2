@@ -266,33 +266,9 @@ const textBody = resumeToText(resume);
   // ── Print + download ────────────────────────────────────────────────
   printBtn?.addEventListener('click', () => window.print());
 
-  // ── Autoprint hook ──────────────────────────────────────────────────
-  // When loaded inside a popup opened by lib/pdf-download.ts (with
-  // ?autoprint=1&filename=...), set the title so it becomes the print
-  // dialog's suggested file name, fire print() once layout settles,
-  // then signal the opener and close. The popup pattern is required
-  // because admin.qadan.co serves X-Frame-Options: deny via Cloudflare
-  // Access, which kills iframe-based printing.
-  (() => {
-    const params = new URLSearchParams(location.search);
-    if (params.get('autoprint') !== '1') return;
-    const filename = params.get('filename');
-    if (filename) document.title = filename;
-
-    const finish = () => {
-      try { window.opener?.postMessage({ type: 'qa-print-done' }, location.origin); } catch { /* swallow */ }
-      window.close();
-    };
-
-    window.addEventListener('afterprint', finish, { once: true });
-    // Fallback: some print stacks (Linux CUPS, virtual printers) skip
-    // the afterprint event. Close after a generous safety window so
-    // the popup doesn't linger forever.
-    window.setTimeout(finish, 90_000);
-
-    // Defer print() one paint cycle so fonts/layout settle.
-    window.setTimeout(() => { try { window.print(); } catch (e) { console.error(e); finish(); } }, 250);
-  })();
+  // (No autoprint hook needed — pdf-download.ts now fetches this page
+  // and rasterizes the .resume--beautiful element inside the Today page,
+  // bypassing X-Frame-Options entirely.)
 
   // The plain-text body is rendered into the page; we download it directly
   // as a Blob so the user gets a real file (no print dialog, no clipboard).

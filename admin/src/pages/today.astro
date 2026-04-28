@@ -431,7 +431,11 @@ import Admin from '@/layouts/Admin.astro';
 <script>
   import { jobsStore, type Job, type JobStatus } from '@/lib/storage';
   import { angleById } from '@/data/angles';
-  import { printToPdf, printToPdfPair } from '@/lib/pdf-download';
+  import {
+    downloadResumePdf as runDownloadResumePdf,
+    downloadLetterPdf as runDownloadLetterPdf,
+    downloadBothPdfs as runDownloadBothPdfs,
+  } from '@/lib/pdf-download';
 
   // ── State ────────────────────────────────────────────────────────────
   type State = {
@@ -731,50 +735,50 @@ import Admin from '@/layouts/Admin.astro';
     return `Moe-Qadan-Cover-Letter-${co}`;
   }
 
-  function downloadResumePdf() {
+  async function downloadResumePdf() {
     const job = state.queue[state.selectedIdx];
     if (!job) return;
     const angleId = job.resumeAngle ?? 'product-designer';
-    // Fire-and-forget so we keep user activation. Awaiting before
-    // window.open could cost the click context on slow hardware.
-    printToPdf({
-      url: `/resume/${encodeURIComponent(angleId)}`,
-      filename: resumeFilename(job),
-    }).catch((e) => {
-      toast(e instanceof Error ? e.message : 'Print failed.');
+    toast('Generating resume PDF…');
+    try {
+      await runDownloadResumePdf({ angleId, filename: resumeFilename(job) });
+      toast('Resume downloaded');
+    } catch (e) {
+      toast(e instanceof Error ? e.message : 'Download failed.');
       console.error(e);
-    });
-    toast('Opening resume print dialog…');
+    }
   }
 
-  function downloadLetterPdf() {
+  async function downloadLetterPdf() {
     const job = state.queue[state.selectedIdx];
     if (!job) return;
-    printToPdf({
-      url: `/letter/?id=${encodeURIComponent(job.id)}`,
-      filename: letterFilename(job),
-    }).catch((e) => {
-      toast(e instanceof Error ? e.message : 'Print failed.');
+    toast('Generating cover letter PDF…');
+    try {
+      await runDownloadLetterPdf({ job, filename: letterFilename(job) });
+      toast('Cover letter downloaded');
+    } catch (e) {
+      toast(e instanceof Error ? e.message : 'Download failed.');
       console.error(e);
-    });
-    toast('Opening cover letter print dialog…');
+    }
   }
 
-  function downloadBothPdfs() {
+  async function downloadBothPdfs() {
     const job = state.queue[state.selectedIdx];
     if (!job) return;
     const angleId = job.resumeAngle ?? 'product-designer';
-    // Pair must open both popups synchronously inside the user-gesture
-    // window — call without await so the second window.open isn't
-    // blocked by the popup blocker.
-    printToPdfPair([
-      { url: `/resume/${encodeURIComponent(angleId)}`, filename: resumeFilename(job) },
-      { url: `/letter/?id=${encodeURIComponent(job.id)}`, filename: letterFilename(job) },
-    ]).catch((e) => {
-      toast(e instanceof Error ? e.message : 'Print failed.');
+    toast('Generating both PDFs…');
+    try {
+      await runDownloadBothPdfs({
+        angleId,
+        resumeFilename: resumeFilename(job),
+        job,
+        letterFilename: letterFilename(job),
+      });
+      toast('Both downloaded');
+    } catch (e) {
+      toast(e instanceof Error ? e.message : 'Download failed.');
       console.error(e);
-    });
-    toast('Two print dialogs incoming — save each.');
+    }
   }
 
   function openJob() {

@@ -432,28 +432,8 @@ import { identity } from '@/data/identity';
       renderLetter();
       // Update document title.
       document.title = `Cover letter — ${job.company || job.role || 'job'} · Qadan`;
-      // Autoprint hook — see lib/pdf-download.ts. When loaded in the
-      // print popup (?autoprint=1), set the title for the dialog
-      // filename, fire print() once the letter is rendered, then
-      // signal the opener and close. Popup-based print is required
-      // because admin.qadan.co serves X-Frame-Options: deny.
-      const aprParams = new URLSearchParams(location.search);
-      if (aprParams.get('autoprint') === '1') {
-        const filename = aprParams.get('filename');
-        if (filename) document.title = filename;
-
-        const finish = () => {
-          try { window.opener?.postMessage({ type: 'qa-print-done' }, location.origin); } catch { /* swallow */ }
-          window.close();
-        };
-
-        window.addEventListener('afterprint', finish, { once: true });
-        window.setTimeout(finish, 90_000);
-
-        // Defer print() so the letter HTML we just inserted has a
-        // paint cycle, then fonts settle.
-        window.setTimeout(() => { try { window.print(); } catch (e) { console.error(e); finish(); } }, 350);
-      }
+      // (No autoprint hook needed — pdf-download.ts re-renders the
+      // letter HTML into the Today page and rasterizes it directly.)
     }
   }
 
