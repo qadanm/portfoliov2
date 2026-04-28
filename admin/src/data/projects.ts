@@ -155,28 +155,28 @@ export const projects: Project[] = [
     },
     bullets: [
       {
-        text: 'Built advisor- and customer-facing portals on InvestCloud’s framework, deployed across Chase, Cetera, Northwestern Mutual, Voya, Silicon Valley Bank, and East West Bank. One platform underneath; per-institution branding, structure, and IA on top.',
+        text: 'Built advisor- and customer-facing portals on InvestCloud’s proprietary multi-tenant platform, deployed across Chase, Cetera, Northwestern Mutual, Voya, Silicon Valley Bank, and East West Bank. One framework underneath; per-institution branding, structure, and IA on top.',
         serves: ['engineering', 'design', 'leadership'],
         weight: 5,
       },
       {
-        text: 'Implemented complex Figma handoffs faithfully in hand-written CSS, against a multi-tenant CMS that didn’t always have a primitive for what was drawn.',
+        text: 'Translated handoffs from Figma, Sketch, and InVision into production through InvestCloud’s proprietary stylesheet development tools and hand-written CSS, against a multi-tenant CMS that didn’t always have a primitive for what was drawn.',
         serves: ['design', 'engineering'],
         weight: 5,
       },
       {
-        text: 'Built dense, data-heavy financial layouts that stayed readable across desktop, tablet, and mobile, often within design constraints authored mostly for one breakpoint.',
+        text: 'Built dense, data-heavy financial layouts that stayed readable across desktop, tablet, and mobile, typically against design specs authored for one breakpoint.',
         serves: ['design', 'engineering'],
         weight: 4,
       },
       {
-        text: 'Coordinated tightly with design, product, and QA so that "looks right in Figma" and "works in production" stayed connected across many institutional implementations.',
-        serves: ['leadership', 'product'],
+        text: 'Configured and customized the platform’s components to fit each institution’s brand, IA, and product requirements while keeping the underlying framework stable across deployments.',
+        serves: ['engineering', 'design', 'product'],
         weight: 4,
       },
       {
-        text: 'Built design literacy: ~60% of the work was reproducing intent faithfully; ~40% was closing gaps the original handoff didn’t see. The second 40% is where it pays off.',
-        serves: ['design', 'leadership'],
+        text: 'Coordinated with design, product, project management, QA, and support so each institutional implementation shipped on schedule and behaved in production the way it did in the spec.',
+        serves: ['leadership', 'product'],
         weight: 4,
       },
     ],
