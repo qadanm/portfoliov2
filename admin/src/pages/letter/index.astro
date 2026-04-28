@@ -432,8 +432,24 @@ import { identity } from '@/data/identity';
       renderLetter();
       // Update document title.
       document.title = `Cover letter — ${job.company || job.role || 'job'} · Qadan`;
-      // (No autoprint hook needed — pdf-download.ts re-renders the
-      // letter HTML into the Today page and rasterizes it directly.)
+      // Autoprint hook — when the tab is opened from Today with
+      // ?autoprint=1, fire the browser print dialog once the letter is
+      // rendered, then close the tab when the dialog dismisses. Vector
+      // PDF, ATS-readable.
+      const aprParams = new URLSearchParams(location.search);
+      if (aprParams.get('autoprint') === '1') {
+        const filename = aprParams.get('filename');
+        if (filename) document.title = filename;
+
+        window.addEventListener('afterprint', () => {
+          setTimeout(() => { try { window.close(); } catch { /* swallow */ } }, 100);
+        }, { once: true });
+        setTimeout(() => { try { window.close(); } catch { /* swallow */ } }, 60_000);
+
+        setTimeout(() => {
+          try { window.print(); } catch (e) { console.error(e); }
+        }, 400);
+      }
     }
   }
 

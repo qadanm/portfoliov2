@@ -431,11 +431,7 @@ import Admin from '@/layouts/Admin.astro';
 <script>
   import { jobsStore, type Job, type JobStatus } from '@/lib/storage';
   import { angleById } from '@/data/angles';
-  import {
-    downloadResumePdf as runDownloadResumePdf,
-    downloadLetterPdf as runDownloadLetterPdf,
-    downloadBothPdfs as runDownloadBothPdfs,
-  } from '@/lib/pdf-download';
+  import { openForPrint, openBothForPrint } from '@/lib/pdf-download';
 
   // ── State ────────────────────────────────────────────────────────────
   type State = {
@@ -735,49 +731,47 @@ import Admin from '@/layouts/Admin.astro';
     return `Moe-Qadan-Cover-Letter-${co}`;
   }
 
-  async function downloadResumePdf() {
+  function downloadResumePdf() {
     const job = state.queue[state.selectedIdx];
     if (!job) return;
     const angleId = job.resumeAngle ?? 'product-designer';
-    toast('Generating resume PDF…');
     try {
-      await runDownloadResumePdf({ angleId, filename: resumeFilename(job) });
-      toast('Resume downloaded');
-    } catch (e) {
-      toast(e instanceof Error ? e.message : 'Download failed.');
-      console.error(e);
-    }
-  }
-
-  async function downloadLetterPdf() {
-    const job = state.queue[state.selectedIdx];
-    if (!job) return;
-    toast('Generating cover letter PDF…');
-    try {
-      await runDownloadLetterPdf({ job, filename: letterFilename(job) });
-      toast('Cover letter downloaded');
-    } catch (e) {
-      toast(e instanceof Error ? e.message : 'Download failed.');
-      console.error(e);
-    }
-  }
-
-  async function downloadBothPdfs() {
-    const job = state.queue[state.selectedIdx];
-    if (!job) return;
-    const angleId = job.resumeAngle ?? 'product-designer';
-    toast('Generating both PDFs…');
-    try {
-      await runDownloadBothPdfs({
-        angleId,
-        resumeFilename: resumeFilename(job),
-        job,
-        letterFilename: letterFilename(job),
+      openForPrint({
+        url: `/resume/${encodeURIComponent(angleId)}`,
+        filename: resumeFilename(job),
       });
-      toast('Both downloaded');
+      toast('Resume opened — Save in the print dialog.');
     } catch (e) {
-      toast(e instanceof Error ? e.message : 'Download failed.');
-      console.error(e);
+      toast(e instanceof Error ? e.message : 'Open failed.');
+    }
+  }
+
+  function downloadLetterPdf() {
+    const job = state.queue[state.selectedIdx];
+    if (!job) return;
+    try {
+      openForPrint({
+        url: `/letter/?id=${encodeURIComponent(job.id)}`,
+        filename: letterFilename(job),
+      });
+      toast('Cover letter opened — Save in the print dialog.');
+    } catch (e) {
+      toast(e instanceof Error ? e.message : 'Open failed.');
+    }
+  }
+
+  function downloadBothPdfs() {
+    const job = state.queue[state.selectedIdx];
+    if (!job) return;
+    const angleId = job.resumeAngle ?? 'product-designer';
+    try {
+      openBothForPrint([
+        { url: `/resume/${encodeURIComponent(angleId)}`, filename: resumeFilename(job) },
+        { url: `/letter/?id=${encodeURIComponent(job.id)}`, filename: letterFilename(job) },
+      ]);
+      toast('Two tabs opened — Save in each print dialog.');
+    } catch (e) {
+      toast(e instanceof Error ? e.message : 'Open failed.');
     }
   }
 

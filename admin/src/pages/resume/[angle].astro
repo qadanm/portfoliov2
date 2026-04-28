@@ -266,9 +266,33 @@ const textBody = resumeToText(resume);
   // ── Print + download ────────────────────────────────────────────────
   printBtn?.addEventListener('click', () => window.print());
 
-  // (No autoprint hook needed — pdf-download.ts now fetches this page
-  // and rasterizes the .resume--beautiful element inside the Today page,
-  // bypassing X-Frame-Options entirely.)
+  // ── Autoprint hook ──────────────────────────────────────────────────
+  // When loaded with ?autoprint=1 (lib/pdf-download.ts opens the page in
+  // a new tab and lets it print itself), set the document title — used
+  // as the dialog's suggested file name — fire window.print() once the
+  // page has rendered, then close the tab when the dialog is dismissed.
+  // Vector PDF, ATS-readable, no special infra required.
+  (() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('autoprint') !== '1') return;
+    const filename = params.get('filename');
+    if (filename) document.title = filename;
+
+    // Close on afterprint (Save and Cancel both fire it).
+    window.addEventListener('afterprint', () => {
+      setTimeout(() => { try { window.close(); } catch { /* swallow */ } }, 100);
+    }, { once: true });
+    // Safety: some print drivers don't fire afterprint. Don't leave the
+    // tab open forever.
+    setTimeout(() => { try { window.close(); } catch { /* swallow */ } }, 60_000);
+
+    // Defer print() so layout/fonts settle. setTimeout(0) instead of
+    // requestAnimationFrame because rAF doesn't fire when the tab is
+    // backgrounded.
+    setTimeout(() => {
+      try { window.print(); } catch (e) { console.error(e); }
+    }, 350);
+  })();
 
   // The plain-text body is rendered into the page; we download it directly
   // as a Blob so the user gets a real file (no print dialog, no clipboard).
