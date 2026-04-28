@@ -16,9 +16,11 @@ import Admin from '@/layouts/Admin.astro';
       <div class="today__hints" aria-label="keyboard shortcuts">
         <kbd>j</kbd><kbd>k</kbd> navigate
         <span class="today__hint-sep">·</span>
-        <kbd>r</kbd> resume
+        <kbd>r</kbd> resume PDF
         <span class="today__hint-sep">·</span>
-        <kbd>l</kbd> letter
+        <kbd>l</kbd> letter PDF
+        <span class="today__hint-sep">·</span>
+        <kbd>b</kbd> both PDFs
         <span class="today__hint-sep">·</span>
         <kbd>space</kbd> open
         <span class="today__hint-sep">·</span>
@@ -322,6 +324,7 @@ import Admin from '@/layouts/Admin.astro';
     justify-content: center;
     font-weight: 500;
   }
+  .today__detail :global(.detail__action--wide) { grid-column: 1 / -1; }
   .today__detail :global(.detail__action--primary:hover) { color: var(--c-bg); filter: brightness(1.1); }
   .today__detail :global(.detail__action kbd) {
     font-family: var(--font-mono);
@@ -428,6 +431,7 @@ import Admin from '@/layouts/Admin.astro';
 <script>
   import { jobsStore, type Job, type JobStatus } from '@/lib/storage';
   import { angleById } from '@/data/angles';
+  import { printToPdf, printToPdfSequential } from '@/lib/pdf-download';
 
   // ── State ────────────────────────────────────────────────────────────
   type State = {
@@ -632,8 +636,9 @@ import Admin from '@/layouts/Admin.astro';
       ${editHtml}
 
       <div class="detail__actions">
-        <a class="detail__action" href="/resume/${escape(angleId)}" target="_blank" rel="noopener"><span>Open resume <span class="hint">↗</span></span><kbd>r</kbd></a>
-        <a class="detail__action" href="/letter/?id=${encodeURIComponent(job.id)}" target="_blank" rel="noopener"><span>Open cover letter <span class="hint">↗</span></span><kbd>l</kbd></a>
+        <button class="detail__action" data-act="resume-pdf" type="button"><span>Resume PDF <span class="hint">↓</span></span><kbd>r</kbd></button>
+        <button class="detail__action" data-act="letter-pdf" type="button"><span>Cover letter PDF <span class="hint">↓</span></span><kbd>l</kbd></button>
+        <button class="detail__action detail__action--wide" data-act="both-pdf" type="button"><span>Download both PDFs <span class="hint">↓↓</span></span><kbd>b</kbd></button>
         ${urlBtn}
         ${editBtn}
         <button class="detail__action" data-act="defer" type="button"><span>${isDeferred(job) ? 'Undefer' : 'Defer'}</span><kbd>d</kbd></button>
@@ -710,17 +715,67 @@ import Admin from '@/layouts/Admin.astro';
     select(next);
   }
 
-  function openResume() {
+  // Build a sensible PDF filename for a job. Browsers append .pdf
+  // automatically when the user picks "Save as PDF" in the print dialog
+  // (the filename here becomes the dialog default), so don't include the
+  // extension.
+  function fileSlug(s: string): string {
+    return s.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
+  }
+  function resumeFilename(job: Job): string {
+    const co = fileSlug(job.company || 'job');
+    return `Moe-Qadan-Resume-${co}`;
+  }
+  function letterFilename(job: Job): string {
+    const co = fileSlug(job.company || 'job');
+    return `Moe-Qadan-Cover-Letter-${co}`;
+  }
+
+  async function downloadResumePdf() {
     const job = state.queue[state.selectedIdx];
     if (!job) return;
     const angleId = job.resumeAngle ?? 'product-designer';
-    window.open(`/resume/${encodeURIComponent(angleId)}`, '_blank', 'noopener');
+    toast('Opening print dialog…');
+    try {
+      await printToPdf({
+        url: `/resume/${encodeURIComponent(angleId)}`,
+        filename: resumeFilename(job),
+      });
+    } catch (e) {
+      toast('Print failed — try the resume page directly.');
+      console.error(e);
+    }
   }
 
-  function openLetter() {
+  async function downloadLetterPdf() {
     const job = state.queue[state.selectedIdx];
     if (!job) return;
-    window.open(`/letter/?id=${encodeURIComponent(job.id)}`, '_blank', 'noopener');
+    toast('Opening print dialog…');
+    try {
+      await printToPdf({
+        url: `/letter/?id=${encodeURIComponent(job.id)}`,
+        filename: letterFilename(job),
+      });
+    } catch (e) {
+      toast('Print failed — try the letter page directly.');
+      console.error(e);
+    }
+  }
+
+  async function downloadBothPdfs() {
+    const job = state.queue[state.selectedIdx];
+    if (!job) return;
+    const angleId = job.resumeAngle ?? 'product-designer';
+    toast('Resume first, then cover letter…');
+    try {
+      await printToPdfSequential([
+        { url: `/resume/${encodeURIComponent(angleId)}`, filename: resumeFilename(job) },
+        { url: `/letter/?id=${encodeURIComponent(job.id)}`, filename: letterFilename(job) },
+      ]);
+    } catch (e) {
+      toast('Print failed — try the docs individually.');
+      console.error(e);
+    }
   }
 
   function openJob() {
@@ -813,8 +868,9 @@ import Admin from '@/layouts/Admin.astro';
 
   function runAction(act: string) {
     switch (act) {
-      case 'resume': openResume(); break;
-      case 'letter': openLetter(); break;
+      case 'resume-pdf': void downloadResumePdf(); break;
+      case 'letter-pdf': void downloadLetterPdf(); break;
+      case 'both-pdf': void downloadBothPdfs(); break;
       case 'open': openJob(); break;
       case 'apply': markApplied(); break;
       case 'defer': toggleDefer(); break;
@@ -853,9 +909,11 @@ import Admin from '@/layouts/Admin.astro';
       case ' ':
         e.preventDefault(); openJob(); break;
       case 'r':
-        e.preventDefault(); openResume(); break;
+        e.preventDefault(); void downloadResumePdf(); break;
       case 'l':
-        e.preventDefault(); openLetter(); break;
+        e.preventDefault(); void downloadLetterPdf(); break;
+      case 'b':
+        e.preventDefault(); void downloadBothPdfs(); break;
       case 'a':
         e.preventDefault(); markApplied(); break;
       case 'd':

@@ -32,24 +32,10 @@ import { identity } from '@/data/identity';
     </article>
 
     <footer class="letter-foot no-print" id="letter-foot" hidden>
-      <div class="letter-foot__row">
-        <label>Tone
-          <select id="letter-tone">
-            <option value="design">Design-focused</option>
-            <option value="warm">Warm professional</option>
-            <option value="direct">Direct</option>
-            <option value="technical">Technical</option>
-            <option value="senior">Senior / executive</option>
-          </select>
-        </label>
-        <label>Recruiter first name <span class="letter-foot__hint">optional</span>
-          <input type="text" id="letter-recruiter" placeholder="" />
-        </label>
-      </div>
-      <label>Custom line <span class="letter-foot__hint">one sentence to weave in (specific hook for this company)</span>
-        <input type="text" id="letter-hook" placeholder="" />
+      <label>Recruiter first name <span class="letter-foot__hint">optional — appears in the greeting</span>
+        <input type="text" id="letter-recruiter" placeholder="" />
       </label>
-      <p class="letter-foot__note">Edits regenerate the letter instantly. They aren't saved unless you re-open from /today.</p>
+      <p class="letter-foot__note">The body is a fixed generic paragraph for this resume angle. Only the greeting and the role/company line change per job — that's by design. Edit the per-angle bodies in <code>admin/src/lib/letters.ts</code> if you want to change the wording.</p>
     </footer>
 
     <div class="letter-toast" id="letter-toast" aria-live="polite"></div>
@@ -206,7 +192,7 @@ import { identity } from '@/data/identity';
     color: #09090b;
   }
 
-  /* ─── Tone footer ──────────────────────────────────────────────── */
+  /* ─── Editor footer ────────────────────────────────────────────── */
   .letter-foot {
     margin-top: 24px;
     padding: 18px;
@@ -249,6 +235,15 @@ import { identity } from '@/data/identity';
     margin: 8px 0 0;
     font-size: 11px;
     color: #71717a;
+  }
+  .letter-foot__note code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    background: #ffffff;
+    border: 1px solid #e4e4e7;
+    padding: 1px 4px;
+    border-radius: 3px;
+    color: #18181b;
   }
 
   /* ─── Toast ────────────────────────────────────────────────────── */
@@ -316,7 +311,7 @@ import { identity } from '@/data/identity';
 
 <script>
   import { jobsStore, ensureSchema, type Job } from '@/lib/storage';
-  import { generateCoverLetter, type Tone } from '@/lib/letters';
+  import { generateCoverLetter } from '@/lib/letters';
   import { identity } from '@/data/identity';
 
   ensureSchema();
@@ -324,13 +319,10 @@ import { identity } from '@/data/identity';
   const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
   const params = new URLSearchParams(window.location.search);
   const jobId = params.get('id');
-  const initialTone = (params.get('tone') ?? '').toLowerCase();
 
   const out = $('letter-output');
   const foot = $('letter-foot');
-  const toneSel = $<HTMLSelectElement>('letter-tone');
   const recruiterInput = $<HTMLInputElement>('letter-recruiter');
-  const hookInput = $<HTMLInputElement>('letter-hook');
   const toastEl = $('letter-toast');
 
   let job: Job | null = null;
@@ -347,21 +339,12 @@ import { identity } from '@/data/identity';
     return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
   }
 
-  function pickToneForAngle(angleId: string | undefined): Tone {
-    if (!angleId) return 'design';
-    if (/ai-product-designer|design-engineer|product-designer/.test(angleId)) return 'design';
-    if (/ux-engineer|frontend-ux-engineer|design-systems-engineer/.test(angleId)) return 'technical';
-    if (/senior-product-designer|web-experience-manager|ux-product-lead/.test(angleId)) return 'senior';
-    return 'design';
-  }
-
   function paragraphsFromText(text: string): string[] {
     return text.split(/\n{2,}/).map(p => p.trim()).filter(Boolean);
   }
 
   function renderLetter() {
     if (!job) return;
-    const tone = (toneSel.value as Tone) || pickToneForAngle(job.resumeAngle);
     const text = generateCoverLetter({
       angleId: job.resumeAngle ?? 'product-designer',
       company: job.company || '(company)',
@@ -369,8 +352,7 @@ import { identity } from '@/data/identity';
       recruiterFirstName: recruiterInput.value.trim() || undefined,
       jobUrl: job.url,
       jdText: job.jdText,
-      customLine: hookInput.value.trim() || undefined,
-    }, tone);
+    });
 
     if (!text) {
       renderError('Could not generate letter for this angle.');
@@ -378,9 +360,9 @@ import { identity } from '@/data/identity';
     }
 
     const paras = paragraphsFromText(text);
-    // Convention: first para is the greeting, last is the sign-off,
-    // everything between is the body.
-    const greeting = paras[0] ?? `Hi ${recruiterInput.value.trim() || 'there'},`;
+    // Convention: first paragraph is the greeting+opener line, last is
+    // the sign-off, everything between is the body.
+    const greeting = paras[0] ?? `Hi there,`;
     const signoff = paras[paras.length - 1] ?? `— ${identity.name}`;
     const body = paras.slice(1, -1);
 
@@ -423,7 +405,6 @@ import { identity } from '@/data/identity';
 
   function getLetterPlainText(): string {
     if (!job) return '';
-    const tone = (toneSel.value as Tone) || pickToneForAngle(job.resumeAngle);
     return generateCoverLetter({
       angleId: job.resumeAngle ?? 'product-designer',
       company: job.company || '',
@@ -431,8 +412,7 @@ import { identity } from '@/data/identity';
       recruiterFirstName: recruiterInput.value.trim() || undefined,
       jobUrl: job.url,
       jdText: job.jdText,
-      customLine: hookInput.value.trim() || undefined,
-    }, tone);
+    });
   }
 
   function toast(msg: string) {
@@ -449,11 +429,6 @@ import { identity } from '@/data/identity';
     if (!job) {
       renderError(`No job found with id ${jobId}.`);
     } else {
-      // Set initial tone based on the angle, or honor ?tone= override.
-      const initial = ['direct', 'warm', 'design', 'technical', 'senior'].includes(initialTone)
-        ? (initialTone as Tone)
-        : pickToneForAngle(job.resumeAngle);
-      toneSel.value = initial;
       renderLetter();
       // Update document title.
       document.title = `Cover letter — ${job.company || job.role || 'job'} · Qadan`;
@@ -461,9 +436,7 @@ import { identity } from '@/data/identity';
   }
 
   // ── Reactive editing ──────────────────────────────────────────────
-  toneSel.addEventListener('change', renderLetter);
   recruiterInput.addEventListener('input', renderLetter);
-  hookInput.addEventListener('input', renderLetter);
 
   // ── Actions ───────────────────────────────────────────────────────
   $('print-btn').addEventListener('click', () => window.print());

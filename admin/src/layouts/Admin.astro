@@ -200,8 +200,14 @@ function isActive(href: string) {
     // Refresh the relative timestamp every 30 seconds even if status doesn't change.
     setInterval(() => render(sync.status()), 30_000);
 
-    // Kick off the sync. Errors are surfaced via render(); never throw out.
-    sync.init().catch(() => { /* surfaced via status */ });
+    // Skip sync init when this page is loaded inside the print iframe
+    // (lib/pdf-download.ts adds ?embed=1). Otherwise every PDF print
+    // would trigger an extra sync round-trip from the headless render.
+    const isEmbedded = new URLSearchParams(window.location.search).get('embed') === '1';
+    if (!isEmbedded) {
+      // Kick off the sync. Errors are surfaced via render(); never throw out.
+      sync.init().catch(() => { /* surfaced via status */ });
+    }
   </script>
 </body>
 </html>
