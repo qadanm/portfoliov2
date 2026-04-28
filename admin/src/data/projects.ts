@@ -102,48 +102,33 @@ export const projects: Project[] = [
     },
     bullets: [
       {
-        text: 'Operate across MagTek.com and a network of related properties built on a long-running ASP.NET MVC platform. Improvements have to land without disrupting production traffic.',
-        serves: ['engineering', 'leadership'],
+        text: 'Own the design and full-stack development of the company’s web platforms, primarily MagTek.com. Work spans UX, front-end architecture, and production systems.',
+        serves: ['design', 'engineering', 'leadership'],
+        weight: 5,
+      },
+      {
+        text: 'Build and maintain a scalable ASP.NET MVC / Razor-based system with a focus on reusable components, performance, and long-term maintainability.',
+        serves: ['engineering'],
         weight: 4,
       },
       {
-        text: 'Built a shared Razor component library that moves the platform off page-specific markup. Modular, strongly typed, faster to iterate, more consistent on the surface.',
+        text: 'Led the development of a shared Razor component library, moving the site away from page-specific markup into modular, strongly typed components that make development faster and more consistent.',
         serves: ['engineering', 'design'],
         weight: 5,
       },
       {
-        text: 'Rebuilt the homepage. Replaced a six-slide rotating carousel that nobody finished with a static hero on a single message. Sequenced the migration so dependent surfaces, analytics taxonomy, and SEO didn’t drift during transition.',
-        serves: ['product', 'design', 'leadership'],
-        weight: 5,
-      },
-      {
-        text: 'Restructured the support portal around how users actually arrive (specific error, product, or question), not the org chart. Standardized layout patterns so every article looks, scrolls, and behaves the same way.',
-        serves: ['product', 'design'],
-        weight: 4,
-      },
-      {
-        text: 'Migrated spacing, color, and type into tokens the rest of the platform could adopt incrementally on its own timeline. No big-bang rewrite, no breakage.',
+        text: 'Rebuilt the CSS foundation into a more scalable design system. Continue to improve site structure, performance, and usability while keeping everything stable with existing integrations.',
         serves: ['design', 'engineering'],
         weight: 5,
       },
       {
-        text: 'Hardware product pages built on a single buyer-facing template across card readers, OEM components, check scanners, and issuance hardware. Sticky horizontal sub-nav keeps the four categories one click apart.',
-        serves: ['design', 'product'],
-        weight: 4,
-      },
-      {
-        text: 'Designed and shipped Magensa subsidiary surfaces: distinct brand identity inside the parent platform, scroll-aware sticky header, "Old Way / Magensa Way" comparison pattern.',
-        serves: ['design', 'product'],
-        weight: 3,
-      },
-      {
-        text: 'Stack: ASP.NET MVC (.NET Framework), C#, Razor (CSHTML), Entity Framework, JavaScript, jQuery, Bootstrap, hand-authored CSS systems.',
-        serves: ['engineering'],
-        weight: 3,
-      },
-      {
-        text: 'Integrated Cursor and Claude into the workflow for repetitive iteration and structured development. Human owns every decision that ships.',
+        text: 'Incorporate AI into parts of the workflow where it actually makes sense, automating repetitive tasks and speeding up development. Tools include Cursor and Claude.',
         serves: ['ai', 'engineering'],
+        weight: 3,
+      },
+      {
+        text: 'Stack: ASP.NET MVC (.NET Framework), C#, Razor (CSHTML), Entity Framework, JavaScript/jQuery, Bootstrap, component-based design systems.',
+        serves: ['engineering'],
         weight: 3,
       },
     ],
