@@ -431,7 +431,7 @@ import Admin from '@/layouts/Admin.astro';
 <script>
   import { jobsStore, type Job, type JobStatus } from '@/lib/storage';
   import { angleById } from '@/data/angles';
-  import { printToPdf, printToPdfSequential } from '@/lib/pdf-download';
+  import { printToPdf, printToPdfPair } from '@/lib/pdf-download';
 
   // ── State ────────────────────────────────────────────────────────────
   type State = {
@@ -731,51 +731,50 @@ import Admin from '@/layouts/Admin.astro';
     return `Moe-Qadan-Cover-Letter-${co}`;
   }
 
-  async function downloadResumePdf() {
+  function downloadResumePdf() {
     const job = state.queue[state.selectedIdx];
     if (!job) return;
     const angleId = job.resumeAngle ?? 'product-designer';
-    toast('Opening print dialog…');
-    try {
-      await printToPdf({
-        url: `/resume/${encodeURIComponent(angleId)}`,
-        filename: resumeFilename(job),
-      });
-    } catch (e) {
-      toast('Print failed — try the resume page directly.');
+    // Fire-and-forget so we keep user activation. Awaiting before
+    // window.open could cost the click context on slow hardware.
+    printToPdf({
+      url: `/resume/${encodeURIComponent(angleId)}`,
+      filename: resumeFilename(job),
+    }).catch((e) => {
+      toast(e instanceof Error ? e.message : 'Print failed.');
       console.error(e);
-    }
+    });
+    toast('Opening resume print dialog…');
   }
 
-  async function downloadLetterPdf() {
+  function downloadLetterPdf() {
     const job = state.queue[state.selectedIdx];
     if (!job) return;
-    toast('Opening print dialog…');
-    try {
-      await printToPdf({
-        url: `/letter/?id=${encodeURIComponent(job.id)}`,
-        filename: letterFilename(job),
-      });
-    } catch (e) {
-      toast('Print failed — try the letter page directly.');
+    printToPdf({
+      url: `/letter/?id=${encodeURIComponent(job.id)}`,
+      filename: letterFilename(job),
+    }).catch((e) => {
+      toast(e instanceof Error ? e.message : 'Print failed.');
       console.error(e);
-    }
+    });
+    toast('Opening cover letter print dialog…');
   }
 
-  async function downloadBothPdfs() {
+  function downloadBothPdfs() {
     const job = state.queue[state.selectedIdx];
     if (!job) return;
     const angleId = job.resumeAngle ?? 'product-designer';
-    toast('Resume first, then cover letter…');
-    try {
-      await printToPdfSequential([
-        { url: `/resume/${encodeURIComponent(angleId)}`, filename: resumeFilename(job) },
-        { url: `/letter/?id=${encodeURIComponent(job.id)}`, filename: letterFilename(job) },
-      ]);
-    } catch (e) {
-      toast('Print failed — try the docs individually.');
+    // Pair must open both popups synchronously inside the user-gesture
+    // window — call without await so the second window.open isn't
+    // blocked by the popup blocker.
+    printToPdfPair([
+      { url: `/resume/${encodeURIComponent(angleId)}`, filename: resumeFilename(job) },
+      { url: `/letter/?id=${encodeURIComponent(job.id)}`, filename: letterFilename(job) },
+    ]).catch((e) => {
+      toast(e instanceof Error ? e.message : 'Print failed.');
       console.error(e);
-    }
+    });
+    toast('Two print dialogs incoming — save each.');
   }
 
   function openJob() {

@@ -1,32 +1,38 @@
-// Print-to-PDF helper. Loads a same-origin URL into a hidden iframe sized
-// to Letter paper, waits for the iframed page to signal it's done
-// rendering, then fires window.print() inside the iframe so the print
-// dialog opens with the right content and the right filename.
+// Print-to-PDF helper. Opens the doc in a popup window with ?autoprint=1.
+// The popup page (resume/letter):
+//   1. detects ?autoprint=1
+//   2. sets document.title from the filename param (used as the print
+//      dialog's suggested file name)
+//   3. waits for content to render
+//   4. fires window.print()
+//   5. on afterprint (or safety timeout), postMessages 'qa-print-done'
+//      to window.opener and calls window.close()
 //
-// Why iframe + postMessage handshake (not just iframe.load + a timer):
-//   - The iframed page (resume / letter) finishes the inline `load`
-//     event well before its own scripts have rendered the body. Firing
-//     print() too early gets a blank dialog or no dialog at all.
-//   - Astro hoists scripts and re-runs them on hydration, which can
-//     happen any time after `load`. We have no reliable fixed delay
-//     that's correct on every device.
-//   - So the iframed page tells us when it's ready via postMessage.
+// Why popup, not iframe:
+//   admin.qadan.co serves `X-Frame-Options: deny` via Cloudflare Access.
+//   That blocks ALL framing — same-origin included — so iframe-based
+//   print never displayed in production. Popups are separate top-level
+//   windows and aren't affected by X-Frame-Options.
 //
-// Why not jsPDF/html2canvas:
+// Why not a true silent download (jsPDF / html2canvas):
 //   - Those rasterize text → pixels. Resumes need vector text so ATSes
 //     (Workday/Greenhouse/Lever) can parse name, dates, skills.
 //
-// Why a Letter-sized iframe and not 1×1px:
-//   - Chrome computes print layout from the iframe's dimensions. A 1px
-//     iframe produces zero printable pages and the dialog is suppressed.
+// Trade-offs we accept:
+//   - User briefly sees the popup window flash before it auto-closes.
+//   - Popup blocker may interrupt the first time on some browsers; the
+//     user can allow popups for the site once.
+//   - For "both", we open BOTH popups inside the same click handler so
+//     they share user activation. Chrome queues print dialogs from
+//     multiple windows (one shows, the next waits).
 
 interface PrintJob {
   url: string;
   filename: string;
 }
 
-const READY_TIMEOUT_MS = 8_000;
-const SAFETY_TIMEOUT_MS = 90_000;
+const POPUP_FEATURES = 'width=900,height=1100,scrollbars=yes,resizable=yes';
+const SAFETY_TIMEOUT_MS = 120_000;
 
 // Set window.__qaPdfDebug = true in DevTools to trace the print flow.
 function log(...args: unknown[]): void {
@@ -36,113 +42,94 @@ function log(...args: unknown[]): void {
   console.log('[pdf-download]', ...args);
 }
 
-export async function printToPdf({ url, filename }: PrintJob): Promise<void> {
-  return new Promise<void>((resolve, reject) => {
-    log('printToPdf start', { url, filename });
+function buildPopupUrl({ url, filename }: PrintJob): string {
+  const sep = url.includes('?') ? '&' : '?';
+  return `${url}${sep}embed=1&autoprint=1&filename=${encodeURIComponent(filename)}`;
+}
 
-    const iframe = document.createElement('iframe');
-    iframe.setAttribute('aria-hidden', 'true');
-    // Letter paper size; offscreen but laid out. Chrome won't render an
-    // empty-dimensioned iframe as "printable", so we need real dimensions.
-    iframe.style.position = 'fixed';
-    iframe.style.left = '-10000px';
-    iframe.style.top = '0';
-    iframe.style.width = '8.5in';
-    iframe.style.height = '11in';
-    iframe.style.border = '0';
-    iframe.style.opacity = '0';
-    iframe.style.pointerEvents = 'none';
-
-    const sep = url.includes('?') ? '&' : '?';
-    iframe.src = `${url}${sep}embed=1&autoprint=1&filename=${encodeURIComponent(filename)}`;
-
+/** Wait for a popup to send 'qa-print-done' or to be closed manually,
+ *  whichever comes first. Resolves regardless — caller doesn't need to
+ *  distinguish (Save and Cancel both produce the same outcome here). */
+function awaitPopupDone(win: Window): Promise<void> {
+  return new Promise<void>((resolve) => {
     let resolved = false;
-    let safetyTimer: number | null = null;
-    let readyTimer: number | null = null;
-
-    const cleanup = (reason: string) => {
+    const finish = (reason: string) => {
       if (resolved) return;
       resolved = true;
-      log('cleanup', reason);
+      log('finish', reason);
       window.removeEventListener('message', onMessage);
-      if (safetyTimer != null) clearTimeout(safetyTimer);
-      if (readyTimer != null) clearTimeout(readyTimer);
-      // Defer removal so the print job has a tick to finalize.
-      setTimeout(() => iframe.remove(), 100);
+      clearInterval(closedCheck);
+      clearTimeout(safety);
       resolve();
     };
 
-    const fail = (err: unknown) => {
-      if (resolved) return;
-      resolved = true;
-      log('fail', err);
-      window.removeEventListener('message', onMessage);
-      if (safetyTimer != null) clearTimeout(safetyTimer);
-      if (readyTimer != null) clearTimeout(readyTimer);
-      iframe.remove();
-      reject(err instanceof Error ? err : new Error(String(err)));
-    };
-
-    const firePrint = () => {
-      const win = iframe.contentWindow;
-      const doc = iframe.contentDocument;
-      if (!win || !doc) {
-        fail(new Error('iframe has no contentWindow/document'));
-        return;
-      }
-      // Set the title so the print dialog uses it as the suggested file
-      // name (".pdf" is appended by the browser).
-      doc.title = filename;
-      log('firing print()', { docTitle: doc.title });
-      win.addEventListener('afterprint', () => cleanup('afterprint'), { once: true });
-      try {
-        win.focus();
-        win.print();
-      } catch (e) {
-        fail(e);
-      }
-    };
-
     const onMessage = (e: MessageEvent) => {
-      const data = e.data as { type?: string } | null;
-      if (!data || data.type !== 'qa-print-ready') return;
-      // Same-origin and content-window identity tend to differ across
-      // Astro/Vite dev (proxies) and prod, so we trust origin + data
-      // shape rather than checking e.source === iframe.contentWindow.
       if (e.origin !== location.origin) return;
-      log('received qa-print-ready');
-      if (readyTimer != null) {
-        clearTimeout(readyTimer);
-        readyTimer = null;
-      }
-      firePrint();
+      if (e.source !== win) return;
+      const data = e.data as { type?: string } | null;
+      if (data?.type === 'qa-print-done') finish('qa-print-done');
     };
     window.addEventListener('message', onMessage);
 
-    iframe.addEventListener('load', () => {
-      log('iframe load fired');
-      // Fallback: if the iframed page never sends qa-print-ready (older
-      // version without the autoprint hook, or a JS error), just fire
-      // print after a generous delay so the user still gets a dialog.
-      readyTimer = window.setTimeout(() => {
-        log('ready signal timed out, firing anyway');
-        firePrint();
-      }, READY_TIMEOUT_MS);
-    }, { once: true });
+    const closedCheck = window.setInterval(() => {
+      if (win.closed) finish('window.closed');
+    }, 500);
 
-    iframe.addEventListener('error', () => fail(new Error('iframe load error')));
-
-    document.body.appendChild(iframe);
-
-    // Outermost safety net: reap iframe even if afterprint never fires
-    // (some print drivers don't dispatch it on Cancel).
-    safetyTimer = window.setTimeout(() => cleanup('safety timeout'), SAFETY_TIMEOUT_MS);
+    const safety = window.setTimeout(() => {
+      try { if (!win.closed) win.close(); } catch { /* swallow */ }
+      finish('safety');
+    }, SAFETY_TIMEOUT_MS);
   });
 }
 
-/** Print two documents back-to-back. The second dialog appears after the
- *  first finishes (Save or Cancel both fire afterprint). */
+export async function printToPdf(job: PrintJob): Promise<void> {
+  log('printToPdf start', job);
+  const win = window.open(
+    buildPopupUrl(job),
+    `qa-print-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    POPUP_FEATURES,
+  );
+  if (!win) {
+    throw new Error('Popup blocked. Allow popups for this site and try again.');
+  }
+  await awaitPopupDone(win);
+}
+
+/** Open BOTH popups in the same synchronous click handler so they share
+ *  user activation (later window.open calls would be blocked by the
+ *  popup blocker once the activation lapses). Chrome queues their
+ *  print dialogs — the user sees them one after the other. */
+export async function printToPdfPair(jobs: [PrintJob, PrintJob]): Promise<void> {
+  log('printToPdfPair start', jobs);
+  const wins: Window[] = [];
+  for (const job of jobs) {
+    const w = window.open(
+      buildPopupUrl(job),
+      `qa-print-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      POPUP_FEATURES,
+    );
+    if (!w) {
+      // Roll back — close any popup we already opened so the user
+      // doesn't end up with a half-baked state.
+      for (const opened of wins) { try { opened.close(); } catch { /* swallow */ } }
+      throw new Error('Popup blocked. Allow popups for this site and try again.');
+    }
+    wins.push(w);
+  }
+  // Wait for both to finish. Order doesn't matter — Chrome serializes
+  // the dialogs anyway. The user just hits Save twice.
+  await Promise.all(wins.map(awaitPopupDone));
+}
+
+/** @deprecated kept for callers that haven't switched to printToPdfPair. */
 export async function printToPdfSequential(jobs: PrintJob[]): Promise<void> {
+  // Sequential window.open calls lose user activation between them;
+  // delegate the two-job case to the pair helper that opens both
+  // synchronously. Anything longer is best-effort.
+  if (jobs.length === 2) {
+    await printToPdfPair([jobs[0], jobs[1]]);
+    return;
+  }
   for (const job of jobs) {
     await printToPdf(job);
   }
