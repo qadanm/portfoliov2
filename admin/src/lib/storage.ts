@@ -63,6 +63,10 @@ export interface Job {
   priority?: 1 | 2 | 3;  // 1 = highest
   fitScore?: number;     // 0–100, derived from analyzer
   jdText?: string;       // raw JD pasted in analyzer (kept for re-analysis)
+  // When set, the job is "deferred" in the Today queue: still visible but
+  // sorted to the bottom and dimmed. Persisted on the job so the state
+  // survives refresh AND syncs across devices via the standard sync layer.
+  deferredAt?: number;
   createdAt: number;
   updatedAt: number;
 }

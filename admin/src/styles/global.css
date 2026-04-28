@@ -66,14 +66,58 @@ a {
 .admin__sync {
   margin-top: auto;
   padding-top: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
   font-family: var(--font-mono);
   font-size: 10.5px;
   color: var(--c-text-subtle);
   border-top: 1px solid var(--c-border-subtle);
 }
+.admin__sync-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.admin__sync-help {
+  margin-top: 10px;
+  padding: 10px;
+  background: var(--c-bg);
+  border: 1px solid var(--c-border-subtle);
+  border-radius: var(--r-md);
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--c-text-muted);
+}
+.admin__sync-help summary {
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c-accent);
+  padding: 2px 0;
+}
+.admin__sync-help[open] summary { margin-bottom: 8px; }
+.admin__sync-help p { margin: 0 0 8px; }
+.admin__sync-steps {
+  margin: 6px 0 8px;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.admin__sync-steps li { margin: 0; }
+.admin__sync-steps a { color: var(--c-accent); text-decoration: underline; text-decoration-color: var(--c-border); text-underline-offset: 2px; }
+.admin__sync-steps a:hover { text-decoration-color: var(--c-accent); }
+.admin__sync-steps code {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: var(--c-bg-muted);
+  border: 1px solid var(--c-border-subtle);
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--c-text);
+}
+.admin__sync-help-note { font-size: 11px; color: var(--c-text-subtle); margin-top: 8px !important; }
 .admin__sync-dot {
   width: 7px;
   height: 7px;

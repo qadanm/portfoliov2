@@ -68,9 +68,23 @@ function isActive(href: string) {
       </nav>
 
       <div class="admin__sync no-print" id="admin-sync" hidden>
-        <span class="admin__sync-dot" data-sync-dot></span>
-        <span class="admin__sync-label" data-sync-label>Sync</span>
-        <button type="button" class="admin__sync-btn" data-sync-action="pull" title="Force re-sync now">↻</button>
+        <div class="admin__sync-row">
+          <span class="admin__sync-dot" data-sync-dot></span>
+          <span class="admin__sync-label" data-sync-label>Sync</span>
+          <button type="button" class="admin__sync-btn" data-sync-action="pull" title="Force re-sync now">↻</button>
+        </div>
+        <details class="admin__sync-help" id="admin-sync-help" hidden>
+          <summary>How to fix</summary>
+          <p data-sync-help-msg></p>
+          <ol class="admin__sync-steps">
+            <li>Open the <a href="https://dash.cloudflare.com" target="_blank" rel="noopener">Cloudflare dashboard</a> → <em>Workers &amp; Pages → KV → Create namespace</em>. Name it anything (e.g. <code>qadan-admin-data</code>).</li>
+            <li>Go to your Pages project (<code>qadan-admin</code> or similar) → <em>Settings → Functions → KV namespace bindings → Add binding</em>.</li>
+            <li>Set <strong>Variable name</strong> to <code>KV</code> (exact, case-sensitive) and pick the namespace from step 1.</li>
+            <li>Save, then redeploy the project (or push a new commit to trigger a deploy).</li>
+            <li>Hard-refresh this page. Status should turn green.</li>
+          </ol>
+          <p class="admin__sync-help-note">Cross-device sync needs the KV binding on every device's deploy — the binding is server-side, not per-browser.</p>
+        </details>
       </div>
     </aside>
 
@@ -132,6 +146,8 @@ function isActive(href: string) {
     const dot = wrap?.querySelector<HTMLElement>('[data-sync-dot]');
     const label = wrap?.querySelector<HTMLElement>('[data-sync-label]');
     const btn = wrap?.querySelector<HTMLButtonElement>('[data-sync-action="pull"]');
+    const help = document.getElementById('admin-sync-help') as HTMLDetailsElement | null;
+    const helpMsg = help?.querySelector<HTMLElement>('[data-sync-help-msg]') ?? null;
 
     function fmtRelative(ms: number): string {
       if (!ms) return 'never';
@@ -167,6 +183,15 @@ function isActive(href: string) {
       }
       if (e.message) wrap.title = e.message;
       else wrap.title = '';
+
+      // Reveal the inline setup steps when the cloud function reports the
+      // KV binding is missing or any other configuration error. The user
+      // sees the fix without hovering the dot for a tooltip.
+      if (help) {
+        const showHelp = e.status === 'unconfigured' || e.status === 'error';
+        help.hidden = !showHelp;
+        if (showHelp && helpMsg) helpMsg.textContent = e.message ?? '';
+      }
     }
 
     sync.subscribe(render);

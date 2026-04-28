@@ -433,14 +433,18 @@ import Admin from '@/layouts/Admin.astro';
   type State = {
     queue: Job[];
     selectedIdx: number;
-    deferredIds: Set<string>;
   };
 
   const state: State = {
     queue: [],
     selectedIdx: -1,
-    deferredIds: new Set(),
   };
+
+  // Defer state lives on the Job itself (job.deferredAt) so it persists
+  // across refreshes and syncs across devices through the standard sync
+  // pipeline. This helper is just a sugar read so the rest of the code
+  // doesn't repeat the boolean check everywhere.
+  const isDeferred = (job: Job): boolean => job.deferredAt != null;
 
   // ── DOM ──────────────────────────────────────────────────────────────
   const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -467,8 +471,8 @@ import Admin from '@/layouts/Admin.astro';
     const saved = all.filter(j => j.status === 'Saved');
     const sorted = sortQueue(saved);
     // Deferred jobs go to the bottom but stay visible (subtle)
-    const undef = sorted.filter(j => !state.deferredIds.has(j.id));
-    const def = sorted.filter(j => state.deferredIds.has(j.id));
+    const undef = sorted.filter(j => !isDeferred(j));
+    const def = sorted.filter(j => isDeferred(j));
     state.queue = [...undef, ...def];
     if (state.queue.length === 0) state.selectedIdx = -1;
     else if (state.selectedIdx < 0 || state.selectedIdx >= state.queue.length) state.selectedIdx = 0;
@@ -500,7 +504,7 @@ import Admin from '@/layouts/Admin.astro';
     }
     queueEl.innerHTML = state.queue.map((j, i) => {
       const sel = i === state.selectedIdx ? 'is-selected' : '';
-      const def = state.deferredIds.has(j.id) ? 'is-deferred' : '';
+      const def = isDeferred(j) ? 'is-deferred' : '';
       const score = j.fitScore != null ? Math.round(j.fitScore) : '—';
       const pri = j.priority ? `<span class="today__pill ${j.priority === 1 ? 'today__pill--p1' : ''}">P${j.priority}</span>` : '';
       const role = j.role ?? '';
@@ -632,7 +636,7 @@ import Admin from '@/layouts/Admin.astro';
         <a class="detail__action" href="/letter/?id=${encodeURIComponent(job.id)}" target="_blank" rel="noopener"><span>Open cover letter <span class="hint">↗</span></span><kbd>l</kbd></a>
         ${urlBtn}
         ${editBtn}
-        <button class="detail__action" data-act="defer" type="button"><span>${state.deferredIds.has(job.id) ? 'Undefer' : 'Defer'}</span><kbd>d</kbd></button>
+        <button class="detail__action" data-act="defer" type="button"><span>${isDeferred(job) ? 'Undefer' : 'Defer'}</span><kbd>d</kbd></button>
         <button class="detail__action detail__action--primary" data-act="apply" type="button"><span>Mark applied</span><kbd>a</kbd></button>
       </div>
 
@@ -741,7 +745,6 @@ import Admin from '@/layouts/Admin.astro';
       updatedAt: Date.now(),
     };
     jobsStore.upsert(updated);
-    state.deferredIds.delete(job.id);
     const prevIdx = state.selectedIdx;
     loadQueue();
     state.selectedIdx = Math.min(prevIdx, state.queue.length - 1);
@@ -754,8 +757,12 @@ import Admin from '@/layouts/Admin.astro';
   function toggleDefer() {
     const job = state.queue[state.selectedIdx];
     if (!job) return;
-    if (state.deferredIds.has(job.id)) state.deferredIds.delete(job.id);
-    else state.deferredIds.add(job.id);
+    const updated: Job = {
+      ...job,
+      deferredAt: isDeferred(job) ? undefined : Date.now(),
+      updatedAt: Date.now(),
+    };
+    jobsStore.upsert(updated);
     const prevIdx = state.selectedIdx;
     loadQueue();
     state.selectedIdx = Math.min(prevIdx, state.queue.length - 1);
