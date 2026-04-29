@@ -183,7 +183,7 @@ export const projects: Project[] = [
   },
   {
     id: 'sawa',
-    title: 'Sawa (Marketing Site)',
+    title: 'Sawa Marketing Site',
     role: 'Designer & Frontend Engineer',
     period: '2024',
     location: 'Independent',
@@ -210,7 +210,7 @@ export const projects: Project[] = [
         weight: 4,
       },
       {
-        text: 'Tone alignment as the brief: carry the app’s calm, low-friction feel into the surface that introduces it. Conversion architecture used SMS install instead of app-store deep links to keep the path one number long.',
+        text: 'Tone alignment as the brief: carry the app’s calm, low-friction feel into the marketing surface that introduces it. The site’s install path used an SMS form instead of app-store deep links, keeping the conversion one number long.',
         serves: ['product', 'design'],
         weight: 4,
       },
