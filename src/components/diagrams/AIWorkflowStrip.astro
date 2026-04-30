@@ -10,10 +10,14 @@ const stages = [
   { name: 'Ship', kind: 'output' },
 ];
 
+// Claude and Cursor both handle reasoning, generation, and code.
+// They are interchangeable execution environments — the differentiator
+// is interaction style (agentic vs local-iteration), not function.
+// Claude Design is the conditional visual branch.
 const executionEnvironments = [
-  { name: 'Claude', sub: 'reasoning' },
-  { name: 'Cursor', sub: 'build' },
-  { name: 'Claude Design', sub: 'visual, when needed', conditional: true },
+  { name: 'Claude', sub: 'agentic work — reasoning, generation, code' },
+  { name: 'Cursor', sub: 'local iteration — code, refactor, integration' },
+  { name: 'Claude Design', sub: 'visual exploration, when needed', conditional: true },
 ];
 ---
 
@@ -50,7 +54,7 @@ const executionEnvironments = [
     ))}
   </div>
   <p class="ai-strip__legend">
-    Execution environments are selected per task, not chained.
+    Execution environment is selected per task, not by role.
   </p>
 </div>
 
@@ -129,29 +133,50 @@ const executionEnvironments = [
     border-color: rgba(16, 185, 129, 0.25);
   }
 
+  /* Execution opens into a vertical stack on every viewport so each
+     branch reads on its own line. The descriptors are too long for a
+     single horizontal row, and the vertical layout makes it visually
+     obvious that the branches are alternatives, not a chain. */
   .ai-strip__node--execution {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 0;
+    border-radius: 18px;
+    overflow: hidden;
     color: var(--color-accent);
     background-color: var(--color-accent-dim);
     border-color: var(--color-accent-muted);
-    padding: 6px 8px 6px 12px;
+    min-width: 280px;
+  }
+
+  .ai-strip__node--execution .ai-strip__node-name {
+    text-align: center;
+    padding: 8px 14px 7px;
+    border-bottom: 1px solid var(--color-accent-muted);
   }
 
   .ai-strip__branches {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    margin-left: 8px;
-    padding: 2px 4px 2px 10px;
-    border-left: 1px solid var(--color-accent-muted);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    margin: 0;
+    padding: 4px 10px 8px;
+    border-left: none;
   }
 
   .ai-strip__branch {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1px;
-    padding: 1px 4px;
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 8px;
+    padding: 5px 4px;
     color: var(--color-accent-hover);
+  }
+
+  .ai-strip__branch + .ai-strip__branch {
+    border-top: 1px dashed var(--color-accent-muted);
   }
 
   .ai-strip__branch--conditional {
@@ -160,19 +185,21 @@ const executionEnvironments = [
 
   .ai-strip__branch-name {
     font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 600;
+    font-size: 11px;
+    font-weight: 700;
     letter-spacing: 0.01em;
-    line-height: 1.1;
+    line-height: 1.2;
+    flex-shrink: 0;
+    min-width: 90px;
   }
 
   .ai-strip__branch-sub {
     font-family: var(--font-mono);
-    font-size: 9px;
+    font-size: 10px;
     color: var(--color-text-subtle);
     font-weight: 400;
-    line-height: 1.1;
-    letter-spacing: 0.02em;
+    line-height: 1.3;
+    letter-spacing: 0.01em;
   }
 
   .ai-strip__star {
@@ -182,10 +209,7 @@ const executionEnvironments = [
   }
 
   .ai-strip__branch-sep {
-    color: var(--color-text-subtle);
-    opacity: 0.4;
-    font-size: 10px;
-    align-self: center;
+    display: none;
   }
 
   .ai-strip__sep {
@@ -223,50 +247,23 @@ const executionEnvironments = [
     .ai-strip__node-sub {
       font-size: 11px;
     }
-    /* Execution opens into a vertical stack on mobile so each branch
-       gets its own row. The horizontal-row treatment from desktop
-       wraps badly with three items + a label. */
     .ai-strip__node--execution {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 0;
-      padding: 0;
-      border-radius: 24px;
-      overflow: hidden;
-    }
-    .ai-strip__node--execution .ai-strip__node-name {
-      text-align: center;
-      padding: 10px 14px 9px;
-      border-bottom: 1px solid var(--color-accent-muted);
-    }
-    .ai-strip__branches {
-      width: 100%;
-      margin: 0;
-      padding: 6px 8px 8px;
-      border-left: none;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 0;
+      min-width: 0;
     }
     .ai-strip__branch {
-      flex-direction: row;
-      justify-content: center;
-      align-items: baseline;
-      gap: 6px;
-      padding: 6px 8px;
-    }
-    .ai-strip__branch + .ai-strip__branch {
-      border-top: 1px dashed var(--color-accent-muted);
+      flex-direction: column;
+      align-items: center;
+      gap: 1px;
+      padding: 6px 4px;
     }
     .ai-strip__branch-name {
+      min-width: 0;
       font-size: 12px;
+      text-align: center;
     }
     .ai-strip__branch-sub {
-      font-size: 11px;
-    }
-    /* Hide the inline dot separators in the column layout. */
-    .ai-strip__branch-sep {
-      display: none;
+      font-size: 10px;
+      text-align: center;
     }
     .ai-strip__sep {
       transform: rotate(90deg);

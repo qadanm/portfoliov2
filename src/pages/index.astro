@@ -59,13 +59,19 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
             in.
           </p>
           <p class="home-about__para">
-            Execution isn't a pipeline. It's a selection:
+            Execution isn't a pipeline. It's environment selection:
           </p>
           <ul class="home-about__select">
-            <li><strong>Claude</strong> for reasoning and generation</li>
-            <li><strong>Cursor</strong> for implementation</li>
-            <li><strong>Claude Design</strong> when the problem is easier to solve visually</li>
+            <li><strong>Claude</strong> — agentic work (reasoning, generation, code)</li>
+            <li><strong>Cursor</strong> — local iteration (code, refactor, integration)</li>
+            <li><strong>Claude Design</strong> — visual exploration, when needed</li>
           </ul>
+          <p class="home-about__para home-about__para--note">
+            Claude and Cursor both handle reasoning and code. The
+            choice is contextual, not by role. Claude Design enters
+            only when visual reasoning moves the work forward faster
+            than code.
+          </p>
           <p class="home-about__para home-about__para--coda">
             The model is one constrained stage. The system is what
             matters.
@@ -253,6 +259,19 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
     color: var(--color-text);
     font-size: clamp(16px, 1.5vw, 19px);
     line-height: 1.6;
+  }
+
+  .home-about__para--note {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.65;
+    color: var(--color-text-subtle);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    background-color: var(--color-bg-muted);
+    max-width: 56ch;
+    margin-top: -2px;
   }
 
   .home-about__para--coda {

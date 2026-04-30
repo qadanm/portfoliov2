@@ -96,12 +96,13 @@ import DesignWorkflowStrip from '@/components/diagrams/DesignWorkflowStrip.astro
         <hr class="design__rule" />
 
         <p class="design__para design__para--final" data-reveal>
-          The execution layer is branched, not chained. Claude Code and
-          Cursor are alternative environments for code work, picked per
-          task. Claude Design is the visual branch, conditional on the
-          work. Figma stays in the mix for precision and system
-          maintenance, WebSim for fast browser experiments. The codebase
-          is the source of truth across all of them.
+          The execution layer is branched, not chained. Claude and
+          Cursor are interchangeable code environments — both handle
+          reasoning, generation, and code; the choice is contextual,
+          not by role. Claude Design is the visual branch, conditional
+          on the work. Figma stays in the mix for precision and system
+          maintenance, WebSim for fast browser experiments. The
+          codebase is the source of truth across all of them.
         </p>
 
         <hr class="design__rule" />
@@ -123,7 +124,7 @@ import DesignWorkflowStrip from '@/components/diagrams/DesignWorkflowStrip.astro
             ChatOBD2 is where the loop lives in practice. The product
             surfaces, marketing site, and developer portal route through
             both branches: Claude Design when exploration is visual, the
-            code branch (Claude Code or Cursor) when it isn't. The
+            code branch (Claude or Cursor — interchangeable) when it isn't. The
             component and token system stays the source of truth, so
             either branch lands in the same codebase.
           </p>

@@ -39,8 +39,8 @@ export const skills: Skill[] = [
   { name: 'Constrained AI pipelines (model as one stage, not the system)', category: 'ai', serves: ['ai', 'product', 'engineering'], weight: 5 },
   { name: 'Branched execution layer (per-task environment selection)', category: 'ai', serves: ['ai', 'engineering'], weight: 5 },
   { name: 'Schema-bound model outputs', category: 'ai', serves: ['ai', 'engineering'], weight: 4 },
-  { name: 'Agentic workflows (Claude Code)', category: 'ai', serves: ['ai', 'engineering'], weight: 5 },
-  { name: 'Tight-loop AI iteration (Cursor)', category: 'ai', serves: ['ai', 'engineering', 'design'], weight: 5 },
+  { name: 'Agentic workflows (Claude or Cursor — environment per task)', category: 'ai', serves: ['ai', 'engineering'], weight: 5 },
+  { name: 'Tight-loop iteration (Claude or Cursor — environment per task)', category: 'ai', serves: ['ai', 'engineering', 'design'], weight: 5 },
   { name: 'Visual exploration (Claude Design, conditional branch)', category: 'ai', serves: ['ai', 'design'], weight: 5 },
 
   // Tools

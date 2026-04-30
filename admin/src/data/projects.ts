@@ -72,7 +72,7 @@ export const projects: Project[] = [
         weight: 3,
       },
       {
-        text: 'Designed the marketing surface alongside the product: hero, longitudinal-intelligence, pricing tiers, and a developer documentation site. Built end to end through both branches of the execution layer — visual exploration via Claude Design where it earned a seat, the code branch (Claude Code, Cursor) for everything else.',
+        text: 'Designed the marketing surface alongside the product: hero, longitudinal-intelligence, pricing tiers, and a developer documentation site. Built end to end through both branches of the execution layer — visual exploration via Claude Design where it earned a seat, the code branch (Claude or Cursor — interchangeable) for everything else.',
         serves: ['design', 'product', 'ai'],
         weight: 4,
       },
@@ -122,7 +122,7 @@ export const projects: Project[] = [
         weight: 5,
       },
       {
-        text: 'Run AI as a structured system layer in the build, not a feature in the product. Spec interrogation, prompts as system, branched execution per task. Claude Code, Cursor, and Claude Design as alternative environments — picked by what the task needs, never chained.',
+        text: 'Run AI as a structured system layer in the build, not a feature in the product. Spec interrogation, prompts as system, branched execution per task. Claude, Cursor, and Claude Design as alternative environments — picked by what the task needs, never chained.',
         serves: ['ai', 'engineering'],
         weight: 3,
       },

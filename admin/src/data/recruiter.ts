@@ -24,7 +24,7 @@ export const recruiterPacks: Record<string, RecruiterPack> = {
       'AI-native product experience without the buzzword tax: I’ve shipped a product where the model is one constrained stage inside a structured pipeline, and I treat AI the same way in the build that ships it.',
     ],
     aiExplanation:
-      'I treat AI as a structured system layer in the build, not a tool I reach for. The loop is the same every time: the model interrogates the spec, the brief gets restated as a structured prompt, then execution routes to the right environment per task. Claude Code, Cursor, and Claude Design are alternative environments — never chained. Figma stays in the mix for precision, hand-authored CSS for the systems that ship.',
+      'I treat AI as a structured system layer in the build, not a tool I reach for. The loop is the same every time: the model interrogates the spec, the brief gets restated as a structured prompt, then execution routes to the right environment per task. Claude, Cursor, and Claude Design are alternative environments — never chained. Figma stays in the mix for precision, hand-authored CSS for the systems that ship.',
     salaryFraming:
       'I’m looking at senior product design roles in the $180–240k base range, depending on scope and equity. Open to discussing.',
   },
@@ -42,7 +42,7 @@ export const recruiterPacks: Record<string, RecruiterPack> = {
       'Real shipped surfaces, not concepts: ChatOBD2 in market, MagTek in production, InvestCloud across institutions.',
     ],
     aiExplanation:
-      'I treat AI as a structured system layer in the build. Same loop every time: spec, model interrogation, prompt engineering, branched execution, human review. Claude Code, Cursor, and Claude Design are alternative execution environments — selected per task, never chained. Figma for precision, WebSim for fast browser experiments. The point is repeatability, not novelty.',
+      'I treat AI as a structured system layer in the build. Same loop every time: spec, model interrogation, prompt engineering, branched execution, human review. Claude, Cursor, and Claude Design are alternative execution environments — selected per task, never chained. Figma for precision, WebSim for fast browser experiments. The point is repeatability, not novelty.',
     salaryFraming:
       'Senior product design with founder-level ownership. I’d expect $200–260k base for the right scope, depending on equity and team size.',
   },
@@ -60,7 +60,7 @@ export const recruiterPacks: Record<string, RecruiterPack> = {
       'Comfortable in the constraints of long-running platforms — most of my work has lived inside them.',
     ],
     aiExplanation:
-      'AI runs through the build as a structured system layer. The model interrogates the spec, the brief becomes a versioned prompt, then execution routes to the right environment — Claude Code for agentic refactors and continuous repo work, Cursor for tight-loop iteration, Claude Design when the work is easier to reason about visually. They are alternative environments inside the execution layer, not steps in a chain. The design lives in the components and tokens the product runs on.',
+      'AI runs through the build as a structured system layer. The model interrogates the spec, the brief becomes a versioned prompt, then execution routes to the right environment per task. Claude and Cursor are interchangeable code environments — both handle reasoning, generation, and code; the choice is contextual, not by role. Claude Design enters only when visual reasoning is needed. The design lives in the components and tokens the product runs on.',
     salaryFraming:
       'UX engineer with cross-stack depth. $180–230k base range depending on level and scope.',
   },
@@ -75,28 +75,28 @@ export const recruiterPacks: Record<string, RecruiterPack> = {
     whyImAFit: [
       'Production frontend work across React, TypeScript, React Native, Next.js, Astro, ASP.NET MVC.',
       'Strong design literacy: the implementation respects intent, not just specs.',
-      'Comfortable with AI in the build loop (Cursor, Claude Code) without giving up the ownership of decisions.',
+      'Comfortable with AI in the build loop (Cursor, Claude) without giving up the ownership of decisions.',
     ],
     aiExplanation:
-      'AI is a structured layer in the build, not a feature. The loop is consistent: model interrogation surfaces spec gaps, prompts live in the system rather than chat, execution routes per task. Claude Code and Cursor are alternative environments for code work — picked by what the task needs, never chained. Claude Design is the visual branch, conditional on the work. Human owns every decision that ships.',
+      'AI is a structured layer in the build, not a feature. The loop is consistent: model interrogation surfaces spec gaps, prompts live in the system rather than chat, execution routes per task. Claude and Cursor are interchangeable code environments — both handle reasoning, generation, and code; the choice is contextual, not by role — picked by what the task needs, never chained. Claude Design is the visual branch, conditional on the work. Human owns every decision that ships.',
     salaryFraming:
       'Senior frontend UX engineer band: $180–230k base depending on stack and scope.',
   },
 
   'design-engineer': {
     shortIntro:
-      'Design engineer working in the overlap. Built ChatOBD2 end to end with AI as a structured system layer in the build — branched execution across Claude Code, Cursor, and Claude Design. Maintain platform-level design systems at MagTek.',
+      'Design engineer working in the overlap. Built ChatOBD2 end to end with AI as a structured system layer in the build — branched execution across Claude, Cursor, and Claude Design. Maintain platform-level design systems at MagTek.',
     longIntro:
-      'I’m a design engineer. Most of my work happens in code, against the components and tokens the product is built from. I built ChatOBD2 end to end with AI as a structured system layer in the build — Claude Design as the visual branch of the execution layer when work was easier to reason about visually, the code branch (Claude Code, Cursor) for everything else. I maintain a Razor component library and token-driven CSS substrate across MagTek’s multi-site enterprise platform. Earlier I built advisor portals at InvestCloud, where the work was translating Figma at fidelity into a multi-tenant CMS.',
+      'I’m a design engineer. Most of my work happens in code, against the components and tokens the product is built from. I built ChatOBD2 end to end with AI as a structured system layer in the build — Claude Design as the visual branch of the execution layer when work was easier to reason about visually, the code branch (Claude or Cursor — interchangeable) for everything else. I maintain a Razor component library and token-driven CSS substrate across MagTek’s multi-site enterprise platform. Earlier I built advisor portals at InvestCloud, where the work was translating Figma at fidelity into a multi-tenant CMS.',
     tellMeAboutYourself:
-      'I describe myself as a design engineer because I don’t think of design and build as separate stages. Most of my work happens in code, against the components and tokens the product is actually built from. Recently I founded ChatOBD2, where AI runs through the build as a structured system layer: spec interrogation, prompts as system, then execution routes to the right environment per task — Claude Code or Cursor for code work, Claude Design when the work is visual. My day job is at MagTek where I maintain a platform-level Razor component library and a token-driven CSS substrate across many properties. Earlier I was at InvestCloud doing high-fidelity Figma implementation across major wealth institutions. The thread is the same: design that survives the build.',
+      'I describe myself as a design engineer because I don’t think of design and build as separate stages. Most of my work happens in code, against the components and tokens the product is actually built from. Recently I founded ChatOBD2, where AI runs through the build as a structured system layer: spec interrogation, prompts as system, then execution routes to the right environment per task — Claude or Cursor (interchangeable code environments), Claude Design when the work is visual. My day job is at MagTek where I maintain a platform-level Razor component library and a token-driven CSS substrate across many properties. Earlier I was at InvestCloud doing high-fidelity Figma implementation across major wealth institutions. The thread is the same: design that survives the build.',
     whyImAFit: [
       'Design-in-code as a real practice, not a buzzword: hand-authored CSS systems, token-driven substrate, component libraries.',
-      'AI as a structured system layer in the build, not a feature: spec interrogation, prompt engineering, branched execution. Claude Code, Cursor, and Claude Design as alternative environments — never chained.',
+      'AI as a structured system layer in the build, not a feature: spec interrogation, prompt engineering, branched execution. Claude, Cursor, and Claude Design as alternative environments — never chained.',
       'Platform discipline: most of my work has shipped in long-running systems where incremental adoption matters.',
     ],
     aiExplanation:
-      'AI is infrastructure inside the build, not a feature inside the product. Same loop every time: spec, model interrogation, structured prompt, branched execution, review. Claude Code, Cursor, and Claude Design are alternative environments inside the execution layer — selected per task. Tokens and components are the source of truth across all of them. Design lives where the system does.',
+      'AI is infrastructure inside the build, not a feature inside the product. Same loop every time: spec, model interrogation, structured prompt, branched execution, review. Claude, Cursor, and Claude Design are alternative environments inside the execution layer — selected per task. Tokens and components are the source of truth across all of them. Design lives where the system does.',
     salaryFraming:
       'Design engineering at the senior band: $190–240k base depending on scope.',
   },
@@ -114,7 +114,7 @@ export const recruiterPacks: Record<string, RecruiterPack> = {
       'Comfortable owning the long arc: incremental adoption, sequenced migrations, no-downtime evolution.',
     ],
     aiExplanation:
-      'AI is a structured layer in how the platform gets built and maintained, not a feature inside the product. Specs get interrogated by the model, prompts live as system, execution picks the right environment per task. Claude Code, Cursor, and Claude Design are alternative environments — never sequenced. Human owns every decision that ships.',
+      'AI is a structured layer in how the platform gets built and maintained, not a feature inside the product. Specs get interrogated by the model, prompts live as system, execution picks the right environment per task. Claude, Cursor, and Claude Design are alternative environments — never sequenced. Human owns every decision that ships.',
     salaryFraming:
       'Web experience lead with multi-site platform scope: $180–230k base depending on team size.',
   },
@@ -132,7 +132,7 @@ export const recruiterPacks: Record<string, RecruiterPack> = {
       'Discipline around incremental adoption and platform constraints — the systems I’ve shipped are the ones still in production.',
     ],
     aiExplanation:
-      'AI runs through the system layer of the build, not the product. Specs are interrogated by the model, prompts are versioned and live in the system, execution routes per task. Claude Code, Cursor, and Claude Design are alternative environments — picked by what the work needs. Tokens and component contracts stay the source of truth across all of them.',
+      'AI runs through the system layer of the build, not the product. Specs are interrogated by the model, prompts are versioned and live in the system, execution routes per task. Claude, Cursor, and Claude Design are alternative environments — picked by what the work needs. Tokens and component contracts stay the source of truth across all of them.',
     salaryFraming:
       'Design systems at the senior band: $190–240k base depending on platform scope.',
   },
@@ -169,7 +169,7 @@ export const recruiterPacks: Record<string, RecruiterPack> = {
       'Cross-functional fluency: design, frontend systems, platform engineering, AI integration.',
     ],
     aiExplanation:
-      'AI runs through how I work as a structured system layer, not a feature. The loop is consistent: spec interrogation, structured prompt, branched execution, human review. Claude Code, Cursor, and Claude Design are alternative execution environments — picked per task, never chained. Same posture across product, build, and platform work.',
+      'AI runs through how I work as a structured system layer, not a feature. The loop is consistent: spec interrogation, structured prompt, branched execution, human review. Claude, Cursor, and Claude Design are alternative execution environments — picked per task, never chained. Same posture across product, build, and platform work.',
     salaryFraming:
       'Lead-level role with founder-level ownership: $210–270k base depending on team size and equity.',
   },

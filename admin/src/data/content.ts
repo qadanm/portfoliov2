@@ -36,7 +36,7 @@ export const summaries: Record<string, string> = {
     'Frontend UX engineer with platform depth. Comfortable across React, TypeScript, React Native, Astro, ASP.NET MVC + Razor, and hand-authored CSS systems. Built and maintain frontend systems for ChatOBD2 (AI-native product) and MagTek (multi-site enterprise platform).',
 
   'design-engineer':
-    'Design engineer working in the overlap. Built ChatOBD2 end to end with AI as a structured system layer in the build — branched execution across Claude Code, Cursor, and Claude Design rather than a chained pipeline. Maintain platform-level design systems at MagTek. Author CSS and components by hand against tokens that ship across many surfaces.',
+    'Design engineer working in the overlap. Built ChatOBD2 end to end with AI as a structured system layer in the build — branched execution across Claude, Cursor, and Claude Design rather than a chained pipeline. Maintain platform-level design systems at MagTek. Author CSS and components by hand against tokens that ship across many surfaces.',
 
   'web-experience-manager':
     'Web experience leader across MagTek’s multi-site enterprise platform. Own UX, content structure, and frontend systems across MagTek.com, Magensa, and related properties. Earlier: built advisor portals at InvestCloud across major wealth institutions.',
