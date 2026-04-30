@@ -5,7 +5,6 @@ import ChatOBDFlow from '@/components/diagrams/ChatOBDFlow.astro';
 import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
 import AdvisorVisual from '@/components/diagrams/AdvisorVisual.astro';
 import ReadingProgress from '@/components/ReadingProgress.astro';
-import Thesis from '@/components/Thesis.astro';
 import SchemaArticle from '@/components/seo/SchemaArticle.astro';
 import SchemaBreadcrumb from '@/components/seo/SchemaBreadcrumb.astro';
 import { getCollection } from 'astro:content';
@@ -53,7 +52,7 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
     <SchemaBreadcrumb
       items={[
         { name: 'Home', url: new URL('/', Astro.site) },
-        { name: 'Build', url: new URL('/build', Astro.site) },
+        { name: 'Work', url: new URL('/work', Astro.site) },
         { name: data.title, url: pageUrl },
       ]}
     />
@@ -64,7 +63,7 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
   <article class="cs">
     <header class="cs__header">
       <div class="container-site">
-        <a href="/build" class="cs__back">
+        <a href="/work" class="cs__back">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path d="M13 8H3M7 12l-4-4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
@@ -81,6 +80,30 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
         <p class="cs__short">{data.short}</p>
 
         <dl class="cs__meta">
+          {data.role && (
+            <div>
+              <dt>Role</dt>
+              <dd><span class="cs__meta-text">{data.role}</span></dd>
+            </div>
+          )}
+          {data.period && (
+            <div>
+              <dt>Period</dt>
+              <dd><span class="cs__meta-text">{data.period}</span></dd>
+            </div>
+          )}
+          {data.company && (
+            <div>
+              <dt>Company</dt>
+              <dd><span class="cs__meta-text">{data.company}</span></dd>
+            </div>
+          )}
+          {data.status && (
+            <div>
+              <dt>Status</dt>
+              <dd><span class="cs__meta-text cs__meta-text--status">{data.status}</span></dd>
+            </div>
+          )}
           <div>
             <dt>Focus</dt>
             <dd>
@@ -102,6 +125,22 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
         </dl>
       </div>
     </header>
+
+    {data.outcomes && data.outcomes.length > 0 && (
+      <div class="container-site cs__outcomes-wrap">
+        <section class="cs__outcomes" aria-label="Outcomes">
+          <span class="cs__outcomes-eyebrow">Outcomes</span>
+          <ul class="cs__outcomes-list">
+            {data.outcomes.map(o => (
+              <li class="cs__outcome">
+                <span class="cs__outcome-value">{o.value}</span>
+                <span class="cs__outcome-label">{o.label}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
+    )}
 
     <div class="container-site cs__cover">
       {data.coverImage ? (
@@ -133,11 +172,11 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
 
     {project.slug === 'chatobd2' && (
       <>
-        <section class="container-narrow">
-          <Thesis
-            text="This is the moment the system stops exposing complexity and starts resolving it."
-            caption="From data to decision"
-          />
+        <section class="container-narrow cs__pull">
+          <p class="cs__pull-text">
+            This is the moment the system stops exposing complexity and starts resolving it.
+          </p>
+          <span class="cs__pull-caption">From data to decision</span>
         </section>
         <section class="container-site cs__visuals cs__visuals--feature">
           <VerdictCardMock />
@@ -151,9 +190,8 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
             <p class="cs__post-sub">
               The marketing site carries the same product premise into a
               public-facing surface. Same "verdict comes first" instinct,
-              same constraint thinking. Designed and built end to end
-              through both branches of the execution layer — visual
-              exploration where it earned a seat, code execution
+              same constraint thinking. Designed and built end to end —
+              visual exploration where it helped, hand-written code
               everywhere else.
             </p>
           </header>
@@ -190,15 +228,16 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
 
         <section class="container-site cs__post cs__post--alt">
           <header class="cs__post-head">
-            <span class="cs__post-eyebrow">Under the hood</span>
-            <h2 class="cs__post-title">The dev surface gets the same care as the product.</h2>
+            <span class="cs__post-eyebrow">Technical depth</span>
+            <h2 class="cs__post-title">The system underneath the surface.</h2>
             <p class="cs__post-sub">
-              ChatOBD2 has grown into a substantial codebase. Six
-              deterministic reasoning layers in front of every model
-              call, a system prompt assembled by priority from a
-              38,000-token budget, BLE adapter integration, write
-              operations with rollback. The model is one constrained
-              stage inside a structured pipeline, not the system.
+              Six deterministic reasoning layers run before every model
+              call. The system prompt is composed per scan from a
+              38,000-token budget, with P0 sections always making the
+              cut and lower-priority sections only landing if budget
+              remains. BLE adapter integration. Write operations with
+              rollback. The dev surface is treated as a designed product,
+              not a wiki — same care as the user-facing app.
             </p>
           </header>
           <div class="cs__shot-grid cs__shot-grid--2">
@@ -211,11 +250,8 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
                 loading="lazy"
               />
               <figcaption>
-                The system prompt is composed dynamically per scan. P0
-                sections always make the cut; P5 sections only land if
-                budget remains. The prompt lives in the system, keyed
-                by verdict tier and code context — not scattered across
-                components.
+                Context budget composed dynamically per scan, keyed by
+                verdict tier and code context.
               </figcaption>
             </figure>
             <figure class="cs__shot">
@@ -227,21 +263,11 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
                 loading="lazy"
               />
               <figcaption>
-                Architecture diagrams, an annotated project structure,
-                a system-diagrams library, a code-standards doc. The
-                portal is treated as a designed surface, not a wiki.
+                Developer portal: architecture diagrams, annotated
+                project structure, a code-standards doc.
               </figcaption>
             </figure>
           </div>
-          <p class="cs__post-closing">
-            The developer portal is held as a product surface and
-            maintained continuously through the code branch of the
-            execution layer. Module ownership stays current. System
-            diagrams regenerate when contracts change. Dev UX is treated
-            as a product-quality bar, not an afterthought. The aim is
-            simple: anyone landing in the repo can find the thing they
-            need without reading it through.
-          </p>
         </section>
       </>
     )}
@@ -510,7 +536,7 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
     <footer class="cs__footer">
       <div class="container-site">
         <a
-          href={`/build/${next.slug}`}
+          href={`/work/${next.slug}`}
           class="cs__next"
           data-track="cta_click"
           data-track-cta="next-project"
@@ -531,7 +557,7 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
 
         <div class="cs__footer-actions">
           <a
-            href="/build"
+            href="/work"
             class="cs__btn-secondary"
             data-track="cta_click"
             data-track-cta="all-projects"
@@ -701,6 +727,92 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
     color: var(--color-border);
   }
 
+  .cs__meta-text {
+    font-size: 14px;
+    color: var(--color-text);
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .cs__meta-text--status {
+    color: var(--color-success);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+
+  /* Outcomes rail — sits below the header, above the cover.
+     Even partial / status-flavored outcomes ground the case study
+     in evidence. The audit's recommendation: every project earns
+     at least one number or a status statement. */
+  .cs__outcomes-wrap {
+    padding-top: var(--space-6);
+    padding-bottom: var(--space-2);
+  }
+
+  @media (min-width: 768px) {
+    .cs__outcomes-wrap {
+      padding-top: var(--space-8);
+    }
+  }
+
+  .cs__outcomes {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-5) var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-bg-elevated);
+  }
+
+  @media (min-width: 720px) {
+    .cs__outcomes {
+      padding: var(--space-6) var(--space-7);
+      border-radius: var(--radius-xl);
+    }
+  }
+
+  .cs__outcomes-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+  }
+
+  .cs__outcomes-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: var(--space-5) var(--space-6);
+  }
+
+  .cs__outcome {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-right: var(--space-2);
+  }
+
+  .cs__outcome-value {
+    font-family: var(--font-display);
+    font-size: clamp(22px, 2.6vw, 30px);
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    line-height: 1.1;
+    color: var(--color-text);
+  }
+
+  .cs__outcome-label {
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--color-text-muted);
+  }
+
   .cs__meta .cs__stack {
     gap: 6px;
   }
@@ -764,6 +876,52 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
 
   .cs__visuals--feature {
     padding-bottom: var(--space-20);
+  }
+
+  /* Inline pull-quote (replaces the deleted Thesis component) */
+  .cs__pull {
+    display: grid;
+    grid-template-columns: 1px 1fr;
+    gap: var(--space-5);
+    align-items: start;
+    margin: var(--space-12) auto var(--space-12);
+    max-width: 720px;
+  }
+
+  @media (min-width: 768px) {
+    .cs__pull {
+      margin: var(--space-16) auto var(--space-12);
+    }
+  }
+
+  .cs__pull::before {
+    content: '';
+    width: 1px;
+    min-height: 64px;
+    background: linear-gradient(to bottom, var(--color-accent), transparent 80%);
+  }
+
+  .cs__pull-text {
+    font-family: var(--font-display);
+    font-size: clamp(22px, 3vw, 32px);
+    font-weight: 400;
+    font-style: italic;
+    letter-spacing: -0.015em;
+    line-height: 1.25;
+    color: var(--color-text);
+    margin: 0;
+    max-width: 28ch;
+  }
+
+  .cs__pull-caption {
+    grid-column: 2;
+    margin-top: var(--space-3);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
   }
 
   .cs__post {

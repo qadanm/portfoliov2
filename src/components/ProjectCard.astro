@@ -13,7 +13,7 @@ const { data, slug } = project;
 ---
 
 <a
-  href={`/build/${slug}`}
+  href={`/work/${slug}`}
   class:list={['project-card', `project-card--${size}`, { 'project-card--flagship': data.category === 'Flagship' }]}
   style={`animation-delay: ${index * 60}ms;`}
   data-category={data.category}
@@ -50,7 +50,7 @@ const { data, slug } = project;
               <rect x="1.5" y="3.5" width="9" height="6.5" rx="1" stroke="currentColor" stroke-width="1"/>
               <path d="M4.5 3.5V2.5a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1" stroke="currentColor" stroke-width="1"/>
             </svg>
-            Work · {data.company}
+            {data.company}
           </span>
         )}
       </span>
@@ -62,6 +62,28 @@ const { data, slug } = project;
     </div>
     <h3 class="project-card__title">{data.title}</h3>
     <p class="project-card__short">{data.short}</p>
+    {(data.role || data.period || data.scope) && (
+      <dl class="project-card__details">
+        {data.role && (
+          <div>
+            <dt>Role</dt>
+            <dd>{data.role}</dd>
+          </div>
+        )}
+        {data.period && (
+          <div>
+            <dt>Period</dt>
+            <dd>{data.period}</dd>
+          </div>
+        )}
+        {data.scope && (
+          <div>
+            <dt>Scope</dt>
+            <dd>{data.scope}</dd>
+          </div>
+        )}
+      </dl>
+    )}
     <ul class="project-card__focus">
       {data.keyFocus.map(item => (
         <li>{item}</li>
@@ -286,6 +308,36 @@ const { data, slug } = project;
     .project-card__short {
       font-size: 15px;
     }
+  }
+
+  .project-card__details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: var(--space-2) var(--space-4);
+    margin: var(--space-1) 0 0;
+    padding: 0;
+  }
+
+  .project-card__details > div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .project-card__details dt {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+  }
+
+  .project-card__details dd {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--color-text);
   }
 
   .project-card__focus {

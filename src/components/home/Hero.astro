@@ -1,38 +1,36 @@
 ---
-const tags = ['Product design', 'System design', 'AI as system layer'];
+// Identity-first hero. Name and role read before the headline so a
+// 5-second visitor knows who's talking.
 ---
 
 <section class="hero" aria-label="Introduction">
   <div class="container-site hero__inner">
-    <ul class="hero__label animate-fade-up" aria-label="Practice areas">
-      {tags.map((tag, i) => (
-        <li class="hero__tag">
-          <span class="hero__tag-dot" aria-hidden="true"></span>
-          {tag}
-          {i < tags.length - 1 && <span class="hero__sep" aria-hidden="true">·</span>}
-        </li>
-      ))}
-    </ul>
+    <div class="hero__id animate-fade-up">
+      <span class="hero__id-name">Moe Qadan</span>
+      <span class="hero__id-sep" aria-hidden="true">·</span>
+      <span class="hero__id-role">Product Designer &amp; UX Engineer</span>
+      <a href="/contact" class="hero__id-status" aria-label="Open to hearing about projects — go to contact">
+        <span class="hero__id-status-dot" aria-hidden="true"></span>
+        Open to projects
+      </a>
+    </div>
 
     <h1 class="hero__headline animate-fade-up animate-delay-100">
       I build systems that<br />make complex things <em>usable</em>.
     </h1>
 
     <p class="hero__paragraph animate-fade-up animate-delay-200">
-      I design and build product systems end to end. Most of the work lives
-      inside long-running platforms where structure and consistency actually
-      matter, and the design problem is usually the constraint, not the canvas.
+      I design and ship products end to end — interface, frontend, and the
+      system the model lives inside. A decade of work across long-running
+      enterprise platforms (MagTek), advisor tools at major wealth
+      institutions (Chase, Cetera, Northwestern Mutual via InvestCloud),
+      and most recently <a href="/work/chatobd2" class="hero__inline-link">ChatOBD2</a>,
+      an AI-native diagnostics product I designed and engineered solo.
     </p>
 
-    <p class="hero__paragraph hero__paragraph--secondary animate-fade-up animate-delay-300">
-      More recently, that work has stretched into AI-native products,
-      where the model is one constrained stage in a structured pipeline
-      and prompt engineering is part of the system, not the chat.
-    </p>
-
-    <div class="hero__ctas animate-fade-up animate-delay-400">
+    <div class="hero__ctas animate-fade-up animate-delay-300">
       <a
-        href="/build"
+        href="/work"
         class="hero__cta hero__cta--primary"
         data-track="cta_click"
         data-track-cta="see-the-work"
@@ -57,88 +55,108 @@ const tags = ['Product design', 'System design', 'AI as system layer'];
 <style>
   .hero {
     position: relative;
-    /* Header is 60px on mobile, 64 on desktop. Keep generous breathing room
-       without dominating the first viewport. CTAs at the bottom now provide
-       visual closure, so the desktop top padding can be tighter than the
-       headline-only original — 240px+160px left an empty band above the
-       label that read as dead space, not breathing room. */
-    padding-top: calc(60px + var(--space-12));
+    padding-top: calc(60px + var(--space-10));
     padding-bottom: var(--space-16);
   }
 
   @media (min-width: 600px) {
     .hero {
-      padding-top: calc(64px + var(--space-16));
+      padding-top: calc(64px + var(--space-12));
       padding-bottom: var(--space-20);
     }
   }
 
   @media (min-width: 768px) {
     .hero {
-      padding-top: calc(64px + var(--space-20));
+      padding-top: calc(64px + var(--space-16));
       padding-bottom: var(--space-24);
     }
   }
 
   @media (min-width: 1024px) {
     .hero {
-      padding-top: calc(64px + 112px);
+      padding-top: calc(64px + 96px);
       padding-bottom: 128px;
     }
   }
 
   .hero__inner {
-    max-width: 720px;
+    max-width: 760px;
   }
 
-  .hero__label {
-    list-style: none;
-    margin: 0 0 var(--space-6);
-    padding: 0;
+  /* Identity strip — name, role, availability — sits above the headline */
+  .hero__id {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
-    gap: 6px 8px;
+    flex-wrap: wrap;
+    gap: 8px 10px;
+    margin-bottom: var(--space-6);
+    font-size: 13px;
+    line-height: 1.4;
   }
 
   @media (min-width: 768px) {
-    .hero__label {
-      margin-bottom: var(--space-10);
+    .hero__id {
+      margin-bottom: var(--space-8);
+      font-size: 14px;
     }
   }
 
-  .hero__tag {
+  .hero__id-name {
+    font-weight: 600;
+    color: var(--color-text);
+    letter-spacing: -0.005em;
+  }
+
+  .hero__id-sep {
+    color: var(--color-border);
+  }
+
+  .hero__id-role {
+    color: var(--color-text-muted);
+    letter-spacing: -0.005em;
+  }
+
+  .hero__id-status {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    padding: 3px 10px 3px 9px;
+    margin-left: 4px;
+    border-radius: 9999px;
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--color-text-subtle);
-    line-height: 1.4;
-    white-space: nowrap;
+    letter-spacing: 0.04em;
+    color: var(--color-success);
+    background-color: color-mix(in srgb, var(--color-success) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-success) 28%, transparent);
+    text-decoration: none;
+    transition: background-color 150ms, border-color 150ms;
+    -webkit-tap-highlight-color: transparent;
   }
 
-  @media (min-width: 380px) {
-    .hero__tag {
-      font-size: 11px;
-      letter-spacing: 0.16em;
-    }
+  .hero__id-status:hover {
+    background-color: color-mix(in srgb, var(--color-success) 14%, transparent);
+    border-color: color-mix(in srgb, var(--color-success) 50%, transparent);
   }
 
-  .hero__tag-dot {
-    width: 4px;
-    height: 4px;
+  .hero__id-status-dot {
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
-    background-color: var(--color-accent);
-    opacity: 0.8;
+    background-color: var(--color-success);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--color-success) 65%, transparent);
+    animation: hero-status-pulse 2.4s ease-in-out infinite;
   }
 
-  .hero__sep {
-    color: var(--color-border);
-    margin-left: 8px;
+  @keyframes hero-status-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(0.85); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero__id-status-dot { animation: none; }
   }
 
   .hero__headline {
@@ -168,23 +186,24 @@ const tags = ['Product design', 'System design', 'AI as system layer'];
 
   .hero__paragraph {
     font-size: clamp(15px, 1.5vw, 18px);
-    line-height: 1.65;
+    line-height: 1.7;
     color: var(--color-text-muted);
-    max-width: 56ch;
-    margin-bottom: var(--space-4);
-    opacity: 0.94;
-  }
-
-  @media (min-width: 768px) {
-    .hero__paragraph {
-      line-height: 1.7;
-    }
-  }
-
-  .hero__paragraph--secondary {
-    color: var(--color-text-subtle);
+    max-width: 60ch;
     margin-bottom: 0;
-    opacity: 0.85;
+  }
+
+  .hero__inline-link {
+    color: var(--color-text);
+    text-decoration: underline;
+    text-decoration-color: var(--color-border);
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+    transition: color 150ms, text-decoration-color 150ms;
+  }
+
+  .hero__inline-link:hover {
+    color: var(--color-accent);
+    text-decoration-color: var(--color-accent);
   }
 
   .hero__ctas {
@@ -240,7 +259,6 @@ const tags = ['Product design', 'System design', 'AI as system layer'];
     background-color: var(--color-accent-dim);
   }
 
-  /* Stretch buttons full-width on the smallest screens for thumb-friendly hits */
   @media (max-width: 380px) {
     .hero__ctas {
       flex-direction: column;

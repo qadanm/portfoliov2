@@ -4,52 +4,42 @@ import type { CollectionEntry } from 'astro:content';
 
 interface Props {
   projects: CollectionEntry<'build'>[];
+  /**
+   * `flat` (default) renders one unified Selected Work list, with badges
+   * on each card carrying the differentiation (Flagship · Platform ·
+   * Product · etc.). The lead card is sized as a feature row, the rest
+   * follow as a 2-up grid. This is the audit-recommended layout — no
+   * "Selected vs Experience" tier split.
+   */
+  variant?: 'flat';
 }
 
-const { projects } = Astro.props;
-
+const { projects, variant = 'flat' } = Astro.props;
 const sorted = [...projects].sort((a, b) => a.data.order - b.data.order);
-const builtProjects = sorted.filter(p => p.data.engagement !== 'work');
-const experienceProjects = sorted.filter(p => p.data.engagement === 'work');
-
-interface SectionProps {
-  label: string;
-  note: string;
-  list: CollectionEntry<'build'>[];
-}
-
-const sections: SectionProps[] = [
-  { label: 'Selected projects', note: "Things I've built.", list: builtProjects },
-  { label: 'Experience', note: 'Systems I operate within.', list: experienceProjects },
-].filter(s => s.list.length > 0);
+const [lead, ...rest] = sorted;
 ---
 
-<div class="pg">
-  {sections.map((section, sectionIndex) => {
-    const [lead, ...rest] = section.list;
-    return (
-      <section class="pg__section" data-reveal data-reveal-delay={sectionIndex === 0 ? undefined : '2'}>
-        <header class="pg__head">
-          <span class="pg__eyebrow">{section.label}</span>
-          <span class="pg__note">{section.note}</span>
-        </header>
+<div class="pg" data-variant={variant}>
+  <section class="pg__section" data-reveal>
+    <header class="pg__head">
+      <span class="pg__eyebrow">Selected work</span>
+      <span class="pg__note">Independent products and platform engagements.</span>
+    </header>
 
-        {lead && (
-          <div class="pg__lead">
-            <ProjectCard project={lead} size="feature" index={0} />
-          </div>
-        )}
+    {lead && (
+      <div class="pg__lead">
+        <ProjectCard project={lead} size="feature" index={0} />
+      </div>
+    )}
 
-        {rest.length > 0 && (
-          <div class:list={['pg__rest', { 'pg__rest--solo': rest.length === 1 }]}>
-            {rest.map((project, i) => (
-              <ProjectCard project={project} index={i + 1} />
-            ))}
-          </div>
-        )}
-      </section>
-    );
-  })}
+    {rest.length > 0 && (
+      <div class:list={['pg__rest', { 'pg__rest--solo': rest.length === 1 }]}>
+        {rest.map((project, i) => (
+          <ProjectCard project={project} index={i + 1} />
+        ))}
+      </div>
+    )}
+  </section>
 </div>
 
 <style>
@@ -102,12 +92,11 @@ const sections: SectionProps[] = [
   .pg__note {
     font-size: 13px;
     color: var(--color-text-subtle);
-    font-style: italic;
     line-height: 1.5;
   }
 
   .pg__lead {
-    /* Single lead card per section, full width */
+    /* Single lead card, full width */
   }
 
   .pg__rest {
@@ -128,8 +117,6 @@ const sections: SectionProps[] = [
       gap: var(--space-6);
     }
 
-    /* When there's only one secondary card, give it half width and align right
-       to balance the lead card visually. */
     .pg__rest--solo {
       grid-template-columns: repeat(2, 1fr);
     }

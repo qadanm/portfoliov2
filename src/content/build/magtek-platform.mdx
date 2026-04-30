@@ -1,11 +1,24 @@
 ---
 title: MagTek Platform
-short: UX systems across a multi-site enterprise platform
+short: UX systems and frontend architecture across a multi-site enterprise platform
 category: Platform
 keyFocus:
   - Platform-level UX
   - Frontend systems
   - System evolution under constraints
+role: UX engineering & frontend systems
+period: 2022 — present
+status: Live · ongoing
+scope: ~11 sites on shared platform, ~85% of frontend ownership
+outcomes:
+  - label: Sites on shared platform
+    value: '11'
+  - label: Frontend ownership
+    value: '~85%'
+  - label: Years inside production
+    value: '10y+'
+  - label: Razor component library
+    value: Modular & typed
 placeholder:
   from: '#F5F6F8'
   to: '#E4E7EC'
@@ -37,11 +50,9 @@ I operate across most of MagTek's web platform: MagTek.com and a network of rela
 
 You can't brute-force improvements in a system like this. You have to work with it.
 
-That's where most of my work sits.
-
 ## What "platform-level" actually means
 
-It means a single change has to land across more than one product surface without breaking the others. The design problem is rarely "this page". It's "this pattern, applied to every page that already exists, and every page that doesn't yet."
+A single change has to land across more than one product surface without breaking the others. The design problem is rarely "this page". It's "this pattern, applied to every page that already exists, and every page that doesn't yet."
 
 Specifically:
 
@@ -58,15 +69,15 @@ A lot of the most valuable work is invisible when it's done right. The change yo
 
 The homepage needed to communicate a complex product ecosystem clearly. It's the highest-traffic entry point and the place most users decide whether they're in the right place.
 
-The work was hierarchy. Which message comes first. Which paths get visual weight. Which ones get demoted. The goal wasn't a visual refresh. It was a homepage that answers am I in the right place before the visitor scrolls.
+The work was hierarchy. Which message comes first. Which paths get visual weight. Which ones get demoted. The goal wasn't a visual refresh — it was a homepage that answers "am I in the right place?" before the visitor scrolls.
 
 The patterns introduced here became reusable across the rest of the platform: section structures, hierarchy rules, and a navigation grammar that the other properties have since adopted.
 
 ### Support portal
 
-The portal had good content but poor usability. That's a common pattern in long-running platforms. The information exists; the structure doesn't. Users spend more time finding answers than reading them, which means most of them give up and contact support. That's exactly the outcome the portal is supposed to prevent.
+The portal had good content but poor usability. That's a common pattern in long-running platforms. The information exists; the structure doesn't. Users spend more time finding answers than reading them, which means most of them give up and contact support — exactly the outcome the portal is supposed to prevent.
 
-The work focused on reducing friction in finding answers, improving layout consistency, and restructuring content organization around how users actually arrive, usually from a specific error, product, or question. Categories were rebuilt around the user's mental model, not the org chart. Layout patterns were standardized so that every article looks, scrolls, and behaves the same way.
+The work focused on reducing friction in finding answers, improving layout consistency, and restructuring content organization around how users actually arrive (usually from a specific error, product, or question). Categories were rebuilt around the user's mental model, not the org chart. Layout patterns were standardized so every article looks, scrolls, and behaves the same way.
 
 Less searching, more finding.
 
@@ -74,20 +85,14 @@ Less searching, more finding.
 
 Long-running systems develop strong opinions about how they want to be changed. Ignoring those opinions is how outages happen. Listening to them is how you ship things that survive.
 
-One example. The homepage hero ran a six-slide rotating carousel that nobody finished. The straight design call was killing the slider and replacing it with a static hero on a single message. The harder problem was around it: the half-dozen marketing surfaces sized to the carousel's dimensions, the analytics taxonomy that named events by slide number, the stakeholders who'd argued for "their" slide. The work was sequencing it. Build the static hero on a parallel route first, run it as a measurable comparison against the live page, migrate the dependent surfaces one at a time, then retire the carousel last so nothing pointed at a dead artifact. The design decision was a single static hero with one message. The harder design decision was about how to land it without breaking the system around it.
+One example. The homepage hero ran a six-slide rotating carousel that nobody finished. The straight design call was killing the slider and replacing it with a static hero on a single message. The harder problem was around it: the half-dozen marketing surfaces sized to the carousel's dimensions, the analytics taxonomy that named events by slide number, the stakeholders who'd argued for "their" slide. The work was sequencing it. Build the static hero on a parallel route first, run it as a measurable comparison against the live page, migrate the dependent surfaces one at a time, then retire the carousel last so nothing pointed at a dead artifact.
 
-Some of the other work that mattered most:
+The design decision was a single static hero with one message. The harder design decision was about how to land it without breaking the system around it.
+
+Other work that mattered most:
 
 - Replacing a cluster of one-off layouts with a small set of layout primitives, without touching production traffic.
 - Moving spacing, color, and type into tokens that the rest of the platform could adopt incrementally, on its own timeline.
-- Sequencing navigation changes so that internal links, SEO, and analytics didn't drift during the transition.
+- Sequencing navigation changes so internal links, SEO, and analytics didn't drift during the transition.
 
 None of this is glamorous. All of it compounds.
-
-## AI as a system layer in the build
-
-AI runs through how the platform itself gets built and maintained, as a structured layer rather than a feature.
-
-The loop is the same every time: the model interrogates the spec to surface ambiguity, the brief gets restated as a structured prompt, then execution routes to the right environment. Claude and Cursor are interchangeable code environments — both handle reasoning, generation, and code; the choice is contextual, not by role. Claude Design enters only when visual reasoning moves the work forward faster than code.
-
-The point is repeatability, not novelty. The system constrains the inputs and the outputs; a human owns every decision that ships.

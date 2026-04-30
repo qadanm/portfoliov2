@@ -1,11 +1,24 @@
 ---
 title: ChatOBD2
-short: AI-native automotive diagnostics interface
+short: AI-native automotive diagnostics product, designed and engineered solo
 category: Flagship
 keyFocus:
   - AI-native UX
-  - System translation
-  - Technical interaction design
+  - Structured pipeline design
+  - End-to-end product engineering
+role: Founder, sole designer & engineer
+period: 2024 — present
+status: Live in beta · iOS
+scope: Mobile app, marketing site, developer portal, backend pipeline
+outcomes:
+  - label: Product surfaces shipped
+    value: '3'
+  - label: Token budget per scan
+    value: 38k
+  - label: Reasoning layers before model call
+    value: '6'
+  - label: Designed and built by
+    value: One person
 placeholder:
   from: '#0B0D12'
   to: '#1A1F2B'
@@ -37,18 +50,18 @@ The interface is intentionally simple. The system behind it isn't.
 
 It pairs structured diagnostic inputs with layered interpretation and a constrained model call, and it constrains the output. Every scan returns the same shape: is it safe to drive, how confident is the answer, what matters most, what to do next.
 
-The model is one stage inside a structured pipeline, not the system. Its job is reducing complexity, not generating content.
+The model is one stage inside a structured pipeline. Its job is reducing complexity, not generating content.
 
 ## Three decisions that shaped the product
 
 **The verdict comes first, before any text.** When a scan finishes, the safe-to-drive answer is the first thing rendered, full-width and color-coded, ahead of every paragraph. The tradeoff is less narrative warmth, but anyone glancing at the screen has the answer they came for in under a second.
 
-**Confidence is part of the answer.** A partial scan changes what the verdict means. Showing scan quality as a fixed bar instead of hiding it costs a small piece of optimism, but earns a much larger piece of trust. It's the kind of decision a less-confident product wouldn't make.
+**Confidence is part of the answer.** A partial scan changes what the verdict means. Showing scan quality as a fixed bar instead of hiding it costs a small piece of optimism but earns a much larger piece of trust. It's the kind of decision a less-confident product wouldn't make.
 
 **Prompts live in the system, not in components.** When prompts get scattered across components, every copy change is a hunt across N files, and the analytics taxonomy quietly drifts behind it. Pulling them into one module, keyed by verdict tier and code context, means a single change updates the whole product, and the analytics stay coherent across it.
 
 ## The shape of the system
 
-Chat surface as the home screen. Verdict card as the unit of output. The model held as a constrained stage in the middle of a structured pipeline — structure on the input side, structure on the output side.
+Chat surface as the home screen. Verdict card as the unit of output. The model held as one structured stage between deterministic input and constrained output.
 
 The interface stops asking the driver to interpret data and starts telling them what to do next.

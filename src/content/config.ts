@@ -21,6 +21,13 @@ const build = defineCollection({
     engagement: z.enum(['independent', 'work']).default('independent'),
     company: z.string().optional(),
     period: z.string().optional(),
+    role: z.string().optional(),
+    scope: z.string().optional(),
+    status: z.string().optional(),
+    outcomes: z.array(z.object({
+      label: z.string(),
+      value: z.string(),
+    })).optional(),
     stack: z.array(z.string()).optional(),
     coverImage: z.string().optional(),
     coverAlt: z.string().optional(),

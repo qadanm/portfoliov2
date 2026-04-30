@@ -24,7 +24,7 @@ export function initAnalytics(): void {
   }
 
   // Auto: project_view fires when a case-study URL is shown.
-  const slug = location.pathname.match(/^\/build\/([^/]+)\/?$/)?.[1];
+  const slug = location.pathname.match(/^\/work\/([^/]+)\/?$/)?.[1];
   if (slug) {
     track('project_view', { project: slug });
   }

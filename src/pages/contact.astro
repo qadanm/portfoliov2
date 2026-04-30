@@ -25,28 +25,33 @@ const channels = [
 ---
 
 <BaseLayout
-  title="Contact Moe Qadan — Product Design & UX Engineering"
-  description="Get in touch with Moe Qadan. Open to interesting work in UX engineering, frontend systems, design engineering, and AI-native products."
+  title="Contact Moe Qadan — Product Designer & UX Engineer"
+  description="Open to hearing about new projects, contracts, advisory, and conversations on AI-native product work. Replies within a day."
   keywords={[
     'contact Moe Qadan',
-    'hire UX engineer',
-    'hire product designer',
-    'design engineer for hire',
+    'product designer',
+    'UX engineer',
+    'design engineer',
     'AI product design',
   ]}
 >
   <div class="contact">
     <div class="container-site contact__inner">
       <div class="contact__content">
-        <span class="contact__eyebrow">Contact</span>
+        <div class="contact__status">
+          <span class="contact__status-dot" aria-hidden="true"></span>
+          <span class="contact__status-text">Open to hearing about projects</span>
+        </div>
+
         <h1 class="contact__title">
-          If you're building something <em>interesting</em>,<br />
-          feel free to reach out.
+          Open to hearing about<br />
+          interesting <em>projects</em>.
         </h1>
+
         <p class="contact__lede">
-          Open to conversations about products, platforms, and the AI
-          system layer underneath them. Drop a note below, or use one
-          of the direct channels.
+          Contracts, advisory, or a 30-minute conversation about an
+          AI-native product you're shaping — all welcome. Tell me what
+          you're building and I'll reply within a day.
         </p>
 
         <div class="contact__form-wrap">
@@ -86,10 +91,6 @@ const channels = [
             </li>
           ))}
         </ul>
-
-        <p class="contact__signoff">
-          What system are we building next?
-        </p>
       </div>
     </div>
   </div>
@@ -104,7 +105,7 @@ const channels = [
 
   @media (min-width: 768px) {
     .contact {
-      padding-top: calc(64px + var(--space-20));
+      padding-top: calc(64px + var(--space-16));
       padding-bottom: var(--space-24);
     }
   }
@@ -113,24 +114,49 @@ const channels = [
     max-width: 720px;
   }
 
-  .contact__eyebrow {
-    display: inline-block;
+  .contact__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px 5px 10px;
+    margin-bottom: var(--space-5);
+    border-radius: 9999px;
+    font-family: var(--font-mono);
     font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--color-text-subtle);
-    margin-bottom: var(--space-4);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--color-success);
+    background-color: color-mix(in srgb, var(--color-success) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-success) 28%, transparent);
+  }
+
+  .contact__status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: var(--color-success);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--color-success) 65%, transparent);
+    animation: contact-status-pulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes contact-status-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(0.85); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .contact__status-dot { animation: none; }
   }
 
   .contact__title {
     font-family: var(--font-display);
-    font-size: clamp(36px, 8vw, 64px);
+    font-size: clamp(34px, 7vw, 60px);
     font-weight: 400;
     letter-spacing: -0.025em;
-    line-height: 1.1;
+    line-height: 1.05;
     color: var(--color-text);
     margin-bottom: var(--space-5);
+    max-width: 18ch;
   }
 
   @media (min-width: 768px) {
@@ -148,7 +174,7 @@ const channels = [
     font-size: clamp(16px, 1.6vw, 18px);
     line-height: 1.65;
     color: var(--color-text-muted);
-    max-width: 56ch;
+    max-width: 60ch;
     margin-bottom: var(--space-10);
   }
 
@@ -274,8 +300,6 @@ const channels = [
   }
 
   @media (max-width: 560px) {
-    /* Stack label + value on the left, keep the chevron locked to the right edge.
-       Without this, the arrow drops under the value and the row loses its right-rail anchor. */
     .contact__channel {
       display: grid;
       grid-template-columns: 1fr auto;
@@ -301,23 +325,5 @@ const channels = [
     .contact__channel-icon {
       grid-area: icon;
     }
-  }
-
-  .contact__signoff {
-    margin-top: var(--space-12);
-    font-family: var(--font-display);
-    font-size: clamp(20px, 2.4vw, 28px);
-    font-style: italic;
-    font-weight: 400;
-    letter-spacing: -0.01em;
-    color: var(--color-text-muted);
-    line-height: 1.4;
-  }
-
-  .contact__signoff span {
-    margin-left: 6px;
-    font-style: normal;
-    display: inline-block;
-    transform: translateY(-2px);
   }
 </style>

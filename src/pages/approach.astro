@@ -1,0 +1,484 @@
+---
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
+---
+
+<BaseLayout
+  title="Approach — How Moe Qadan designs and builds"
+  description="The methodology. AI as production infrastructure, not a feature. Prompt engineering as system, not chat. Claude, Cursor, and Claude Design selected by task. The codebase is the source of truth."
+  keywords={[
+    'Moe Qadan',
+    'design approach',
+    'design engineering',
+    'AI-assisted design',
+    'prompt engineering',
+    'design systems',
+    'product design process',
+    'Claude Design',
+    'Figma',
+    'Cursor',
+  ]}
+>
+  <div class="apr">
+    <div class="apr__hero">
+      <div class="container-site">
+        <span class="apr__eyebrow">Approach</span>
+        <h1 class="apr__title">
+          The model is one stage.<br />The <em>system</em> is the product.
+        </h1>
+        <p class="apr__subtitle">
+          Most of my work isn't building from scratch. It's stepping
+          into what already exists and making it better. AI runs
+          through it as production infrastructure, not a feature you
+          flip on.
+        </p>
+      </div>
+    </div>
+
+    <div class="container-site apr__body">
+      <section class="apr__section" data-reveal>
+        <h2 class="apr__h2">Three principles</h2>
+        <ol class="apr__principles">
+          <li>
+            <span class="apr__principle-num">01</span>
+            <div>
+              <strong class="apr__principle-title">Systems before surfaces.</strong>
+              <p class="apr__principle-desc">
+                A page is a render of something deeper. Get the
+                underlying structure right and the surface gets cheaper
+                to change.
+              </p>
+            </div>
+          </li>
+          <li>
+            <span class="apr__principle-num">02</span>
+            <div>
+              <strong class="apr__principle-title">Constraints are the brief.</strong>
+              <p class="apr__principle-desc">
+                Long-running stacks. Real users. Code that can't be torn
+                down. Those aren't obstacles; they're the actual design
+                problem.
+              </p>
+            </div>
+          </li>
+          <li>
+            <span class="apr__principle-num">03</span>
+            <div>
+              <strong class="apr__principle-title">AI is infrastructure, not a feature.</strong>
+              <p class="apr__principle-desc">
+                Prompts live in the system, scoped to context, versioned,
+                and budgeted. Same inputs, consistent outputs. The point
+                is repeatability, not novelty.
+              </p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <hr class="apr__rule" />
+
+      <section class="apr__section" data-reveal>
+        <h2 class="apr__h2">AI as production infrastructure</h2>
+        <p class="apr__para">
+          ChatOBD2 is the clearest example. Six deterministic reasoning
+          layers run before every model call. The system prompt is
+          composed per scan from a 38,000-token budget — P0 sections
+          always make the cut; lower-priority sections only land if
+          budget remains. Prompts are keyed by verdict tier and code
+          context, not scattered across components.
+        </p>
+        <p class="apr__para">
+          The model gets a structured spec, not a chat. That's what
+          makes the output repeatable, the analytics coherent, and the
+          system inspectable. A human owns every decision that ships.
+        </p>
+
+        <div class="apr__art" data-reveal>
+          <span class="apr__art-caption">From inputs to verdict — ChatOBD2 product surface</span>
+          <VerdictCardMock />
+        </div>
+      </section>
+
+      <hr class="apr__rule" />
+
+      <section class="apr__section" data-reveal>
+        <h2 class="apr__h2">Tools, picked by task</h2>
+        <p class="apr__para">
+          Most of the work happens in code, against the components and
+          tokens the product is built from. The tool is selected by what
+          the task actually needs:
+        </p>
+
+        <ul class="apr__tools">
+          <li>
+            <span class="apr__tool-name">Claude</span>
+            <span class="apr__tool-role">Reasoning, code generation, refactoring across a codebase. Default for non-trivial work.</span>
+          </li>
+          <li>
+            <span class="apr__tool-name">Cursor</span>
+            <span class="apr__tool-role">Local iteration in the editor. Same code work, different interaction style.</span>
+          </li>
+          <li>
+            <span class="apr__tool-name">Figma</span>
+            <span class="apr__tool-role">Precision work, design-system maintenance, handoff fidelity.</span>
+          </li>
+          <li>
+            <span class="apr__tool-name">Claude Design</span>
+            <span class="apr__tool-role">Visual exploration when reasoning is faster in a frame than in code. Output lands back in the codebase.</span>
+          </li>
+        </ul>
+
+        <p class="apr__para apr__para--note">
+          The codebase is the source of truth across all of them. Tools
+          are interchangeable; the system isn't.
+        </p>
+      </section>
+
+      <hr class="apr__rule" />
+
+      <section class="apr__section" data-reveal>
+        <h2 class="apr__h2">Across the work</h2>
+        <p class="apr__para">
+          Different products, different surfaces, different tools — but
+          the same loop: understand the constraint, structure the
+          intent, ship into a real system, hold the result to a
+          product-quality bar.
+        </p>
+
+        <div class="apr__work-grid">
+          <figure class="apr__work-shot">
+            <img
+              src="/images/chatobd2/hero.webp"
+              alt="ChatOBD2 marketing hero with phone mockup of a live diagnostic chat."
+              width="1440"
+              height="900"
+              loading="lazy"
+            />
+            <figcaption>
+              <strong>ChatOBD2</strong> — AI-native diagnostics, designed and engineered solo.
+              <a href="/work/chatobd2">Read the case study →</a>
+            </figcaption>
+          </figure>
+          <figure class="apr__work-shot">
+            <img
+              src="/images/magtek/homepage.webp"
+              alt="MagTek homepage with metric story and team photography."
+              width="1440"
+              height="900"
+              loading="lazy"
+            />
+            <figcaption>
+              <strong>MagTek</strong> — UX systems and frontend across an enterprise platform.
+              <a href="/work/magtek-platform">Read the case study →</a>
+            </figcaption>
+          </figure>
+          <figure class="apr__work-shot">
+            <img
+              src="/images/sawa/hero.webp"
+              alt="Sawa marketing hero — 'idk, you pick' with phone mockup of a matched restaurant card."
+              width="1440"
+              height="900"
+              loading="lazy"
+            />
+            <figcaption>
+              <strong>Sawa</strong> — marketing site for an iMessage-native group dining app.
+              <a href="/work/sawa">Read the case study →</a>
+            </figcaption>
+          </figure>
+          <figure class="apr__work-shot">
+            <img
+              src="/images/financial-platforms/chase.webp"
+              alt="Chase homepage built on the InvestCloud framework."
+              width="1440"
+              height="900"
+              loading="lazy"
+            />
+            <figcaption>
+              <strong>Advisor platforms</strong> — multi-tenant frontend across major institutions.
+              <a href="/work/financial-platforms">Read the case study →</a>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .apr__hero {
+    padding-top: calc(60px + var(--space-10));
+    padding-bottom: var(--space-10);
+    border-bottom: 1px solid var(--color-border-subtle);
+    margin-bottom: var(--space-10);
+  }
+
+  @media (min-width: 768px) {
+    .apr__hero {
+      padding-top: calc(64px + var(--space-16));
+      padding-bottom: var(--space-12);
+      margin-bottom: var(--space-12);
+    }
+  }
+
+  .apr__eyebrow {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+    margin-bottom: var(--space-4);
+  }
+
+  .apr__title {
+    font-family: var(--font-display);
+    font-size: clamp(36px, 8vw, 72px);
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    line-height: 1.05;
+    color: var(--color-text);
+    max-width: 18ch;
+    margin-bottom: var(--space-5);
+  }
+
+  .apr__title em {
+    font-style: italic;
+    color: var(--color-accent);
+  }
+
+  .apr__subtitle {
+    font-size: clamp(16px, 1.7vw, 19px);
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    max-width: 60ch;
+  }
+
+  .apr__body {
+    padding-bottom: var(--space-16);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+    max-width: 1080px;
+  }
+
+  @media (min-width: 768px) {
+    .apr__body {
+      padding-bottom: var(--space-24);
+      gap: var(--space-16);
+    }
+  }
+
+  .apr__rule {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: 0;
+  }
+
+  .apr__section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  .apr__h2 {
+    font-family: var(--font-display);
+    font-size: clamp(24px, 3vw, 36px);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: var(--color-text);
+    margin-bottom: var(--space-3);
+  }
+
+  .apr__para {
+    font-size: clamp(15px, 1.5vw, 17px);
+    line-height: 1.75;
+    color: var(--color-text-muted);
+    max-width: 64ch;
+  }
+
+  .apr__para--note {
+    font-size: 14px;
+    color: var(--color-text-subtle);
+    padding: var(--space-3) var(--space-4);
+    border-left: 2px solid var(--color-border);
+    background-color: var(--color-bg-muted);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  }
+
+  .apr__principles {
+    counter-reset: apr-principles;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  .apr__principles li {
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    gap: var(--space-4);
+    align-items: baseline;
+    padding: var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-bg-elevated);
+  }
+
+  @media (min-width: 600px) {
+    .apr__principles li {
+      padding: var(--space-6) var(--space-7);
+    }
+  }
+
+  .apr__principle-num {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-accent);
+    letter-spacing: 0.04em;
+    padding-top: 2px;
+  }
+
+  .apr__principle-title {
+    display: block;
+    font-family: var(--font-display);
+    font-size: clamp(18px, 2vw, 22px);
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    color: var(--color-text);
+    margin-bottom: var(--space-2);
+  }
+
+  .apr__principle-desc {
+    margin: 0;
+    font-size: clamp(14px, 1.4vw, 16px);
+    line-height: 1.65;
+    color: var(--color-text-muted);
+  }
+
+  .apr__art {
+    margin-top: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .apr__art-caption {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+  }
+
+  .apr__art :global(.verdict-mock__head) {
+    display: none;
+  }
+
+  .apr__art :global(.verdict-mock) {
+    margin: 0;
+  }
+
+  .apr__tools {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+
+  @media (min-width: 720px) {
+    .apr__tools {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+    }
+  }
+
+  .apr__tools li {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-bg-elevated);
+  }
+
+  .apr__tool-name {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--color-text);
+    letter-spacing: -0.01em;
+  }
+
+  .apr__tool-role {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    line-height: 1.55;
+  }
+
+  .apr__work-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+    margin-top: var(--space-3);
+  }
+
+  @media (min-width: 720px) {
+    .apr__work-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-6);
+    }
+  }
+
+  .apr__work-shot {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .apr__work-shot img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-md);
+  }
+
+  .apr__work-shot figcaption {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--color-text-muted);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .apr__work-shot figcaption strong {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  .apr__work-shot figcaption a {
+    color: var(--color-text);
+    text-decoration: underline;
+    text-decoration-color: var(--color-border);
+    text-underline-offset: 3px;
+    font-size: 12px;
+    transition: color 150ms, text-decoration-color 150ms;
+  }
+
+  .apr__work-shot figcaption a:hover {
+    color: var(--color-accent);
+    text-decoration-color: var(--color-accent);
+  }
+</style>

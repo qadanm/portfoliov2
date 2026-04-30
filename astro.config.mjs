@@ -9,17 +9,19 @@ export default defineConfig({
     tailwind({ applyBaseStyles: false }),
     mdx(),
     sitemap({
-      // /work/* are 301 redirects to /build/* — keep the canonical URLs in
-      // the sitemap and let crawlers discover the redirect via the live site.
-      filter: (page) => !page.includes('/work'),
+      // /build/* and /design are 301 redirects to the new canonical URLs;
+      // keep the canonical paths in the sitemap and let crawlers discover
+      // redirects via the live site.
+      filter: (page) => !page.includes('/build') && !page.includes('/design'),
       changefreq: 'monthly',
       priority: 0.8,
       lastmod: new Date(),
     }),
   ],
   redirects: {
-    '/work': '/build',
-    '/work/[slug]': '/build/[slug]',
+    '/build': '/work',
+    '/build/[slug]': '/work/[slug]',
+    '/design': '/approach',
   },
   markdown: {
     shikiConfig: {

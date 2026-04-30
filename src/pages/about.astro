@@ -1,19 +1,19 @@
 ---
 import BaseLayout from '@/components/layout/BaseLayout.astro';
-import HowIWorkLoop from '@/components/diagrams/HowIWorkLoop.astro';
 ---
 
 <BaseLayout
-  title="About Moe Qadan — Product Design & UX Engineering"
-  description="How Moe Qadan works. UX engineering at the intersection of product design, frontend systems, and AI-native systems — built for long-running platforms with real constraints."
+  title="About Moe Qadan — Product Designer & UX Engineer"
+  description="A decade designing and shipping product end to end. Currently: ChatOBD2 (AI-native diagnostics) and the MagTek platform. Previously: advisor tools at Chase, Cetera, Northwestern Mutual via InvestCloud."
   keywords={[
     'Moe Qadan',
     'about',
     'product designer',
     'UX engineer',
     'design engineer',
+    'background',
+    'experience',
     'AI-native systems',
-    'how I work',
   ]}
 >
   <div class="about">
@@ -21,8 +21,13 @@ import HowIWorkLoop from '@/components/diagrams/HowIWorkLoop.astro';
       <div class="container-site">
         <span class="about__eyebrow">About</span>
         <h1 class="about__title">
-          How I <em>work</em>.
+          Moe Qadan, <em>plain</em>.
         </h1>
+        <p class="about__hero-sub">
+          Product designer and UX engineer. A decade shipping product
+          across long-running platforms and, more recently, AI-native
+          systems where the model is one stage in a structured pipeline.
+        </p>
       </div>
     </div>
 
@@ -34,70 +39,76 @@ import HowIWorkLoop from '@/components/diagrams/HowIWorkLoop.astro';
         </p>
 
         <p class="about__para">
-          That means:
+          Understand the constraints. Improve the structure instead of
+          adding complexity. Build patterns that get reused, not just
+          shipped. Know when to automate and when not to.
         </p>
 
-        <ul class="about__bullets">
-          <li>Understanding constraints before changing anything</li>
-          <li>Improving structure instead of adding complexity</li>
-          <li>Building things that can be reused, not just shipped</li>
-          <li>Knowing when to automate and when not to</li>
-        </ul>
-
-        <p class="about__para">
-          <strong>AI runs through the work as a structured system layer.</strong>
-          Not a feature, not a tool I reach for. The loop is the same
-          every time: state the intent, let the model interrogate it
-          back to surface the spec gaps, restate the brief as a prompt
-          that lives in the system, then route execution to the right
-          environment. Review owns the call.
+        <p class="about__signature">
+          Most systems don't need to be replaced. They need to be
+          understood first.
         </p>
 
-        <p class="about__para">
-          <strong>Prompt engineering is core, not garnish.</strong>
-          Prompts are versioned, named, scoped to a verdict tier or a
-          code context, and assembled by priority inside a budget. The
-          model gets a structured spec, not a chat. That's what makes
-          the output repeatable and the system inspectable.
-        </p>
+        <hr class="about__rule" />
 
-        <p class="about__para">
-          <strong>Execution is environment selection, not a pipeline.</strong>
-          Claude and Cursor are interchangeable — both handle
-          reasoning, generation, and code. The differentiator is
-          interaction style (agentic vs local-iteration), not
-          function, and either is fair game for either style. Claude
-          Design enters only when visual reasoning moves the work
-          forward faster than code. Selection is per task, not by
-          role. Never chained.
-        </p>
+        <h2 class="about__h2">Background</h2>
 
-        <aside class="about__callout">
-          <span class="about__callout-eyebrow">Prompts are part of the system</span>
-          <p class="about__callout-lead">
-            Prompts aren't disposable. They live inside the system,
-            scoped to context, and evolve with the product.
-          </p>
-          <p class="about__callout-body">
-            That turns one-off outputs into repeatable behavior:
-          </p>
-          <ul class="about__callout-list">
-            <li>same inputs → consistent outputs</li>
-            <li>less ambiguity across iterations</li>
-            <li>faster onboarding into complex systems</li>
-          </ul>
-          <p class="about__callout-coda">
-            The goal isn't to get an answer. It's to make the system
-            produce good answers reliably.
-          </p>
-        </aside>
+        <ol class="about__career">
+          <li class="about__career-item about__career-item--current">
+            <header class="about__career-head">
+              <span class="about__career-status">Current</span>
+              <h3 class="about__career-title">ChatOBD2</h3>
+              <span class="about__career-period">2024 — present</span>
+            </header>
+            <p class="about__career-desc">
+              Founder &amp; sole designer / engineer. AI-native automotive
+              diagnostics product I designed, engineered, and shipped end
+              to end. Mobile app, marketing site, developer portal,
+              backend pipeline.
+            </p>
+            <p class="about__career-stack">
+              React Native (Expo), TypeScript, Supabase, BLE, structured
+              prompt pipeline.
+            </p>
+          </li>
 
-        <p class="about__para">
-          The goal is always the same: make the hard parts easier to use,
-          and cheaper to evolve.
-        </p>
+          <li class="about__career-item about__career-item--current">
+            <header class="about__career-head">
+              <span class="about__career-status">Current</span>
+              <h3 class="about__career-title">MagTek</h3>
+              <span class="about__career-period">2022 — present</span>
+            </header>
+            <p class="about__career-desc">
+              UX systems and frontend architecture across MagTek.com and
+              a network of related sites on a shared, long-running
+              ASP.NET MVC platform. Razor component library, design
+              tokens, layout primitives, navigation grammar.
+            </p>
+            <p class="about__career-stack">
+              ASP.NET MVC, C#, Razor, Bootstrap, hand-authored CSS,
+              JavaScript.
+            </p>
+          </li>
 
-        <HowIWorkLoop />
+          <li class="about__career-item">
+            <header class="about__career-head">
+              <span class="about__career-status">Past</span>
+              <h3 class="about__career-title">InvestCloud</h3>
+              <span class="about__career-period">Earlier</span>
+            </header>
+            <p class="about__career-desc">
+              Advisor- and customer-facing portals deployed across major
+              wealth and banking institutions including Chase, Cetera,
+              Northwestern Mutual, Voya, Silicon Valley Bank, and East
+              West Bank. Multi-tenant frontend, per-institution branding,
+              dense data layouts.
+            </p>
+            <p class="about__career-stack">
+              CSS, proprietary CMS / component framework, Figma handoff
+              translation.
+            </p>
+          </li>
+        </ol>
 
         <hr class="about__rule" />
 
@@ -105,9 +116,9 @@ import HowIWorkLoop from '@/components/diagrams/HowIWorkLoop.astro';
 
         <ol class="about__list">
           <li>
-            <strong>Systems before surfaces.</strong> A page is a render of
-            something deeper. Get the underlying structure right and the
-            surface gets cheaper to change.
+            <strong>Systems before surfaces.</strong> A page is a render
+            of something deeper. Get the underlying structure right and
+            the surface gets cheaper to change.
           </li>
           <li>
             <strong>Constraints are the brief.</strong> A long-running
@@ -117,49 +128,28 @@ import HowIWorkLoop from '@/components/diagrams/HowIWorkLoop.astro';
           </li>
           <li>
             <strong>AI is infrastructure, not a feature.</strong>
-            Requirement discovery via interrogation, prompts as system,
-            branched execution, human review. Same loop every time. The
-            point is repeatability, not novelty.
+            Prompts live in the system, scoped to context, versioned,
+            and budgeted. The point is repeatability, not novelty.
           </li>
         </ol>
 
-        <p class="about__signature">
-          Most systems don't need to be replaced. They need to be
-          understood first.
+        <p class="about__para about__para--note">
+          More on the workflow — Claude, Cursor, Figma, and how visual
+          exploration fits in — lives on the
+          <a href="/approach" class="about__inline-link">Approach</a> page.
         </p>
 
         <hr class="about__rule" />
 
         <h2 class="about__h2">The kind of work I take on</h2>
 
-        <div class="about__columns">
-          <div class="about__col">
-            <span class="about__col-label about__col-label--yes">
-              <span class="about__col-mark" aria-hidden="true">+</span>
-              Interested in
-            </span>
-            <ul class="about__col-list">
-              <li>Long-running platforms with real constraints</li>
-              <li>AI-native products where structure beats vibes</li>
-              <li>System-level UX, not single-page polish</li>
-              <li>Frontend architecture in environments that can't be torn down</li>
-              <li>Tooling and workflows where AI is the delivery layer, not the demo</li>
-            </ul>
-          </div>
-
-          <div class="about__col">
-            <span class="about__col-label about__col-label--no">
-              <span class="about__col-mark" aria-hidden="true">−</span>
-              Less interested in
-            </span>
-            <ul class="about__col-list">
-              <li>Greenfield-from-greenfield with no domain</li>
-              <li>"AI feature for AI feature's sake" projects</li>
-              <li>Visual refresh without structural change</li>
-              <li>Agency-style throughput across many shallow surfaces</li>
-            </ul>
-          </div>
-        </div>
+        <ul class="about__interests">
+          <li>Long-running platforms with real constraints</li>
+          <li>AI-native products where structure beats vibes</li>
+          <li>System-level UX, not single-page polish</li>
+          <li>Frontend architecture in environments that can't be torn down</li>
+          <li>Tooling and workflows where AI is the delivery layer, not the demo</li>
+        </ul>
       </div>
 
       <aside class="about__aside">
@@ -167,24 +157,23 @@ import HowIWorkLoop from '@/components/diagrams/HowIWorkLoop.astro';
           <h3 class="about__card-title">Currently</h3>
           <ul class="about__card-list">
             <li>
-              <span class="about__card-key">Platform</span>
-              <span class="about__card-val">MagTek &amp; related sites</span>
+              <span class="about__card-key">Status</span>
+              <span class="about__card-val about__card-val--status">
+                <span class="about__card-status-dot" aria-hidden="true"></span>
+                Open to projects
+              </span>
             </li>
             <li>
-              <span class="about__card-key">Product</span>
-              <span class="about__card-val">ChatOBD2</span>
+              <span class="about__card-key">Best fit</span>
+              <span class="about__card-val">Product systems · UX engineering · AI-native products</span>
+            </li>
+            <li>
+              <span class="about__card-key">Building</span>
+              <span class="about__card-val">ChatOBD2 · MagTek platform</span>
             </li>
             <li>
               <span class="about__card-key">Stack</span>
-              <span class="about__card-val">ASP.NET MVC · Razor · C# · TypeScript · React · Astro</span>
-            </li>
-            <li>
-              <span class="about__card-key">Execution</span>
-              <span class="about__card-val">Claude · Cursor · Claude Design*</span>
-            </li>
-            <li>
-              <span class="about__card-key">Prompt layer</span>
-              <span class="about__card-val">System-resident, versioned, budgeted</span>
+              <span class="about__card-val">TypeScript · React · Astro · ASP.NET MVC · C# · Razor</span>
             </li>
           </ul>
         </div>
@@ -192,8 +181,7 @@ import HowIWorkLoop from '@/components/diagrams/HowIWorkLoop.astro';
         <div class="about__card">
           <h3 class="about__card-title">Reach out</h3>
           <p class="about__card-note">
-            Open to interesting work: products, platforms, AI-native
-            systems.
+            Tell me what you're building. Replies usually within a day.
           </p>
           <a href="/contact" class="about__card-cta">
             Get in touch
@@ -225,6 +213,7 @@ import HowIWorkLoop from '@/components/diagrams/HowIWorkLoop.astro';
 
   .about__eyebrow {
     display: inline-block;
+    font-family: var(--font-mono);
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.1em;
@@ -241,11 +230,19 @@ import HowIWorkLoop from '@/components/diagrams/HowIWorkLoop.astro';
     line-height: 1.05;
     color: var(--color-text);
     max-width: 18ch;
+    margin-bottom: var(--space-5);
   }
 
   .about__title em {
     font-style: italic;
     color: var(--color-accent);
+  }
+
+  .about__hero-sub {
+    font-size: clamp(16px, 1.7vw, 19px);
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    max-width: 60ch;
   }
 
   .about__body {
@@ -270,12 +267,16 @@ import HowIWorkLoop from '@/components/diagrams/HowIWorkLoop.astro';
   }
 
   .about__lead {
-    font-size: clamp(18px, 2vw, 22px);
-    line-height: 1.6;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(22px, 2.4vw, 28px);
+    line-height: 1.4;
     color: var(--color-text);
-    margin-bottom: var(--space-6);
+    margin-bottom: var(--space-5);
     max-width: 56ch;
     font-weight: 400;
+    padding-left: var(--space-5);
+    border-left: 2px solid var(--color-accent);
   }
 
   .about__para {
@@ -286,222 +287,153 @@ import HowIWorkLoop from '@/components/diagrams/HowIWorkLoop.astro';
     max-width: 60ch;
   }
 
-  .about__columns {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-6);
-    margin-top: var(--space-5);
-  }
-
-  @media (min-width: 720px) {
-    .about__columns {
-      grid-template-columns: 1fr 1fr;
-      gap: var(--space-8);
-    }
-  }
-
-  .about__col {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-    padding: var(--space-5);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    background-color: var(--color-bg-elevated);
-  }
-
-  .about__col-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--color-text-subtle);
-    line-height: 1;
-  }
-
-  .about__col-mark {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    font-size: 11px;
-    font-weight: 700;
-    border: 1px solid var(--color-border);
-  }
-
-  .about__col-label--yes .about__col-mark {
-    color: var(--color-accent);
-    border-color: var(--color-accent-muted);
-    background-color: var(--color-accent-dim);
-  }
-
-  .about__col-label--no .about__col-mark {
-    color: var(--color-text-subtle);
-  }
-
-  .about__col-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-  }
-
-  .about__col-list li {
+  .about__para--note {
     font-size: 14px;
-    line-height: 1.55;
+    color: var(--color-text-subtle);
+    line-height: 1.65;
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    background-color: var(--color-bg-muted);
+    max-width: 60ch;
+    margin-top: var(--space-2);
+  }
+
+  .about__inline-link {
     color: var(--color-text);
-    padding: var(--space-2) 0;
-    border-bottom: 1px solid var(--color-border-subtle);
+    text-decoration: underline;
+    text-decoration-color: var(--color-border);
+    text-underline-offset: 3px;
+    transition: color 150ms, text-decoration-color 150ms;
   }
 
-  .about__col-list li:last-child {
-    border-bottom: none;
-  }
-
-  .about__col-label--no ~ .about__col-list li {
-    color: var(--color-text-muted);
+  .about__inline-link:hover {
+    color: var(--color-accent);
+    text-decoration-color: var(--color-accent);
   }
 
   .about__signature {
-    margin-top: var(--space-10);
+    margin-top: var(--space-8);
     padding: var(--space-5) var(--space-6);
-    border-left: 2px solid var(--color-accent);
-    background-color: var(--color-accent-dim);
-    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    background-color: var(--color-bg-muted);
+    border-radius: var(--radius-md);
     font-family: var(--font-display);
-    font-size: clamp(18px, 2vw, 22px);
-    font-style: italic;
+    font-size: clamp(17px, 1.9vw, 21px);
     line-height: 1.5;
     color: var(--color-text);
     max-width: 56ch;
   }
 
-  .about__bullets {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 var(--space-5);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-    max-width: 60ch;
-  }
-
-  .about__bullets li {
-    position: relative;
-    padding-left: 24px;
-    font-size: clamp(15px, 1.5vw, 17px);
-    line-height: 1.7;
-    color: var(--color-text-muted);
-  }
-
-  .about__bullets li::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0.7em;
-    width: 12px;
-    height: 1px;
-    background-color: var(--color-accent);
-  }
-
   .about__rule {
     border: none;
     border-top: 1px solid var(--color-border);
-    margin: var(--space-10) 0;
+    margin: var(--space-12) 0 var(--space-10);
   }
 
-  .about__callout {
-    margin: var(--space-8) 0;
-    padding: var(--space-6) var(--space-7);
-    border: 1px solid var(--color-accent-muted);
+  .about__h2 {
+    font-family: var(--font-display);
+    font-size: clamp(24px, 2.8vw, 34px);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    color: var(--color-text);
+    margin-bottom: var(--space-6);
+  }
+
+  /* Career timeline — adds the proof of seniority that was missing */
+  .about__career {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .about__career-item {
+    padding: var(--space-5);
+    border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
-    background-color: var(--color-accent-dim);
-    max-width: 60ch;
+    background-color: var(--color-bg-elevated);
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
   }
 
-  .about__callout-eyebrow {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--color-accent);
+  @media (min-width: 600px) {
+    .about__career-item {
+      padding: var(--space-6) var(--space-7);
+    }
   }
 
-  .about__callout-lead {
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: clamp(18px, 1.9vw, 22px);
-    font-weight: 400;
-    line-height: 1.4;
-    color: var(--color-text);
+  .about__career-item--current {
+    border-color: var(--color-accent-muted);
+    background-image: radial-gradient(ellipse 50% 80% at 100% 0%, var(--color-accent-dim), transparent 65%);
   }
 
-  .about__callout-body {
-    margin: 0;
-    font-size: clamp(14px, 1.4vw, 16px);
-    line-height: 1.7;
-    color: var(--color-text-muted);
-  }
-
-  .about__callout-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  .about__career-head {
     display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
+    align-items: baseline;
+    gap: var(--space-3);
+    flex-wrap: wrap;
   }
 
-  .about__callout-list li {
-    position: relative;
-    padding-left: 22px;
-    font-size: clamp(14px, 1.4vw, 16px);
-    line-height: 1.65;
-    color: var(--color-text);
+  .about__career-status {
     font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+    padding: 3px 8px;
+    border-radius: 9999px;
+    background-color: var(--color-bg-muted);
+    border: 1px solid var(--color-border);
+    line-height: 1;
   }
 
-  .about__callout-list li::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0.65em;
-    width: 12px;
-    height: 1px;
-    background-color: var(--color-accent);
+  .about__career-item--current .about__career-status {
+    color: var(--color-accent);
+    background-color: var(--color-accent-dim);
+    border-color: var(--color-accent-muted);
   }
 
-  .about__callout-coda {
-    margin: var(--space-2) 0 0;
-    padding-top: var(--space-3);
-    border-top: 1px solid var(--color-accent-muted);
+  .about__career-title {
     font-family: var(--font-display);
-    font-style: italic;
-    font-size: clamp(15px, 1.5vw, 17px);
-    line-height: 1.55;
-    color: var(--color-text);
-  }
-
-  .about__h2 {
-    font-family: var(--font-display);
-    font-size: clamp(22px, 2.5vw, 30px);
+    font-size: clamp(22px, 2.4vw, 28px);
     font-weight: 400;
     letter-spacing: -0.02em;
-    line-height: 1.2;
     color: var(--color-text);
-    margin-bottom: var(--space-5);
+    line-height: 1.1;
+    margin: 0;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .about__career-period {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-text-subtle);
+    letter-spacing: 0.04em;
+  }
+
+  .about__career-desc {
+    font-size: clamp(14px, 1.4vw, 16px);
+    line-height: 1.65;
+    color: var(--color-text-muted);
+    margin: 0;
+    max-width: 60ch;
+  }
+
+  .about__career-stack {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-text-subtle);
+    line-height: 1.55;
+    margin: 0;
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-border-subtle);
   }
 
   .about__list {
@@ -541,6 +473,43 @@ import HowIWorkLoop from '@/components/diagrams/HowIWorkLoop.astro';
     font-weight: 600;
   }
 
+  .about__interests {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    max-width: 60ch;
+  }
+
+  .about__interests li {
+    position: relative;
+    padding-left: 24px;
+    font-size: clamp(15px, 1.5vw, 17px);
+    line-height: 1.7;
+    color: var(--color-text);
+    padding-block: var(--space-2);
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .about__interests li::before {
+    content: '+';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-accent);
+  }
+
+  .about__interests li:last-child {
+    border-bottom: none;
+  }
+
+  /* Sidebar */
   .about__aside {
     display: flex;
     flex-direction: column;
@@ -555,6 +524,7 @@ import HowIWorkLoop from '@/components/diagrams/HowIWorkLoop.astro';
   }
 
   .about__card-title {
+    font-family: var(--font-mono);
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.1em;
@@ -590,6 +560,34 @@ import HowIWorkLoop from '@/components/diagrams/HowIWorkLoop.astro';
     font-size: 13px;
     color: var(--color-text);
     line-height: 1.45;
+  }
+
+  .about__card-val--status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--color-success);
+    font-family: var(--font-mono);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  .about__card-status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: var(--color-success);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--color-success) 65%, transparent);
+    animation: about-status-pulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes about-status-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(0.85); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .about__card-status-dot { animation: none; }
   }
 
   .about__card-note {

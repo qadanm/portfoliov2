@@ -2,10 +2,10 @@
 const pathname = Astro.url.pathname;
 
 const nav = [
-  { href: '/build', label: 'Build', sub: 'Projects, platforms, AI products.' },
-  { href: '/design', label: 'Design', sub: 'The visual branch of the loop.' },
-  { href: '/about', label: 'About', sub: 'How I think about the work.' },
-  { href: '/contact', label: 'Contact', sub: 'Open to interesting work.' },
+  { href: '/work', label: 'Work', sub: 'Selected projects and case studies.' },
+  { href: '/approach', label: 'Approach', sub: 'How I design, build, and use AI.' },
+  { href: '/about', label: 'About', sub: 'Background and how I think.' },
+  { href: '/contact', label: 'Contact', sub: 'Open to hearing about projects.' },
 ];
 
 function isActive(href: string) {
@@ -34,6 +34,16 @@ function isActive(href: string) {
     </nav>
 
     <div class="header-actions">
+      <a
+        href="/contact"
+        class="status-pill"
+        aria-label="Open to hearing about projects — go to contact"
+        title="Open to hearing about new projects"
+      >
+        <span class="status-pill__dot" aria-hidden="true"></span>
+        <span class="status-pill__text">Open to projects</span>
+      </a>
+
       <button
         class="theme-toggle"
         id="theme-toggle"
@@ -65,7 +75,12 @@ function isActive(href: string) {
   <div class="nav-mobile-backdrop" id="mobile-nav-backdrop" aria-hidden="true"></div>
   <div class="nav-mobile" id="mobile-nav" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Site navigation">
     <nav class="nav-mobile__inner" aria-label="Mobile navigation">
-      <span class="nav-mobile__eyebrow">Menu</span>
+      <span class="nav-mobile__eyebrow">
+        <span class="nav-mobile__status">
+          <span class="status-pill__dot" aria-hidden="true"></span>
+          Open to hearing about projects
+        </span>
+      </span>
       <ul class="nav-mobile__list">
         {nav.map((item, i) => (
           <li>
@@ -108,7 +123,6 @@ function isActive(href: string) {
   function getTheme() {
     const attr = html.getAttribute('data-theme');
     if (attr === 'dark' || attr === 'light') return attr;
-    // Fallback to system preference when no attribute is set yet.
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
 
@@ -121,8 +135,6 @@ function isActive(href: string) {
     const from = getTheme();
     const to = from === 'dark' ? 'light' : 'dark';
     setTheme(to);
-    // Theme preference is signal: a visitor's first action is often to switch
-    // to the mode that matches their actual environment. Track the direction.
     if (typeof window.plausible === 'function') {
       window.plausible('theme_toggle', { props: { from, to } });
     }
@@ -194,7 +206,6 @@ function isActive(href: string) {
     link.addEventListener('click', closeMenu);
   });
 
-  // Close on Escape
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && isMenuOpen()) {
       closeMenu();
@@ -202,7 +213,6 @@ function isActive(href: string) {
     }
   });
 
-  // Close when resizing past the desktop breakpoint
   const desktopMQ = window.matchMedia('(min-width: 768px)');
   const onMQChange = (e: MediaQueryListEvent | MediaQueryList) => {
     if (e.matches && isMenuOpen()) closeMenu();
@@ -210,11 +220,9 @@ function isActive(href: string) {
   if (typeof desktopMQ.addEventListener === 'function') {
     desktopMQ.addEventListener('change', onMQChange);
   } else {
-    // Safari < 14 fallback
     desktopMQ.addListener(onMQChange);
   }
 
-  // Close before view-transition swap (covers browser back/forward too)
   document.addEventListener('astro:before-swap', closeMenu);
 
   const header = document.getElementById('site-header');
@@ -268,13 +276,13 @@ function isActive(href: string) {
     align-items: center;
     justify-content: space-between;
     height: 60px;
-    gap: 16px;
+    gap: 12px;
   }
 
   @media (min-width: 768px) {
     .header-inner {
       height: 64px;
-      gap: 32px;
+      gap: 24px;
     }
   }
 
@@ -287,7 +295,6 @@ function isActive(href: string) {
     font-size: 18px;
     letter-spacing: -0.02em;
     transition: color 150ms;
-    /* Maintain a generous tap target without changing visual weight */
     padding-block: 8px;
   }
 
@@ -337,6 +344,54 @@ function isActive(href: string) {
     gap: 8px;
   }
 
+  /* "Open to projects" pill — soft availability signal that doesn't read as job-hunting */
+  .status-pill {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px 5px 9px;
+    border-radius: 9999px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--color-success);
+    background-color: color-mix(in srgb, var(--color-success) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-success) 28%, transparent);
+    text-decoration: none;
+    transition: background-color 150ms, border-color 150ms, transform 150ms var(--ease-out);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  @media (min-width: 600px) {
+    .status-pill { display: inline-flex; }
+  }
+
+  .status-pill:hover {
+    background-color: color-mix(in srgb, var(--color-success) 14%, transparent);
+    border-color: color-mix(in srgb, var(--color-success) 50%, transparent);
+    transform: translateY(-1px);
+  }
+
+  .status-pill__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: var(--color-success);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--color-success) 65%, transparent);
+    animation: status-pulse 2.4s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes status-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(0.85); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .status-pill__dot { animation: none; }
+  }
+
   .theme-toggle {
     display: flex;
     align-items: center;
@@ -376,7 +431,6 @@ function isActive(href: string) {
     cursor: pointer;
     transition: all 150ms;
     -webkit-tap-highlight-color: transparent;
-    /* Above the open drawer so the close affordance stays clickable */
     position: relative;
     z-index: 102;
   }
@@ -410,7 +464,6 @@ function isActive(href: string) {
   .is-open .hamburger::before { transform: rotate(45deg); top: 0; }
   .is-open .hamburger::after { transform: rotate(-45deg); top: 0; }
 
-  /* Backdrop sits below the drawer panel but above page content */
   .nav-mobile-backdrop {
     position: fixed;
     inset: 0;
@@ -432,7 +485,6 @@ function isActive(href: string) {
     .nav-mobile-backdrop { display: none !important; }
   }
 
-  /* Drawer: slides down from the header, fills the viewport for focus */
   .nav-mobile {
     position: fixed;
     top: 0;
@@ -466,13 +518,8 @@ function isActive(href: string) {
   }
 
   .nav-mobile__eyebrow {
-    display: inline-block;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--color-text-subtle);
+    display: flex;
+    align-items: center;
     margin-bottom: 12px;
     padding-bottom: 12px;
     border-bottom: 1px solid var(--color-border-subtle);
@@ -484,6 +531,17 @@ function isActive(href: string) {
   .nav-mobile--open .nav-mobile__eyebrow {
     opacity: 1;
     transform: none;
+  }
+
+  .nav-mobile__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--color-success);
   }
 
   .nav-mobile__list {
