@@ -35,9 +35,9 @@ ChatOBD2 is built around a different premise: diagnostics should explain themsel
 
 The interface is intentionally simple. The system behind it isn't.
 
-It pairs structured diagnostic inputs with layered interpretation and AI-assisted reasoning, and it constrains the output. Every scan returns the same shape: is it safe to drive, how confident is the answer, what matters most, what to do next.
+It pairs structured diagnostic inputs with layered interpretation and a constrained model call, and it constrains the output. Every scan returns the same shape: is it safe to drive, how confident is the answer, what matters most, what to do next.
 
-This is where AI earns its keep. The model's job is reducing complexity, not generating content.
+The model is one stage inside a structured pipeline, not the system. Its job is reducing complexity, not generating content.
 
 ## Three decisions that shaped the product
 
@@ -49,6 +49,6 @@ This is where AI earns its keep. The model's job is reducing complexity, not gen
 
 ## The shape of the system
 
-Chat surface as the home screen. Verdict card as the unit of output. AI in the middle of the pipeline, constrained by structure on either side.
+Chat surface as the home screen. Verdict card as the unit of output. The model held as a constrained stage in the middle of a structured pipeline — structure on the input side, structure on the output side.
 
 The interface stops asking the driver to interpret data and starts telling them what to do next.

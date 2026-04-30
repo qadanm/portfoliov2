@@ -42,7 +42,7 @@ export const projects: Project[] = [
     },
     bullets: [
       {
-        text: 'Designed and built an AI-native diagnostics product end to end: chat-first UX, verdict-first scan results, and a six-layer deterministic reasoning pipeline that constrains the model on either side.',
+        text: 'Designed and built an AI-native diagnostics product end to end: chat-first UX, verdict-first scan results, and a six-layer deterministic reasoning pipeline where the model is one constrained stage with structured inputs and schema-bound outputs.',
         serves: ['product', 'design', 'ai'],
         weight: 5,
       },
@@ -57,12 +57,12 @@ export const projects: Project[] = [
         weight: 4,
       },
       {
-        text: 'Pulled all AI prompts into a single module keyed by verdict tier and code context. One change updates the whole product; analytics taxonomy stays coherent.',
+        text: 'Pulled all model prompts into a system-resident layer, versioned and keyed by verdict tier and code context. Prompt engineering as a core layer, not as scattered chat. One change updates the whole product; analytics taxonomy stays coherent.',
         serves: ['engineering', 'ai', 'design'],
         weight: 5,
       },
       {
-        text: 'Built a developer portal as a first-class product surface: architecture diagrams, annotated project structure, system-diagrams library, design system docs. Maintained continuously by Claude Code as the codebase moves.',
+        text: 'Built a developer portal as a first-class product surface: architecture diagrams, annotated project structure, system-diagrams library, design system docs. Maintained continuously through the code branch of the execution layer as the codebase moves.',
         serves: ['engineering', 'ai', 'leadership'],
         weight: 4,
       },
@@ -72,12 +72,12 @@ export const projects: Project[] = [
         weight: 3,
       },
       {
-        text: 'Designed the marketing surface alongside the product: hero, longitudinal-intelligence, pricing tiers, and a developer documentation site, all built end to end with Claude Design and Claude Code.',
+        text: 'Designed the marketing surface alongside the product: hero, longitudinal-intelligence, pricing tiers, and a developer documentation site. Built end to end through both branches of the execution layer — visual exploration via Claude Design where it earned a seat, the code branch (Claude Code, Cursor) for everything else.',
         serves: ['design', 'product', 'ai'],
         weight: 4,
       },
       {
-        text: 'Composed the AI system prompt dynamically from prioritized modules within a 38,000-token budget. P0 sections always make the cut; P5 sections only land if budget remains. Same logic that constrains the model also makes it inspectable.',
+        text: 'Composed the system prompt dynamically from prioritized modules within a 38,000-token budget. P0 sections always make the cut; P5 sections only land if budget remains. The prompt lives in the system, keyed by verdict tier and code context — prompt engineering as a first-class layer, not as scattered chat.',
         serves: ['ai', 'engineering'],
         weight: 5,
       },
@@ -122,7 +122,7 @@ export const projects: Project[] = [
         weight: 5,
       },
       {
-        text: 'Incorporate AI into parts of the workflow where it actually makes sense, automating repetitive tasks and speeding up development. Tools include Cursor and Claude.',
+        text: 'Run AI as a structured system layer in the build, not a feature in the product. Spec interrogation, prompts as system, branched execution per task. Claude Code, Cursor, and Claude Design as alternative environments — picked by what the task needs, never chained.',
         serves: ['ai', 'engineering'],
         weight: 3,
       },
@@ -205,7 +205,7 @@ export const projects: Project[] = [
         weight: 4,
       },
       {
-        text: 'Started in Cursor with hand-authored Tailwind. Brought Claude Design into the loop for visual exploration of new sections (live matches, city food guides, the swipe-and-match story) before they landed back in code.',
+        text: 'Code branch as default — Cursor as the execution environment, hand-authored Tailwind as the styling system. Visual branch (Claude Design) selected only for sections easier to think through visually — live matches, city food guides, swipe-and-match story — with output landing back in Tailwind. Branched execution, not a chained pipeline.',
         serves: ['design', 'ai', 'engineering'],
         weight: 4,
       },

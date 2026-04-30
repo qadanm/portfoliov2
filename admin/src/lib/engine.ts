@@ -36,7 +36,7 @@ const CATEGORY_LABELS: Record<Skill['category'], string> = {
   design: 'Design',
   frontend: 'Frontend',
   platform: 'Platform',
-  ai: 'AI workflow',
+  ai: 'AI-native systems',
   tools: 'Tools',
   practice: 'Practice',
 };

@@ -5,14 +5,14 @@ import HowIWorkLoop from '@/components/diagrams/HowIWorkLoop.astro';
 
 <BaseLayout
   title="About Moe Qadan — Product Design & UX Engineering"
-  description="How Moe Qadan works. UX engineering at the intersection of product design, frontend systems, and AI-native workflows — built for long-running platforms with real constraints."
+  description="How Moe Qadan works. UX engineering at the intersection of product design, frontend systems, and AI-native systems — built for long-running platforms with real constraints."
   keywords={[
     'Moe Qadan',
     'about',
     'product designer',
     'UX engineer',
     'design engineer',
-    'AI workflow',
+    'AI-native systems',
     'how I work',
   ]}
 >
@@ -45,29 +45,48 @@ import HowIWorkLoop from '@/components/diagrams/HowIWorkLoop.astro';
         </ul>
 
         <p class="about__para">
-          <strong>AI is part of how I build now.</strong> It's part of
-          the stack, like everything else I use. I treat it the way I'd
-          treat any other tool with real surface area: structured inputs,
-          constrained outputs, deliberate iteration. The model drafts,
-          refactors, and handles the parts that compound over time. I
-          keep the architecture, the decisions, and the review.
+          <strong>AI runs through the work as a structured system layer.</strong>
+          Not a feature, not a tool I reach for. The loop is the same
+          every time: state the intent, let the model interrogate it
+          back to surface the spec gaps, restate the brief as a prompt
+          that lives in the system, then route execution to the right
+          environment. Review owns the call.
         </p>
 
         <p class="about__para">
-          I also run small agents inside the workflow. Short-lived, scoped
-          to one job, used where it makes sense. Just another tool in
-          the build, sitting alongside the rest of the stack. They don't
-          replace the work. They make the work move.
+          <strong>Prompt engineering is core, not garnish.</strong>
+          Prompts are versioned, named, scoped to a verdict tier or a
+          code context, and assembled by priority inside a budget. The
+          model gets a structured spec, not a chat. That's what makes
+          the output repeatable and the system inspectable.
         </p>
 
         <p class="about__para">
-          <strong>Design works alongside that loop now.</strong> When a
-          screen is easier to think through visually than in code, I start
-          in Claude Design and prototype against the components and
-          styling patterns the product already supports. From there it
-          hands off into Claude Code. Figma stays in the mix for
-          precision and system maintenance.
+          <strong>Execution is a branched layer, not a pipeline.</strong>
+          Claude for reasoning and generation. Cursor for
+          implementation. Claude Design when the problem is easier to
+          solve visually. Picked per task. Never chained.
         </p>
+
+        <aside class="about__callout">
+          <span class="about__callout-eyebrow">Prompts are part of the system</span>
+          <p class="about__callout-lead">
+            Prompts aren't disposable. They live inside the system,
+            scoped to context, and evolve with the product.
+          </p>
+          <p class="about__callout-body">
+            That turns one-off outputs into repeatable behavior:
+          </p>
+          <ul class="about__callout-list">
+            <li>same inputs → consistent outputs</li>
+            <li>less ambiguity across iterations</li>
+            <li>faster onboarding into complex systems</li>
+          </ul>
+          <p class="about__callout-coda">
+            The goal isn't to get an answer. It's to make the system
+            produce good answers reliably.
+          </p>
+        </aside>
 
         <p class="about__para">
           The goal is always the same: make the hard parts easier to use,
@@ -93,9 +112,10 @@ import HowIWorkLoop from '@/components/diagrams/HowIWorkLoop.astro';
             design problem.
           </li>
           <li>
-            <strong>AI runs through the workflow now.</strong> Agentic
-            workflows, structured prompts, AI-assisted development. Used
-            in the parts where it earns its keep.
+            <strong>AI is infrastructure, not a feature.</strong>
+            Requirement discovery via interrogation, prompts as system,
+            branched execution, human review. Same loop every time. The
+            point is repeatability, not novelty.
           </li>
         </ol>
 
@@ -155,12 +175,12 @@ import HowIWorkLoop from '@/components/diagrams/HowIWorkLoop.astro';
               <span class="about__card-val">ASP.NET MVC · Razor · C# · TypeScript · React · Astro</span>
             </li>
             <li>
-              <span class="about__card-key">Build</span>
-              <span class="about__card-val">Cursor + Claude · agentic loops</span>
+              <span class="about__card-key">Execution</span>
+              <span class="about__card-val">Claude Code · Cursor · Claude Design (visual)</span>
             </li>
             <li>
-              <span class="about__card-key">Design</span>
-              <span class="about__card-val">Claude Design with Figma</span>
+              <span class="about__card-key">Prompt layer</span>
+              <span class="about__card-val">System-resident, versioned, budgeted</span>
             </li>
           </ul>
         </div>
@@ -392,6 +412,82 @@ import HowIWorkLoop from '@/components/diagrams/HowIWorkLoop.astro';
     border: none;
     border-top: 1px solid var(--color-border);
     margin: var(--space-10) 0;
+  }
+
+  .about__callout {
+    margin: var(--space-8) 0;
+    padding: var(--space-6) var(--space-7);
+    border: 1px solid var(--color-accent-muted);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-accent-dim);
+    max-width: 60ch;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .about__callout-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  .about__callout-lead {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(18px, 1.9vw, 22px);
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--color-text);
+  }
+
+  .about__callout-body {
+    margin: 0;
+    font-size: clamp(14px, 1.4vw, 16px);
+    line-height: 1.7;
+    color: var(--color-text-muted);
+  }
+
+  .about__callout-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .about__callout-list li {
+    position: relative;
+    padding-left: 22px;
+    font-size: clamp(14px, 1.4vw, 16px);
+    line-height: 1.65;
+    color: var(--color-text);
+    font-family: var(--font-mono);
+  }
+
+  .about__callout-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.65em;
+    width: 12px;
+    height: 1px;
+    background-color: var(--color-accent);
+  }
+
+  .about__callout-coda {
+    margin: var(--space-2) 0 0;
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-accent-muted);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(15px, 1.5vw, 17px);
+    line-height: 1.55;
+    color: var(--color-text);
   }
 
   .about__h2 {

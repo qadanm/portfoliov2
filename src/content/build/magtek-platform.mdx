@@ -84,8 +84,10 @@ Some of the other work that mattered most:
 
 None of this is glamorous. All of it compounds.
 
-## AI in the workflow
+## AI as a system layer in the build
 
-More recently, I've been integrating AI into the workflow where it pays off. Cursor and Claude speed up iteration, structure development, and reduce friction in the repetitive parts.
+AI runs through how the platform itself gets built and maintained, as a structured layer rather than a feature.
 
-It's not a feature inside the product. It's part of how the platform itself gets built and maintained, with a human still owning every decision that ships.
+The loop is the same every time: the model interrogates the spec to surface ambiguity, the brief gets restated as a structured prompt, then execution routes to the right environment for the work — Claude Code for agentic refactors and continuous repo maintenance, Cursor for tight-loop local iteration. Claude Design only when a screen is easier to think through visually than in code.
+
+The point is repeatability, not novelty. The system constrains the inputs and the outputs; a human owns every decision that ships.

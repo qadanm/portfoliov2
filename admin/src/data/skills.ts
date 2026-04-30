@@ -33,13 +33,15 @@ export const skills: Skill[] = [
   { name: 'Long-running platform UX', category: 'platform', serves: ['engineering', 'product', 'leadership'], weight: 5 },
   { name: 'Supabase', category: 'platform', serves: ['engineering'], weight: 3 },
 
-  // AI
-  { name: 'Claude Design', category: 'ai', serves: ['design', 'ai'], weight: 5 },
-  { name: 'Claude Code', category: 'ai', serves: ['engineering', 'ai'], weight: 5 },
-  { name: 'Cursor (design-in-code)', category: 'ai', serves: ['design', 'engineering', 'ai'], weight: 5 },
-  { name: 'Constrained AI pipelines', category: 'ai', serves: ['ai', 'product', 'engineering'], weight: 5 },
-  { name: 'Prompt-as-system', category: 'ai', serves: ['ai', 'engineering'], weight: 4 },
-  { name: 'Agentic workflows', category: 'ai', serves: ['ai', 'engineering'], weight: 4 },
+  // AI — treated as a system layer, not a tool list
+  { name: 'Prompt engineering (system-resident, versioned, budgeted)', category: 'ai', serves: ['ai', 'engineering'], weight: 5 },
+  { name: 'Requirement discovery via model interrogation', category: 'ai', serves: ['ai', 'product'], weight: 5 },
+  { name: 'Constrained AI pipelines (model as one stage, not the system)', category: 'ai', serves: ['ai', 'product', 'engineering'], weight: 5 },
+  { name: 'Branched execution layer (per-task environment selection)', category: 'ai', serves: ['ai', 'engineering'], weight: 5 },
+  { name: 'Schema-bound model outputs', category: 'ai', serves: ['ai', 'engineering'], weight: 4 },
+  { name: 'Agentic workflows (Claude Code)', category: 'ai', serves: ['ai', 'engineering'], weight: 5 },
+  { name: 'Tight-loop AI iteration (Cursor)', category: 'ai', serves: ['ai', 'engineering', 'design'], weight: 5 },
+  { name: 'Visual exploration (Claude Design, conditional branch)', category: 'ai', serves: ['ai', 'design'], weight: 5 },
 
   // Tools
   { name: 'Figma', category: 'tools', serves: ['design'], weight: 4 },

@@ -151,8 +151,10 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
             <p class="cs__post-sub">
               The marketing site carries the same product premise into a
               public-facing surface. Same "verdict comes first" instinct,
-              same constraint thinking. Designed and built end to end with
-              Claude Design and Claude Code.
+              same constraint thinking. Designed and built end to end
+              through both branches of the execution layer — visual
+              exploration where it earned a seat, code execution
+              everywhere else.
             </p>
           </header>
           <div class="cs__shot-grid cs__shot-grid--2">
@@ -193,10 +195,10 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
             <p class="cs__post-sub">
               ChatOBD2 has grown into a substantial codebase. Six
               deterministic reasoning layers in front of every model
-              call, an AI prompt assembled by priority from a
+              call, a system prompt assembled by priority from a
               38,000-token budget, BLE adapter integration, write
-              operations with rollback. Holding that together is the
-              actual job.
+              operations with rollback. The model is one constrained
+              stage inside a structured pipeline, not the system.
             </p>
           </header>
           <div class="cs__shot-grid cs__shot-grid--2">
@@ -209,10 +211,11 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
                 loading="lazy"
               />
               <figcaption>
-                The AI prompt is composed dynamically per scan. P0
+                The system prompt is composed dynamically per scan. P0
                 sections always make the cut; P5 sections only land if
-                budget remains. The same logic that constrains the
-                model also makes the system inspectable.
+                budget remains. The prompt lives in the system, keyed
+                by verdict tier and code context — not scattered across
+                components.
               </figcaption>
             </figure>
             <figure class="cs__shot">
@@ -231,13 +234,13 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
             </figure>
           </div>
           <p class="cs__post-closing">
-            Claude Code maintains the developer portal continuously as
-            the codebase moves. Module ownership stays current.
-            System diagrams regenerate when contracts change.
-            Dev UX is held as a product-quality bar, not an
-            afterthought. The aim is simple: anyone landing in the
-            repo can find the thing they need without reading it
-            through.
+            The developer portal is held as a product surface and
+            maintained continuously through the code branch of the
+            execution layer. Module ownership stays current. System
+            diagrams regenerate when contracts change. Dev UX is treated
+            as a product-quality bar, not an afterthought. The aim is
+            simple: anyone landing in the repo can find the thing they
+            need without reading it through.
           </p>
         </section>
       </>

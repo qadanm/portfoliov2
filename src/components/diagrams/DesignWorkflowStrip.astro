@@ -1,45 +1,54 @@
 ---
-const nodes = [
-  { name: 'Idea', kind: 'input' },
-  { name: 'Claude Design', kind: 'agent' },
-  { name: 'Claude Code', kind: 'agent' },
-  { name: 'Ship', kind: 'output' },
+// Same loop as AIWorkflowStrip, scoped to the visual-exploration branch.
+// Claude Design is shown as the *selected* execution environment when a
+// screen is easier to think through visually. The output lands back in
+// the codebase — that is not a separate "Claude Code" step in a chain,
+// it is the codebase the work always belonged to.
+const stages = [
+  { name: 'Visual intent', kind: 'input' },
+  { name: 'Prompt', kind: 'process' },
+  { name: 'Claude Design', kind: 'execution' },
+  { name: 'Codebase', kind: 'output' },
 ];
 ---
 
-<div class="dw-strip" aria-label="Design workflow">
-  <span class="dw-strip__label">Design loop</span>
+<div class="dw-strip" aria-label="Visual exploration branch: intent, prompt, Claude Design, codebase">
+  <span class="dw-strip__label">Visual branch</span>
   <div class="dw-strip__flow">
-    {nodes.map((node, i) => (
+    {stages.map((stage, i) => (
       <>
-        <span class:list={['dw-strip__node', `dw-strip__node--${node.kind}`]}>
-          {node.kind === 'agent' && (
+        <span class:list={['dw-strip__node', `dw-strip__node--${stage.kind}`]}>
+          {stage.kind === 'execution' && (
             <svg class="dw-strip__icon" width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
               <circle cx="5" cy="5" r="2" fill="currentColor"/>
               <circle cx="5" cy="5" r="4" stroke="currentColor" stroke-width="0.75" opacity="0.4"/>
             </svg>
           )}
-          {node.name}
+          {stage.name}
         </span>
-        {i < nodes.length - 1 && (
+        {i < stages.length - 1 && (
           <span class="dw-strip__sep" aria-hidden="true">→</span>
         )}
       </>
     ))}
   </div>
+  <p class="dw-strip__legend">
+    One branch of the execution layer. Selected when the work is easier to
+    reason about visually than in code.
+  </p>
 </div>
 
 <style>
   .dw-strip {
     display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: var(--space-4);
-    padding: var(--space-4) var(--space-5);
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+    padding: var(--space-5);
     border: 1px solid var(--color-border);
-    border-radius: 9999px;
+    border-radius: var(--radius-lg);
     background-color: var(--color-bg-elevated);
-    width: fit-content;
+    width: 100%;
     max-width: 100%;
   }
 
@@ -47,11 +56,11 @@ const nodes = [
     font-family: var(--font-mono);
     font-size: 10px;
     font-weight: 600;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--color-text-subtle);
-    padding-right: var(--space-3);
-    border-right: 1px solid var(--color-border-subtle);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--color-border-subtle);
   }
 
   .dw-strip__flow {
@@ -69,13 +78,19 @@ const nodes = [
     font-size: 11px;
     font-weight: 500;
     color: var(--color-text-muted);
-    padding: 3px 9px;
+    padding: 5px 11px;
     border-radius: 9999px;
     background-color: var(--color-bg-muted);
     border: 1px solid var(--color-border);
   }
 
-  .dw-strip__node--agent {
+  .dw-strip__node--input {
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    border-color: var(--color-text-subtle);
+  }
+
+  .dw-strip__node--execution {
     color: var(--color-accent);
     background-color: var(--color-accent-dim);
     border-color: var(--color-accent-muted);
@@ -99,31 +114,30 @@ const nodes = [
     line-height: 1;
   }
 
+  .dw-strip__legend {
+    margin: 0;
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-border-subtle);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--color-text-subtle);
+    letter-spacing: 0.02em;
+    line-height: 1.5;
+  }
+
   @media (max-width: 640px) {
     .dw-strip {
-      flex-direction: column;
-      align-items: stretch;
-      border-radius: 16px;
       padding: 14px 16px 16px;
-      gap: 0;
-      /* Drop fit-content so the strip fills the section column */
-      width: 100%;
-    }
-    .dw-strip__label {
-      border-right: none;
-      border-bottom: 1px solid var(--color-border-subtle);
-      padding: 0 0 10px;
-      margin-bottom: 12px;
-      width: 100%;
     }
     .dw-strip__flow {
       flex-direction: column;
-      align-items: center;
+      align-items: stretch;
       gap: 6px;
     }
     .dw-strip__node {
+      justify-content: center;
       font-size: 12px;
-      padding: 6px 12px;
+      padding: 7px 12px;
     }
     .dw-strip__sep {
       transform: rotate(90deg);

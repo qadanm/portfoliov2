@@ -1,46 +1,70 @@
 ---
-const nodes = [
-  { name: 'Spec', kind: 'input' },
-  { name: 'Claude', kind: 'agent' },
-  { name: 'Cursor', kind: 'agent' },
+// Six-stage loop. Execution is a branched node with three alternative
+// environments — never chained as a pipeline.
+const stages = [
+  { name: 'Intent', kind: 'input' },
+  { name: 'Interrogate', kind: 'process' },
+  { name: 'Structure', kind: 'process', sub: 'Prompt System' },
+  { name: 'Execute', kind: 'execution' },
   { name: 'Review', kind: 'gate' },
   { name: 'Ship', kind: 'output' },
 ];
+
+const executionEnvironments = [
+  { name: 'Claude', sub: 'reasoning' },
+  { name: 'Cursor', sub: 'build' },
+  { name: 'Claude Design', sub: 'visual, when needed', conditional: true },
+];
 ---
 
-<div class="ai-strip" aria-label="AI-augmented development flow">
-  <span class="ai-strip__label">AI-augmented workflow</span>
+<div class="ai-strip" aria-label="From intent to ship: an AI-native system layer with branched execution">
+  <span class="ai-strip__label">From intent to ship · AI-native system</span>
   <div class="ai-strip__flow">
-    {nodes.map((node, i) => (
+    {stages.map((stage, i) => (
       <>
-        <span class:list={['ai-strip__node', `ai-strip__node--${node.kind}`]}>
-          {node.kind === 'agent' && (
-            <svg class="ai-strip__icon" width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-              <circle cx="5" cy="5" r="2" fill="currentColor"/>
-              <circle cx="5" cy="5" r="4" stroke="currentColor" stroke-width="0.75" opacity="0.4"/>
-            </svg>
+        <span class:list={['ai-strip__node', `ai-strip__node--${stage.kind}`]}>
+          <span class="ai-strip__node-name">{stage.name}</span>
+          {stage.sub && (
+            <span class="ai-strip__node-sub">({stage.sub})</span>
           )}
-          {node.name}
+          {stage.kind === 'execution' && (
+            <span class="ai-strip__branches" aria-label="Execution environments">
+              {executionEnvironments.map((env, j) => (
+                <>
+                  <span class:list={['ai-strip__branch', { 'ai-strip__branch--conditional': env.conditional }]}>
+                    <span class="ai-strip__branch-name">{env.name}{env.conditional && <span class="ai-strip__star" aria-hidden="true">*</span>}</span>
+                    <span class="ai-strip__branch-sub">{env.sub}</span>
+                  </span>
+                  {j < executionEnvironments.length - 1 && (
+                    <span class="ai-strip__branch-sep" aria-hidden="true">·</span>
+                  )}
+                </>
+              ))}
+            </span>
+          )}
         </span>
-        {i < nodes.length - 1 && (
+        {i < stages.length - 1 && (
           <span class="ai-strip__sep" aria-hidden="true">→</span>
         )}
       </>
     ))}
   </div>
+  <p class="ai-strip__legend">
+    Execution environments are selected per task, not chained.
+  </p>
 </div>
 
 <style>
   .ai-strip {
     display: flex;
-    align-items: center;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: stretch;
     gap: var(--space-4);
-    padding: var(--space-4) var(--space-5);
+    padding: var(--space-5) var(--space-6);
     border: 1px solid var(--color-border);
-    border-radius: 9999px;
+    border-radius: var(--radius-lg);
     background-color: var(--color-bg-elevated);
-    width: fit-content;
+    width: 100%;
     max-width: 100%;
   }
 
@@ -48,49 +72,120 @@ const nodes = [
     font-family: var(--font-mono);
     font-size: 10px;
     font-weight: 600;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--color-text-subtle);
-    padding-right: var(--space-3);
-    border-right: 1px solid var(--color-border-subtle);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--color-border-subtle);
   }
 
   .ai-strip__flow {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 8px 10px;
   }
 
   .ai-strip__node {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
     font-family: var(--font-mono);
     font-size: 11px;
     font-weight: 500;
     color: var(--color-text-muted);
-    padding: 3px 9px;
+    padding: 6px 12px;
     border-radius: 9999px;
     background-color: var(--color-bg-muted);
     border: 1px solid var(--color-border);
+    line-height: 1.2;
   }
 
-  .ai-strip__node--agent {
-    color: var(--color-accent);
-    background-color: var(--color-accent-dim);
-    border-color: var(--color-accent-muted);
+  .ai-strip__node-name {
+    font-weight: 600;
+  }
+
+  .ai-strip__node-sub {
+    font-size: 10px;
+    color: var(--color-text-subtle);
+    font-weight: 400;
+  }
+
+  .ai-strip__node--input {
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    border-color: var(--color-text-subtle);
+  }
+
+  .ai-strip__node--gate {
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    border-color: var(--color-border);
   }
 
   .ai-strip__node--output {
     color: var(--color-success);
     background-color: rgba(16, 185, 129, 0.08);
-    border-color: rgba(16, 185, 129, 0.2);
+    border-color: rgba(16, 185, 129, 0.25);
   }
 
-  .ai-strip__icon {
-    display: inline-block;
-    color: currentColor;
+  .ai-strip__node--execution {
+    color: var(--color-accent);
+    background-color: var(--color-accent-dim);
+    border-color: var(--color-accent-muted);
+    padding: 6px 8px 6px 12px;
+  }
+
+  .ai-strip__branches {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 8px;
+    padding: 2px 4px 2px 10px;
+    border-left: 1px solid var(--color-accent-muted);
+  }
+
+  .ai-strip__branch {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    padding: 1px 4px;
+    color: var(--color-accent-hover);
+  }
+
+  .ai-strip__branch--conditional {
+    color: var(--color-text-muted);
+  }
+
+  .ai-strip__branch-name {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    line-height: 1.1;
+  }
+
+  .ai-strip__branch-sub {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--color-text-subtle);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+  }
+
+  .ai-strip__star {
+    color: var(--color-accent);
+    font-weight: 700;
+    margin-left: 1px;
+  }
+
+  .ai-strip__branch-sep {
+    color: var(--color-text-subtle);
+    opacity: 0.4;
+    font-size: 10px;
+    align-self: center;
   }
 
   .ai-strip__sep {
@@ -100,30 +195,78 @@ const nodes = [
     line-height: 1;
   }
 
-  @media (max-width: 640px) {
+  .ai-strip__legend {
+    margin: 0;
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-border-subtle);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--color-text-subtle);
+    letter-spacing: 0.04em;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 720px) {
     .ai-strip {
-      flex-direction: column;
-      align-items: stretch;
-      border-radius: 16px;
       padding: 14px 16px 16px;
-      gap: 0;
-      width: 100%;
-    }
-    .ai-strip__label {
-      border-right: none;
-      border-bottom: 1px solid var(--color-border-subtle);
-      padding: 0 0 10px;
-      margin-bottom: 12px;
-      width: 100%;
     }
     .ai-strip__flow {
       flex-direction: column;
-      align-items: center;
+      align-items: stretch;
       gap: 6px;
     }
     .ai-strip__node {
+      justify-content: center;
       font-size: 12px;
-      padding: 6px 12px;
+      padding: 8px 14px;
+    }
+    .ai-strip__node-sub {
+      font-size: 11px;
+    }
+    /* Execution opens into a vertical stack on mobile so each branch
+       gets its own row. The horizontal-row treatment from desktop
+       wraps badly with three items + a label. */
+    .ai-strip__node--execution {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+      padding: 0;
+      border-radius: 24px;
+      overflow: hidden;
+    }
+    .ai-strip__node--execution .ai-strip__node-name {
+      text-align: center;
+      padding: 10px 14px 9px;
+      border-bottom: 1px solid var(--color-accent-muted);
+    }
+    .ai-strip__branches {
+      width: 100%;
+      margin: 0;
+      padding: 6px 8px 8px;
+      border-left: none;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+    }
+    .ai-strip__branch {
+      flex-direction: row;
+      justify-content: center;
+      align-items: baseline;
+      gap: 6px;
+      padding: 6px 8px;
+    }
+    .ai-strip__branch + .ai-strip__branch {
+      border-top: 1px dashed var(--color-accent-muted);
+    }
+    .ai-strip__branch-name {
+      font-size: 12px;
+    }
+    .ai-strip__branch-sub {
+      font-size: 11px;
+    }
+    /* Hide the inline dot separators in the column layout. */
+    .ai-strip__branch-sep {
+      display: none;
     }
     .ai-strip__sep {
       transform: rotate(90deg);

@@ -23,20 +23,19 @@ import DesignWorkflowStrip from '@/components/diagrams/DesignWorkflowStrip.astro
       <div class="container-site">
         <span class="design__eyebrow">Design workflow</span>
         <h1 class="design__title">
-          Designing in <em>context</em>.
+          Claude Design <em>(visual branch)</em>.
         </h1>
         <p class="design__subtitle">
-          When a screen is easier to reason about visually than in code,
-          I start in Claude Design. The value is exploring directions
-          against real system context, then carrying clearer intent into
-          implementation.
+          Claude Design is one branch of the execution layer. I use
+          it when structure alone isn't enough and the problem needs
+          to be seen.
         </p>
       </div>
     </div>
 
     <div class="container-site design__body">
       <div class="design__strip" data-reveal>
-        <span class="design__strip-caption">Where Claude Design sits in the loop</span>
+        <span class="design__strip-caption">The visual branch of the execution layer</span>
         <DesignWorkflowStrip />
       </div>
 
@@ -47,21 +46,20 @@ import DesignWorkflowStrip from '@/components/diagrams/DesignWorkflowStrip.astro
       </p>
 
       <div class="design__prose">
+        <p class="design__para" data-reveal>
+          That usually means:
+        </p>
         <ul class="design__bullets" data-reveal>
-          <li>Fast interactive prototypes for flows, states, and reviews</li>
-          <li>More useful when the codebase or system is already in context</li>
-          <li>Easier comparison of a few directions before committing</li>
-          <li>Cleaner handoff into implementation work</li>
+          <li>new flows</li>
+          <li>layout and hierarchy decisions</li>
+          <li>comparing multiple directions quickly</li>
         </ul>
 
         <p class="design__para" data-reveal>
-          Claude Design is most useful when it can work against real
-          components, spacing, and styling patterns. That keeps new
-          screens grounded in what the product can actually support, and
-          shortens the gap between a sketch and something that holds up
-          at build time. It does not replace the precision work, the
-          system maintenance, or the implementation. It sits in front of
-          those, helping me get to a sharper product shape earlier.
+          It's not part of every loop. It earns its place when visual
+          reasoning moves the work forward faster than code. Once
+          direction is clear, everything resolves back into the same
+          system and build loop.
         </p>
 
         <hr class="design__rule" />
@@ -70,22 +68,21 @@ import DesignWorkflowStrip from '@/components/diagrams/DesignWorkflowStrip.astro
 
         <div class="design__blurbs" data-reveal>
           <figure class="design__blurb">
-            <figcaption class="design__blurb-label">In the workflow</figcaption>
+            <figcaption class="design__blurb-label">When the branch is selected</figcaption>
             <blockquote class="design__blurb-text">
               When a screen is easier to reason about visually than in
-              code, I start in Claude Design. I use it to get hierarchy,
-              layout, and interaction into something tangible, then hand
-              off to Claude Code or refine in Figma first if the system
-              work calls for it.
+              code, the execution layer routes to Claude Design. The
+              output is a clearer prompt for the codebase — not a
+              handoff to a separate tool.
             </blockquote>
           </figure>
           <figure class="design__blurb">
             <figcaption class="design__blurb-label">Against the system</figcaption>
             <blockquote class="design__blurb-text">
               Claude Design gets more useful when it can work against real
-              components, spacing, and styling patterns. I use that to
-              keep new screens grounded in what the product can actually
-              support.
+              components, spacing, and styling patterns. That keeps the
+              visual exploration grounded in what the product can
+              actually carry.
             </blockquote>
           </figure>
         </div>
@@ -99,10 +96,12 @@ import DesignWorkflowStrip from '@/components/diagrams/DesignWorkflowStrip.astro
         <hr class="design__rule" />
 
         <p class="design__para design__para--final" data-reveal>
-          Claude Design hands off into Claude Code, which carries the
-          design intent into the codebase. Figma stays in the mix for
-          precision and system maintenance, Cursor for the rest of the
-          build, and WebSim for fast browser experiments.
+          The execution layer is branched, not chained. Claude Code and
+          Cursor are alternative environments for code work, picked per
+          task. Claude Design is the visual branch, conditional on the
+          work. Figma stays in the mix for precision and system
+          maintenance, WebSim for fast browser experiments. The codebase
+          is the source of truth across all of them.
         </p>
 
         <hr class="design__rule" />
@@ -110,23 +109,23 @@ import DesignWorkflowStrip from '@/components/diagrams/DesignWorkflowStrip.astro
         <h2 class="design__h2">Across the work</h2>
 
         <p class="design__para" data-reveal>
-          Different products, different surfaces, different toolchains.
-          Claude Design is the latest layer in a longer practice, not
-          the only one.
+          Different products, different surfaces, different execution
+          environments. Claude Design is the latest branch in a longer
+          practice, not the default one.
         </p>
 
         <section class="design__work" data-reveal>
           <header class="design__work-head">
             <span class="design__work-eyebrow">ChatOBD2</span>
-            <h3 class="design__work-title">Claude Design + Claude Code, end to end.</h3>
+            <h3 class="design__work-title">Both branches of the execution layer.</h3>
           </header>
           <p class="design__work-sub">
-            ChatOBD2 is where the loop lives in practice. Most product
-            surfaces, the marketing site, and the developer portal all
-            start as visual exploration in Claude Design, then hand off
-            to Claude Code for implementation against the same component
-            and token system. The same tooling carries the design from
-            idea to ship without changing hands.
+            ChatOBD2 is where the loop lives in practice. The product
+            surfaces, marketing site, and developer portal route through
+            both branches: Claude Design when exploration is visual, the
+            code branch (Claude Code or Cursor) when it isn't. The
+            component and token system stays the source of truth, so
+            either branch lands in the same codebase.
           </p>
           <div class="design__work-shots">
             <figure class="design__work-shot">
@@ -194,16 +193,16 @@ import DesignWorkflowStrip from '@/components/diagrams/DesignWorkflowStrip.astro
         <section class="design__work" data-reveal>
           <header class="design__work-head">
             <span class="design__work-eyebrow">Sawa marketing site</span>
-            <h3 class="design__work-title">Cursor first, then Claude Design.</h3>
+            <h3 class="design__work-title">Code branch by default, visual branch when it earned a seat.</h3>
           </header>
           <p class="design__work-sub">
-            Sawa's marketing surface started as design-in-code: Cursor
-            for the build, Tailwind for the styling system. Claude
-            Design slid in once the loop was available, taking on
-            visual exploration of new sections — live matches, city
-            food guides, the swipe-and-match story — before they
-            landed back in Tailwind. The implementation stack stayed
-            tight throughout.
+            Sawa's marketing surface ran on the code branch: Cursor as
+            the execution environment, Tailwind as the styling system.
+            The visual branch was selected only for the sections where
+            it was easier to think through visually — live matches, city
+            food guides, the swipe-and-match story — and the output
+            landed back in Tailwind. The codebase stayed the source of
+            truth across both.
           </p>
           <div class="design__work-shots">
             <figure class="design__work-shot">

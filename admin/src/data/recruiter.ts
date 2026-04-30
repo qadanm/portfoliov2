@@ -21,10 +21,10 @@ export const recruiterPacks: Record<string, RecruiterPack> = {
     whyImAFit: [
       'Senior-level product thinking: visible decisions, named tradeoffs, ownership of consequences.',
       'Frontend literacy means handoff hygiene that actually works — I think in components, tokens, and breakpoints natively.',
-      'AI-native product experience without the buzzword tax: I’ve shipped a product where AI sits constrained in the middle of a deterministic pipeline.',
+      'AI-native product experience without the buzzword tax: I’ve shipped a product where the model is one constrained stage inside a structured pipeline, and I treat AI the same way in the build that ships it.',
     ],
     aiExplanation:
-      'Claude Design is part of how I explore visually now. Claude Code carries the chosen direction into implementation. Both sit inside a longer practice: Figma for precision, Cursor for build, hand-authored CSS for the systems that ship. AI is one tool in the loop, used where it actually helps.',
+      'I treat AI as a structured system layer in the build, not a tool I reach for. The loop is the same every time: the model interrogates the spec, the brief gets restated as a structured prompt, then execution routes to the right environment per task. Claude Code, Cursor, and Claude Design are alternative environments — never chained. Figma stays in the mix for precision, hand-authored CSS for the systems that ship.',
     salaryFraming:
       'I’m looking at senior product design roles in the $180–240k base range, depending on scope and equity. Open to discussing.',
   },
@@ -33,7 +33,7 @@ export const recruiterPacks: Record<string, RecruiterPack> = {
     shortIntro:
       'Senior product designer with end-to-end ownership. Founded ChatOBD2, an AI-native diagnostics product. Lead UX and frontend systems for MagTek’s multi-site platform.',
     longIntro:
-      'Senior product designer who works across product, marketing surface, and developer-facing experience. I founded ChatOBD2, where AI sits constrained inside a six-layer deterministic pipeline. I lead UX and frontend systems for MagTek’s multi-site enterprise platform, where most of the work is evolving a long-running system in production. Earlier I shipped advisor portals at InvestCloud across institutions like Chase, Cetera, and Northwestern Mutual. The pattern across all of it: design that ships, decisions that get owned, systems that stay healthy.',
+      'Senior product designer who works across product, marketing surface, and developer-facing experience. I founded ChatOBD2, where the model is one constrained stage inside a six-layer structured pipeline. I lead UX and frontend systems for MagTek’s multi-site enterprise platform, where most of the work is evolving a long-running system in production. Earlier I shipped advisor portals at InvestCloud across institutions like Chase, Cetera, and Northwestern Mutual. The pattern across all of it: design that ships, decisions that get owned, systems that stay healthy.',
     tellMeAboutYourself:
       'I’m a senior product designer with end-to-end ownership in my recent work. I founded ChatOBD2, an AI-native diagnostics product. I designed and built the product surface, the marketing site, and the developer portal that keeps the codebase maintainable. The design problem was translation: turning vehicle data into a single answer the driver can act on, with confidence visible as part of the answer. My current platform work is at MagTek, where I lead UX and frontend systems across the multi-site portfolio. The work there is about evolving a long-running ASP.NET platform in production without breaking what runs. Earlier I was at InvestCloud building advisor-facing portals at production fidelity across major wealth institutions. The thread is the same: design that survives the system it lives in.',
     whyImAFit: [
@@ -42,7 +42,7 @@ export const recruiterPacks: Record<string, RecruiterPack> = {
       'Real shipped surfaces, not concepts: ChatOBD2 in market, MagTek in production, InvestCloud across institutions.',
     ],
     aiExplanation:
-      'Claude Design is part of my front-end design loop. Figma for precision, Cursor and Claude Code for implementation, WebSim for fast browser experiments. AI sits where it earns a seat — exploration, system-aware iteration, dev-portal maintenance — not as a feature pasted onto everything.',
+      'I treat AI as a structured system layer in the build. Same loop every time: spec, model interrogation, prompt engineering, branched execution, human review. Claude Code, Cursor, and Claude Design are alternative execution environments — selected per task, never chained. Figma for precision, WebSim for fast browser experiments. The point is repeatability, not novelty.',
     salaryFraming:
       'Senior product design with founder-level ownership. I’d expect $200–260k base for the right scope, depending on equity and team size.',
   },
@@ -51,7 +51,7 @@ export const recruiterPacks: Record<string, RecruiterPack> = {
     shortIntro:
       'UX engineer in the seam between design and frontend. Built ChatOBD2 end to end. Lead UX and frontend systems for MagTek’s multi-site platform.',
     longIntro:
-      'I’m a UX engineer who lives at the design/frontend boundary. Most of my work is closing the gap between Figma intent (or Claude Design exploration) and what the system can actually carry. I built ChatOBD2 end to end, lead the UX layer across MagTek’s ASP.NET MVC platform, and earlier shipped advisor portals at InvestCloud across institutions like Chase, Cetera, and Northwestern Mutual. Comfortable in TypeScript, React, React Native, Astro, Razor, hand-authored CSS, and the constraints that come with all of them.',
+      'I’m a UX engineer who lives at the design/frontend boundary. Most of my work is closing the gap between Figma intent (or visual exploration through Claude Design) and what the system can actually carry. I built ChatOBD2 end to end, lead the UX layer across MagTek’s ASP.NET MVC platform, and earlier shipped advisor portals at InvestCloud across institutions like Chase, Cetera, and Northwestern Mutual. AI runs through the build as a structured system layer — model interrogation, prompt engineering, branched execution. Comfortable in TypeScript, React, React Native, Astro, Razor, hand-authored CSS, and the constraints that come with all of them.',
     tellMeAboutYourself:
       'I’m a UX engineer. The reason I describe myself that way is that I think most of the interesting work happens in the seam between design and frontend, not on either side of it. Recently I founded ChatOBD2, where I designed and built the product end to end including the AI pipeline behind it. My day job is leading the UX and frontend systems work for MagTek’s multi-site enterprise platform, which is a long-running ASP.NET system that has to keep evolving in production. Earlier I was at InvestCloud building advisor portals across major wealth institutions, which was mostly translating Figma at fidelity into a multi-tenant CMS. The common thread is design that has to survive the system it lives in.',
     whyImAFit: [
@@ -60,7 +60,7 @@ export const recruiterPacks: Record<string, RecruiterPack> = {
       'Comfortable in the constraints of long-running platforms — most of my work has lived inside them.',
     ],
     aiExplanation:
-      'I use Claude Code for implementation work and Claude Design for exploration. Cursor for the rest of the build. The thread is design-in-code: the design lives in the components and tokens the product is built from, and AI sits in the loop where it earns a seat.',
+      'AI runs through the build as a structured system layer. The model interrogates the spec, the brief becomes a versioned prompt, then execution routes to the right environment — Claude Code for agentic refactors and continuous repo work, Cursor for tight-loop iteration, Claude Design when the work is easier to reason about visually. They are alternative environments inside the execution layer, not steps in a chain. The design lives in the components and tokens the product runs on.',
     salaryFraming:
       'UX engineer with cross-stack depth. $180–230k base range depending on level and scope.',
   },
@@ -78,25 +78,25 @@ export const recruiterPacks: Record<string, RecruiterPack> = {
       'Comfortable with AI in the build loop (Cursor, Claude Code) without giving up the ownership of decisions.',
     ],
     aiExplanation:
-      'Cursor and Claude Code are part of how I move through implementation work. Claude Design at the front of the loop for visual exploration. AI is used where it actually pays off — repetitive iteration, structured development, dev-portal maintenance — not for the parts that need a human call.',
+      'AI is a structured layer in the build, not a feature. The loop is consistent: model interrogation surfaces spec gaps, prompts live in the system rather than chat, execution routes per task. Claude Code and Cursor are alternative environments for code work — picked by what the task needs, never chained. Claude Design is the visual branch, conditional on the work. Human owns every decision that ships.',
     salaryFraming:
       'Senior frontend UX engineer band: $180–230k base depending on stack and scope.',
   },
 
   'design-engineer': {
     shortIntro:
-      'Design engineer working in the overlap. Built ChatOBD2 end to end with Claude Design + Claude Code. Maintain platform-level design systems at MagTek.',
+      'Design engineer working in the overlap. Built ChatOBD2 end to end with AI as a structured system layer in the build — branched execution across Claude Code, Cursor, and Claude Design. Maintain platform-level design systems at MagTek.',
     longIntro:
-      'I’m a design engineer. Most of my work happens in code, against the components and tokens the product is built from. I built ChatOBD2 end to end with Claude Design at the front of the loop and Claude Code carrying it into implementation. I maintain a Razor component library and token-driven CSS substrate across MagTek’s multi-site enterprise platform. Earlier I built advisor portals at InvestCloud, where the work was translating Figma at fidelity into a multi-tenant CMS.',
+      'I’m a design engineer. Most of my work happens in code, against the components and tokens the product is built from. I built ChatOBD2 end to end with AI as a structured system layer in the build — Claude Design as the visual branch of the execution layer when work was easier to reason about visually, the code branch (Claude Code, Cursor) for everything else. I maintain a Razor component library and token-driven CSS substrate across MagTek’s multi-site enterprise platform. Earlier I built advisor portals at InvestCloud, where the work was translating Figma at fidelity into a multi-tenant CMS.',
     tellMeAboutYourself:
-      'I describe myself as a design engineer because I don’t think of design and build as separate stages. Most of my work happens in code, against the components and tokens the product is actually built from. Recently I founded ChatOBD2, where Claude Design lives at the front of the loop and Claude Code carries it into implementation. My day job is at MagTek where I maintain a platform-level Razor component library and a token-driven CSS substrate across many properties. Earlier I was at InvestCloud doing high-fidelity Figma implementation across major wealth institutions. The thread is the same: design that survives the build.',
+      'I describe myself as a design engineer because I don’t think of design and build as separate stages. Most of my work happens in code, against the components and tokens the product is actually built from. Recently I founded ChatOBD2, where AI runs through the build as a structured system layer: spec interrogation, prompts as system, then execution routes to the right environment per task — Claude Code or Cursor for code work, Claude Design when the work is visual. My day job is at MagTek where I maintain a platform-level Razor component library and a token-driven CSS substrate across many properties. Earlier I was at InvestCloud doing high-fidelity Figma implementation across major wealth institutions. The thread is the same: design that survives the build.',
     whyImAFit: [
       'Design-in-code as a real practice, not a buzzword: hand-authored CSS systems, token-driven substrate, component libraries.',
-      'AI-augmented build loop without losing ownership: Claude Design + Claude Code + Cursor live in my day-to-day.',
+      'AI as a structured system layer in the build, not a feature: spec interrogation, prompt engineering, branched execution. Claude Code, Cursor, and Claude Design as alternative environments — never chained.',
       'Platform discipline: most of my work has shipped in long-running systems where incremental adoption matters.',
     ],
     aiExplanation:
-      'Claude Design at the front of the loop for visual exploration against real system context. Claude Code carries the chosen direction into the codebase. Cursor for the rest of the build. Tokens and components are the source of truth, not Figma — design lives where the system does.',
+      'AI is infrastructure inside the build, not a feature inside the product. Same loop every time: spec, model interrogation, structured prompt, branched execution, review. Claude Code, Cursor, and Claude Design are alternative environments inside the execution layer — selected per task. Tokens and components are the source of truth across all of them. Design lives where the system does.',
     salaryFraming:
       'Design engineering at the senior band: $190–240k base depending on scope.',
   },
@@ -114,7 +114,7 @@ export const recruiterPacks: Record<string, RecruiterPack> = {
       'Comfortable owning the long arc: incremental adoption, sequenced migrations, no-downtime evolution.',
     ],
     aiExplanation:
-      'AI runs through how the platform itself gets built and maintained. Cursor and Claude in the build workflow for repetitive iteration. Claude Design for visual exploration when a screen is easier to think through visually than in code. Human owns every decision that ships.',
+      'AI is a structured layer in how the platform gets built and maintained, not a feature inside the product. Specs get interrogated by the model, prompts live as system, execution picks the right environment per task. Claude Code, Cursor, and Claude Design are alternative environments — never sequenced. Human owns every decision that ships.',
     salaryFraming:
       'Web experience lead with multi-site platform scope: $180–230k base depending on team size.',
   },
@@ -132,25 +132,26 @@ export const recruiterPacks: Record<string, RecruiterPack> = {
       'Discipline around incremental adoption and platform constraints — the systems I’ve shipped are the ones still in production.',
     ],
     aiExplanation:
-      'Claude Design as the front of the design loop. Claude Code maintaining developer-facing docs and system-diagram libraries. Cursor for the build. AI lives where it earns a seat — system-aware exploration, doc maintenance, repetitive iteration — not as a layer pasted onto the system itself.',
+      'AI runs through the system layer of the build, not the product. Specs are interrogated by the model, prompts are versioned and live in the system, execution routes per task. Claude Code, Cursor, and Claude Design are alternative environments — picked by what the work needs. Tokens and component contracts stay the source of truth across all of them.',
     salaryFraming:
       'Design systems at the senior band: $190–240k base depending on platform scope.',
   },
 
   'ai-product-designer': {
     shortIntro:
-      'AI product designer. Founded ChatOBD2, where AI sits constrained inside a six-layer deterministic pipeline. End-to-end design and build.',
+      'AI product designer. Founded ChatOBD2, where the model is one constrained stage inside a six-layer structured pipeline. Treat AI as a structured system layer, in the product and in the build.',
     longIntro:
-      'I design AI-native products where the AI is constrained, not driving. Most recently founded ChatOBD2, an automotive diagnostics product where vehicle data flows through six deterministic reasoning layers before the model writes a character. The design problem is translation: turning data into a single answer a driver can act on, with confidence visible as part of the answer. I designed and built the product, the marketing surface, and the developer portal end to end. Earlier I lead UX and frontend systems work across MagTek’s multi-site platform.',
+      'I design AI-native products where the model is constrained, not driving. Most recently founded ChatOBD2, an automotive diagnostics product where vehicle data flows through six deterministic reasoning layers before the model is invoked. The design problem is translation: turning data into a single answer a driver can act on, with confidence visible as part of the answer. Prompts live in the system, keyed by verdict tier and code context, assembled by priority inside a 38,000-token budget. I designed and built the product, the marketing surface, and the developer portal end to end. Earlier I lead UX and frontend systems work across MagTek’s multi-site platform.',
     tellMeAboutYourself:
-      'I design AI-native products. The framing I use is that the design problem is translation, not generation. ChatOBD2, which I founded, is the clearest example: the system reads vehicle data, runs it through six deterministic reasoning layers to assemble context, and then the model gets a heavily structured prompt with a 38,000 token budget where each section has a priority. The model’s output is a single verdict card. The interface stops asking the driver to interpret data and starts telling them what to do next. AI is in the middle of the pipeline, constrained by structure on either side. That’s the kind of work I want to keep doing.',
+      'I design AI-native products. The framing I use is that the design problem is translation, not generation. ChatOBD2, which I founded, is the clearest example: the system reads vehicle data, runs it through six deterministic reasoning layers to assemble context, then invokes the model with a heavily structured prompt assembled by priority inside a 38,000-token budget. The output is a single verdict card with a constrained schema. The model is one stage inside a structured pipeline, not the system. The interface stops asking the driver to interpret data and starts telling them what to do next. I bring the same posture to the build that ships these products: AI as a structured system layer, prompt engineering as a core skill, execution as a branched layer rather than a chained pipeline.',
     whyImAFit: [
       'Real shipped AI-native product, not a Figma concept.',
-      'Product UX thinking specifically about model-in-the-loop systems: constrained outputs, confidence as part of the answer, prompts as system not as components.',
+      'Product UX thinking for model-in-the-loop systems: constrained outputs, confidence as part of the answer, prompts as system rather than as scattered components, schema-driven verdicts.',
+      'Prompt engineering as a core skill — versioned prompts, priority budgets, requirement discovery via model interrogation.',
       'Cross-functional reach: design, build, AI pipeline, marketing surface, developer portal — all owned end to end.',
     ],
     aiExplanation:
-      'I treat AI like any other tool with real surface area. Structured inputs, constrained outputs, deliberate iteration. The model drafts and handles the parts that compound; I keep the architecture, the decisions, and the review. That posture extends to how I use Claude Design and Claude Code in the build loop too.',
+      'I treat AI as a structured system layer, both inside the product and in the build that ships it. Inside the product: the model is one constrained stage in a structured pipeline, prompts live in the system keyed by verdict tier and code context, outputs are constrained by schema. Inside the build: spec gets interrogated, prompt gets engineered, execution routes to the right environment. Same posture in both places. Repeatability over novelty.',
     salaryFraming:
       'AI-native product design with founder-level ownership: $200–260k base depending on scope.',
   },
@@ -168,7 +169,7 @@ export const recruiterPacks: Record<string, RecruiterPack> = {
       'Cross-functional fluency: design, frontend systems, platform engineering, AI integration.',
     ],
     aiExplanation:
-      'AI runs through how I work. Claude Design at the front of the design loop, Claude Code carrying decisions into implementation, Cursor for the rest of the build. AI is used where it earns a seat. Human owns every decision that ships.',
+      'AI runs through how I work as a structured system layer, not a feature. The loop is consistent: spec interrogation, structured prompt, branched execution, human review. Claude Code, Cursor, and Claude Design are alternative execution environments — picked per task, never chained. Same posture across product, build, and platform work.',
     salaryFraming:
       'Lead-level role with founder-level ownership: $210–270k base depending on team size and equity.',
   },

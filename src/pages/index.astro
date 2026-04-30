@@ -38,23 +38,37 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
             How I work
           </span>
           <h2 class="home-about__title">
-            Most of my work isn't about building from scratch.
+            AI as a <em>system layer</em>.
           </h2>
         </div>
         <div class="home-about__col" data-reveal data-reveal-delay="2">
-          <p class="home-about__para">
-            It's about stepping into existing systems and making them better.
-            That means understanding the constraints before changing anything,
-            improving structure instead of piling on, and building things that
-            can be reused.
+          <p class="home-about__para home-about__para--lead">
+            I don't use AI as a tool I jump into. I use it as a
+            structured layer between intent and execution.
           </p>
           <p class="home-about__para">
-            These days, AI is part of the workflow. Models for drafting,
-            agents for the parts they handle well.
+            Every project starts with rough specs. Before anything is
+            built, I use LLMs to interrogate the problem, forcing
+            clarity on requirements, constraints, and edge cases. The
+            model asks the questions a strong engineer or product
+            partner would ask.
           </p>
           <p class="home-about__para">
-            The goal is the same as it's always been: make complex systems
-            easier to use and easier to build on.
+            From there, I translate that into structured prompts that
+            are scoped, reusable, and tied to the system they operate
+            in.
+          </p>
+          <p class="home-about__para">
+            Execution isn't a pipeline. It's a selection:
+          </p>
+          <ul class="home-about__select">
+            <li><strong>Claude</strong> for reasoning and generation</li>
+            <li><strong>Cursor</strong> for implementation</li>
+            <li><strong>Claude Design</strong> when the problem is easier to solve visually</li>
+          </ul>
+          <p class="home-about__para home-about__para--coda">
+            The model is one constrained stage. The system is what
+            matters.
           </p>
           <a
             href="/about"
@@ -72,7 +86,7 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
       </div>
 
       <div class="home-about__strip" data-reveal data-reveal-delay="3">
-        <span class="home-about__strip-caption">From intent to ship</span>
+        <span class="home-about__strip-caption">From intent to ship (AI-native system)</span>
         <AIWorkflowStrip />
       </div>
     </div>
@@ -110,20 +124,27 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
             Design workflow
           </span>
           <h2 class="home-design__title">
-            Design as part of the <em>build</em>.
+            Claude Design <em>(visual branch)</em>.
           </h2>
         </div>
         <div class="home-design__col" data-reveal data-reveal-delay="2">
           <p class="home-design__para">
-            When a screen is easier to think through visually than in code,
-            I start in Claude Design. It sits in front of the implementation
-            loop without replacing the rest.
+            Claude Design is one branch of the execution layer. I use
+            it when structure alone isn't enough and the problem needs
+            to be seen.
           </p>
+          <p class="home-design__para">That usually means:</p>
           <ul class="home-design__bullets">
-            <li>Fast prototypes for flows, states, and reviews</li>
-            <li>More useful when the codebase or system is already in context</li>
-            <li>Cleaner handoff into implementation work</li>
+            <li>new flows</li>
+            <li>layout and hierarchy decisions</li>
+            <li>comparing multiple directions quickly</li>
           </ul>
+          <p class="home-design__para">
+            It's not part of every loop. It earns its place when
+            visual reasoning moves the work forward faster than code.
+            Once direction is clear, everything resolves back into
+            the same system and build loop.
+          </p>
           <a
             href="/design"
             class="home-design__link"
@@ -140,7 +161,7 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
       </div>
 
       <div class="home-design__strip" data-reveal data-reveal-delay="3">
-        <span class="home-design__strip-caption">Where Claude Design sits in the loop</span>
+        <span class="home-design__strip-caption">The visual branch of the execution layer</span>
         <DesignWorkflowStrip />
       </div>
     </div>
@@ -215,12 +236,68 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
     max-width: 18ch;
   }
 
+  .home-about__title em {
+    font-style: italic;
+    color: var(--color-accent);
+  }
+
   .home-about__para {
     font-size: clamp(15px, 1.4vw, 17px);
     line-height: 1.75;
     color: var(--color-text-muted);
     margin-bottom: var(--space-4);
     max-width: 56ch;
+  }
+
+  .home-about__para--lead {
+    color: var(--color-text);
+    font-size: clamp(16px, 1.5vw, 19px);
+    line-height: 1.6;
+  }
+
+  .home-about__para--coda {
+    color: var(--color-text);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(17px, 1.7vw, 20px);
+    line-height: 1.5;
+    margin-top: var(--space-2);
+    padding-left: var(--space-4);
+    border-left: 2px solid var(--color-accent);
+    max-width: 48ch;
+  }
+
+  .home-about__select {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    max-width: 56ch;
+  }
+
+  .home-about__select li {
+    position: relative;
+    padding-left: 22px;
+    font-size: clamp(15px, 1.4vw, 17px);
+    line-height: 1.65;
+    color: var(--color-text-muted);
+  }
+
+  .home-about__select li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.7em;
+    width: 12px;
+    height: 1px;
+    background-color: var(--color-accent);
+  }
+
+  .home-about__select strong {
+    color: var(--color-text);
+    font-weight: 600;
   }
 
   .home-about__link {
