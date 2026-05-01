@@ -1,0 +1,198 @@
+---
+// AI flow visualization. Five steps from constraint to ship, showing
+// where prompts live, what gets executed, and what comes out the other
+// side. Replaces the old AIWorkflowStrip with simpler labels and no
+// vocabulary tics.
+---
+
+<figure class="aiflow" aria-label="How my AI workflow runs: from constraint to prompt to execute to schema-bound output to ship">
+  <ol class="aiflow__steps">
+    <li class="aiflow__step">
+      <span class="aiflow__num">01</span>
+      <div class="aiflow__body">
+        <span class="aiflow__label">Constraint</span>
+        <span class="aiflow__hint">Read what already exists</span>
+      </div>
+    </li>
+    <li class="aiflow__step">
+      <span class="aiflow__num">02</span>
+      <div class="aiflow__body">
+        <span class="aiflow__label">Interrogate</span>
+        <span class="aiflow__hint">Use the model to surface gaps in the spec</span>
+      </div>
+    </li>
+    <li class="aiflow__step">
+      <span class="aiflow__num">03</span>
+      <div class="aiflow__body">
+        <span class="aiflow__label">Prompt module</span>
+        <span class="aiflow__hint">Typed, versioned, in source</span>
+      </div>
+    </li>
+    <li class="aiflow__step">
+      <span class="aiflow__num">04</span>
+      <div class="aiflow__body">
+        <span class="aiflow__label">Execute</span>
+        <span class="aiflow__hint">Claude · Cursor · Claude Design · Figma</span>
+      </div>
+    </li>
+    <li class="aiflow__step">
+      <span class="aiflow__num">05</span>
+      <div class="aiflow__body">
+        <span class="aiflow__label">Review &amp; ship</span>
+        <span class="aiflow__hint">Output in code or schema-bound</span>
+      </div>
+    </li>
+  </ol>
+</figure>
+
+<style>
+  .aiflow {
+    margin: 0;
+    padding: var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-bg-elevated);
+    overflow: hidden;
+  }
+
+  @media (min-width: 600px) {
+    .aiflow {
+      padding: var(--space-6) var(--space-7);
+    }
+  }
+
+  @media (min-width: 900px) {
+    .aiflow {
+      padding: var(--space-7) var(--space-8);
+      border-radius: var(--radius-xl);
+    }
+  }
+
+  .aiflow__steps {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+    counter-reset: aiflow;
+  }
+
+  /* Vertical stacking on narrow screens, horizontal on wide.
+     Connector line is drawn via pseudo-element on each step except
+     the last one, so the chain is implicit not explicit. */
+  @media (min-width: 900px) {
+    .aiflow__steps {
+      grid-template-columns: repeat(5, 1fr);
+      gap: var(--space-2);
+    }
+  }
+
+  .aiflow__step {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-3) 0;
+  }
+
+  @media (min-width: 900px) {
+    .aiflow__step {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-3);
+      padding: var(--space-2) 0;
+    }
+  }
+
+  /* Connector. Vertical bar between rows on mobile,
+     horizontal line between columns on desktop. */
+  .aiflow__step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    background-color: var(--color-border);
+  }
+
+  @media (max-width: 899.98px) {
+    .aiflow__step:not(:last-child)::after {
+      left: 13px;
+      top: 36px;
+      width: 1px;
+      height: calc(100% - 8px);
+    }
+  }
+
+  @media (min-width: 900px) {
+    .aiflow__step:not(:last-child)::after {
+      left: calc(50% + 14px);
+      top: 13px;
+      right: -50%;
+      height: 1px;
+      background: linear-gradient(
+        to right,
+        var(--color-border) 0%,
+        var(--color-border) 60%,
+        var(--color-accent) 100%
+      );
+    }
+  }
+
+  .aiflow__num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 8px;
+    border-radius: 999px;
+    border: 1px solid var(--color-accent-muted);
+    background-color: var(--color-accent-dim);
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    position: relative;
+    z-index: 1;
+  }
+
+  .aiflow__body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .aiflow__label {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+    line-height: 1.2;
+  }
+
+  @media (min-width: 900px) {
+    .aiflow__label {
+      font-size: 18px;
+    }
+  }
+
+  .aiflow__hint {
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--color-text-muted);
+    max-width: 26ch;
+  }
+
+  @media (min-width: 900px) {
+    .aiflow__hint {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.5;
+      letter-spacing: 0.01em;
+    }
+  }
+</style>

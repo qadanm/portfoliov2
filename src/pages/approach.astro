@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@/components/layout/BaseLayout.astro';
 import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
+import AIFlow from '@/components/diagrams/AIFlow.astro';
 ---
 
 <BaseLayout
@@ -35,23 +36,20 @@ import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
       {/* Lead — discursive, not symmetrical */}
       <section class="apr__section apr__section--lead" data-reveal>
         <p class="apr__lead">
-          Most of what I'm hired to do is repair. A platform that grew
-          without a system. A site that ranks well and converts badly.
-          A frontend that looks fine in Chrome and falls apart on iOS
-          15. AI tooling that demos beautifully and has nowhere to live
-          in the codebase. Greenfield work happens, but it's the
-          minority. The skill that matters more is reading what's
-          already there before changing any of it.
+          A lot of the work I take on looks like repair. A platform that
+          grew without a system. A site that ranks well and converts
+          badly. A frontend that looks fine in Chrome and falls apart on
+          iOS 15. Existing AI tooling that needs a real home in the
+          codebase. Greenfield happens, but most of the work I do isn't
+          that.
         </p>
 
         <p class="apr__para">
-          That's a long way of saying I'm a senior generalist. UX,
-          frontend, design systems, content architecture, SEO,
-          performance, accessibility, AI-assisted prototyping. Whichever
-          subset the work needs, on whatever platform the company runs
-          on. The skills sit in one head, so the tradeoffs between them
-          get made in one head, which tends to ship faster and cleaner
-          than handoff loops between three specialists.
+          I'm a senior generalist. UX, frontend, design systems, content
+          architecture, SEO, performance, accessibility, AI-assisted
+          prototyping. Whichever subset the work needs, on whatever
+          platform the company runs on. The skills sit in one head, so
+          the tradeoffs between them get made in one head.
         </p>
       </section>
 
@@ -84,20 +82,36 @@ import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
 
         <p class="apr__para">
           Two places: in the products I ship, and in the way I build
-          them.
+          them. The shape is the same in both: read the constraint,
+          translate it into a prompt that lives in source, execute
+          where the work fits best, ship reviewable output.
         </p>
+
+        <div class="apr__flow" data-reveal>
+          <AIFlow />
+        </div>
 
         <p class="apr__para">
           <strong>In the products.</strong> ChatOBD2 is the worked
           example. Vehicle data flows through six deterministic
-          reasoning layers before any model call. The system prompt is
-          composed per scan from a 38,000-token budget, with priority
-          tiers that decide what stays in and what gets dropped if
-          there's not enough room. Prompts live in a single module,
-          keyed by verdict tier and code context, so a copy change is
-          one file edit, not a hunt across the components that happen
-          to render that text. Outputs are schema-bound, which means
-          the rendering layer can stop apologizing for the model.
+          reasoning layers before any model call. The system prompt
+          isn't a string; it's a module that assembles fragments by
+          priority inside a 38,000-token budget, keyed by verdict
+          tier and code context. The fragments are typed, versioned,
+          and reviewed in pull requests like any other source. A copy
+          change is a one-file edit. The analytics taxonomy stays
+          coherent because every fragment is tagged. Outputs are
+          schema-bound, which means the rendering layer doesn't
+          apologize for the model.
+        </p>
+
+        <p class="apr__para">
+          <strong>The prompt practice.</strong> Prompts as production
+          code. New behavior lands as a new fragment with a clear name.
+          Failure modes are tested. Token budgets are tracked the way
+          any other resource budget is. The result is AI you can keep
+          iterating on, in the same review loop as the rest of the
+          codebase.
         </p>
 
         <div class="apr__art" data-reveal>
@@ -107,18 +121,17 @@ import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
 
         <p class="apr__para">
           <strong>In the build.</strong> Claude and Cursor handle code
-          work. Either one. The choice is contextual, not by role.
-          Figma stays for precision and design-system maintenance.
-          Claude Design comes in for visual exploration when a frame is
-          faster to reason about than markup. None of this is fancy.
-          The codebase is the source of truth across all of them; the
-          tools are interchangeable, the system isn't.
+          work; the choice between them is contextual. Figma stays for
+          precision and design-system maintenance. Claude Design comes
+          in for visual exploration when a frame is faster to reason
+          about than markup. The codebase is the source of truth across
+          all of them.
         </p>
 
         <p class="apr__para">
-          What I don't do is treat AI as the product. The model is one
-          stage in a structured pipeline; a human still owns every
-          decision that ships. The point is repeatability, not novelty.
+          AI in the build, not the product. The model is one stage in a
+          structured pipeline. A human owns every decision that ships.
+          The goal is repeatability.
         </p>
       </section>
 
@@ -129,11 +142,11 @@ import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
         <h2 class="apr__h2">What I'm best at on a team</h2>
 
         <ul class="apr__bullets">
-          <li><strong>Owning the whole web experience for a team that doesn't have a department for it.</strong> One person carrying UX, the design system, the frontend, the content model, the SEO graph, and the perf budget. Most teams under-invest in this generalist; it's where I add the most.</li>
+          <li><strong>Owning the whole web experience for a team that doesn't have a department for it.</strong> One person carrying UX, the design system, the frontend, the content model, the SEO graph, and the performance budget.</li>
           <li><strong>Modernizing a platform that can't be rewritten.</strong> Long-running stacks have opinions. I read those first, plan around them, and ship in increments that don't require a flag day.</li>
           <li><strong>Building systems engineers actually use.</strong> Typed components. Tokens. Layout primitives. Real consumers from day one. No big-bang library that ships into a vacuum.</li>
           <li><strong>Sitting between design and engineering and unblocking both.</strong> I read intent, not just specs. Most production breakage lives in the gap a handoff doesn't see.</li>
-          <li><strong>Prototyping with AI without losing taste.</strong> Faster from concept to shipped, without outsourcing judgment.</li>
+          <li><strong>Building AI features as engineering.</strong> Prompt modules in source. Schema-bound outputs. Structured pipelines that hold up under traffic. ChatOBD2 is the worked example: six deterministic layers in front of every model call, prompts assembled per scan from a 38,000-token budget.</li>
         </ul>
       </section>
 
@@ -404,6 +417,10 @@ import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
 
   .apr__art :global(.verdict-mock) {
     margin: 0;
+  }
+
+  .apr__flow {
+    margin: var(--space-2) 0 var(--space-4);
   }
 
   .apr__tools {
