@@ -1,5 +1,6 @@
 // Per-angle headline + summary. The engine picks by angle id.
-// Tone rules: grounded, anti-buzzword, no em dashes, no fabricated metrics.
+// Tone rules: grounded, anti-buzzword, no em dashes, no fabricated metrics,
+// no fabricated tenure (no "decade", no "eight-plus years", etc.).
 
 export const headlines: Record<string, string> = {
   'product-designer':
@@ -17,7 +18,7 @@ export const headlines: Record<string, string> = {
   'design-systems-engineer':
     'Design systems engineer. Tokens, components, and the platform-level discipline that lets a single change land everywhere it should.',
   'ai-product-designer':
-    'AI product designer. Build for systems where the model is one constrained stage in a structured pipeline, and prompt engineering is a core layer.',
+    'AI product designer. I design products where the model is one constrained stage in a structured pipeline, not the product itself.',
   'ux-product-lead':
     'Product/UX lead. End-to-end ownership: the design, the implementation, the system underneath, and the calls that hold them together.',
 };
@@ -36,19 +37,19 @@ export const summaries: Record<string, string> = {
     'Frontend UX engineer with platform depth. Comfortable across React, TypeScript, React Native, Astro, ASP.NET MVC + Razor, and hand-authored CSS systems. Built and maintain frontend systems for ChatOBD2 (AI-native product) and MagTek (multi-site enterprise platform).',
 
   'design-engineer':
-    'Design engineer working in the overlap. Built ChatOBD2 end to end with AI as a structured system layer in the build — branched execution across Claude, Cursor, and Claude Design rather than a chained pipeline. Maintain platform-level design systems at MagTek. Author CSS and components by hand against tokens that ship across many surfaces.',
+    'Design engineer working in the overlap. Built ChatOBD2 end to end — chat surface, verdict-first scan results, marketing site, developer portal. Maintain a Razor component library and token-driven CSS substrate across MagTek’s multi-site platform. Author CSS and components by hand against tokens that ship across many surfaces.',
 
   'web-experience-manager':
     'Web experience leader across MagTek’s multi-site enterprise platform. Own UX, content structure, and frontend systems across MagTek.com, Magensa, and related properties. Earlier: built advisor portals at InvestCloud across major wealth institutions.',
 
   'design-systems-engineer':
-    'Design systems engineer. Built and maintain a Razor component library + token-driven CSS substrate across MagTek’s multi-site platform. Built ChatOBD2’s React Native design system from the ground up. Comfortable with platform constraints, incremental adoption, and zero-downtime migration.',
+    'Design systems engineer. Built and maintain a 100+ component Razor partial library plus token-driven CSS substrate across MagTek’s multi-site platform. Built ChatOBD2’s React Native design system from the ground up. Comfortable with platform constraints, incremental adoption, and zero-downtime migration.',
 
   'ai-product-designer':
-    'Product designer for AI-native systems. Founded ChatOBD2, where the model is one constrained stage inside a six-layer structured pipeline, prompts live in the system rather than in components, and outputs are schema-bound. Designed and built the product, the marketing site, and the developer portal that keeps it maintainable.',
+    'Product designer for AI-native systems. Founded ChatOBD2, where the model is one constrained stage inside a six-layer structured pipeline, prompts are versioned and budgeted at the system level, and outputs are schema-bound. Designed and built the product, the marketing site, and the developer portal that keeps it maintainable.',
 
   'ux-product-lead':
-    'Product and UX lead. End-to-end ownership across an AI-native product (ChatOBD2) and a multi-site enterprise platform (MagTek). Comfortable making the call, building the surface, and living with the consequences across many years of platform life.',
+    'Product and UX lead. End-to-end ownership across an AI-native product (ChatOBD2) and a multi-site enterprise platform (MagTek). Comfortable making the call, building the surface, and living with the consequences.',
 };
 
 // Optional kicker line under headline, kept very short.
@@ -56,11 +57,11 @@ export const summaries: Record<string, string> = {
 export const kickers: Record<string, string> = {
   'product-designer': 'Product UX · System design · Design-in-code',
   'senior-product-designer': 'Product · System design · End-to-end ownership',
-  'ux-engineer': 'Frontend systems · UX implementation · AI as system layer',
-  'frontend-ux-engineer': 'Frontend systems · Platform UX · AI as system layer',
+  'ux-engineer': 'Frontend systems · UX implementation · AI in production',
+  'frontend-ux-engineer': 'Frontend systems · Platform UX · AI in production',
   'design-engineer': 'Design-in-code · Tokens & components · AI as infrastructure',
   'web-experience-manager': 'Multi-site platform · Content systems · UX',
   'design-systems-engineer': 'Tokens · Components · Platform discipline',
-  'ai-product-designer': 'AI-native product UX · System translation · Design-in-code',
+  'ai-product-designer': 'AI-native product UX · Structured pipelines · Design-in-code',
   'ux-product-lead': 'Product · UX · Implementation · Ownership',
 };

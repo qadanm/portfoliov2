@@ -28,20 +28,19 @@ export const skills: Skill[] = [
 
   // Platform
   { name: 'ASP.NET MVC + Razor', category: 'platform', serves: ['engineering'], weight: 4 },
+  { name: 'Razor partials as typed components', category: 'platform', serves: ['engineering', 'design'], weight: 5 },
   { name: 'C#', category: 'platform', serves: ['engineering'], weight: 3 },
   { name: 'Multi-tenant frontends', category: 'platform', serves: ['engineering', 'leadership'], weight: 4 },
   { name: 'Long-running platform UX', category: 'platform', serves: ['engineering', 'product', 'leadership'], weight: 5 },
   { name: 'Supabase', category: 'platform', serves: ['engineering'], weight: 3 },
 
-  // AI — treated as a system layer, not a tool list
-  { name: 'Prompt engineering (system-resident, versioned, budgeted)', category: 'ai', serves: ['ai', 'engineering'], weight: 5 },
-  { name: 'Requirement discovery via model interrogation', category: 'ai', serves: ['ai', 'product'], weight: 5 },
-  { name: 'Constrained AI pipelines (model as one stage, not the system)', category: 'ai', serves: ['ai', 'product', 'engineering'], weight: 5 },
-  { name: 'Branched execution layer (per-task environment selection)', category: 'ai', serves: ['ai', 'engineering'], weight: 5 },
+  // AI — described as concrete capabilities, not jargon
+  { name: 'Prompt engineering (versioned, scoped, budgeted)', category: 'ai', serves: ['ai', 'engineering'], weight: 5 },
+  { name: 'Structured AI pipelines (model held as one constrained stage)', category: 'ai', serves: ['ai', 'product', 'engineering'], weight: 5 },
   { name: 'Schema-bound model outputs', category: 'ai', serves: ['ai', 'engineering'], weight: 4 },
-  { name: 'Agentic workflows (Claude or Cursor — environment per task)', category: 'ai', serves: ['ai', 'engineering'], weight: 5 },
-  { name: 'Tight-loop iteration (Claude or Cursor — environment per task)', category: 'ai', serves: ['ai', 'engineering', 'design'], weight: 5 },
-  { name: 'Visual exploration (Claude Design, conditional branch)', category: 'ai', serves: ['ai', 'design'], weight: 5 },
+  { name: 'Requirement discovery via model interrogation', category: 'ai', serves: ['ai', 'product'], weight: 4 },
+  { name: 'AI-assisted code workflows (Claude, Cursor)', category: 'ai', serves: ['ai', 'engineering'], weight: 5 },
+  { name: 'Visual exploration with Claude Design', category: 'ai', serves: ['ai', 'design'], weight: 4 },
 
   // Tools
   { name: 'Figma', category: 'tools', serves: ['design'], weight: 4 },

@@ -57,12 +57,12 @@ export const projects: Project[] = [
         weight: 4,
       },
       {
-        text: 'Pulled all model prompts into a system-resident layer, versioned and keyed by verdict tier and code context. Prompt engineering as a core layer, not as scattered chat. One change updates the whole product; analytics taxonomy stays coherent.',
+        text: 'Pulled all model prompts into a single system module, versioned and keyed by verdict tier and code context. One change updates the whole product; analytics taxonomy stays coherent across it.',
         serves: ['engineering', 'ai', 'design'],
         weight: 5,
       },
       {
-        text: 'Built a developer portal as a first-class product surface: architecture diagrams, annotated project structure, system-diagrams library, design system docs. Maintained continuously through the code branch of the execution layer as the codebase moves.',
+        text: 'Built a developer portal as a first-class product surface: architecture diagrams, annotated project structure, system-diagrams library, design-system docs. Maintained alongside the codebase, not bolted on as a wiki.',
         serves: ['engineering', 'ai', 'leadership'],
         weight: 4,
       },
@@ -72,12 +72,12 @@ export const projects: Project[] = [
         weight: 3,
       },
       {
-        text: 'Designed the marketing surface alongside the product: hero, longitudinal-intelligence, pricing tiers, and a developer documentation site. Built end to end through both branches of the execution layer — visual exploration via Claude Design where it earned a seat, the code branch (Claude or Cursor — interchangeable) for everything else.',
+        text: 'Designed the marketing surface alongside the product: hero, longitudinal-intelligence, pricing tiers, and a developer documentation site — all built end to end against the same component and token system.',
         serves: ['design', 'product', 'ai'],
         weight: 4,
       },
       {
-        text: 'Composed the system prompt dynamically from prioritized modules within a 38,000-token budget. P0 sections always make the cut; P5 sections only land if budget remains. The prompt lives in the system, keyed by verdict tier and code context — prompt engineering as a first-class layer, not as scattered chat.',
+        text: 'Composed the system prompt dynamically per scan from a 38,000-token budget. P0 sections always make the cut; lower-priority sections only land if budget remains. Prompts live in the system, keyed by verdict tier and code context — not scattered across components.',
         serves: ['ai', 'engineering'],
         weight: 5,
       },
@@ -102,32 +102,37 @@ export const projects: Project[] = [
     },
     bullets: [
       {
-        text: 'Own the design and full-stack development of the company’s web platforms, primarily MagTek.com. Work spans UX, front-end architecture, and production systems.',
+        text: 'Own UX and frontend architecture across MagTek’s multi-site platform — MagTek.com, Magensa, the hardware product line, the support portal, and the network of related properties built on the shared ASP.NET MVC substrate. ~85% of the public frontend, modernized end to end.',
         serves: ['design', 'engineering', 'leadership'],
         weight: 5,
       },
       {
-        text: 'Build and maintain a scalable ASP.NET MVC / Razor-based system with a focus on reusable components, performance, and long-term maintainability.',
-        serves: ['engineering'],
-        weight: 4,
-      },
-      {
-        text: 'Led the development of a shared Razor component library, moving the site away from page-specific markup into modular, strongly typed components that make development faster and more consistent.',
+        text: 'Built a shared component library on Razor partials — 100+ shared components covering primitives (button, card, badge, breadcrumb, sticky sub-nav), content blocks (hero, metric row, comparison table, feature grid, callout), and layout shells. Each partial declares a typed ViewModel, so calling it is type-checked and a missing required field is a build error.',
         serves: ['engineering', 'design'],
         weight: 5,
       },
       {
-        text: 'Rebuilt the CSS foundation into a more scalable design system. Continue to improve site structure, performance, and usability while keeping everything stable with existing integrations.',
+        text: 'Rebuilt the CSS foundation as a real design system: spacing, color, type, radius, shadow, motion pulled into tokens. Surfaces adopt the tokens incrementally, on their own timeline — no flag day, no rewrite, just compounding consistency as each property migrates.',
         serves: ['design', 'engineering'],
         weight: 5,
       },
       {
-        text: 'Run AI as a structured system layer in the build, not a feature in the product. Spec interrogation, prompts as system, branched execution per task. Claude, Cursor, and Claude Design as alternative environments — picked by what the task needs, never chained.',
+        text: 'Built navigation grammar that travels across properties never originally designed to share an identity — header behavior on scroll, breadcrumbs, sticky horizontal sub-navs, mobile drawers. Same primitives, applied with the same rules across MagTek and Magensa.',
+        serves: ['design', 'engineering'],
+        weight: 4,
+      },
+      {
+        text: 'Sequenced platform-evolution work without breaking production: replacing one-off layouts with primitives, migrating consumers off legacy markup, and choreographing internal links, redirects, analytics, and crawl signals so downstream tools never saw a discontinuity.',
+        serves: ['engineering', 'leadership'],
+        weight: 4,
+      },
+      {
+        text: 'Use AI as production infrastructure in the build, not a feature in the product. Claude and Cursor for code work, Figma for precision, Claude Design when visual reasoning is faster than markup. Codebase stays the source of truth across all of them.',
         serves: ['ai', 'engineering'],
         weight: 3,
       },
       {
-        text: 'Stack: ASP.NET MVC (.NET Framework), C#, Razor (CSHTML), Entity Framework, JavaScript/jQuery, Bootstrap, component-based design systems.',
+        text: 'Stack: ASP.NET MVC (.NET Framework), C#, Razor (CSHTML), Entity Framework, JavaScript/jQuery, Bootstrap, hand-authored CSS systems, design tokens.',
         serves: ['engineering'],
         weight: 3,
       },
@@ -155,7 +160,7 @@ export const projects: Project[] = [
     },
     bullets: [
       {
-        text: 'Built advisor- and customer-facing portals on InvestCloud’s proprietary multi-tenant platform, deployed across Chase, Cetera, Northwestern Mutual, Voya, Silicon Valley Bank, and East West Bank. One framework underneath; per-institution branding, structure, and IA on top.',
+        text: 'Contributed to or led 0-to-production deploys across 50+ wealth-management and banking institutions on InvestCloud’s proprietary multi-tenant platform — Chase, Cetera, Northwestern Mutual, Voya, Silicon Valley Bank, East West Bank, and many more. One framework underneath; per-institution branding, structure, and IA on top.',
         serves: ['engineering', 'design', 'leadership'],
         weight: 5,
       },
@@ -175,7 +180,7 @@ export const projects: Project[] = [
         weight: 4,
       },
       {
-        text: 'Coordinated with design, product, project management, QA, and support so each institutional implementation shipped on schedule and behaved in production the way it did in the spec.',
+        text: 'Coordinated with design, product, project management, QA, and support so each institutional implementation shipped on schedule and behaved in production the way it did in the spec — at the pace and volume a 50+ institution deploy schedule required.',
         serves: ['leadership', 'product'],
         weight: 4,
       },
@@ -205,12 +210,12 @@ export const projects: Project[] = [
         weight: 4,
       },
       {
-        text: 'Code branch as default — Cursor as the execution environment, hand-authored Tailwind as the styling system. Visual branch (Claude Design) selected only for sections easier to think through visually — live matches, city food guides, swipe-and-match story — with output landing back in Tailwind. Branched execution, not a chained pipeline.',
-        serves: ['design', 'ai', 'engineering'],
+        text: 'Two surfaces did the convincing: a live matches feed (real squads, real restaurants, real time) and a curated City Food Guides section sourced from Reddit threads with attribution kept intact. Content as proof, not promises.',
+        serves: ['design', 'product'],
         weight: 4,
       },
       {
-        text: 'Tone alignment as the brief: carry the app’s calm, low-friction feel into the marketing surface that introduces it. The site’s install path used an SMS form instead of app-store deep links, keeping the conversion one number long.',
+        text: 'Tone alignment as the brief: carry the app’s calm, low-friction feel into the marketing surface that introduces it. The install path is one number long — SMS in, app link out, no account creation before the user has seen the value.',
         serves: ['product', 'design'],
         weight: 4,
       },
