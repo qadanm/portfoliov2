@@ -15,8 +15,10 @@ outcomes:
     value: '11'
   - label: Frontend ownership
     value: '~85%'
-  - label: Razor component library
-    value: Modular & typed
+  - label: Shared components built
+    value: '100+'
+  - label: Component substrate
+    value: Razor partials
 placeholder:
   from: '#F5F6F8'
   to: '#E4E7EC'
@@ -54,12 +56,29 @@ A single change has to land across more than one product surface without breakin
 
 Specifically:
 
-- A shared Razor component library, modular and strongly typed, that moves the platform off page-specific markup. Development is faster, the result is more consistent.
+- A shared component library on Razor partials. Detailed below.
 - A rebuilt CSS foundation that scales as a real design system instead of a stylesheet that ages with the platform.
 - Layout grammar that makes navigation feel coherent across properties that were never designed to share an identity.
 - Performance work that respects the integrations the business depends on.
 
 A lot of the most valuable work is invisible when it's done right. The change you can't see is usually the one that took the most thinking.
+
+## A component library on Razor partials
+
+ASP.NET MVC doesn't ship a native component model. Razor partials do — the trick is treating them as components instead of as include directives.
+
+The library now sits at **100+ shared components**: primitives (button, card, badge, breadcrumb, sticky sub-nav), content blocks (hero, metric row, comparison table, feature grid, callout), and layout shells (page chrome, product-page templates).
+
+Each one is:
+
+- **Modular.** One responsibility per partial. The card is the card. The hero is the hero. Nothing knows about anything it doesn't have to.
+- **Strongly-typed.** Every partial declares a ViewModel, so calling it from a Razor view is type-checked, the parameters are visible to IntelliSense, and a missing required field is a build error — not a runtime surprise.
+- **Dynamic.** Partials take parameters, render conditional regions, and compose with each other. A hero can wrap a CTA component which wraps a button component, and the consuming view gets the typed contract for the whole stack.
+- **Reusable.** The same hero partial drives the homepage, every product category page, the support portal landing, and Magensa's surfaces — once with brand variants, once with structural variants, never duplicated in markup.
+
+That's where the "single change lands across many pages" property comes from. Updating the spacing on the hero updates ~30 surfaces at once. Renaming a CTA prop is a compile-time error in every consumer until it's fixed. The platform stops behaving like a stack of bespoke pages and starts behaving like a system.
+
+Most of the work was less about authoring new components than about extracting them carefully — finding the patterns already in the codebase, hoisting them into partials with sensible defaults, then migrating consumers without touching production traffic. A library you can't migrate to safely is just another stylesheet.
 
 ## Surfaces I've shipped within the platform
 
