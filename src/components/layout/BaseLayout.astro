@@ -18,10 +18,10 @@ interface Props {
 }
 
 const {
-  title = 'Moe Qadan — Product Design & UX Engineering',
-  description = "Moe Qadan designs and builds product systems end to end — UX engineering, frontend architecture, and AI-native products inside long-running platforms.",
+  title = 'Moe Qadan, Senior UX & Front-end',
+  description = "Moe Qadan is a senior UX and frontend practitioner. UX, design systems, content architecture, SEO, performance, accessibility, and AI-assisted prototyping, on whatever platform the work has to live on.",
   image = '/og.png',
-  imageAlt = 'Moe Qadan — Product Designer & UX Engineer. Diagram of a constrained AI pipeline with the model held between deterministic stages.',
+  imageAlt = 'Moe Qadan, Senior UX & Front-end. Verdict card from ChatOBD2 showing a structured AI output.',
   article = false,
   noindex = false,
   keywords,
@@ -29,7 +29,7 @@ const {
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const fullTitle = title.includes('Qadan') || title.includes('Moe ') ? title : `${title} — Qadan`;
+const fullTitle = title.includes('Qadan') || title.includes('Moe ') ? title : `${title} · Qadan`;
 const ogImage = new URL(image, Astro.site).toString();
 const ogType = article ? 'article' : 'website';
 const ogImageType = image.endsWith('.webp') ? 'image/webp'
@@ -38,7 +38,7 @@ const ogImageType = image.endsWith('.webp') ? 'image/webp'
 
 // WebSite schema describes the *site*, not the page — keep its description
 // stable across navigations so Google's site card stays coherent.
-const SITE_DESCRIPTION = "Moe Qadan designs and builds product systems end to end — UX engineering, frontend architecture, and AI-native products inside long-running platforms.";
+const SITE_DESCRIPTION = "Moe Qadan is a senior UX and frontend practitioner. UX, design systems, content architecture, SEO, performance, accessibility, and AI-assisted prototyping, on whatever platform the work has to live on.";
 
 const defaultKeywords = [
   'Moe Qadan',

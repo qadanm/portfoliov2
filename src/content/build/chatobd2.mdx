@@ -7,7 +7,7 @@ keyFocus:
   - Structured pipeline design
   - End-to-end product engineering
 role: Founder, sole designer & engineer
-period: 2025 — present
+period: 2025, present
 status: Live in beta · iOS
 scope: Mobile app, marketing site, developer portal, backend pipeline
 outcomes:
@@ -27,38 +27,32 @@ placeholder:
   angle: 135
   labelTone: light
 coverImage: /images/chatobd2/hero.webp
-coverAlt: ChatOBD2 marketing site hero — "Your car is talking. ChatOBD-2 translates." with phone mockup showing a live diagnostic chat on a 2010 Toyota Prius.
+coverAlt: ChatOBD2 marketing site hero, "Your car is talking. ChatOBD-2 translates." Phone mockup showing a live diagnostic chat on a 2010 Toyota Prius.
 featured: true
 order: 1
 ---
 
 ## The premise
 
-Most diagnostic tools assume the user already knows how to interpret them. They don't.
+Diagnostic apps for cars are written by engineers for engineers. Codes, freeze frames, partial explanations, all surfaced raw. The driver staring at a screen is supposed to take all of that and produce a decision: drive it, don't drive it, fix it now, fix it later. Most of them give up and call a mechanic.
 
-That's not a polish problem. It's a translation problem.
-
-Codes, freeze frames, partial explanations. The data is technically present, but the user is left to assemble it into an answer. The tool exposes complexity instead of resolving it.
-
-That gap is the actual problem.
+The actual problem isn't visualization. It's translation. The data is technically present; the user is left to assemble it into an answer.
 
 ## A different idea
 
-ChatOBD2 is built around a different premise: diagnostics should explain themselves.
+ChatOBD2 closes the gap by deciding for them.
 
-The interface is intentionally simple. The system behind it isn't.
+The interface is intentionally simple. The system behind it isn't. Structured diagnostic inputs feed into layered interpretation, then into a constrained model call, then into a constrained output. Every scan returns the same shape: is it safe to drive, how confident is the answer, what matters most, what to do next.
 
-It pairs structured diagnostic inputs with layered interpretation and a constrained model call, and it constrains the output. Every scan returns the same shape: is it safe to drive, how confident is the answer, what matters most, what to do next.
-
-The model is one stage inside a structured pipeline. Its job is reducing complexity, not generating content.
+The model is one stage in a structured pipeline. Its job is reducing complexity, not generating prose.
 
 ## Three decisions that shaped the product
 
-**The verdict comes first, before any text.** When a scan finishes, the safe-to-drive answer is the first thing rendered, full-width and color-coded, ahead of every paragraph. The tradeoff is less narrative warmth, but anyone glancing at the screen has the answer they came for in under a second.
+**The verdict comes first, before any text.** When a scan finishes, the safe-to-drive answer renders first. Full-width, color-coded, ahead of every paragraph. The tradeoff is less narrative warmth. Anyone glancing at the screen has the answer they came for in under a second.
 
-**Confidence is part of the answer.** A partial scan changes what the verdict means. Showing scan quality as a fixed bar instead of hiding it costs a small piece of optimism but earns a much larger piece of trust. It's the kind of decision a less-confident product wouldn't make.
+**Confidence is part of the answer.** A partial scan changes what the verdict means. Showing scan quality as a fixed bar instead of hiding it costs a small piece of optimism and earns a much larger piece of trust.
 
-**Prompts live in the system, not in components.** When prompts get scattered across components, every copy change is a hunt across N files, and the analytics taxonomy quietly drifts behind it. Pulling them into one module, keyed by verdict tier and code context, means a single change updates the whole product, and the analytics stay coherent across it.
+**Prompts live in the system, not in components.** When prompts get scattered across components, every copy change is a hunt across files and the analytics taxonomy quietly drifts behind it. Pulling them into one module, keyed by verdict tier and code context, means a single change updates the whole product, and the analytics stay coherent across it.
 
 ## The shape of the system
 

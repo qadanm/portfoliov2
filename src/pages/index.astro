@@ -2,7 +2,6 @@
 import BaseLayout from '@/components/layout/BaseLayout.astro';
 import Hero from '@/components/home/Hero.astro';
 import ProjectGrid from '@/components/ProjectGrid.astro';
-import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
 import { getCollection } from 'astro:content';
 
 const projects = (await getCollection('build', ({ data }) => !data.draft))
@@ -10,39 +9,37 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
 ---
 
 <BaseLayout
-  title="Moe Qadan — Product Designer & UX Engineer"
-  description="Moe Qadan designs and ships products end to end — interface, frontend, and the system the model lives inside. Work spans enterprise platforms (MagTek), advisor portals deployed across 50+ wealth and banking institutions at InvestCloud, and ChatOBD2."
+  title="Moe Qadan, Senior UX & Front-end"
+  description="Moe Qadan is a senior UX and frontend practitioner in Los Angeles. UX, design systems, content architecture, SEO, performance, accessibility, and AI-assisted prototyping. Currently leading web experience at MagTek; shipping ChatOBD2 solo; previously deployed advisor portals at InvestCloud across 50+ wealth and banking institutions."
   keywords={[
     'Moe Qadan',
     'Muhammed Qadan',
-    'product designer',
     'UX engineer',
-    'design engineer',
-    'AI product design',
-    'frontend architecture',
+    'senior UX engineer',
+    'frontend engineer',
+    'web experience',
     'design systems',
-    'platform UX',
+    'Razor partials',
+    'ASP.NET MVC',
+    'AI-assisted prototyping',
     'portfolio',
   ]}
 >
   <Hero />
 
-  {/* Section 01 — Selected work, BEFORE methodology.
-      The audit's #1 structural fix: lead with evidence, not process. */}
+  {/* Selected work. No section number, no manifesto lede.
+      The cards do the work. */}
   <section class="home-work" id="work">
     <div class="container-site">
       <div class="home-work__head" data-reveal>
-        <span class="home-work__eyebrow">
-          <span class="section-index" aria-hidden="true">01</span>
-          Selected work
-        </span>
+        <span class="home-work__eyebrow">Work</span>
         <h2 class="home-work__title">
-          Recent work — products,<br />platforms, AI systems.
+          Four shipped projects.
         </h2>
         <p class="home-work__lede">
-          A flagship AI product, a multi-site enterprise platform, and
-          advisor tools deployed across major wealth institutions. All
-          shipped, all live, all built end to end.
+          ChatOBD2, MagTek's multi-site platform, the Sawa marketing
+          site, and the InvestCloud portal work. All in production. All
+          have traffic on them. None of them are concept files.
         </p>
       </div>
 
@@ -52,57 +49,28 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
     </div>
   </section>
 
-  {/* Section 02 — Approach.
-      One concise section combining "How I work" + design workflow,
-      anchored by a real product surface (the verdict card) instead of
-      an abstract workflow diagram. Concrete proof beats methodology. */}
-  <section class="home-approach" id="approach">
+  {/* Approach teaser. Three lines, links into the dedicated page.
+      The /approach page carries the depth so the homepage stays
+      a fast read. */}
+  <section class="home-approach" id="approach-teaser">
     <div class="container-site">
-      <div class="home-approach__head" data-reveal>
-        <span class="home-approach__eyebrow">
-          <span class="section-index" aria-hidden="true">02</span>
-          Approach
-        </span>
-        <h2 class="home-approach__title">
-          The model is one stage.<br />The <em>system</em> is the product.
-        </h2>
-      </div>
-
-      <div class="home-approach__grid">
-        <div class="home-approach__col" data-reveal data-reveal-delay="1">
+      <div class="home-approach__inner" data-reveal>
+        <div class="home-approach__col-l">
+          <span class="home-approach__eyebrow">How I work</span>
           <p class="home-approach__lead">
-            ChatOBD2 puts six deterministic reasoning layers in front of
-            every model call, with a system prompt assembled per scan
-            from a 38,000-token budget. The model gets a structured spec,
-            not a chat. That's how it stays repeatable, inspectable, and
-            cheaper to evolve.
+            Most of what I'm hired to do is repair, not invent. A
+            platform that grew without a system. A site that ranks but
+            doesn't convert. A frontend that ships fine on Chrome and
+            falls apart on iOS. AI tooling that demos well and has
+            nowhere to live in the codebase.
           </p>
-          <ul class="home-approach__principles">
-            <li>
-              <span class="home-approach__principle-num">01</span>
-              <div>
-                <strong>Systems before surfaces.</strong>
-                A page is a render of something deeper. Get the structure
-                right and the surface gets cheaper to change.
-              </div>
-            </li>
-            <li>
-              <span class="home-approach__principle-num">02</span>
-              <div>
-                <strong>Constraints are the brief.</strong>
-                Long-running stacks, real users, code that can't be torn
-                down. That's the actual design problem.
-              </div>
-            </li>
-            <li>
-              <span class="home-approach__principle-num">03</span>
-              <div>
-                <strong>AI is infrastructure, not a feature.</strong>
-                Prompts live in the system, scoped and budgeted. Same
-                inputs, consistent outputs. Repeatability over novelty.
-              </div>
-            </li>
-          </ul>
+        </div>
+        <div class="home-approach__col-r">
+          <p class="home-approach__body">
+            The way I think about all of it is the same. Read the
+            constraints first. Pick the structure carefully. Use AI
+            where it earns its place, not where it sounds impressive.
+          </p>
           <a
             href="/approach"
             class="home-approach__link"
@@ -110,38 +78,29 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
             data-track-cta="more-approach"
             data-track-loc="home-approach"
           >
-            More on the approach
+            Read more on how I work
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </a>
         </div>
-
-        {/* Real product artifact, not an abstract diagram —
-            audit fix: replace workflow strip with shipped pixels. */}
-        <div class="home-approach__art" data-reveal data-reveal-delay="3">
-          <VerdictCardMock />
-        </div>
       </div>
     </div>
   </section>
 
-  {/* Section 03 — Single CTA.
-      No inline form (the form is on /contact, no need to duplicate it). */}
+  {/* Single, plain CTA. No section number. */}
   <section class="home-contact" id="contact-cta">
     <div class="container-site">
       <div class="home-contact__card" data-reveal>
         <div class="home-contact__card-text">
-          <span class="home-contact__eyebrow">
-            <span class="section-index" aria-hidden="true">03</span>
-            Get in touch
-          </span>
+          <span class="home-contact__eyebrow">Contact</span>
           <h2 class="home-contact__title">
-            Open to hearing about projects<br />
-            and AI-native product work.
+            If you're putting something on the web,<br />
+            I'd like to hear about it.
           </h2>
           <p class="home-contact__sub">
-            Tell me what you're building. Replies usually within a day.
+            Contracts, advisory, or a half-hour conversation. Reply
+            within a day.
           </p>
         </div>
         <div class="home-contact__card-actions">
@@ -173,7 +132,6 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
 </BaseLayout>
 
 <style>
-  /* Selected work — comes first now */
   .home-work {
     padding-top: var(--space-12);
     padding-bottom: var(--space-16);
@@ -201,55 +159,34 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
   .home-work__eyebrow,
   .home-approach__eyebrow,
   .home-contact__eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
+    display: inline-block;
     font-family: var(--font-mono);
     font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
+    font-weight: 700;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--color-text-subtle);
     margin-bottom: var(--space-4);
   }
 
-  .section-index {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 28px;
-    height: 22px;
-    padding: 0 7px;
-    border-radius: 6px;
-    border: 1px solid var(--color-border);
-    background-color: var(--color-bg-elevated);
-    color: var(--color-accent);
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    line-height: 1;
-  }
-
   .home-work__title {
     font-family: var(--font-display);
-    font-size: clamp(36px, 5vw, 64px);
+    font-size: clamp(34px, 5vw, 56px);
     font-weight: 400;
-    letter-spacing: -0.028em;
-    line-height: 1.0;
+    letter-spacing: -0.022em;
+    line-height: 1.05;
     color: var(--color-text);
-    margin-bottom: var(--space-6);
+    margin-bottom: var(--space-5);
   }
 
   .home-work__lede {
     font-size: clamp(15px, 1.5vw, 17px);
     line-height: 1.65;
     color: var(--color-text-muted);
-    max-width: 56ch;
-    opacity: 0.92;
+    max-width: 60ch;
   }
 
-  /* Approach — single combined section (was: How I Work + Design Workflow) */
+  /* Approach teaser */
   .home-approach {
     padding-top: var(--space-16);
     padding-bottom: var(--space-16);
@@ -258,93 +195,41 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
 
   @media (min-width: 768px) {
     .home-approach {
-      padding-top: var(--space-32);
+      padding-top: var(--space-24);
       padding-bottom: var(--space-24);
     }
   }
 
-  .home-approach__head {
-    margin-bottom: var(--space-8);
-    max-width: 720px;
-  }
-
-  @media (min-width: 768px) {
-    .home-approach__head {
-      margin-bottom: var(--space-12);
-    }
-  }
-
-  .home-approach__title {
-    font-family: var(--font-display);
-    font-size: clamp(28px, 4vw, 52px);
-    font-weight: 400;
-    letter-spacing: -0.025em;
-    line-height: 1.05;
-    color: var(--color-text);
-    text-wrap: balance;
-  }
-
-  .home-approach__title em {
-    font-style: italic;
-    color: var(--color-accent);
-  }
-
-  .home-approach__grid {
+  .home-approach__inner {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--space-10);
-    align-items: start;
+    gap: var(--space-6);
   }
 
-  @media (min-width: 1024px) {
-    .home-approach__grid {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
-      gap: var(--space-16);
+  @media (min-width: 900px) {
+    .home-approach__inner {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-12);
+      align-items: start;
     }
   }
 
   .home-approach__lead {
-    font-size: clamp(16px, 1.6vw, 19px);
-    line-height: 1.6;
+    font-family: var(--font-display);
+    font-size: clamp(20px, 2.4vw, 28px);
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    line-height: 1.35;
     color: var(--color-text);
-    margin-bottom: var(--space-6);
-    max-width: 56ch;
+    max-width: 32ch;
   }
 
-  .home-approach__principles {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 var(--space-6);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-    max-width: 56ch;
-  }
-
-  .home-approach__principles li {
-    display: grid;
-    grid-template-columns: 32px 1fr;
-    gap: var(--space-3);
-    align-items: baseline;
-    font-size: clamp(14px, 1.4vw, 16px);
-    line-height: 1.65;
+  .home-approach__body {
+    font-size: clamp(15px, 1.5vw, 17px);
+    line-height: 1.7;
     color: var(--color-text-muted);
-  }
-
-  .home-approach__principle-num {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--color-accent);
-    letter-spacing: 0.04em;
-    padding-top: 2px;
-  }
-
-  .home-approach__principles strong {
-    color: var(--color-text);
-    font-weight: 600;
-    display: block;
-    margin-bottom: 2px;
+    max-width: 56ch;
+    margin-bottom: var(--space-5);
   }
 
   .home-approach__link {
@@ -365,30 +250,7 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
     border-bottom-color: var(--color-accent);
   }
 
-  .home-approach__art {
-    /* The verdict card mock has its own internal layout */
-  }
-
-  .home-approach__art :global(.verdict-mock) {
-    margin: 0;
-  }
-
-  .home-approach__art :global(.verdict-mock__head) {
-    display: none;
-  }
-
-  .home-approach__art :global(.verdict-mock__frame) {
-    grid-template-columns: 1fr;
-    gap: var(--space-6);
-  }
-
-  @media (min-width: 1024px) {
-    .home-approach__art :global(.verdict-mock__frame) {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  /* Contact CTA card — single, focused, no inline form */
+  /* Contact CTA card */
   .home-contact {
     padding-top: var(--space-12);
     padding-bottom: var(--space-16);
@@ -405,12 +267,11 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
   .home-contact__card {
     display: flex;
     flex-direction: column;
-    gap: var(--space-8);
+    gap: var(--space-7);
     padding: var(--space-7) var(--space-6);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-xl);
     background-color: var(--color-bg-elevated);
-    background-image: radial-gradient(ellipse 60% 70% at 100% 0%, var(--color-accent-dim), transparent 70%);
   }
 
   @media (min-width: 720px) {
@@ -436,7 +297,7 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
     letter-spacing: -0.02em;
     line-height: 1.2;
     color: var(--color-text);
-    max-width: 28ch;
+    max-width: 30ch;
   }
 
   .home-contact__sub {

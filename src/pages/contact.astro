@@ -25,8 +25,8 @@ const channels = [
 ---
 
 <BaseLayout
-  title="Contact Moe Qadan — Product Designer & UX Engineer"
-  description="Open to hearing about new projects, contracts, advisory, and conversations on AI-native product work. Replies within a day."
+  title="Contact Moe Qadan"
+  description="Open to hearing about projects. Contracts, advisory, or a half-hour conversation. Reply within a day."
   keywords={[
     'contact Moe Qadan',
     'product designer',
@@ -40,18 +40,17 @@ const channels = [
       <div class="contact__content">
         <div class="contact__status">
           <span class="contact__status-dot" aria-hidden="true"></span>
-          <span class="contact__status-text">Open to hearing about projects</span>
+          <span class="contact__status-text">Open to projects</span>
         </div>
 
         <h1 class="contact__title">
-          Open to hearing about<br />
-          interesting <em>projects</em>.
+          Tell me what you're building.
         </h1>
 
         <p class="contact__lede">
-          Contracts, advisory, or a 30-minute conversation about an
-          AI-native product you're shaping — all welcome. Tell me what
-          you're building and I'll reply within a day.
+          Contracts, advisory, or a half-hour conversation about
+          something on your roadmap. Reply within a day. Form below
+          works fine, or email me directly.
         </p>
 
         <div class="contact__form-wrap">
@@ -152,7 +151,7 @@ const channels = [
     font-family: var(--font-display);
     font-size: clamp(34px, 7vw, 60px);
     font-weight: 400;
-    letter-spacing: -0.025em;
+    letter-spacing: -0.022em;
     line-height: 1.05;
     color: var(--color-text);
     margin-bottom: var(--space-5);
@@ -163,11 +162,6 @@ const channels = [
     .contact__title {
       margin-bottom: var(--space-6);
     }
-  }
-
-  .contact__title em {
-    font-style: italic;
-    color: var(--color-accent);
   }
 
   .contact__lede {

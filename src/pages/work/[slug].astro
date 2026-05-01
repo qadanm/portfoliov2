@@ -28,11 +28,11 @@ const next = allProjects[(currentIndex + 1) % allProjects.length];
 
 const pageUrl = new URL(Astro.url.pathname, Astro.site);
 const ogImage = data.coverImage ? new URL(data.coverImage, Astro.site).toString() : undefined;
-const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
+const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
 ---
 
 <BaseLayout
-  title={`${data.title} — Case Study by Moe Qadan`}
+  title={`${data.title}, Case Study by Moe Qadan`}
   description={data.short}
   article={true}
   image={data.coverImage ?? '/og.png'}
@@ -190,8 +190,8 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
             <p class="cs__post-sub">
               The marketing site carries the same product premise into a
               public-facing surface. Same "verdict comes first" instinct,
-              same constraint thinking. Designed and built end to end —
-              visual exploration where it helped, hand-written code
+              same constraint thinking. Designed and built end to end.
+              Visual exploration where it helped, hand-written code
               everywhere else.
             </p>
           </header>
@@ -199,7 +199,7 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
             <figure class="cs__shot">
               <img
                 src="/images/chatobd2/longitudinal-intelligence.webp"
-                alt="ChatOBD2 marketing site — The only OBD app that learns your car over time. Vehicle health score and trend dashboard."
+                alt="ChatOBD2 marketing site: The only OBD app that learns your car over time. Vehicle health score and trend dashboard."
                 width="1440"
                 height="900"
                 loading="lazy"
@@ -212,7 +212,7 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
             <figure class="cs__shot">
               <img
                 src="/images/chatobd2/pricing-tiers.webp"
-                alt="ChatOBD2 pricing page — Free, Pro $9.99/mo, Elite $19.99/mo with feature lists."
+                alt="ChatOBD2 pricing page: Free, Pro $9.99/mo, Elite $19.99/mo with feature lists."
                 width="1440"
                 height="900"
                 loading="lazy"
@@ -237,14 +237,14 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
               cut and lower-priority sections only landing if budget
               remains. BLE adapter integration. Write operations with
               rollback. The dev surface is treated as a designed product,
-              not a wiki — same care as the user-facing app.
+              not a wiki. Same care as the user-facing app.
             </p>
           </header>
           <div class="cs__shot-grid cs__shot-grid--2">
             <figure class="cs__shot">
               <img
                 src="/images/chatobd2/context-budget.webp"
-                alt="ChatOBD2 context budget UI — 38,000 tokens assembled by priority across module sections like Vehicle identity, Behavioral rules, Diagnostic report, etc."
+                alt="ChatOBD2 context budget UI: 38,000 tokens assembled by priority across module sections like Vehicle identity, Behavioral rules, Diagnostic report, etc."
                 width="1440"
                 height="900"
                 loading="lazy"
@@ -257,7 +257,7 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
             <figure class="cs__shot">
               <img
                 src="/images/chatobd2/developer-portal.webp"
-                alt="ChatOBD2 developer portal — Under the Hood docs covering Quick Start, System Diagrams, Project Structure, Intelligence Engine, OBD Reference, Design System, Auth, Subscriptions, Edge Function, Mobile Design System."
+                alt="ChatOBD2 developer portal: Under the Hood docs covering Quick Start, System Diagrams, Project Structure, Intelligence Engine, OBD Reference, Design System, Auth, Subscriptions, Edge Function, Mobile Design System."
                 width="1440"
                 height="900"
                 loading="lazy"
@@ -289,17 +289,17 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
             <figure class="cs__shot">
               <img
                 src="/images/magtek/hardware-card-readers.webp"
-                alt="MagTek hardware page — Card readers for magstripe, EMV chip, and contactless NFC, with product photography."
+                alt="MagTek hardware page: Card readers for magstripe, EMV chip, and contactless NFC, with product photography."
                 width="1440"
                 height="900"
                 loading="lazy"
               />
-              <figcaption>Card readers — magstripe, EMV chip, contactless NFC.</figcaption>
+              <figcaption>Card readers, magstripe, EMV chip, contactless NFC.</figcaption>
             </figure>
             <figure class="cs__shot">
               <img
                 src="/images/magtek/hardware-oem-components.webp"
-                alt="MagTek hardware page — OEM card readers and components for embedded payment and access."
+                alt="MagTek hardware page: OEM card readers and components for embedded payment and access."
                 width="1440"
                 height="900"
                 loading="lazy"
@@ -309,7 +309,7 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
             <figure class="cs__shot">
               <img
                 src="/images/magtek/hardware-check-scanners.webp"
-                alt="MagTek hardware page — MICR readers and check scanners for retail and banking."
+                alt="MagTek hardware page: MICR readers and check scanners for retail and banking."
                 width="1440"
                 height="900"
                 loading="lazy"
@@ -319,7 +319,7 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
             <figure class="cs__shot">
               <img
                 src="/images/magtek/hardware-instant-issuance.webp"
-                alt="MagTek hardware page — Issuance and personalization hardware for every program."
+                alt="MagTek hardware page: Issuance and personalization hardware for every program."
                 width="1440"
                 height="900"
                 loading="lazy"
@@ -347,7 +347,7 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
             <h2 class="cs__post-title">A subsidiary that needed to feel its own.</h2>
             <p class="cs__post-sub">
               Magensa carries its own product identity inside the
-              MagTek family — gateway, eCommerce, tokenization, PIN
+              MagTek family: gateway, eCommerce, tokenization, PIN
               services, reader management. The brief was to keep it
               inside the family without making it feel like the same
               site with a recolored stripe.
@@ -357,7 +357,7 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
             <figure class="cs__shot">
               <img
                 src="/images/magtek/magensa-pin-services.webp"
-                alt="Magensa PIN Services page — Secure PIN Verification and Issuance, with Old Way vs Magensa Way comparison."
+                alt="Magensa PIN Services page: Secure PIN Verification and Issuance, with Old Way vs Magensa Way comparison."
                 width="1440"
                 height="900"
                 loading="lazy"
@@ -385,7 +385,7 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
           </div>
           <p class="cs__post-closing">
             The "Old Way / Magensa Way" comparison runs across the
-            product pages — a visual structure that carries the sales
+            product pages. A visual structure that carries the sales
             argument without paragraphs of marketing copy. The
             subsidiary feels like its own product because it is one,
             and the design treats it that way.
@@ -402,18 +402,18 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
             <span class="cs__post-eyebrow">Earning trust through content</span>
             <h2 class="cs__post-title">Two surfaces that do the convincing.</h2>
             <p class="cs__post-sub">
-              A group-decision product has to feel calm and credible
-              before anyone installs it. The marketing site does that
-              with two content surfaces — a live matches feed that
-              shows the product in motion, and a curated guide section
-              sourced from Reddit threads.
+              A group-decision product has to feel low-friction before
+              anyone installs it. The marketing site does that with two
+              content surfaces. A live matches feed that shows the
+              product in motion. A curated guide section sourced from
+              Reddit threads.
             </p>
           </header>
           <div class="cs__shot-grid cs__shot-grid--2">
             <figure class="cs__shot">
               <img
                 src="/images/sawa/live-matches.webp"
-                alt="Sawa marketing site — Matches Happening Now. A live grid of group dining matches with location, headline, swipe count, and time stamps."
+                alt="Sawa marketing site: Matches Happening Now. A live grid of group dining matches with location, headline, swipe count, and time stamps."
                 width="1440"
                 height="900"
                 loading="lazy"
@@ -427,7 +427,7 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
             <figure class="cs__shot">
               <img
                 src="/images/sawa/city-guides.webp"
-                alt="Sawa City Food Guides — Real recommendations from real locals, powered by Reddit. Filter pills for All Cities, NYC, Los Angeles, Honolulu, Seattle."
+                alt="Sawa City Food Guides: real recommendations from real locals, powered by Reddit. Filter pills for All Cities, NYC, Los Angeles, Honolulu, Seattle."
                 width="1440"
                 height="900"
                 loading="lazy"
@@ -457,7 +457,7 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
             <figure class="cs__shot">
               <img
                 src="/images/sawa/article.webp"
-                alt="Sawa article page — The Apple Pan, Los Angeles, CA (Since 1947). Restaurant feature with hero photography, tags, date, and editorial body."
+                alt="Sawa article page: The Apple Pan, Los Angeles, CA (Since 1947). Restaurant feature with hero photography, tags, date, and editorial body."
                 width="1440"
                 height="900"
                 loading="lazy"
@@ -471,7 +471,7 @@ const ogAlt = data.coverAlt ?? `${data.title} — case study by Moe Qadan.`;
             <figure class="cs__shot">
               <img
                 src="/images/sawa/download-cta.webp"
-                alt="Sawa final CTA section — Ready to End the Food Fight? With an SMS download form."
+                alt="Sawa final CTA section: Ready to End the Food Fight? With an SMS download form."
                 width="1440"
                 height="900"
                 loading="lazy"

@@ -1,13 +1,13 @@
 ---
 title: Sawa
-short: Marketing site for an iMessage-native group dining app — turning "idk, you pick" into matched plans
+short: Marketing site for an iMessage-native group dining app, where the install path is one number long
 category: Product
 keyFocus:
   - Marketing site
   - Content as proof
   - Frontend in Tailwind
 role: Marketing site design & frontend
-period: Past
+period: '2024'
 status: Live
 scope: Marketing site, content surface, install path
 outcomes:
@@ -25,33 +25,29 @@ placeholder:
   angle: 135
   labelTone: light
 coverImage: /images/sawa/hero.webp
-coverAlt: Sawa marketing site hero — "idk, you pick" with a phone mockup of a matched restaurant card.
+coverAlt: Sawa marketing site hero, "idk, you pick" with a phone mockup of a matched restaurant card.
 featured: false
 order: 3
 ---
 
+## The brief
+
+Sawa is a group-decision app for dining. The challenge isn't finding restaurants. There are too many. The challenge is getting four people who all said "idk, you pick" to actually pick.
+
+The marketing site had one job: introduce the product without adding any friction the product itself doesn't have. Tone alignment. The site has to feel like the app feels.
+
 ## What I worked on
 
-Sawa's marketing site and content structure. Not the app itself — that's a separate product team.
+The marketing surface and the content structure. The app itself is built by a different team.
 
-The brief was tone alignment: carry the same calm, lightweight feel from the app into the surface that introduces it. The first impression has to match what using Sawa actually feels like, which means the site has to be as low-friction as the thing it's selling.
+## Two decisions that mattered
 
-## The premise
+**Content as proof, not promises.** A live matches feed shows the product in motion. Real squads, real restaurants, real time. Saying "trust us" is the move of a product that doesn't have anything to show. Sawa does. So the site shows it.
 
-Sawa is a group-decision app for dining. The challenge isn't finding options — there are too many. The challenge is getting people to agree.
+The City Food Guides section is sourced from Reddit threads, with attribution kept intact. Editorial-feeling pages, but the source material is real recommendations from people who actually live in the city. Curation as proof that the app is built around real places, not just a swipe mechanic.
 
-The app is built around three things: reducing friction in group decisions, simplifying interaction, keeping flows lightweight. A group-decision product fails the moment it asks people to do work. Every extra tap is a place where someone drops out and the group breaks.
+**One-number install path.** No account creation. No profile setup before the user has seen the value. SMS in, app link out. A friction-heavy install path for a friction-killing product would have undone everything the product surface was trying to communicate.
 
-The marketing site has to mirror that.
+## Stack notes
 
-## Two decisions that shaped the site
-
-**Content as proof, not promises.** A live matches feed shows the product in motion — real squads, real restaurants, real time — instead of saying "trust us". A curated City Food Guides section sources from Reddit threads with attribution kept intact, so the site reads as built around real places, not just a swipe mechanic.
-
-**One-number install path.** No account creation, no profile setup before the user has seen the value. SMS in, app link out. Friction in onboarding is friction in the product itself.
-
-## The shape of the site
-
-Hero, live matches feed, city guides, long-form restaurant articles, install path. Each piece earns SEO surface, builds brand surface, and leads the same reader into the same install prompt at the bottom.
-
-Tailwind across the whole thing, kept close to the underlying component system so the marketing surface stayed cheap to evolve.
+Next.js, Tailwind, content-driven city guides, hand-built layouts. Marketing surface stayed close to the product's component vocabulary, so any future cross-pollination wouldn't require a translation layer.

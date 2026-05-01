@@ -4,12 +4,13 @@ import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
 ---
 
 <BaseLayout
-  title="Approach — How Moe Qadan designs and builds"
-  description="The methodology. AI as production infrastructure, not a feature. Prompt engineering as system, not chat. Claude, Cursor, and Claude Design selected by task. The codebase is the source of truth."
+  title="How Moe Qadan works"
+  description="The way I think about UX, frontend, design systems, AI-assisted prototyping, and platforms that already exist. Direct version: read the constraints, get the structure right, use AI where it earns its place."
   keywords={[
     'Moe Qadan',
     'design approach',
     'design engineering',
+    'UX engineering',
     'AI-assisted design',
     'prompt engineering',
     'design systems',
@@ -23,126 +24,158 @@ import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
     <div class="apr__hero">
       <div class="container-site">
         <span class="apr__eyebrow">Approach</span>
-        <h1 class="apr__title">
-          The model is one stage.<br />The <em>system</em> is the product.
-        </h1>
+        <h1 class="apr__title">How I work.</h1>
         <p class="apr__subtitle">
-          Most of my work isn't building from scratch. It's stepping
-          into what already exists and making it better. AI runs
-          through it as production infrastructure, not a feature you
-          flip on.
+          The short version. The long version is the rest of this page.
         </p>
       </div>
     </div>
 
     <div class="container-site apr__body">
-      <section class="apr__section" data-reveal>
-        <h2 class="apr__h2">Three principles</h2>
-        <ol class="apr__principles">
-          <li>
-            <span class="apr__principle-num">01</span>
-            <div>
-              <strong class="apr__principle-title">Systems before surfaces.</strong>
-              <p class="apr__principle-desc">
-                A page is a render of something deeper. Get the
-                underlying structure right and the surface gets cheaper
-                to change.
-              </p>
-            </div>
-          </li>
-          <li>
-            <span class="apr__principle-num">02</span>
-            <div>
-              <strong class="apr__principle-title">Constraints are the brief.</strong>
-              <p class="apr__principle-desc">
-                Long-running stacks. Real users. Code that can't be torn
-                down. Those aren't obstacles; they're the actual design
-                problem.
-              </p>
-            </div>
-          </li>
-          <li>
-            <span class="apr__principle-num">03</span>
-            <div>
-              <strong class="apr__principle-title">AI is infrastructure, not a feature.</strong>
-              <p class="apr__principle-desc">
-                Prompts live in the system, scoped to context, versioned,
-                and budgeted. Same inputs, consistent outputs. The point
-                is repeatability, not novelty.
-              </p>
-            </div>
-          </li>
-        </ol>
+      {/* Lead — discursive, not symmetrical */}
+      <section class="apr__section apr__section--lead" data-reveal>
+        <p class="apr__lead">
+          Most of what I'm hired to do is repair. A platform that grew
+          without a system. A site that ranks well and converts badly.
+          A frontend that looks fine in Chrome and falls apart on iOS
+          15. AI tooling that demos beautifully and has nowhere to live
+          in the codebase. Greenfield work happens, but it's the
+          minority. The skill that matters more is reading what's
+          already there before changing any of it.
+        </p>
+
+        <p class="apr__para">
+          That's a long way of saying I'm a senior generalist. UX,
+          frontend, design systems, content architecture, SEO,
+          performance, accessibility, AI-assisted prototyping. Whichever
+          subset the work needs, on whatever platform the company runs
+          on. The skills sit in one head, so the tradeoffs between them
+          get made in one head, which tends to ship faster and cleaner
+          than handoff loops between three specialists.
+        </p>
       </section>
 
       <hr class="apr__rule" />
 
+      {/* What I actually do, day to day */}
       <section class="apr__section" data-reveal>
-        <h2 class="apr__h2">AI as production infrastructure</h2>
+        <h2 class="apr__h2">A normal week</h2>
         <p class="apr__para">
-          ChatOBD2 is the clearest example. Six deterministic reasoning
-          layers run before every model call. The system prompt is
-          composed per scan from a 38,000-token budget — P0 sections
-          always make the cut; lower-priority sections only land if
-          budget remains. Prompts are keyed by verdict tier and code
-          context, not scattered across components.
+          Concretely, the recurring work in any given week looks
+          something like this.
         </p>
+
+        <ul class="apr__bullets">
+          <li>Modify a Razor partial that's used in fifty places, knowing the typed ViewModel will surface every consumer that needs to update.</li>
+          <li>Argue for a slower header hero against the "but the carousel is what marketing wants" reflex, and sequence the migration so the analytics taxonomy doesn't go dark.</li>
+          <li>Open a hand-authored CSS file, find the spacing token that's almost right but not quite, decide whether to add a new token or stretch the existing one. Most of the time it's stretch.</li>
+          <li>Write a prompt module for ChatOBD2 that lives in the system, not in a component. Version it. Budget it inside the 38,000-token system prompt assembly.</li>
+          <li>Read a Figma file someone handed off. Notice the spacing they almost got right. Translate it into production at fidelity, while quietly fixing the spacing.</li>
+          <li>Run Lighthouse, watch the LCP regress when a marketing team drops a hero image, find a workable compromise that keeps both groups happy.</li>
+          <li>Ship something into production that nobody but me will notice. Watch the bug board not light up.</li>
+        </ul>
+      </section>
+
+      <hr class="apr__rule" />
+
+      {/* AI in the work — concrete, not slogans */}
+      <section class="apr__section" data-reveal>
+        <h2 class="apr__h2">How AI actually fits in</h2>
+
         <p class="apr__para">
-          The model gets a structured spec, not a chat. That's what
-          makes the output repeatable, the analytics coherent, and the
-          system inspectable. A human owns every decision that ships.
+          Two places: in the products I ship, and in the way I build
+          them.
+        </p>
+
+        <p class="apr__para">
+          <strong>In the products.</strong> ChatOBD2 is the worked
+          example. Vehicle data flows through six deterministic
+          reasoning layers before any model call. The system prompt is
+          composed per scan from a 38,000-token budget, with priority
+          tiers that decide what stays in and what gets dropped if
+          there's not enough room. Prompts live in a single module,
+          keyed by verdict tier and code context, so a copy change is
+          one file edit, not a hunt across the components that happen
+          to render that text. Outputs are schema-bound, which means
+          the rendering layer can stop apologizing for the model.
         </p>
 
         <div class="apr__art" data-reveal>
-          <span class="apr__art-caption">From inputs to verdict — ChatOBD2 product surface</span>
+          <span class="apr__art-caption">ChatOBD2 verdict surface</span>
           <VerdictCardMock />
         </div>
+
+        <p class="apr__para">
+          <strong>In the build.</strong> Claude and Cursor handle code
+          work. Either one. The choice is contextual, not by role.
+          Figma stays for precision and design-system maintenance.
+          Claude Design comes in for visual exploration when a frame is
+          faster to reason about than markup. None of this is fancy.
+          The codebase is the source of truth across all of them; the
+          tools are interchangeable, the system isn't.
+        </p>
+
+        <p class="apr__para">
+          What I don't do is treat AI as the product. The model is one
+          stage in a structured pipeline; a human still owns every
+          decision that ships. The point is repeatability, not novelty.
+        </p>
       </section>
 
       <hr class="apr__rule" />
 
+      {/* What I bring to a team */}
       <section class="apr__section" data-reveal>
-        <h2 class="apr__h2">Tools, picked by task</h2>
+        <h2 class="apr__h2">What I'm best at on a team</h2>
+
+        <ul class="apr__bullets">
+          <li><strong>Owning the whole web experience for a team that doesn't have a department for it.</strong> One person carrying UX, the design system, the frontend, the content model, the SEO graph, and the perf budget. Most teams under-invest in this generalist; it's where I add the most.</li>
+          <li><strong>Modernizing a platform that can't be rewritten.</strong> Long-running stacks have opinions. I read those first, plan around them, and ship in increments that don't require a flag day.</li>
+          <li><strong>Building systems engineers actually use.</strong> Typed components. Tokens. Layout primitives. Real consumers from day one. No big-bang library that ships into a vacuum.</li>
+          <li><strong>Sitting between design and engineering and unblocking both.</strong> I read intent, not just specs. Most production breakage lives in the gap a handoff doesn't see.</li>
+          <li><strong>Prototyping with AI without losing taste.</strong> Faster from concept to shipped, without outsourcing judgment.</li>
+        </ul>
+      </section>
+
+      <hr class="apr__rule" />
+
+      {/* Tools, plain */}
+      <section class="apr__section" data-reveal>
+        <h2 class="apr__h2">Tools I reach for</h2>
         <p class="apr__para">
-          Most of the work happens in code, against the components and
-          tokens the product is built from. The tool is selected by what
-          the task actually needs:
+          The default stack changes per project. The judgment about
+          which tool to use for which job stays the same.
         </p>
 
         <ul class="apr__tools">
           <li>
             <span class="apr__tool-name">Claude</span>
-            <span class="apr__tool-role">Reasoning, code generation, refactoring across a codebase. Default for non-trivial work.</span>
+            <span class="apr__tool-role">Code work and reasoning. The default for non-trivial refactors and anything that needs to think across more than one file.</span>
           </li>
           <li>
             <span class="apr__tool-name">Cursor</span>
-            <span class="apr__tool-role">Local iteration in the editor. Same code work, different interaction style.</span>
+            <span class="apr__tool-role">Local iteration. Same code work as Claude, different interaction model. Whichever is faster on the task at hand.</span>
           </li>
           <li>
             <span class="apr__tool-name">Figma</span>
-            <span class="apr__tool-role">Precision work, design-system maintenance, handoff fidelity.</span>
+            <span class="apr__tool-role">Precision design, component-system maintenance, handoff fidelity, and the occasional client review.</span>
           </li>
           <li>
             <span class="apr__tool-name">Claude Design</span>
-            <span class="apr__tool-role">Visual exploration when reasoning is faster in a frame than in code. Output lands back in the codebase.</span>
+            <span class="apr__tool-role">Visual exploration when a frame is faster to think in than code. Output lands back in the codebase.</span>
           </li>
         </ul>
-
-        <p class="apr__para apr__para--note">
-          The codebase is the source of truth across all of them. Tools
-          are interchangeable; the system isn't.
-        </p>
       </section>
 
       <hr class="apr__rule" />
 
+      {/* Across the work */}
       <section class="apr__section" data-reveal>
         <h2 class="apr__h2">Across the work</h2>
         <p class="apr__para">
-          Different products, different surfaces, different tools — but
-          the same loop: understand the constraint, structure the
-          intent, ship into a real system, hold the result to a
-          product-quality bar.
+          Different companies, different stacks, the same question
+          underneath: how do I move this surface from where it is to
+          where it should be without breaking what's already running.
         </p>
 
         <div class="apr__work-grid">
@@ -155,8 +188,9 @@ import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
               loading="lazy"
             />
             <figcaption>
-              <strong>ChatOBD2</strong> — AI-native diagnostics, designed and engineered solo.
-              <a href="/work/chatobd2">Read the case study →</a>
+              <strong>ChatOBD2.</strong> AI-native diagnostics, designed
+              and engineered solo.
+              <a href="/work/chatobd2">Case study</a>
             </figcaption>
           </figure>
           <figure class="apr__work-shot">
@@ -168,21 +202,23 @@ import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
               loading="lazy"
             />
             <figcaption>
-              <strong>MagTek</strong> — UX systems and frontend across an enterprise platform.
-              <a href="/work/magtek-platform">Read the case study →</a>
+              <strong>MagTek.</strong> Web experience across a multi-site
+              platform on a long-running ASP.NET MVC stack.
+              <a href="/work/magtek-platform">Case study</a>
             </figcaption>
           </figure>
           <figure class="apr__work-shot">
             <img
               src="/images/sawa/hero.webp"
-              alt="Sawa marketing hero — 'idk, you pick' with phone mockup of a matched restaurant card."
+              alt="Sawa marketing hero with phone mockup of a matched restaurant card."
               width="1440"
               height="900"
               loading="lazy"
             />
             <figcaption>
-              <strong>Sawa</strong> — marketing site for an iMessage-native group dining app.
-              <a href="/work/sawa">Read the case study →</a>
+              <strong>Sawa.</strong> Marketing site for an iMessage-native
+              group dining app.
+              <a href="/work/sawa">Case study</a>
             </figcaption>
           </figure>
           <figure class="apr__work-shot">
@@ -194,8 +230,9 @@ import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
               loading="lazy"
             />
             <figcaption>
-              <strong>Advisor platforms</strong> — multi-tenant frontend across major institutions.
-              <a href="/work/financial-platforms">Read the case study →</a>
+              <strong>Advisor portals.</strong> Multi-tenant frontend
+              across 50+ wealth and banking institutions at InvestCloud.
+              <a href="/work/financial-platforms">Case study</a>
             </figcaption>
           </figure>
         </div>
@@ -225,7 +262,7 @@ import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
     font-family: var(--font-mono);
     font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--color-text-subtle);
     margin-bottom: var(--space-4);
@@ -233,7 +270,7 @@ import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
 
   .apr__title {
     font-family: var(--font-display);
-    font-size: clamp(36px, 8vw, 72px);
+    font-size: clamp(40px, 9vw, 80px);
     font-weight: 400;
     letter-spacing: -0.025em;
     line-height: 1.05;
@@ -242,15 +279,10 @@ import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
     margin-bottom: var(--space-5);
   }
 
-  .apr__title em {
-    font-style: italic;
-    color: var(--color-accent);
-  }
-
   .apr__subtitle {
-    font-size: clamp(16px, 1.7vw, 19px);
+    font-size: clamp(15px, 1.5vw, 17px);
     line-height: 1.6;
-    color: var(--color-text-muted);
+    color: var(--color-text-subtle);
     max-width: 60ch;
   }
 
@@ -281,6 +313,10 @@ import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
     gap: var(--space-5);
   }
 
+  .apr__section--lead {
+    gap: var(--space-6);
+  }
+
   .apr__h2 {
     font-family: var(--font-display);
     font-size: clamp(24px, 3vw, 36px);
@@ -291,6 +327,16 @@ import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
     margin-bottom: var(--space-3);
   }
 
+  .apr__lead {
+    font-family: var(--font-display);
+    font-size: clamp(20px, 2.4vw, 26px);
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    line-height: 1.4;
+    color: var(--color-text);
+    max-width: 60ch;
+  }
+
   .apr__para {
     font-size: clamp(15px, 1.5vw, 17px);
     line-height: 1.75;
@@ -298,70 +344,46 @@ import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
     max-width: 64ch;
   }
 
-  .apr__para--note {
-    font-size: 14px;
-    color: var(--color-text-subtle);
-    padding: var(--space-3) var(--space-4);
-    border-left: 2px solid var(--color-border);
-    background-color: var(--color-bg-muted);
-    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  .apr__para strong {
+    color: var(--color-text);
+    font-weight: 600;
   }
 
-  .apr__principles {
-    counter-reset: apr-principles;
+  .apr__bullets {
     list-style: none;
     padding: 0;
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--space-5);
+    gap: var(--space-3);
+    max-width: 66ch;
   }
 
-  .apr__principles li {
-    display: grid;
-    grid-template-columns: 36px 1fr;
-    gap: var(--space-4);
-    align-items: baseline;
-    padding: var(--space-5);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    background-color: var(--color-bg-elevated);
-  }
-
-  @media (min-width: 600px) {
-    .apr__principles li {
-      padding: var(--space-6) var(--space-7);
-    }
-  }
-
-  .apr__principle-num {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--color-accent);
-    letter-spacing: 0.04em;
-    padding-top: 2px;
-  }
-
-  .apr__principle-title {
-    display: block;
-    font-family: var(--font-display);
-    font-size: clamp(18px, 2vw, 22px);
-    font-weight: 400;
-    letter-spacing: -0.015em;
-    color: var(--color-text);
-    margin-bottom: var(--space-2);
-  }
-
-  .apr__principle-desc {
-    margin: 0;
-    font-size: clamp(14px, 1.4vw, 16px);
-    line-height: 1.65;
+  .apr__bullets li {
+    position: relative;
+    padding-left: 24px;
+    font-size: clamp(15px, 1.5vw, 17px);
+    line-height: 1.7;
     color: var(--color-text-muted);
   }
 
+  .apr__bullets li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.7em;
+    width: 12px;
+    height: 1px;
+    background-color: var(--color-accent);
+  }
+
+  .apr__bullets strong {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
   .apr__art {
-    margin-top: var(--space-6);
+    margin: var(--space-4) 0;
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
@@ -371,7 +393,7 @@ import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
     font-family: var(--font-mono);
     font-size: 11px;
     font-weight: 600;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--color-text-subtle);
   }

@@ -8,8 +8,8 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
 ---
 
 <BaseLayout
-  title="Work — Selected projects by Moe Qadan"
-  description="Selected work across product design, UX engineering, frontend systems, platform-scale work, and AI-native products. ChatOBD2, MagTek Platform, Sawa, and advisor platforms across 50+ institutions at InvestCloud."
+  title="Work, Moe Qadan"
+  description="Selected work. ChatOBD2, MagTek's multi-site platform, the Sawa marketing site, and advisor portals deployed across 50+ wealth and banking institutions at InvestCloud."
   keywords={[
     'Moe Qadan',
     'portfolio',
@@ -25,17 +25,15 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
   <div class="work-index">
     <header class="work-index__hero">
       <div class="container-site">
-        <span class="work-index__eyebrow">
-          <span class="eyebrow__index">W</span>
-          Work
-        </span>
+        <span class="work-index__eyebrow">Work</span>
         <h1 class="work-index__title">
-          Selected work — products,<br />platforms, AI <em>systems</em>.
+          Four shipped projects.
         </h1>
         <p class="work-index__lede">
-          A flagship AI product, a multi-site enterprise platform, and
-          advisor tools deployed across major wealth institutions. Each
-          one shipped, each one live.
+          ChatOBD2, MagTek's multi-site platform, the Sawa marketing
+          site, and the InvestCloud portal work. All in production. All
+          have traffic. The case studies below cover the constraint, the
+          decision, the tradeoff, and what landed.
         </p>
       </div>
     </header>
@@ -63,13 +61,11 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
   }
 
   .work-index__eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
+    display: inline-block;
     font-family: var(--font-mono);
     font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
+    font-weight: 700;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--color-text-subtle);
     margin-bottom: var(--space-4);
@@ -86,16 +82,11 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
     max-width: 18ch;
   }
 
-  .work-index__title em {
-    font-style: italic;
-    color: var(--color-accent);
-  }
-
   .work-index__lede {
     font-size: clamp(15px, 1.5vw, 17px);
     line-height: 1.7;
     color: var(--color-text-muted);
-    max-width: 60ch;
+    max-width: 62ch;
   }
 
   .work-index__body {

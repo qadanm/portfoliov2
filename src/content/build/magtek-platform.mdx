@@ -1,6 +1,6 @@
 ---
 title: MagTek Platform
-short: UX systems and frontend architecture across a multi-site enterprise platform
+short: UX and frontend systems across a multi-site enterprise platform built on a long-running ASP.NET MVC stack
 category: Platform
 keyFocus:
   - Platform-level UX
@@ -8,7 +8,7 @@ keyFocus:
   - System evolution under constraints
 role: UX engineering & frontend systems
 period: Current
-status: Live · ongoing
+status: Live, ongoing
 scope: ~11 sites on shared platform, ~85% of frontend ownership
 outcomes:
   - label: Sites on shared platform
@@ -27,7 +27,7 @@ placeholder:
   angle: 135
   labelTone: dark
 coverImage: /images/magtek/homepage.webp
-coverAlt: MagTek homepage — "Secure Transactions. More than just payments." with metric story ($11B processed annually, 1.8s transaction speed, 99.9% uptime) and a photo of a collaborating team.
+coverAlt: MagTek homepage. "Secure Transactions. More than just payments." Metric story showing $11B processed annually, 1.8s transaction speed, 99.9% uptime, with a photo of a collaborating team.
 featured: true
 order: 2
 engagement: work
@@ -44,17 +44,15 @@ stack:
 
 ## The setting
 
-Most engineering case studies are about greenfield. This isn't.
+Most engineering case studies are about greenfield. This isn't one.
 
-I operate across most of MagTek's web platform: MagTek.com and a network of related sites built on the same architecture. The platform is a long-running ASP.NET MVC system that can't be rewritten. It has to be understood, stabilized, and evolved in place.
-
-You can't brute-force improvements in a system like this. You have to work with it.
+I operate across most of MagTek's web platform: MagTek.com and a network of related sites built on the same architecture. The platform is a long-running ASP.NET MVC system that can't be rewritten. It has to be understood, stabilized, and evolved in place. That's the actual job.
 
 ## What "platform-level" actually means
 
 A single change has to land across more than one product surface without breaking the others. The design problem is rarely "this page". It's "this pattern, applied to every page that already exists, and every page that doesn't yet."
 
-Specifically:
+In practice that means:
 
 - A shared component library on Razor partials. Detailed below.
 - A rebuilt CSS foundation that scales as a real design system instead of a stylesheet that ages with the platform.
@@ -65,43 +63,43 @@ A lot of the most valuable work is invisible when it's done right. The change yo
 
 ## A component library on Razor partials
 
-ASP.NET MVC doesn't ship a native component model. Razor partials do — the trick is treating them as components instead of as include directives.
+ASP.NET MVC doesn't ship a native component model. Razor partials do, if you treat them as components instead of as include directives.
 
 The library now sits at **100+ shared components**: primitives (button, card, badge, breadcrumb, sticky sub-nav), content blocks (hero, metric row, comparison table, feature grid, callout), and layout shells (page chrome, product-page templates).
 
 Each one is:
 
 - **Modular.** One responsibility per partial. The card is the card. The hero is the hero. Nothing knows about anything it doesn't have to.
-- **Strongly-typed.** Every partial declares a ViewModel, so calling it from a Razor view is type-checked, the parameters are visible to IntelliSense, and a missing required field is a build error — not a runtime surprise.
-- **Dynamic.** Partials take parameters, render conditional regions, and compose with each other. A hero can wrap a CTA component which wraps a button component, and the consuming view gets the typed contract for the whole stack.
-- **Reusable.** The same hero partial drives the homepage, every product category page, the support portal landing, and Magensa's surfaces — once with brand variants, once with structural variants, never duplicated in markup.
+- **Strongly-typed.** Every partial declares a ViewModel. Calling it from a Razor view is type-checked, the parameters are visible to IntelliSense, and a missing required field is a build error rather than a runtime surprise.
+- **Dynamic.** Partials take parameters, render conditional regions, and compose. A hero can wrap a CTA component which wraps a button component, and the consuming view gets the typed contract for the whole stack.
+- **Reusable.** The same hero partial drives the homepage, every product category page, the support portal landing, and Magensa's surfaces. Once with brand variants, once with structural variants, never duplicated in markup.
 
 That's where the "single change lands across many pages" property comes from. Updating the spacing on the hero updates ~30 surfaces at once. Renaming a CTA prop is a compile-time error in every consumer until it's fixed. The platform stops behaving like a stack of bespoke pages and starts behaving like a system.
 
-Most of the work was less about authoring new components than about extracting them carefully — finding the patterns already in the codebase, hoisting them into partials with sensible defaults, then migrating consumers without touching production traffic. A library you can't migrate to safely is just another stylesheet.
+Most of the work was less about authoring new components and more about extracting them carefully. Finding the patterns already in the codebase, hoisting them into partials with sensible defaults, then migrating consumers without touching production traffic. A library you can't migrate to safely is just another stylesheet.
 
 ## Modernization at the system level
 
 The work isn't a page. It's the platform.
 
-Every public surface across MagTek and the related sites — every product page, every category page, every subsidiary site, every form, every header, every footer, every navigation pattern — runs on the components, tokens, layout primitives, and conventions I built and own. The leverage compounds: a change at the system level propagates everywhere at once. A new visual treatment lands across the whole platform without a single per-page edit. A renamed prop is a compile-time error in every consumer until it's fixed.
+Every public surface across MagTek and the related sites runs on the components, tokens, layout primitives, and conventions I built and own. A change at the system level propagates everywhere at once. A new visual treatment lands across the whole platform without a single per-page edit. A renamed prop is a compile-time error in every consumer until it's fixed.
 
-What that looks like, mechanically:
+Mechanically:
 
-- **CSS rebuilt as a real design system.** Spacing, color, type, radius, shadow, motion — all pulled into tokens. Surfaces adopt them incrementally, on their own timeline. No flag day, no rewrite, just compounding consistency as each surface migrates.
+- **CSS rebuilt as a real design system.** Spacing, color, type, radius, shadow, motion, all pulled into tokens. Surfaces adopt them incrementally on their own timeline. No flag day, no rewrite, just compounding consistency as each surface migrates.
 - **Layout primitives instead of bespoke layouts.** A small set of layout shells (page chrome, content rails, sticky sub-nav scaffolds, card grids) replaces a long tail of one-off CSS. The same shells run the marketing surfaces, the product line, the subsidiary brand, the support portal, the developer pages.
-- **Navigation grammar that travels.** Header behavior on scroll, breadcrumbs, sticky horizontal sub-navs, mobile drawers — built once, used everywhere, behaving consistently across properties that were never originally designed to share an identity.
+- **Navigation grammar that travels.** Header behavior on scroll, breadcrumbs, sticky horizontal sub-navs, mobile drawers. Built once, used everywhere, behaving consistently across properties that were never originally designed to share an identity.
 - **Type contracts at the boundary.** Every shared component declares a ViewModel; every consumer is type-checked at build. The platform stops absorbing the cost of typos and missing fields at runtime.
-- **Pattern systems, not pages.** Comparison rows ("Old Way / vendor's way"), metric stories, callouts, feature grids, hero variants, CTA blocks — designed as system-level patterns the partials make trivial to drop in, so the same argument can render in dozens of places without copy-paste.
-- **Migration as a first-class concern.** Most of the actual hours go into the work no one sees: extracting patterns from existing markup safely, hoisting them into partials with sensible defaults, then routing consumers over without breaking production traffic. A library you can't migrate to safely is just another stylesheet.
-- **SEO, analytics, and redirect choreography.** Internal links, sitemap entries, structured-data hooks, event taxonomies, 301 maps — all sequenced so crawlers, dashboards, and downstream tools never see a discontinuity even while the system changes underneath them.
+- **Pattern systems, not pages.** Comparison rows ("Old Way / vendor's way"), metric stories, callouts, feature grids, hero variants, CTA blocks. Designed as system-level patterns the partials make trivial to drop in, so the same argument can render in dozens of places without copy-paste.
+- **Migration as a first-class concern.** Most of the actual hours go into the work no one sees: extracting patterns from existing markup safely, hoisting them into partials with sensible defaults, then routing consumers over without breaking production traffic.
+- **SEO, analytics, and redirect choreography.** Internal links, sitemap entries, structured-data hooks, event taxonomies, 301 maps, all sequenced so crawlers, dashboards, and downstream tools never see a discontinuity even while the system changes underneath them.
 - **Performance discipline.** Asset budgets, render-path attention, image strategy, JS reduced to where it earns its keep. The platform serves real customers on real connections; "feels fast" is a system property, not a per-page polish step.
 
-The screenshots that follow show what this looks like landed on specific surfaces. But the surfaces aren't the work. The system is the work. The surfaces are what the system produces.
+The screenshots that follow show what this looks like landed on specific surfaces. The surfaces aren't the work, though. The system is the work. The surfaces are what the system produces.
 
-## Working with constraints, not against them
+## Working with constraints
 
-Long-running systems develop strong opinions about how they want to be changed. Ignoring those opinions is how outages happen. Listening to them is how you ship things that survive.
+Long-running systems have opinions about how they want to be changed. Ignoring those opinions is how outages happen. Listening to them is how you ship things that survive.
 
 One example. The homepage hero ran a six-slide rotating carousel that nobody finished. The straight design call was killing the slider and replacing it with a static hero on a single message. The harder problem was around it: the half-dozen marketing surfaces sized to the carousel's dimensions, the analytics taxonomy that named events by slide number, the stakeholders who'd argued for "their" slide. The work was sequencing it. Build the static hero on a parallel route first, run it as a measurable comparison against the live page, migrate the dependent surfaces one at a time, then retire the carousel last so nothing pointed at a dead artifact.
 
@@ -110,7 +108,7 @@ The design decision was a single static hero with one message. The harder design
 Other work that mattered most:
 
 - Replacing a cluster of one-off layouts with a small set of layout primitives, without touching production traffic.
-- Moving spacing, color, and type into tokens that the rest of the platform could adopt incrementally, on its own timeline.
+- Moving spacing, color, and type into tokens that the rest of the platform could adopt incrementally on its own timeline.
 - Sequencing navigation changes so internal links, SEO, and analytics didn't drift during the transition.
 
 None of this is glamorous. All of it compounds.

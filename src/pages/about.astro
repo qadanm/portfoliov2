@@ -3,17 +3,17 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
 ---
 
 <BaseLayout
-  title="About Moe Qadan — Product Designer & UX Engineer"
-  description="Designing and shipping product end to end. Currently: ChatOBD2 (AI-native diagnostics) and the MagTek platform. Previously: contributed to or led 0-to-production deploys for advisor portals across 50+ wealth and banking institutions at InvestCloud."
+  title="About Moe Qadan"
+  description="Senior UX and frontend practitioner in Los Angeles. Currently leading web experience at MagTek. Shipping ChatOBD2 solo. Previously deployed advisor portals at InvestCloud across 50+ wealth and banking institutions."
   keywords={[
     'Moe Qadan',
     'about',
-    'product designer',
     'UX engineer',
-    'design engineer',
+    'senior frontend',
+    'web experience',
+    'design systems',
     'background',
     'experience',
-    'AI-native systems',
   ]}
 >
   <div class="about">
@@ -21,33 +21,31 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
       <div class="container-site">
         <span class="about__eyebrow">About</span>
         <h1 class="about__title">
-          Moe Qadan, <em>plain</em>.
+          Moe Qadan
         </h1>
         <p class="about__hero-sub">
-          Product designer and UX engineer. Currently shipping product
-          across long-running platforms and AI-native systems, where the
-          model is one stage in a structured pipeline.
+          Senior UX and frontend practitioner based in Los Angeles. I
+          do the parts of web work that usually get split across a
+          team. Most days that's the seam where Figma, the codebase,
+          the content model, the SEO graph, and the performance budget
+          all have to agree.
         </p>
       </div>
     </div>
 
     <div class="container-site about__body">
       <div class="about__prose">
-        <p class="about__lead">
-          Most of my work isn't about building from scratch. It's about
-          stepping into what already exists and making it better.
-        </p>
-
+        <h2 class="about__h2">What I'm best at</h2>
         <p class="about__para">
-          Understand the constraints. Improve the structure instead of
-          adding complexity. Build patterns that get reused, not just
-          shipped. Know when to automate and when not to.
+          The work I get hired for tends to fall into a few shapes.
         </p>
-
-        <p class="about__signature">
-          Most systems don't need to be replaced. They need to be
-          understood first.
-        </p>
+        <ul class="about__bullets">
+          <li><strong>Owning the whole web experience for a team that doesn't have a department for it.</strong> UX, design system, frontend, content architecture, SEO, performance, accessibility, all on one person. Most teams under-invest in a generalist who can carry it.</li>
+          <li><strong>Modernizing platforms that can't be rewritten.</strong> Long-running systems with traffic on them, opinions baked in, integrations the business depends on. The win is incremental, sequenced, and invisible when it lands.</li>
+          <li><strong>Building component systems engineers actually use.</strong> Typed, documented, scoped, migrated to without flag days. Right now it's a 100+ component Razor partial library at MagTek; previously it was per-tenant CSS systems on InvestCloud's framework across more than 50 institutions.</li>
+          <li><strong>Translating design intent into code at fidelity.</strong> Reading what the file is asking for, not just what it specifies, and closing the gaps a handoff doesn't see. Most production breakage lives in those gaps.</li>
+          <li><strong>Shipping AI-assisted features without the buzzword tax.</strong> Prompts as system rather than scattered components. Schema-bound outputs. The model held as one stage in a pipeline. ChatOBD2 is the worked example.</li>
+        </ul>
 
         <hr class="about__rule" />
 
@@ -58,17 +56,19 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
             <header class="about__career-head">
               <span class="about__career-status">Current</span>
               <h3 class="about__career-title">ChatOBD2</h3>
-              <span class="about__career-period">2025 — present</span>
+              <span class="about__career-period">2025, present</span>
             </header>
             <p class="about__career-desc">
-              Founder &amp; sole designer / engineer. AI-native automotive
-              diagnostics product I designed, engineered, and shipped end
-              to end. Mobile app, marketing site, developer portal,
-              backend pipeline.
+              Founder, sole designer and engineer. AI-native automotive
+              diagnostics product I built end to end: mobile app,
+              marketing site, developer portal, prompt pipeline. The
+              design problem was translation. Vehicle data is messy and
+              technical; the verdict has to be a single sentence the
+              driver can act on.
             </p>
             <p class="about__career-stack">
               React Native (Expo), TypeScript, Supabase, BLE, structured
-              prompt pipeline.
+              prompt pipeline, Next.js + Tailwind for the marketing site.
             </p>
           </li>
 
@@ -79,14 +79,17 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
               <span class="about__career-period">Now</span>
             </header>
             <p class="about__career-desc">
-              UX systems and frontend architecture across MagTek.com and
-              a network of related sites on a shared, long-running
-              ASP.NET MVC platform. Razor component library, design
-              tokens, layout primitives, navigation grammar.
+              I lead the web experience across MagTek.com, Magensa, the
+              hardware product line, the support portal, and the network
+              of related properties built on the shared ASP.NET MVC
+              substrate. The work is platform-level: a 100+ component
+              Razor partial library, a CSS foundation rebuilt as design
+              tokens, navigation grammar that travels, sequenced
+              migrations that don't break production.
             </p>
             <p class="about__career-stack">
-              ASP.NET MVC, C#, Razor, Bootstrap, hand-authored CSS,
-              JavaScript.
+              ASP.NET MVC, C#, Razor, hand-authored CSS, JavaScript,
+              Bootstrap.
             </p>
           </li>
 
@@ -97,12 +100,13 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
               <span class="about__career-period">Earlier</span>
             </header>
             <p class="about__career-desc">
-              Contributed to or led 0-to-production deploys for advisor-
-              and customer-facing portals across <strong>50+ wealth-management
-              and banking institutions</strong> — Chase, Cetera, Northwestern
-              Mutual, Voya, Silicon Valley Bank, East West Bank, and many
-              more. Multi-tenant frontend, per-institution branding, dense
-              data layouts.
+              Contributed to or led 0-to-production deploys for advisor
+              and customer portals across <strong>50+ wealth-management and
+              banking institutions</strong>: Chase, Cetera, Northwestern
+              Mutual, Voya, Silicon Valley Bank, East West Bank, and
+              many more. Multi-tenant frontend, per-institution branding,
+              dense data layouts, and the discipline that comes from
+              fifty deploys against the same substrate.
             </p>
             <p class="about__career-stack">
               CSS, proprietary CMS / component framework, Figma handoff
@@ -113,44 +117,39 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
 
         <hr class="about__rule" />
 
-        <h2 class="about__h2">A few things that shape the work</h2>
+        <h2 class="about__h2">How I think about the work</h2>
+
+        <p class="about__para">
+          A few things I keep coming back to.
+        </p>
 
         <ol class="about__list">
           <li>
-            <strong>Systems before surfaces.</strong> A page is a render
-            of something deeper. Get the underlying structure right and
-            the surface gets cheaper to change.
+            <strong>Read the constraints first.</strong> Long-running platforms
+            have opinions about how they want to be changed. Listening
+            tends to ship things that survive. Ignoring them tends to
+            produce outages.
           </li>
           <li>
-            <strong>Constraints are the brief.</strong> A long-running
-            platform, a legacy stack, a business that depends on what's
-            already running. Those aren't obstacles. They're the actual
-            design problem.
+            <strong>Get the structure right early.</strong> Components,
+            tokens, layout primitives, content models. When those are
+            sound most decisions become cheap. When they aren't every
+            decision is expensive.
           </li>
           <li>
-            <strong>AI is infrastructure, not a feature.</strong>
-            Prompts live in the system, scoped to context, versioned,
-            and budgeted. The point is repeatability, not novelty.
+            <strong>Use AI where it earns its place.</strong> Code in
+            Claude or Cursor when it's faster than typing. Visual
+            exploration in Claude Design when a frame is faster than
+            markup. Figma when precision matters. None of these
+            replaces taste, judgment, or product thinking.
           </li>
         </ol>
 
         <p class="about__para about__para--note">
-          More on the workflow — Claude, Cursor, Figma, and how visual
-          exploration fits in — lives on the
-          <a href="/approach" class="about__inline-link">Approach</a> page.
+          More on the workflow itself, including how AI fits into the
+          build pipeline, lives on the
+          <a href="/approach" class="about__inline-link">approach</a> page.
         </p>
-
-        <hr class="about__rule" />
-
-        <h2 class="about__h2">The kind of work I take on</h2>
-
-        <ul class="about__interests">
-          <li>Long-running platforms with real constraints</li>
-          <li>AI-native products where structure beats vibes</li>
-          <li>System-level UX, not single-page polish</li>
-          <li>Frontend architecture in environments that can't be torn down</li>
-          <li>Tooling and workflows where AI is the delivery layer, not the demo</li>
-        </ul>
       </div>
 
       <aside class="about__aside">
@@ -166,7 +165,7 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
             </li>
             <li>
               <span class="about__card-key">Best fit</span>
-              <span class="about__card-val">Product systems · UX engineering · AI-native products</span>
+              <span class="about__card-val">UX + frontend as one job. Design systems. Long-running platforms.</span>
             </li>
             <li>
               <span class="about__card-key">Building</span>
@@ -174,7 +173,7 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
             </li>
             <li>
               <span class="about__card-key">Stack</span>
-              <span class="about__card-val">TypeScript · React · Astro · ASP.NET MVC · C# · Razor</span>
+              <span class="about__card-val">TypeScript · React · React Native · Astro · ASP.NET MVC · C# · Razor · hand-authored CSS</span>
             </li>
           </ul>
         </div>
@@ -182,7 +181,7 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
         <div class="about__card">
           <h3 class="about__card-title">Reach out</h3>
           <p class="about__card-note">
-            Tell me what you're building. Replies usually within a day.
+            Tell me what you're building. Reply within a day.
           </p>
           <a href="/contact" class="about__card-cta">
             Get in touch
@@ -217,7 +216,7 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     font-family: var(--font-mono);
     font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--color-text-subtle);
     margin-bottom: var(--space-4);
@@ -234,16 +233,11 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     margin-bottom: var(--space-5);
   }
 
-  .about__title em {
-    font-style: italic;
-    color: var(--color-accent);
-  }
-
   .about__hero-sub {
     font-size: clamp(16px, 1.7vw, 19px);
     line-height: 1.6;
     color: var(--color-text-muted);
-    max-width: 60ch;
+    max-width: 62ch;
   }
 
   .about__body {
@@ -265,19 +259,6 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
       grid-template-columns: 1fr 320px;
       gap: var(--space-16);
     }
-  }
-
-  .about__lead {
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: clamp(22px, 2.4vw, 28px);
-    line-height: 1.4;
-    color: var(--color-text);
-    margin-bottom: var(--space-5);
-    max-width: 56ch;
-    font-weight: 400;
-    padding-left: var(--space-5);
-    border-left: 2px solid var(--color-accent);
   }
 
   .about__para {
@@ -313,16 +294,37 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     text-decoration-color: var(--color-accent);
   }
 
-  .about__signature {
-    margin-top: var(--space-8);
-    padding: var(--space-5) var(--space-6);
-    background-color: var(--color-bg-muted);
-    border-radius: var(--radius-md);
-    font-family: var(--font-display);
-    font-size: clamp(17px, 1.9vw, 21px);
-    line-height: 1.5;
+  .about__bullets {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    max-width: 64ch;
+  }
+
+  .about__bullets li {
+    position: relative;
+    padding-left: 24px;
+    font-size: clamp(15px, 1.5vw, 17px);
+    line-height: 1.65;
+    color: var(--color-text-muted);
+  }
+
+  .about__bullets li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.7em;
+    width: 12px;
+    height: 1px;
+    background-color: var(--color-accent);
+  }
+
+  .about__bullets strong {
     color: var(--color-text);
-    max-width: 56ch;
+    font-weight: 600;
   }
 
   .about__rule {
@@ -338,10 +340,10 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     letter-spacing: -0.02em;
     line-height: 1.2;
     color: var(--color-text);
-    margin-bottom: var(--space-6);
+    margin-bottom: var(--space-5);
   }
 
-  /* Career timeline — adds the proof of seniority that was missing */
+  /* Career timeline */
   .about__career {
     list-style: none;
     padding: 0;
@@ -427,6 +429,11 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     max-width: 60ch;
   }
 
+  .about__career-desc strong {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
   .about__career-stack {
     font-family: var(--font-mono);
     font-size: 11px;
@@ -454,7 +461,7 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     font-size: clamp(15px, 1.5vw, 17px);
     line-height: 1.7;
     color: var(--color-text-muted);
-    max-width: 60ch;
+    max-width: 62ch;
   }
 
   .about__list li::before {
@@ -472,42 +479,6 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
   .about__list strong {
     color: var(--color-text);
     font-weight: 600;
-  }
-
-  .about__interests {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-    max-width: 60ch;
-  }
-
-  .about__interests li {
-    position: relative;
-    padding-left: 24px;
-    font-size: clamp(15px, 1.5vw, 17px);
-    line-height: 1.7;
-    color: var(--color-text);
-    padding-block: var(--space-2);
-    border-bottom: 1px solid var(--color-border-subtle);
-  }
-
-  .about__interests li::before {
-    content: '+';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    font-family: var(--font-mono);
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--color-accent);
-  }
-
-  .about__interests li:last-child {
-    border-bottom: none;
   }
 
   /* Sidebar */
@@ -528,7 +499,7 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     font-family: var(--font-mono);
     font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--color-text-subtle);
     margin-bottom: var(--space-4);
