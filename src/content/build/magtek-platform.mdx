@@ -80,36 +80,24 @@ That's where the "single change lands across many pages" property comes from. Up
 
 Most of the work was less about authoring new components than about extracting them carefully — finding the patterns already in the codebase, hoisting them into partials with sensible defaults, then migrating consumers without touching production traffic. A library you can't migrate to safely is just another stylesheet.
 
-## Modernization across the platform
+## Modernization at the system level
 
-The work isn't a page or two. It's the whole platform — MagTek.com plus the subsidiary and product sites that share its architecture, modernized end to end on top of the component library and rebuilt CSS foundation.
+The work isn't a page. It's the platform.
 
-Concretely, that's:
+Every public surface across MagTek and the related sites — every product page, every category page, every subsidiary site, every form, every header, every footer, every navigation pattern — runs on the components, tokens, layout primitives, and conventions I built and own. The leverage compounds: a change at the system level propagates everywhere at once. A new visual treatment lands across the whole platform without a single per-page edit. A renamed prop is a compile-time error in every consumer until it's fixed.
 
-- **The full hardware product line.** Card readers, OEM components, check scanners, instant-issuance hardware. One template per category, driven from the same partials, with a sticky horizontal sub-nav so adjacent categories are one click apart instead of a round-trip through the main nav.
-- **Magensa, the subsidiary brand.** Distinct logo lockup and distinct top nav (Overview, Gateway, eCommerce, Tokenization, Dev & Apps, PIN Services, Reader Management, MagCare); same platform underneath. The "Old Way / Magensa Way" comparison pattern carries the sales argument across product pages without paragraphs of marketing copy.
-- **The homepage and the support portal.** Two surfaces with very different jobs, both restructured around what visitors actually came to do — covered in detail below.
-- **The CSS foundation, rebuilt as a real design system.** Spacing, color, and type pulled into tokens that the rest of the platform adopts incrementally on its own timeline. No flag day, no rewrite, just compounding consistency as each surface migrates.
-- **Navigation grammar consistent across properties** that were never originally designed to share an identity. Header behavior, sticky scroll states, sub-nav scaffolds, breadcrumbs — same primitives, applied with the same rules.
-- **Performance and SEO sequencing** so internal links, redirects, analytics, and crawl signals didn't drift while the platform changed underneath them.
+What that looks like, mechanically:
 
-Two of those surfaces are worth a closer look.
+- **CSS rebuilt as a real design system.** Spacing, color, type, radius, shadow, motion — all pulled into tokens. Surfaces adopt them incrementally, on their own timeline. No flag day, no rewrite, just compounding consistency as each surface migrates.
+- **Layout primitives instead of bespoke layouts.** A small set of layout shells (page chrome, content rails, sticky sub-nav scaffolds, card grids) replaces a long tail of one-off CSS. The same shells run the marketing surfaces, the product line, the subsidiary brand, the support portal, the developer pages.
+- **Navigation grammar that travels.** Header behavior on scroll, breadcrumbs, sticky horizontal sub-navs, mobile drawers — built once, used everywhere, behaving consistently across properties that were never originally designed to share an identity.
+- **Type contracts at the boundary.** Every shared component declares a ViewModel; every consumer is type-checked at build. The platform stops absorbing the cost of typos and missing fields at runtime.
+- **Pattern systems, not pages.** Comparison rows ("Old Way / vendor's way"), metric stories, callouts, feature grids, hero variants, CTA blocks — designed as system-level patterns the partials make trivial to drop in, so the same argument can render in dozens of places without copy-paste.
+- **Migration as a first-class concern.** Most of the actual hours go into the work no one sees: extracting patterns from existing markup safely, hoisting them into partials with sensible defaults, then routing consumers over without breaking production traffic. A library you can't migrate to safely is just another stylesheet.
+- **SEO, analytics, and redirect choreography.** Internal links, sitemap entries, structured-data hooks, event taxonomies, 301 maps — all sequenced so crawlers, dashboards, and downstream tools never see a discontinuity even while the system changes underneath them.
+- **Performance discipline.** Asset budgets, render-path attention, image strategy, JS reduced to where it earns its keep. The platform serves real customers on real connections; "feels fast" is a system property, not a per-page polish step.
 
-### Homepage rebuild
-
-The homepage needed to communicate a complex product ecosystem clearly. It's the highest-traffic entry point and the place most users decide whether they're in the right place.
-
-The work was hierarchy. Which message comes first. Which paths get visual weight. Which ones get demoted. The goal wasn't a visual refresh — it was a homepage that answers "am I in the right place?" before the visitor scrolls.
-
-The patterns introduced here became reusable across the rest of the platform: section structures, hierarchy rules, and a navigation grammar that the other properties have since adopted.
-
-### Support portal
-
-The portal had good content but poor usability. That's a common pattern in long-running platforms. The information exists; the structure doesn't. Users spend more time finding answers than reading them, which means most of them give up and contact support — exactly the outcome the portal is supposed to prevent.
-
-The work focused on reducing friction in finding answers, improving layout consistency, and restructuring content organization around how users actually arrive (usually from a specific error, product, or question). Categories were rebuilt around the user's mental model, not the org chart. Layout patterns were standardized so every article looks, scrolls, and behaves the same way.
-
-Less searching, more finding.
+The screenshots that follow show what this looks like landed on specific surfaces. But the surfaces aren't the work. The system is the work. The surfaces are what the system produces.
 
 ## Working with constraints, not against them
 
