@@ -4,54 +4,128 @@ import type { CollectionEntry } from 'astro:content';
 
 interface Props {
   projects: CollectionEntry<'build'>[];
-  /**
-   * `flat` (default) renders one unified Selected Work list, with badges
-   * on each card carrying the differentiation (Flagship · Platform ·
-   * Product · etc.). The lead card is sized as a feature row, the rest
-   * follow as a 2-up grid. This is the audit-recommended layout — no
-   * "Selected vs Experience" tier split.
-   */
-  variant?: 'flat';
 }
 
-const { projects, variant = 'flat' } = Astro.props;
+/**
+ * Two distinct sections, never mixed:
+ *
+ *   Projects   = independent work I designed/built/own end to end
+ *                (engagement !== 'work')
+ *   Experience = companies I work at or have contributed to
+ *                (engagement === 'work')
+ *
+ * Each section gets its own numbered editorial head with a fine rule
+ * that runs into the gutter and a count of items on the right. This is
+ * a designer fingerprint — it gives the grid the feel of a curated
+ * issue, not a feed.
+ */
+
+const { projects } = Astro.props;
 const sorted = [...projects].sort((a, b) => a.data.order - b.data.order);
-const [lead, ...rest] = sorted;
+
+const independentProjects = sorted.filter(p => p.data.engagement !== 'work');
+const experienceProjects = sorted.filter(p => p.data.engagement === 'work');
+
+const sections = [
+  {
+    key: 'projects',
+    sectionNumber: '01',
+    eyebrow: 'Projects',
+    note: 'Independent work, designed and built end to end.',
+    items: independentProjects,
+    leadIsFeature: true,
+  },
+  {
+    key: 'experience',
+    sectionNumber: '02',
+    eyebrow: 'Experience',
+    note: 'Companies I work at or have contributed to.',
+    items: experienceProjects,
+    leadIsFeature: false,
+  },
+].filter(s => s.items.length > 0);
+
+const pad = (n: number) => String(n).padStart(2, '0');
 ---
 
-<div class="pg" data-variant={variant}>
-  <section class="pg__section" data-reveal>
-    <header class="pg__head">
-      <span class="pg__eyebrow">Selected work</span>
-      <span class="pg__note">Independent products and platform engagements.</span>
-    </header>
+<div class="pg">
+  {sections.map((section, sectionIndex) => {
+    const items = section.items;
+    const total = items.length;
+    if (section.leadIsFeature) {
+      const [lead, ...rest] = items;
+      return (
+        <section
+          class="pg__section"
+          data-section={section.key}
+          data-reveal
+          data-reveal-delay={sectionIndex === 0 ? undefined : '2'}
+        >
+          <header class="pg__head">
+            <span class="pg__sn">{section.sectionNumber}</span>
+            <span class="pg__eyebrow">{section.eyebrow}</span>
+            <span class="pg__rule" aria-hidden="true"></span>
+            <span class="pg__count">
+              <span class="pg__count-num">{pad(total)}</span>
+              <span class="pg__count-label">{total === 1 ? 'item' : 'items'}</span>
+            </span>
+          </header>
+          <p class="pg__note">{section.note}</p>
 
-    {lead && (
-      <div class="pg__lead">
-        <ProjectCard project={lead} size="feature" index={0} />
-      </div>
-    )}
+          {lead && (
+            <div class="pg__lead">
+              <ProjectCard project={lead} size="feature" index={0} number={`${section.sectionNumber} / ${pad(1)}`} />
+            </div>
+          )}
 
-    {rest.length > 0 && (
-      <div class:list={['pg__rest', { 'pg__rest--solo': rest.length === 1 }]}>
-        {rest.map((project, i) => (
-          <ProjectCard project={project} index={i + 1} />
-        ))}
-      </div>
-    )}
-  </section>
+          {rest.length > 0 && (
+            <div class:list={['pg__rest', { 'pg__rest--solo': rest.length === 1 }]}>
+              {rest.map((project, i) => (
+                <ProjectCard project={project} index={i + 1} number={`${section.sectionNumber} / ${pad(i + 2)}`} />
+              ))}
+            </div>
+          )}
+        </section>
+      );
+    }
+    return (
+      <section
+        class="pg__section"
+        data-section={section.key}
+        data-reveal
+        data-reveal-delay={sectionIndex === 0 ? undefined : '2'}
+      >
+        <header class="pg__head">
+          <span class="pg__sn">{section.sectionNumber}</span>
+          <span class="pg__eyebrow">{section.eyebrow}</span>
+          <span class="pg__rule" aria-hidden="true"></span>
+          <span class="pg__count">
+            <span class="pg__count-num">{pad(total)}</span>
+            <span class="pg__count-label">{total === 1 ? 'item' : 'items'}</span>
+          </span>
+        </header>
+        <p class="pg__note">{section.note}</p>
+
+        <div class="pg__grid">
+          {items.map((project, i) => (
+            <ProjectCard project={project} index={i} number={`${section.sectionNumber} / ${pad(i + 1)}`} />
+          ))}
+        </div>
+      </section>
+    );
+  })}
 </div>
 
 <style>
   .pg {
     display: flex;
     flex-direction: column;
-    gap: var(--space-12);
+    gap: var(--space-16);
   }
 
   @media (min-width: 768px) {
     .pg {
-      gap: var(--space-20);
+      gap: var(--space-24);
     }
   }
 
@@ -67,36 +141,78 @@ const [lead, ...rest] = sorted;
     }
   }
 
+  /* Numbered editorial head */
   .pg__head {
     display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--space-4);
-    flex-wrap: wrap;
-    padding-bottom: var(--space-3);
-    border-bottom: 1px solid var(--color-border-subtle);
+    align-items: center;
+    gap: 14px;
+    margin-bottom: var(--space-2);
+  }
+
+  .pg__sn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 22px;
+    padding: 0 7px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-elevated);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1;
   }
 
   .pg__eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
     font-family: var(--font-mono);
     font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
+    font-weight: 700;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
+    color: var(--color-text);
+  }
+
+  .pg__rule {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, var(--color-border) 0%, transparent 100%);
+    min-width: 32px;
+  }
+
+  .pg__count {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 5px;
+    font-family: var(--font-mono);
+    font-size: 11px;
     color: var(--color-text-subtle);
+    letter-spacing: 0.06em;
+  }
+
+  .pg__count-num {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  .pg__count-label {
+    text-transform: uppercase;
+    font-size: 10px;
   }
 
   .pg__note {
-    font-size: 13px;
-    color: var(--color-text-subtle);
+    font-size: 14px;
+    color: var(--color-text-muted);
     line-height: 1.5;
+    max-width: 60ch;
+    margin: 0;
   }
 
+  /* Projects section: feature lead + optional solo right-aligned card */
   .pg__lead {
-    /* Single lead card, full width */
+    margin-top: var(--space-2);
   }
 
   .pg__rest {
@@ -117,12 +233,35 @@ const [lead, ...rest] = sorted;
       gap: var(--space-6);
     }
 
+    /* When there's one secondary card, push it right so the row balances
+       under the wider feature lead. */
     .pg__rest--solo {
       grid-template-columns: repeat(2, 1fr);
     }
 
-    .pg__rest--solo :global(.project-card) {
+    .pg__rest--solo :global(.pcard) {
       grid-column: 2 / 3;
+    }
+  }
+
+  /* Experience section: even 2-up grid, no feature/secondary distinction.
+     Two companies, same visual weight. */
+  .pg__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 600px) {
+    .pg__grid {
+      gap: var(--space-5);
+    }
+  }
+
+  @media (min-width: 720px) {
+    .pg__grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-6);
     }
   }
 </style>

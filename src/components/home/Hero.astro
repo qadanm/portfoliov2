@@ -1,77 +1,155 @@
 ---
-// Hero. Identity strip, plain headline, factual subhead naming the
-// actual work. No italicized keyword. No em dashes. The pill links
-// to /contact and signals availability without sounding like a job
-// hunt.
+// Hero. Editorial two-column composition: identity + headline + body
+// + CTAs on the left. Right column hosts the portrait stage — a single
+// transparent portrait grounded inside a designed backdrop:
+//   • ambient field (soft radial backlight that catches the torso)
+//   • subtle editorial grid + horizontal rules behind the figure
+//   • a tonal plinth at the bottom so the figure visually lands
+//   • theme-aware tonal treatment via CSS filter (subtle, no effect-y feel)
+//   • floating system UI in front (monogram mark, availability pulse)
+// One source image. Theme-aware atmosphere does the work.
 ---
 
 <section class="hero" aria-label="Introduction">
   <div class="container-site hero__inner">
-    <div class="hero__id animate-fade-up">
-      <span class="hero__id-name">Moe Qadan</span>
-      <span class="hero__id-sep" aria-hidden="true">·</span>
-      <span class="hero__id-role">Senior UX &amp; frontend</span>
-      <span class="hero__id-sep" aria-hidden="true">·</span>
-      <span class="hero__id-loc">Los Angeles</span>
-      <a href="/contact" class="hero__id-status" aria-label="Open to hearing about projects, go to contact">
-        <span class="hero__id-status-dot" aria-hidden="true"></span>
-        Open to projects
-      </a>
+    <div class="hero__main">
+      <div class="hero__id animate-fade-up">
+        <span class="hero__id-monogram" aria-hidden="true">MQ</span>
+        <span class="hero__id-meta">
+          <span class="hero__id-name">Moe Qadan</span>
+          <span class="hero__id-sep" aria-hidden="true">/</span>
+          <span class="hero__id-role">Senior UX &amp; frontend</span>
+          <span class="hero__id-sep" aria-hidden="true">/</span>
+          <span class="hero__id-loc">Los Angeles</span>
+        </span>
+        <a href="/contact" class="hero__id-status" aria-label="Send a message">
+          <span class="hero__id-status-dot" aria-hidden="true"></span>
+          Send a message
+        </a>
+      </div>
+
+      <h1 class="hero__headline animate-fade-up animate-delay-100">
+        I do UX and frontend as one job.
+      </h1>
+
+      <p class="hero__paragraph animate-fade-up animate-delay-200">
+        Design systems, frontend craft, and AI-native product
+        engineering. Senior generalist working across long-running
+        platforms and independent product surfaces.
+      </p>
+
+      <div class="hero__ctas animate-fade-up animate-delay-400">
+        <a
+          href="/work"
+          class="hero__cta hero__cta--primary"
+          data-track="cta_click"
+          data-track-cta="see-the-work"
+          data-track-loc="home-hero"
+        >
+          See the work
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        <a
+          href="/approach"
+          class="hero__cta hero__cta--ghost"
+          data-track="cta_click"
+          data-track-cta="approach"
+          data-track-loc="home-hero"
+        >How I work</a>
+      </div>
     </div>
 
-    <h1 class="hero__headline animate-fade-up animate-delay-100">
-      I do UX and frontend as one job.
-    </h1>
+    {/* Portrait stage. One transparent portrait, designed backdrop. */}
+    <aside class="hero__portrait animate-fade-up animate-delay-500">
+      <div class="hero__portrait-frame">
+        {/* Stage layers — sit BEHIND the transparent portrait */}
+        <div class="hero__portrait-stage" aria-hidden="true">
+          <span class="hero__portrait-grid"></span>
+          <span class="hero__portrait-rules">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+          <span class="hero__portrait-glow"></span>
+          <span class="hero__portrait-plinth"></span>
+        </div>
 
-    <p class="hero__paragraph animate-fade-up animate-delay-200">
-      Design systems, content architecture, SEO, performance,
-      accessibility, and AI-native product engineering: prompt
-      pipelines in source, schema-bound model outputs, AI-assisted
-      prototyping that ships into the same codebase as the rest of the
-      work.
-    </p>
+        {/* The figure */}
+        <img
+          src="/images/portrait/qadan-portrait.webp"
+          alt="Portrait of Muhammed Qadan"
+          width="1122"
+          height="1402"
+          fetchpriority="high"
+          decoding="async"
+          class="hero__portrait-img"
+        />
 
-    <p class="hero__paragraph hero__paragraph--meta animate-fade-up animate-delay-300">
-      Currently leading web experience at MagTek (a long-running
-      ASP.NET MVC platform, Razor partial library past 100 shared
-      typed components). Solo build alongside it:
-      <a href="/work/chatobd2" class="hero__inline-link">ChatOBD2</a>,
-      an AI-native diagnostics product where the system prompt
-      assembles per scan from a 38,000-token budget across six
-      reasoning layers. Earlier: 50+ wealth and banking portal
-      deploys at InvestCloud, including Chase, Cetera, and
-      Northwestern Mutual.
-    </p>
+        {/* Frame corner crosshairs — same fingerprint as project cards */}
+        <span class="hero__portrait-corner hero__portrait-corner--tl" aria-hidden="true"></span>
+        <span class="hero__portrait-corner hero__portrait-corner--tr" aria-hidden="true"></span>
+        <span class="hero__portrait-corner hero__portrait-corner--bl" aria-hidden="true"></span>
+        <span class="hero__portrait-corner hero__portrait-corner--br" aria-hidden="true"></span>
 
-    <div class="hero__ctas animate-fade-up animate-delay-400">
-      <a
-        href="/work"
-        class="hero__cta hero__cta--primary"
-        data-track="cta_click"
-        data-track-cta="see-the-work"
-        data-track-loc="home-hero"
-      >
-        See the work
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-          <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </a>
-      <a
-        href="/approach"
-        class="hero__cta hero__cta--ghost"
-        data-track="cta_click"
-        data-track-cta="approach"
-        data-track-loc="home-hero"
-      >How I work</a>
-    </div>
+        {/* Floating UI in front of the figure */}
+        <div class="hero__portrait-mark">
+          <span class="hero__portrait-mark-mono">MQ</span>
+          <span class="hero__portrait-mark-rule"></span>
+          <span class="hero__portrait-mark-year">'26</span>
+        </div>
+
+        <a href="/contact" class="hero__portrait-pulse" aria-label="Contact">
+          <span class="hero__portrait-pulse-dot" aria-hidden="true"></span>
+          <span class="hero__portrait-pulse-text">Contact</span>
+        </a>
+      </div>
+
+      {/* Spec panel below the frame — a designed signature object that
+          carries the proof (Now / Solo / Past) the hero copy used to
+          dump in dense paragraphs. Quietly says: this person works in
+          systems, products, and frontend craft. */}
+      <dl class="hero__spec">
+        <div class="hero__spec-row">
+          <dt class="hero__spec-key">Now</dt>
+          <dd class="hero__spec-val">
+            Web experience at <span class="hero__spec-mark">MagTek</span>
+          </dd>
+        </div>
+        <div class="hero__spec-row">
+          <dt class="hero__spec-key">Solo</dt>
+          <dd class="hero__spec-val">
+            <a href="/work/chatobd2" class="hero__spec-link">
+              <span class="hero__spec-dot hero__spec-dot--flagship" aria-hidden="true"></span>
+              ChatOBD2 <span class="hero__spec-sub">AI-native diagnostics</span>
+            </a>
+          </dd>
+        </div>
+        <div class="hero__spec-row">
+          <dt class="hero__spec-key">Past</dt>
+          <dd class="hero__spec-val">
+            <a href="/work/financial-platforms" class="hero__spec-link">
+              <span class="hero__spec-dot hero__spec-dot--platform" aria-hidden="true"></span>
+              InvestCloud <span class="hero__spec-sub">50+ wealth &amp; banking portals</span>
+            </a>
+          </dd>
+        </div>
+      </dl>
+    </aside>
+  </div>
+
+  <div class="hero__scroll" aria-hidden="true">
+    <span class="hero__scroll-text">Scroll</span>
+    <span class="hero__scroll-line"></span>
   </div>
 </section>
 
 <style>
   .hero {
     position: relative;
-    padding-top: calc(60px + var(--space-10));
-    padding-bottom: var(--space-16);
+    padding-top: calc(60px + var(--space-6));
+    padding-bottom: var(--space-12);
   }
 
   @media (min-width: 600px) {
@@ -96,14 +174,35 @@
   }
 
   .hero__inner {
-    max-width: 760px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-10);
+    align-items: start;
+  }
+
+  .hero__main { order: 1; max-width: 760px; }
+  .hero__portrait { order: 2; }
+
+  @media (min-width: 1024px) {
+    .hero__inner {
+      grid-template-columns: minmax(0, 1.4fr) minmax(300px, 380px);
+      gap: var(--space-16);
+      align-items: end;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .hero__inner {
+      grid-template-columns: minmax(0, 1.55fr) 400px;
+      gap: 96px;
+    }
   }
 
   .hero__id {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 8px 10px;
+    gap: 10px 14px;
     margin-bottom: var(--space-6);
     font-size: 13px;
     line-height: 1.4;
@@ -116,6 +215,36 @@
     }
   }
 
+  .hero__id-monogram {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    background: linear-gradient(180deg, var(--color-bg-elevated), var(--color-bg-muted));
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--color-text);
+    letter-spacing: 0.04em;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+
+  /* Header already carries the MQ chip on mobile — drop the duplicate
+     in the identity strip below to save vertical space and visual noise. */
+  @media (max-width: 600px) {
+    .hero__id-monogram { display: none; }
+  }
+
+  .hero__id-meta {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+  }
+
   .hero__id-name {
     font-weight: 600;
     color: var(--color-text);
@@ -123,7 +252,9 @@
   }
 
   .hero__id-sep {
-    color: var(--color-border);
+    color: var(--color-border-strong);
+    font-family: var(--font-mono);
+    font-size: 11px;
   }
 
   .hero__id-role,
@@ -135,50 +266,48 @@
   .hero__id-status {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 3px 10px 3px 9px;
+    gap: 7px;
+    padding: 4px 11px 4px 10px;
     margin-left: 4px;
     border-radius: 9999px;
     font-family: var(--font-mono);
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.04em;
-    color: var(--color-success);
-    background-color: color-mix(in srgb, var(--color-success) 8%, transparent);
-    border: 1px solid color-mix(in srgb, var(--color-success) 28%, transparent);
+    color: var(--color-text);
+    background-color: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
     text-decoration: none;
-    transition: background-color 150ms, border-color 150ms;
-    -webkit-tap-highlight-color: transparent;
+    transition: background-color 150ms, border-color 150ms, color 150ms;
   }
 
   .hero__id-status:hover {
-    background-color: color-mix(in srgb, var(--color-success) 14%, transparent);
-    border-color: color-mix(in srgb, var(--color-success) 50%, transparent);
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+    background-color: var(--color-accent-dim);
   }
 
   .hero__id-status-dot {
-    width: 7px;
-    height: 7px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    background-color: var(--color-success);
-    box-shadow: 0 0 8px color-mix(in srgb, var(--color-success) 65%, transparent);
-    animation: hero-status-pulse 2.4s ease-in-out infinite;
+    background-color: var(--color-text-subtle);
+    transition: background-color 150ms;
   }
 
-  @keyframes hero-status-pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.7; transform: scale(0.85); }
+  .hero__id-status:hover .hero__id-status-dot {
+    background-color: var(--color-accent);
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .hero__id-status-dot { animation: none; }
+    .hero__portrait-pulse-dot { animation: none; }
   }
 
   .hero__headline {
     font-family: var(--font-display);
-    font-size: clamp(38px, 8.5vw, 80px);
+    font-size: clamp(38px, 8.5vw, 84px);
     font-weight: 400;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.022em;
     line-height: 1.04;
     color: var(--color-text);
     margin-bottom: var(--space-6);
@@ -189,7 +318,7 @@
   @media (min-width: 768px) {
     .hero__headline {
       line-height: 1.02;
-      letter-spacing: -0.018em;
+      letter-spacing: -0.02em;
       margin-bottom: var(--space-8);
     }
   }
@@ -211,7 +340,7 @@
   .hero__inline-link {
     color: var(--color-text);
     text-decoration: underline;
-    text-decoration-color: var(--color-border);
+    text-decoration-color: var(--color-border-strong);
     text-underline-offset: 3px;
     text-decoration-thickness: 1px;
     transition: color 150ms, text-decoration-color 150ms;
@@ -237,6 +366,7 @@
   }
 
   .hero__cta {
+    position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -248,19 +378,47 @@
     font-weight: 600;
     letter-spacing: -0.01em;
     text-decoration: none;
-    transition: transform 200ms var(--ease-out), background-color 200ms, border-color 200ms, color 200ms, box-shadow 200ms;
+    transition:
+      transform 200ms var(--ease-out),
+      background-color 200ms,
+      border-color 200ms,
+      color 200ms,
+      box-shadow 280ms;
     -webkit-tap-highlight-color: transparent;
+    overflow: hidden;
   }
 
   .hero__cta--primary {
     background-color: var(--color-text);
     color: var(--color-bg);
     border: 1px solid var(--color-text);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.5) inset,
+      0 1px 2px rgba(0,0,0,0.2),
+      0 6px 20px rgba(0,0,0,0.18);
+  }
+
+  :global([data-theme="dark"]) .hero__cta--primary {
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.6) inset,
+      0 1px 2px rgba(0,0,0,0.4),
+      0 8px 24px rgba(0,0,0,0.35);
   }
 
   .hero__cta--primary:hover {
     transform: translateY(-1px);
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.5) inset,
+      0 12px 28px rgba(0,0,0,0.18),
+      0 0 0 4px var(--color-accent-dim);
+  }
+
+  .hero__cta--primary svg {
+    transition: transform 220ms var(--ease-out);
+  }
+
+  .hero__cta--primary:hover svg {
+    transform: translateX(2px);
   }
 
   .hero__cta--ghost {
@@ -283,5 +441,508 @@
     .hero__cta {
       width: 100%;
     }
+  }
+
+  /* ─── Portrait stage ──────────────────────────────────────────────────
+     One transparent portrait sits inside a designed backdrop. The stage
+     does the work of grounding the figure: ambient backlight + subtle
+     grid + horizontal editorial rules + tonal plinth at the bottom. */
+
+  .hero__portrait {
+    --portrait-max: 380px;
+    width: 100%;
+    max-width: var(--portrait-max);
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  @media (min-width: 600px) {
+    .hero__portrait {
+      --portrait-max: 420px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .hero__portrait {
+      --portrait-max: 100%;
+      margin-inline: 0;
+    }
+  }
+
+  .hero__portrait-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1122 / 1402;
+    border-radius: var(--radius-2xl);
+    border: 1px solid var(--color-border);
+    overflow: hidden;
+    isolation: isolate;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.04) inset,
+      0 30px 60px -20px rgba(0, 0, 0, 0.45),
+      0 0 0 1px rgba(255, 255, 255, 0.02);
+    background:
+      /* Vertical tonal wash: lighter at top, deeper at bottom — feels
+         like a studio backdrop with directional light from above. */
+      linear-gradient(180deg,
+        color-mix(in srgb, var(--color-bg-elevated) 85%, transparent) 0%,
+        color-mix(in srgb, var(--color-bg-muted) 95%, transparent) 60%,
+        color-mix(in srgb, var(--color-bg-deep) 95%, transparent) 100%
+      );
+    transition: border-color 320ms var(--ease-out), box-shadow 320ms var(--ease-out);
+  }
+
+  :global([data-theme="light"]) .hero__portrait-frame {
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.6) inset,
+      0 1px 2px rgba(15, 15, 20, 0.04),
+      0 24px 48px -16px rgba(15, 15, 20, 0.10);
+  }
+
+  .hero__portrait-frame:hover {
+    border-color: var(--color-accent-muted);
+  }
+
+  /* ─── Stage layers — sit behind the figure ────────────────────────── */
+
+  .hero__portrait-stage {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Subtle grid behind the figure. Masked to the upper half so it doesn't
+     fight the plinth below. Acts as a quiet editorial substrate. */
+  .hero__portrait-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, var(--viz-grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--viz-grid) 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: -1px -1px;
+    opacity: 0.7;
+    mask-image: radial-gradient(ellipse 100% 80% at 50% 30%, #000 0%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 100% 80% at 50% 30%, #000 0%, transparent 75%);
+  }
+
+  /* Three thin horizontal rules at fixed heights — fine editorial scaffold
+     visible only where the portrait's transparency reveals them. */
+  .hero__portrait-rules {
+    position: absolute;
+    inset: 0;
+  }
+
+  .hero__portrait-rules span {
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    height: 1px;
+    background: linear-gradient(to right,
+      transparent 0%,
+      color-mix(in srgb, var(--color-border-strong) 70%, transparent) 30%,
+      color-mix(in srgb, var(--color-border-strong) 70%, transparent) 70%,
+      transparent 100%
+    );
+    opacity: 0.35;
+  }
+
+  .hero__portrait-rules span:nth-child(1) { top: 22%; }
+  .hero__portrait-rules span:nth-child(2) { top: 46%; }
+  .hero__portrait-rules span:nth-child(3) { top: 68%; }
+
+  /* Ambient backlight — a soft warm radial that catches the upper torso.
+     This is the most important visual layer: it gives the figure a sense
+     of being lit from behind, like a portrait stage. */
+  .hero__portrait-glow {
+    position: absolute;
+    top: 12%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 110%;
+    height: 75%;
+    background:
+      radial-gradient(ellipse 50% 60% at 50% 40%,
+        color-mix(in srgb, var(--color-accent) 18%, transparent) 0%,
+        color-mix(in srgb, var(--color-accent) 6%, transparent) 35%,
+        transparent 70%
+      );
+    filter: blur(28px);
+    opacity: 0.85;
+  }
+
+  :global([data-theme="light"]) .hero__portrait-glow {
+    background:
+      radial-gradient(ellipse 50% 60% at 50% 40%,
+        color-mix(in srgb, var(--color-accent) 12%, transparent) 0%,
+        color-mix(in srgb, var(--color-accent) 4%, transparent) 35%,
+        transparent 70%
+      );
+    opacity: 0.7;
+  }
+
+  /* Plinth — a tonal panel that the lower torso visually lands on.
+     Provides grounding so the figure doesn't feel like a floating cutout.
+     Has a soft top edge that catches a hint of light. */
+  .hero__portrait-plinth {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 30%;
+    background:
+      linear-gradient(180deg,
+        transparent 0%,
+        color-mix(in srgb, var(--color-bg-deep) 40%, transparent) 35%,
+        color-mix(in srgb, var(--color-bg-deep) 80%, transparent) 100%
+      );
+  }
+
+  .hero__portrait-plinth::before {
+    content: '';
+    position: absolute;
+    top: 35%;
+    left: 12%;
+    right: 12%;
+    height: 1px;
+    background: linear-gradient(to right,
+      transparent,
+      color-mix(in srgb, var(--color-text-subtle) 50%, transparent) 50%,
+      transparent
+    );
+  }
+
+  :global([data-theme="light"]) .hero__portrait-plinth {
+    background:
+      linear-gradient(180deg,
+        transparent 0%,
+        color-mix(in srgb, #1F1408 5%, transparent) 35%,
+        color-mix(in srgb, #1F1408 9%, transparent) 100%
+      );
+  }
+
+  /* ─── The figure ──────────────────────────────────────────────────── */
+
+  .hero__portrait-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Desktop frame is portrait-oriented and matches the source aspect
+       so the figure lands cleanly at center-top. On phones the frame
+       compresses; nudging the crop down 6% lifts the face out of the
+       frame's top edge and gives the shoulders breathing room. */
+    object-position: center top;
+    display: block;
+    z-index: 2;
+    /* Theme-aware tonal treatment + stacked drop-shadows.
+       Multiple sub-pixel dark shadows stacked together neutralize any
+       residual white halo from the alpha cutout, then a wider grounding
+       shadow lands the figure. All follow the alpha silhouette. */
+    filter:
+      contrast(1.03)
+      saturate(1.05)
+      drop-shadow(0 0 0.4px rgba(0, 0, 0, 0.95))
+      drop-shadow(0 0 0.8px rgba(0, 0, 0, 0.75))
+      drop-shadow(0 0 1.4px rgba(0, 0, 0, 0.45))
+      drop-shadow(0 14px 30px rgba(0, 0, 0, 0.4));
+    transition: transform 720ms var(--ease-out), filter 320ms var(--ease-out);
+  }
+
+  :global([data-theme="light"]) .hero__portrait-img {
+    filter:
+      contrast(0.97)
+      saturate(0.96)
+      brightness(1.02)
+      drop-shadow(0 0 0.4px rgba(40, 30, 20, 0.55))
+      drop-shadow(0 0 0.9px rgba(40, 30, 20, 0.35))
+      drop-shadow(0 12px 24px rgba(15, 15, 20, 0.18));
+  }
+
+  /* Mobile-only crop nudge: shift the portrait down so the face sits
+     naturally framed instead of pinning to the very top edge. */
+  @media (max-width: 600px) {
+    .hero__portrait-img {
+      object-position: center 8%;
+    }
+  }
+
+  .hero__portrait-frame:hover .hero__portrait-img {
+    transform: scale(1.015);
+  }
+
+  /* ─── Corner crosshairs ───────────────────────────────────────────── */
+
+  .hero__portrait-corner {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border: 1px solid var(--color-text-subtle);
+    pointer-events: none;
+    z-index: 3;
+    opacity: 0.55;
+    transition: opacity 240ms, border-color 240ms;
+  }
+
+  .hero__portrait-frame:hover .hero__portrait-corner {
+    opacity: 1;
+    border-color: var(--color-accent);
+  }
+
+  .hero__portrait-corner--tl { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+  .hero__portrait-corner--tr { top: 10px; right: 10px; border-left: none; border-bottom: none; }
+  .hero__portrait-corner--bl { bottom: 10px; left: 10px; border-right: none; border-top: none; }
+  .hero__portrait-corner--br { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+
+  /* ─── Floating UI in front ────────────────────────────────────────── */
+
+  .hero__portrait-mark {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background-color: rgba(8, 8, 12, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px) saturate(140%);
+    -webkit-backdrop-filter: blur(10px) saturate(140%);
+  }
+
+  :global([data-theme="light"]) .hero__portrait-mark {
+    background-color: rgba(255, 255, 255, 0.78);
+    border-color: rgba(15, 15, 20, 0.08);
+  }
+
+  .hero__portrait-mark-mono {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: rgba(255, 255, 255, 0.92);
+    line-height: 1;
+  }
+
+  :global([data-theme="light"]) .hero__portrait-mark-mono {
+    color: rgba(15, 15, 20, 0.92);
+  }
+
+  .hero__portrait-mark-rule {
+    width: 12px;
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+
+  :global([data-theme="light"]) .hero__portrait-mark-rule {
+    background-color: rgba(15, 15, 20, 0.25);
+  }
+
+  .hero__portrait-mark-year {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+
+  :global([data-theme="light"]) .hero__portrait-mark-year {
+    color: rgba(15, 15, 20, 0.55);
+  }
+
+  .hero__portrait-pulse {
+    position: absolute;
+    bottom: 18px;
+    right: 18px;
+    z-index: 4;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 12px 6px 11px;
+    border-radius: 9999px;
+    background-color: rgba(8, 8, 12, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(10px) saturate(160%);
+    -webkit-backdrop-filter: blur(10px) saturate(160%);
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.92);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1;
+    transition: border-color 200ms, color 200ms, transform 200ms var(--ease-out);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  :global([data-theme="light"]) .hero__portrait-pulse {
+    background-color: rgba(255, 255, 255, 0.82);
+    border-color: rgba(15, 15, 20, 0.18);
+    color: rgba(15, 15, 20, 0.85);
+  }
+
+  .hero__portrait-pulse:hover {
+    transform: translateY(-1px);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .hero__portrait-pulse-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--color-accent) 60%, transparent);
+    animation: hero-portrait-pulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes hero-portrait-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(0.85); }
+  }
+
+  /* ─── Spec panel below the frame ──────────────────────────────────── */
+
+  .hero__spec {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .hero__spec-row {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    align-items: baseline;
+    gap: 12px;
+    padding: 9px 4px;
+    border-bottom: 1px dashed var(--color-border-subtle);
+  }
+
+  .hero__spec-row:last-child {
+    border-bottom: none;
+  }
+
+  .hero__spec-key {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+    line-height: 1.1;
+  }
+
+  .hero__spec-val {
+    margin: 0;
+    font-size: 13px;
+    color: var(--color-text);
+    line-height: 1.45;
+    letter-spacing: -0.005em;
+  }
+
+  .hero__spec-mark {
+    font-weight: 600;
+  }
+
+  .hero__spec-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--color-text);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 150ms;
+  }
+
+  .hero__spec-link:hover {
+    color: var(--color-accent);
+  }
+
+  .hero__spec-link:hover .hero__spec-sub {
+    color: var(--color-accent);
+  }
+
+  .hero__spec-sub {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-text-subtle);
+    letter-spacing: 0.02em;
+    transition: color 150ms;
+  }
+
+  .hero__spec-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .hero__spec-dot--flagship {
+    background-color: var(--color-accent);
+    box-shadow: 0 0 6px color-mix(in srgb, var(--color-accent) 60%, transparent);
+  }
+
+  .hero__spec-dot--platform {
+    background-color: rgb(var(--project-platform-rgb));
+    box-shadow: 0 0 6px rgb(var(--project-platform-rgb));
+  }
+
+  /* ─── Reduced motion ──────────────────────────────────────────────── */
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero__portrait-img { transition: none; }
+    .hero__portrait-frame:hover .hero__portrait-img { transform: none; }
+  }
+
+  /* ─── Scroll cue at bottom of hero ────────────────────────────────── */
+
+  .hero__scroll {
+    display: none;
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    pointer-events: none;
+  }
+
+  @media (min-width: 1024px) {
+    .hero__scroll { display: flex; }
+  }
+
+  .hero__scroll-text {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+  }
+
+  .hero__scroll-line {
+    width: 1px;
+    height: 28px;
+    background: linear-gradient(to bottom, var(--color-text-subtle), transparent);
+    animation: scroll-pulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes scroll-pulse {
+    0%, 100% { opacity: 0.4; transform: scaleY(0.7); transform-origin: top; }
+    50% { opacity: 1; transform: scaleY(1); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero__scroll-line { animation: none; }
   }
 </style>

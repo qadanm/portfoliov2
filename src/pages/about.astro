@@ -3,26 +3,37 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
 ---
 
 <BaseLayout
-  title="About Moe Qadan"
-  description="Senior UX and frontend practitioner in Los Angeles. Currently leading web experience at MagTek. Shipping ChatOBD2 solo. Previously deployed advisor portals at InvestCloud across 50+ wealth and banking institutions."
+  title="About"
+  description="Background and practice of Moe Qadan, a senior UX and frontend practitioner based in Los Angeles. UX engineering, design systems, frontend implementation, and AI-assisted product work across long-running platforms and independent product surfaces."
   keywords={[
     'Moe Qadan',
     'about',
     'UX engineer',
-    'senior frontend',
+    'frontend engineer',
+    'design engineer',
     'web experience',
     'design systems',
     'background',
-    'experience',
+    'creative technologist',
+    'Los Angeles',
   ]}
 >
   <div class="about">
-    <div class="about__hero">
+    {/* Page atmosphere — soft accent glow at the top */}
+    <div class="about__atmos" aria-hidden="true">
+      <span class="about__atmos-glow"></span>
+    </div>
+
+    <header class="about__hero">
       <div class="container-site">
-        <span class="about__eyebrow">About</span>
-        <h1 class="about__title">
-          Moe Qadan
-        </h1>
+        <div class="about__sxn">
+          <span class="about__sxn-num">01</span>
+          <span class="about__sxn-label">Profile</span>
+          <span class="about__sxn-rule" aria-hidden="true"></span>
+          <span class="about__sxn-meta">Independent senior generalist</span>
+        </div>
+
+        <h1 class="about__title">Moe Qadan.</h1>
         <p class="about__hero-sub">
           Senior UX and frontend practitioner based in Los Angeles. I
           do the parts of web work that usually get split across a
@@ -30,156 +41,225 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
           the content model, the SEO graph, and the performance budget
           all have to agree.
         </p>
+
+        <div class="about__id-strip">
+          <a href="/contact" class="about__id-status" aria-label="Send a message">
+            <span class="about__id-status-dot" aria-hidden="true"></span>
+            Send a message
+          </a>
+          <span class="about__id-sep" aria-hidden="true">/</span>
+          <span class="about__id-loc">Los Angeles, CA</span>
+          <span class="about__id-sep" aria-hidden="true">/</span>
+          <a href="mailto:moe@qadan.co" class="about__id-mail">moe@qadan.co</a>
+        </div>
       </div>
-    </div>
+    </header>
 
     <div class="container-site about__body">
-      <div class="about__prose">
-        <h2 class="about__h2">What I'm best at</h2>
-        <p class="about__para">
-          The work I get hired for tends to fall into a few shapes.
-        </p>
-        <ul class="about__bullets">
-          <li><strong>Owning the whole web experience for a team that doesn't have a department for it.</strong> UX, design system, frontend, content architecture, SEO, performance, accessibility, all on one person.</li>
-          <li><strong>Modernizing platforms that can't be rewritten.</strong> Long-running systems with traffic on them, opinions baked in, integrations the business depends on. The win is incremental, sequenced, and invisible when it lands.</li>
-          <li><strong>Building component systems engineers actually use.</strong> Typed, documented, scoped, migrated to without flag days. Right now it's a 100+ component Razor partial library at MagTek; previously it was per-tenant CSS systems on InvestCloud's framework across more than 50 institutions.</li>
-          <li><strong>Translating design intent into code at fidelity.</strong> Reading what the file is asking for, not just what it specifies, and closing the gaps a handoff doesn't see. Most production breakage lives in those gaps.</li>
-          <li><strong>Shipping AI-assisted features without the buzzword tax.</strong> Prompts as system rather than scattered components. Schema-bound outputs. The model held as one stage in a pipeline. ChatOBD2 is the worked example.</li>
-        </ul>
+      <div class="about__main">
+        {/* What I'm best at */}
+        <section class="about__section" data-reveal>
+          <header class="about__sxn about__sxn--inner">
+            <span class="about__sxn-num">02</span>
+            <span class="about__sxn-label">What I'm best at</span>
+            <span class="about__sxn-rule" aria-hidden="true"></span>
+          </header>
+          <h2 class="about__h2">A few shapes the work tends to take.</h2>
+          <ul class="about__bullets">
+            <li><strong>Owning the whole web experience for a team that doesn't have a department for it.</strong> UX, design system, frontend, content architecture, SEO, performance, accessibility, all on one person.</li>
+            <li><strong>Modernizing platforms that can't be rewritten.</strong> Long-running systems with traffic on them, opinions baked in, integrations the business depends on. The win is incremental, sequenced, and invisible when it lands.</li>
+            <li><strong>Building component systems engineers actually use.</strong> Typed, documented, scoped, migrated to without flag days. Right now it's a 100+ component Razor partial library at MagTek; previously it was per-tenant CSS systems on InvestCloud's framework across more than 50 institutions.</li>
+            <li><strong>Translating design intent into code at fidelity.</strong> Reading what the file is asking for, not just what it specifies, and closing the gaps a handoff doesn't see. Most production breakage lives in those gaps.</li>
+            <li><strong>Shipping AI-assisted features without the buzzword tax.</strong> Prompts as system rather than scattered components. Schema-bound outputs. The model held as one stage in a pipeline. ChatOBD2 is the worked example.</li>
+          </ul>
+        </section>
 
-        <hr class="about__rule" />
+        {/* Background */}
+        <section class="about__section" data-reveal>
+          <header class="about__sxn about__sxn--inner">
+            <span class="about__sxn-num">03</span>
+            <span class="about__sxn-label">Background</span>
+            <span class="about__sxn-rule" aria-hidden="true"></span>
+            <span class="about__sxn-meta">2018 to present</span>
+          </header>
 
-        <h2 class="about__h2">Background</h2>
+          <ol class="about__career">
+            <li class="about__career-item about__career-item--current about__career-item--flagship">
+              <span class="about__career-corner about__career-corner--tl" aria-hidden="true"></span>
+              <span class="about__career-corner about__career-corner--tr" aria-hidden="true"></span>
+              <span class="about__career-corner about__career-corner--bl" aria-hidden="true"></span>
+              <span class="about__career-corner about__career-corner--br" aria-hidden="true"></span>
 
-        <ol class="about__career">
-          <li class="about__career-item about__career-item--current">
-            <header class="about__career-head">
-              <span class="about__career-status">Current</span>
-              <h3 class="about__career-title">ChatOBD2</h3>
-              <span class="about__career-period">2025, present</span>
-            </header>
-            <p class="about__career-desc">
-              Founder, sole designer and engineer. AI-native automotive
-              diagnostics product I built end to end: mobile app,
-              marketing site, developer portal, prompt pipeline. The
-              design problem was translation. Vehicle data is messy and
-              technical; the verdict has to be a single sentence the
-              driver can act on.
-            </p>
-            <p class="about__career-stack">
-              React Native (Expo), TypeScript, Supabase, BLE, structured
-              prompt pipeline, Next.js + Tailwind for the marketing site.
-            </p>
-          </li>
+              <header class="about__career-head">
+                <span class="about__career-status">
+                  <span class="about__career-status-dot"></span>
+                  Current
+                </span>
+                <h3 class="about__career-title">ChatOBD2</h3>
+                <span class="about__career-period">2025 to present</span>
+              </header>
+              <p class="about__career-desc">
+                Founder, sole designer and engineer. AI-native automotive
+                diagnostics product I built end to end: mobile app,
+                marketing site, developer portal, prompt pipeline. The
+                design problem was translation. Vehicle data is messy and
+                technical; the verdict has to be a single sentence the
+                driver can act on.
+              </p>
+              <p class="about__career-stack">
+                React Native (Expo) · TypeScript · Supabase · BLE ·
+                Structured prompt pipeline · Next.js + Tailwind for the
+                marketing site
+              </p>
+            </li>
 
-          <li class="about__career-item about__career-item--current">
-            <header class="about__career-head">
-              <span class="about__career-status">Current</span>
-              <h3 class="about__career-title">MagTek</h3>
-              <span class="about__career-period">Now</span>
-            </header>
-            <p class="about__career-desc">
-              I lead the web experience across MagTek.com, Magensa, the
-              hardware product line, the support portal, and the network
-              of related properties built on the shared ASP.NET MVC
-              substrate. The work is platform-level: a 100+ component
-              Razor partial library, a CSS foundation rebuilt as design
-              tokens, navigation grammar that travels, sequenced
-              migrations that don't break production.
-            </p>
-            <p class="about__career-stack">
-              ASP.NET MVC, C#, Razor, hand-authored CSS, JavaScript,
-              Bootstrap.
-            </p>
-          </li>
+            <li class="about__career-item about__career-item--current about__career-item--platform">
+              <span class="about__career-corner about__career-corner--tl" aria-hidden="true"></span>
+              <span class="about__career-corner about__career-corner--tr" aria-hidden="true"></span>
+              <span class="about__career-corner about__career-corner--bl" aria-hidden="true"></span>
+              <span class="about__career-corner about__career-corner--br" aria-hidden="true"></span>
 
-          <li class="about__career-item">
-            <header class="about__career-head">
-              <span class="about__career-status">Past</span>
-              <h3 class="about__career-title">InvestCloud</h3>
-              <span class="about__career-period">Earlier</span>
-            </header>
-            <p class="about__career-desc">
-              Contributed to or led 0-to-production deploys for advisor
-              and customer portals across <strong>50+ wealth-management and
-              banking institutions</strong>: Chase, Cetera, Northwestern
-              Mutual, Voya, Silicon Valley Bank, East West Bank, and
-              many more. Multi-tenant frontend, per-institution branding,
-              dense data layouts, and the discipline that comes from
-              fifty deploys against the same substrate.
-            </p>
-            <p class="about__career-stack">
-              CSS, proprietary CMS / component framework, Figma handoff
-              translation.
-            </p>
-          </li>
-        </ol>
+              <header class="about__career-head">
+                <span class="about__career-status">
+                  <span class="about__career-status-dot"></span>
+                  Current
+                </span>
+                <h3 class="about__career-title">MagTek</h3>
+                <span class="about__career-period">Now</span>
+              </header>
+              <p class="about__career-desc">
+                I lead the web experience across MagTek.com, Magensa, the
+                hardware product line, the support portal, and the network
+                of related properties built on the shared ASP.NET MVC
+                substrate. The work is platform-level: a 100+ component
+                Razor partial library, a CSS foundation rebuilt as design
+                tokens, navigation grammar that travels, sequenced
+                migrations that don't break production.
+              </p>
+              <p class="about__career-stack">
+                ASP.NET MVC · C# · Razor · hand-authored CSS ·
+                JavaScript · Bootstrap
+              </p>
+            </li>
 
-        <hr class="about__rule" />
+            <li class="about__career-item about__career-item--product">
+              <span class="about__career-corner about__career-corner--tl" aria-hidden="true"></span>
+              <span class="about__career-corner about__career-corner--tr" aria-hidden="true"></span>
+              <span class="about__career-corner about__career-corner--bl" aria-hidden="true"></span>
+              <span class="about__career-corner about__career-corner--br" aria-hidden="true"></span>
 
-        <h2 class="about__h2">How I think about the work</h2>
+              <header class="about__career-head">
+                <span class="about__career-status about__career-status--past">Past</span>
+                <h3 class="about__career-title">InvestCloud</h3>
+                <span class="about__career-period">Earlier</span>
+              </header>
+              <p class="about__career-desc">
+                Contributed to or led 0-to-production deploys for advisor
+                and customer portals across <strong>50+ wealth-management and
+                banking institutions</strong>: Chase, Cetera, Northwestern
+                Mutual, Voya, Silicon Valley Bank, East West Bank, and
+                many more. Multi-tenant frontend, per-institution branding,
+                dense data layouts, and the discipline that comes from
+                fifty deploys against the same substrate.
+              </p>
+              <p class="about__career-stack">
+                CSS · proprietary CMS / component framework · Figma
+                handoff translation
+              </p>
+            </li>
+          </ol>
+        </section>
 
-        <p class="about__para">
-          A few things I keep coming back to.
-        </p>
+        {/* How I think */}
+        <section class="about__section" data-reveal>
+          <header class="about__sxn about__sxn--inner">
+            <span class="about__sxn-num">04</span>
+            <span class="about__sxn-label">How I think about the work</span>
+            <span class="about__sxn-rule" aria-hidden="true"></span>
+          </header>
 
-        <ol class="about__list">
-          <li>
-            <strong>Read the constraints first.</strong> Long-running platforms
-            have opinions about how they want to be changed. Listening
-            to them is how the work survives.
-          </li>
-          <li>
-            <strong>Get the structure right early.</strong> Components,
-            tokens, layout primitives, content models. When those are
-            sound most decisions become cheap. When they aren't every
-            decision is expensive.
-          </li>
-          <li>
-            <strong>Use AI where it earns its place.</strong> Code in
-            Claude or Cursor when it's faster than typing. Visual
-            exploration in Claude Design when a frame is faster than
-            markup. Figma when precision matters.
-          </li>
-        </ol>
-
-        <p class="about__para about__para--note">
-          More on the workflow itself, including how AI fits into the
-          build pipeline, lives on the
-          <a href="/approach" class="about__inline-link">approach</a> page.
-        </p>
-      </div>
-
-      <aside class="about__aside">
-        <div class="about__card">
-          <h3 class="about__card-title">Currently</h3>
-          <ul class="about__card-list">
+          <ol class="about__list">
             <li>
-              <span class="about__card-key">Status</span>
-              <span class="about__card-val about__card-val--status">
-                <span class="about__card-status-dot" aria-hidden="true"></span>
-                Open to projects
-              </span>
+              <strong>Read the constraints first.</strong> Long-running platforms
+              have opinions about how they want to be changed. Listening
+              to them is how the work survives.
             </li>
             <li>
-              <span class="about__card-key">Best fit</span>
+              <strong>Get the structure right early.</strong> Components,
+              tokens, layout primitives, content models. When those are
+              sound most decisions become cheap. When they aren't every
+              decision is expensive.
+            </li>
+            <li>
+              <strong>Use AI where it earns its place.</strong> Code in
+              Claude or Cursor when it's faster than typing. Visual
+              exploration in Claude Design when a frame is faster than
+              markup. Figma when precision matters.
+            </li>
+          </ol>
+
+          <p class="about__para about__para--note">
+            More on the workflow itself, including how AI fits into the
+            build pipeline, lives on the
+            <a href="/approach" class="about__inline-link">approach</a> page.
+          </p>
+        </section>
+      </div>
+
+      {/* Right column aside */}
+      <aside class="about__aside">
+        <div class="about__card about__card--current">
+          <span class="about__card-corner about__card-corner--tl" aria-hidden="true"></span>
+          <span class="about__card-corner about__card-corner--tr" aria-hidden="true"></span>
+          <span class="about__card-corner about__card-corner--bl" aria-hidden="true"></span>
+          <span class="about__card-corner about__card-corner--br" aria-hidden="true"></span>
+
+          <header class="about__card-head">
+            <span class="about__card-num">05</span>
+            <h3 class="about__card-title">Currently</h3>
+          </header>
+
+          <ul class="about__card-list">
+            <li>
+              <span class="about__card-key">Focus</span>
               <span class="about__card-val">UX + frontend as one job. Design systems. AI-native product work. Long-running platforms.</span>
             </li>
             <li>
               <span class="about__card-key">Building</span>
-              <span class="about__card-val">ChatOBD2 · MagTek platform</span>
+              <span class="about__card-val about__card-val--building">
+                <a href="/work/chatobd2" class="about__card-pill about__card-pill--flagship">
+                  <span class="about__card-pill-dot"></span>
+                  ChatOBD2
+                </a>
+                <a href="/work/magtek-platform" class="about__card-pill about__card-pill--platform">
+                  <span class="about__card-pill-dot"></span>
+                  MagTek
+                </a>
+              </span>
             </li>
             <li>
               <span class="about__card-key">Stack</span>
               <span class="about__card-val">TypeScript · React · React Native · Astro · ASP.NET MVC · C# · Razor · hand-authored CSS</span>
             </li>
+            <li>
+              <span class="about__card-key">Based in</span>
+              <span class="about__card-val">Los Angeles, California</span>
+            </li>
           </ul>
         </div>
 
-        <div class="about__card">
-          <h3 class="about__card-title">Reach out</h3>
+        <div class="about__card about__card--reach">
+          <span class="about__card-corner about__card-corner--tl" aria-hidden="true"></span>
+          <span class="about__card-corner about__card-corner--tr" aria-hidden="true"></span>
+          <span class="about__card-corner about__card-corner--bl" aria-hidden="true"></span>
+          <span class="about__card-corner about__card-corner--br" aria-hidden="true"></span>
+
+          <header class="about__card-head">
+            <span class="about__card-num">06</span>
+            <h3 class="about__card-title">Reach out</h3>
+          </header>
           <p class="about__card-note">
-            Tell me what you're building. Reply within a day.
+            Project questions, design or engineering conversations. Replies within a day.
           </p>
           <a href="/contact" class="about__card-cta">
             Get in touch
@@ -194,7 +274,35 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
 </BaseLayout>
 
 <style>
+  .about {
+    position: relative;
+  }
+
+  /* Atmospheric glow at top of page */
+  .about__atmos {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 600px;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .about__atmos-glow {
+    position: absolute;
+    top: -180px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1100px;
+    height: 540px;
+    background: radial-gradient(ellipse 50% 50% at 50% 50%, var(--color-accent-muted), transparent 70%);
+    filter: blur(28px);
+    opacity: 0.7;
+  }
+
   .about__hero {
+    position: relative;
     padding-top: calc(60px + var(--space-10));
     padding-bottom: var(--space-10);
     border-bottom: 1px solid var(--color-border-subtle);
@@ -209,23 +317,66 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     }
   }
 
-  .about__eyebrow {
-    display: inline-block;
+  /* Shared section-head pattern */
+  .about__sxn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: var(--space-5);
+    flex-wrap: wrap;
+  }
+
+  .about__sxn--inner {
+    margin-bottom: var(--space-5);
+  }
+
+  .about__sxn-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 22px;
+    padding: 0 7px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-elevated);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1;
+  }
+
+  .about__sxn-label {
     font-family: var(--font-mono);
     font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
+    color: var(--color-text);
+  }
+
+  .about__sxn-rule {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, var(--color-border), transparent);
+    min-width: 32px;
+  }
+
+  .about__sxn-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
     color: var(--color-text-subtle);
-    margin-bottom: var(--space-4);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
   }
 
   .about__title {
     font-family: var(--font-display);
-    font-size: clamp(40px, 9.5vw, 80px);
+    font-size: clamp(48px, 11vw, 96px);
     font-weight: 400;
     letter-spacing: -0.025em;
-    line-height: 1.05;
+    line-height: 1.02;
     color: var(--color-text);
     max-width: 18ch;
     margin-bottom: var(--space-5);
@@ -236,9 +387,97 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     line-height: 1.6;
     color: var(--color-text-muted);
     max-width: 62ch;
+    margin-bottom: var(--space-6);
   }
 
+  /* Identity strip below the intro */
+  .about__id-strip {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px 14px;
+    font-size: 13px;
+    line-height: 1.4;
+    margin-top: var(--space-6);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  .about__id-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 11px 4px 10px;
+    border-radius: 9999px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--color-text);
+    background-color: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    text-decoration: none;
+    transition: background-color 150ms, border-color 150ms, color 150ms;
+  }
+
+  .about__id-status:hover {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+    background-color: var(--color-accent-dim);
+  }
+
+  .about__id-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--color-text-subtle);
+    transition: background-color 150ms;
+  }
+
+  .about__id-status:hover .about__id-status-dot {
+    background-color: var(--color-accent);
+  }
+
+  @keyframes about-status-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(0.85); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .about__career-status-dot { animation: none; }
+  }
+
+  .about__id-sep {
+    color: var(--color-border-strong);
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+
+  .about__id-loc {
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+  }
+
+  .about__id-mail {
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    text-decoration: underline;
+    text-decoration-color: var(--color-border);
+    text-underline-offset: 3px;
+    transition: color 150ms, text-decoration-color 150ms;
+  }
+
+  .about__id-mail:hover {
+    color: var(--color-accent);
+    text-decoration-color: var(--color-accent);
+  }
+
+  /* Body grid */
   .about__body {
+    position: relative;
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--space-10);
@@ -254,9 +493,38 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
 
   @media (min-width: 1024px) {
     .about__body {
-      grid-template-columns: 1fr 320px;
+      grid-template-columns: 1fr 340px;
+      gap: var(--space-16);
+      align-items: start;
+    }
+  }
+
+  .about__main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+  }
+
+  @media (min-width: 768px) {
+    .about__main {
       gap: var(--space-16);
     }
+  }
+
+  .about__section {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .about__h2 {
+    font-family: var(--font-display);
+    font-size: clamp(26px, 3vw, 36px);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: var(--color-text);
+    margin-bottom: var(--space-5);
+    max-width: 28ch;
   }
 
   .about__para {
@@ -276,7 +544,7 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     border-radius: var(--radius-md);
     background-color: var(--color-bg-muted);
     max-width: 60ch;
-    margin-top: var(--space-2);
+    margin-top: var(--space-5);
   }
 
   .about__inline-link {
@@ -325,78 +593,141 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     font-weight: 600;
   }
 
-  .about__rule {
-    border: none;
-    border-top: 1px solid var(--color-border);
-    margin: var(--space-12) 0 var(--space-10);
-  }
-
-  .about__h2 {
-    font-family: var(--font-display);
-    font-size: clamp(24px, 2.8vw, 34px);
-    font-weight: 400;
-    letter-spacing: -0.02em;
-    line-height: 1.2;
-    color: var(--color-text);
-    margin-bottom: var(--space-5);
-  }
-
-  /* Career timeline */
+  /* Career timeline — each card carries its project accent */
   .about__career {
     list-style: none;
     padding: 0;
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--space-6);
+    gap: var(--space-5);
   }
 
   .about__career-item {
-    padding: var(--space-5);
+    --pc-accent: var(--color-text-subtle);
+    --pc-accent-rgb: 113, 113, 122;
+    position: relative;
+    padding: var(--space-6);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    background-color: var(--color-bg-elevated);
+    border-radius: var(--radius-2xl);
+    background:
+      linear-gradient(180deg, var(--color-bg-elevated), var(--color-bg-muted));
+    box-shadow: var(--shadow-card);
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
+    overflow: hidden;
+    transition: border-color 280ms, box-shadow 280ms, transform 280ms var(--ease-out);
+  }
+
+  .about__career-item--flagship {
+    --pc-accent: var(--color-accent);
+    --pc-accent-rgb: var(--project-flagship-rgb);
+  }
+  .about__career-item--platform {
+    --pc-accent-rgb: var(--project-platform-rgb);
+    --pc-accent: rgb(var(--project-platform-rgb));
+  }
+  .about__career-item--product {
+    --pc-accent-rgb: var(--project-product-rgb);
+    --pc-accent: rgb(var(--project-product-rgb));
+  }
+
+  .about__career-item::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 70% 80% at 100% 0%, rgba(var(--pc-accent-rgb), 0.10), transparent 55%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 320ms var(--ease-out);
+  }
+
+  .about__career-item--current::before {
+    opacity: 0.85;
+  }
+
+  .about__career-item:hover {
+    border-color: rgba(var(--pc-accent-rgb), 0.4);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  .about__career-item:hover::before {
+    opacity: 1;
+  }
+
+  .about__career-item--current {
+    border-color: rgba(var(--pc-accent-rgb), 0.35);
   }
 
   @media (min-width: 600px) {
     .about__career-item {
-      padding: var(--space-6) var(--space-7);
+      padding: var(--space-7) var(--space-8);
     }
   }
 
-  .about__career-item--current {
-    border-color: var(--color-accent-muted);
-    background-image: radial-gradient(ellipse 50% 80% at 100% 0%, var(--color-accent-dim), transparent 65%);
+  /* Corner crosshairs */
+  .about__career-corner {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border: 1px solid var(--color-text-subtle);
+    pointer-events: none;
+    opacity: 0.3;
+    transition: opacity 240ms, border-color 240ms;
+    z-index: 2;
   }
 
+  .about__career-item:hover .about__career-corner {
+    opacity: 1;
+    border-color: var(--pc-accent);
+  }
+
+  .about__career-corner--tl { top: 8px; left: 8px; border-right: none; border-bottom: none; }
+  .about__career-corner--tr { top: 8px; right: 8px; border-left: none; border-bottom: none; }
+  .about__career-corner--bl { bottom: 8px; left: 8px; border-right: none; border-top: none; }
+  .about__career-corner--br { bottom: 8px; right: 8px; border-left: none; border-top: none; }
+
   .about__career-head {
+    position: relative;
     display: flex;
     align-items: baseline;
     gap: var(--space-3);
     flex-wrap: wrap;
+    z-index: 1;
   }
 
   .about__career-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
     font-family: var(--font-mono);
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--color-text-subtle);
-    padding: 3px 8px;
+    color: var(--pc-accent);
+    padding: 4px 10px;
     border-radius: 9999px;
-    background-color: var(--color-bg-muted);
-    border: 1px solid var(--color-border);
+    background-color: rgba(var(--pc-accent-rgb), 0.12);
+    border: 1px solid rgba(var(--pc-accent-rgb), 0.4);
     line-height: 1;
   }
 
-  .about__career-item--current .about__career-status {
-    color: var(--color-accent);
-    background-color: var(--color-accent-dim);
-    border-color: var(--color-accent-muted);
+  .about__career-status--past {
+    color: var(--color-text-subtle);
+    background-color: var(--color-bg-deep);
+    border-color: var(--color-border);
+  }
+
+  .about__career-status-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: var(--pc-accent);
+    box-shadow: 0 0 6px var(--pc-accent);
+    animation: about-status-pulse 2.4s ease-in-out infinite;
   }
 
   .about__career-title {
@@ -420,11 +751,13 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
   }
 
   .about__career-desc {
+    position: relative;
     font-size: clamp(14px, 1.4vw, 16px);
     line-height: 1.65;
     color: var(--color-text-muted);
     margin: 0;
     max-width: 60ch;
+    z-index: 1;
   }
 
   .about__career-desc strong {
@@ -433,6 +766,7 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
   }
 
   .about__career-stack {
+    position: relative;
     font-family: var(--font-mono);
     font-size: 11px;
     color: var(--color-text-subtle);
@@ -440,8 +774,10 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     margin: 0;
     padding-top: var(--space-3);
     border-top: 1px solid var(--color-border-subtle);
+    z-index: 1;
   }
 
+  /* Numbered list (How I think) */
   .about__list {
     counter-reset: about-list;
     list-style: none;
@@ -479,109 +815,220 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     font-weight: 600;
   }
 
-  /* Sidebar */
+  /* Sidebar cards */
   .about__aside {
     display: flex;
     flex-direction: column;
     gap: var(--space-4);
+    position: sticky;
+    top: 80px;
+  }
+
+  @media (max-width: 1023px) {
+    .about__aside {
+      position: static;
+    }
   }
 
   .about__card {
-    padding: var(--space-5);
+    position: relative;
+    padding: var(--space-6);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-2xl);
+    background:
+      linear-gradient(180deg, var(--color-bg-elevated), var(--color-bg-muted));
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+  }
+
+  .about__card--current::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 100% 0%, var(--color-accent-dim), transparent 60%);
+    pointer-events: none;
+  }
+
+  .about__card-corner {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border: 1px solid var(--color-text-subtle);
+    pointer-events: none;
+    opacity: 0.4;
+    z-index: 1;
+  }
+
+  .about__card-corner--tl { top: 8px; left: 8px; border-right: none; border-bottom: none; }
+  .about__card-corner--tr { top: 8px; right: 8px; border-left: none; border-bottom: none; }
+  .about__card-corner--bl { bottom: 8px; left: 8px; border-right: none; border-top: none; }
+  .about__card-corner--br { bottom: 8px; right: 8px; border-left: none; border-top: none; }
+
+  .about__card-head {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: var(--space-4);
+    z-index: 2;
+  }
+
+  .about__card-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 22px;
+    padding: 0 7px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
     background-color: var(--color-bg-elevated);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1;
   }
 
   .about__card-title {
     font-family: var(--font-mono);
     font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--color-text-subtle);
-    margin-bottom: var(--space-4);
+    color: var(--color-text);
+    margin: 0;
   }
 
   .about__card-list {
+    position: relative;
     list-style: none;
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
+    gap: var(--space-4);
+    z-index: 2;
   }
 
   .about__card-list li {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 4px;
   }
 
   .about__card-key {
     font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 500;
+    font-size: 10px;
+    font-weight: 600;
     color: var(--color-text-subtle);
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.08em;
   }
 
   .about__card-val {
     font-size: 13px;
     color: var(--color-text);
-    line-height: 1.45;
+    line-height: 1.5;
   }
 
-  .about__card-val--status {
+  .about__card-val--building {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .about__card-pill {
     display: inline-flex;
     align-items: center;
-    gap: 7px;
-    color: var(--color-success);
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 9999px;
     font-family: var(--font-mono);
+    font-size: 11px;
     font-weight: 600;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.02em;
+    color: var(--color-text);
+    text-decoration: none;
+    background-color: var(--color-bg-deep);
+    border: 1px solid var(--color-border);
+    transition: border-color 200ms, color 200ms, transform 200ms var(--ease-out);
+    line-height: 1.2;
   }
 
-  .about__card-status-dot {
-    width: 7px;
-    height: 7px;
+  .about__card-pill:hover {
+    transform: translateY(-1px);
+  }
+
+  .about__card-pill-dot {
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    background-color: var(--color-success);
-    box-shadow: 0 0 8px color-mix(in srgb, var(--color-success) 65%, transparent);
-    animation: about-status-pulse 2.4s ease-in-out infinite;
   }
 
-  @keyframes about-status-pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.7; transform: scale(0.85); }
+  .about__card-pill--flagship {
+    color: var(--color-accent);
+  }
+  .about__card-pill--flagship .about__card-pill-dot {
+    background-color: var(--color-accent);
+    box-shadow: 0 0 6px var(--color-accent);
+  }
+  .about__card-pill--flagship:hover {
+    border-color: var(--color-accent);
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .about__card-status-dot { animation: none; }
+  .about__card-pill--platform {
+    color: rgb(var(--project-platform-rgb));
+  }
+  .about__card-pill--platform .about__card-pill-dot {
+    background-color: rgb(var(--project-platform-rgb));
+    box-shadow: 0 0 6px rgb(var(--project-platform-rgb));
+  }
+  .about__card-pill--platform:hover {
+    border-color: rgb(var(--project-platform-rgb));
+  }
+
+  .about__card--reach {
+    border-color: var(--color-border);
   }
 
   .about__card-note {
+    position: relative;
     font-size: 13px;
     line-height: 1.6;
     color: var(--color-text-muted);
     margin-bottom: var(--space-4);
+    z-index: 2;
   }
 
   .about__card-cta {
+    position: relative;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 9999px;
     font-size: 13px;
     font-weight: 600;
     color: var(--color-text);
     text-decoration: none;
-    border-bottom: 1px solid var(--color-border);
-    padding-bottom: 4px;
-    transition: color 150ms, border-color 150ms;
+    background-color: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    transition: color 200ms, border-color 200ms, background-color 200ms, transform 200ms var(--ease-out);
+    z-index: 2;
+  }
+
+  .about__card-cta svg {
+    transition: transform 200ms var(--ease-out);
   }
 
   .about__card-cta:hover {
     color: var(--color-accent);
-    border-bottom-color: var(--color-accent);
+    border-color: var(--color-accent);
+    background-color: var(--color-accent-dim);
+    transform: translateY(-1px);
+  }
+
+  .about__card-cta:hover svg {
+    transform: translateX(2px);
   }
 </style>

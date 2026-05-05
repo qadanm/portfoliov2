@@ -3,9 +3,12 @@ Allow: /
 Disallow: /admin/
 Disallow: /api/
 
-# Block legacy /work paths — redirected to /build, no need to index both.
-Disallow: /work/
-Disallow: /work
+# Legacy /build paths redirect to /work — the canonical is /work.
+Disallow: /build/
+Disallow: /build
+
+# /design is a redirect to /approach — same reasoning.
+Disallow: /design
 
 # Most LLM crawlers are welcome — opt them out only by exception below.
 User-agent: GPTBot

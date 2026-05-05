@@ -36,3 +36,6 @@ yarn-error.log*
 
 # TypeScript
 *.tsbuildinfo
+
+# OG-card font cache (downloaded by scripts/generate-og.sh)
+scripts/_og-fonts/

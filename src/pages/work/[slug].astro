@@ -1,10 +1,15 @@
 ---
 import BaseLayout from '@/components/layout/BaseLayout.astro';
 import Placeholder from '@/components/Placeholder.astro';
+import VerdictArtifact from '@/components/artifacts/VerdictArtifact.astro';
+import PlatformArtifact from '@/components/artifacts/PlatformArtifact.astro';
+import SawaArtifact from '@/components/artifacts/SawaArtifact.astro';
+import AdvisorArtifact from '@/components/artifacts/AdvisorArtifact.astro';
 import ChatOBDFlow from '@/components/diagrams/ChatOBDFlow.astro';
 import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
 import AdvisorVisual from '@/components/diagrams/AdvisorVisual.astro';
 import ReadingProgress from '@/components/ReadingProgress.astro';
+import CaseStudyMobileBar from '@/components/work/CaseStudyMobileBar.astro';
 import SchemaArticle from '@/components/seo/SchemaArticle.astro';
 import SchemaBreadcrumb from '@/components/seo/SchemaBreadcrumb.astro';
 import { getCollection } from 'astro:content';
@@ -24,18 +29,33 @@ const { data } = project;
 const allProjects = (await getCollection('build', ({ data }) => !data.draft))
   .sort((a, b) => a.data.order - b.data.order);
 const currentIndex = allProjects.findIndex(p => p.slug === project.slug);
+const currentNumber = String(currentIndex + 1).padStart(2, '0');
+const totalNumber = String(allProjects.length).padStart(2, '0');
 const next = allProjects[(currentIndex + 1) % allProjects.length];
 
 const pageUrl = new URL(Astro.url.pathname, Astro.site);
-const ogImage = data.coverImage ? new URL(data.coverImage, Astro.site).toString() : undefined;
-const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
+// Per-case-study OG card — bespoke 1200×630 PNG generated from the
+// portfolio's design system. Falls back to default site OG if missing.
+const ogImagePath = `/og/${project.slug}.jpg`;
+const ogImage = new URL(ogImagePath, Astro.site).toString();
+const ogAlt = `${data.title} — case study by Moe Qadan.`;
+
+// Map slugs to bespoke artifact components for the hero preview frame.
+const artifactMap: Record<string, any> = {
+  'chatobd2': VerdictArtifact,
+  'magtek-platform': PlatformArtifact,
+  'sawa': SawaArtifact,
+  'financial-platforms': AdvisorArtifact,
+};
+const Artifact = artifactMap[project.slug] ?? null;
+const categoryKey = data.category.toLowerCase();
 ---
 
 <BaseLayout
-  title={`${data.title}, Case Study by Moe Qadan`}
+  title={`${data.title} Case Study`}
   description={data.short}
   article={true}
-  image={data.coverImage ?? '/og.png'}
+  image={ogImagePath}
   imageAlt={ogAlt}
   keywords={[data.title, data.category, ...data.keyFocus, 'case study', 'product design', 'UX engineering']}
 >
@@ -60,7 +80,13 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
 
   <ReadingProgress />
 
-  <article class="cs">
+  <article class:list={['cs', `cs--${categoryKey}`, { 'cs--flagship': data.category === 'Flagship' }]}>
+    {/* Page-level accent glow that picks up the project's color signature.
+        Sits behind the header and fades out as the user scrolls. */}
+    <div class="cs__atmos" aria-hidden="true">
+      <span class="cs__atmos-glow"></span>
+    </div>
+
     <header class="cs__header">
       <div class="container-site">
         <a href="/work" class="cs__back">
@@ -70,10 +96,25 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
           All projects
         </a>
 
-        <div class="cs__category">
-          {data.category === 'Flagship'
-            ? <span class="cs__flagship">Flagship</span>
-            : <span class="cs__category-label">{data.category}</span>}
+        {/* Numbered editorial head: project index + category. Mirrors the
+            section-head pattern from the homepage grid. */}
+        <div class="cs__sxn">
+          <span class="cs__sxn-num">{currentNumber} / {totalNumber}</span>
+          <span class:list={['cs__sxn-tag', `cs__sxn-tag--${categoryKey}`]}>
+            <span class="cs__sxn-tag-dot" aria-hidden="true"></span>
+            {data.category}
+          </span>
+          {data.engagement === 'work' && data.company && (
+            <span class="cs__sxn-company">
+              <svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                <rect x="1.5" y="3.5" width="9" height="6.5" rx="1" stroke="currentColor" stroke-width="1"/>
+                <path d="M4.5 3.5V2.5a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1" stroke="currentColor" stroke-width="1"/>
+              </svg>
+              {data.company}
+            </span>
+          )}
+          <span class="cs__sxn-rule" aria-hidden="true"></span>
+          <span class="cs__sxn-meta">Case study</span>
         </div>
 
         <h1 class="cs__title">{data.title}</h1>
@@ -92,16 +133,16 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
               <dd><span class="cs__meta-text">{data.period}</span></dd>
             </div>
           )}
-          {data.company && (
+          {data.scope && (
             <div>
-              <dt>Company</dt>
-              <dd><span class="cs__meta-text">{data.company}</span></dd>
+              <dt>Scope</dt>
+              <dd><span class="cs__meta-text">{data.scope}</span></dd>
             </div>
           )}
           {data.status && (
             <div>
               <dt>Status</dt>
-              <dd><span class="cs__meta-text cs__meta-text--status">{data.status}</span></dd>
+              <dd><span class="cs__meta-text cs__meta-text--status"><span class="cs__status-dot" aria-hidden="true"></span>{data.status}</span></dd>
             </div>
           )}
           <div>
@@ -129,7 +170,12 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
     {data.outcomes && data.outcomes.length > 0 && (
       <div class="container-site cs__outcomes-wrap">
         <section class="cs__outcomes" aria-label="Outcomes">
-          <span class="cs__outcomes-eyebrow">Outcomes</span>
+          <header class="cs__outcomes-head">
+            <span class="cs__outcomes-num">02</span>
+            <span class="cs__outcomes-eyebrow">Outcomes</span>
+            <span class="cs__outcomes-rule" aria-hidden="true"></span>
+            <span class="cs__outcomes-meta">at a glance</span>
+          </header>
           <ul class="cs__outcomes-list">
             {data.outcomes.map(o => (
               <li class="cs__outcome">
@@ -142,29 +188,45 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
       </div>
     )}
 
-    <div class="container-site cs__cover">
-      {data.coverImage ? (
-        <img
-          src={data.coverImage}
-          alt={data.coverAlt ?? data.title}
-          class="cs__cover-image"
-          width="1440"
-          height="900"
-          loading="eager"
-        />
-      ) : (
-        <Placeholder
-          from={data.placeholder.from}
-          to={data.placeholder.to}
-          label={data.placeholder.label}
-          sublabel={data.placeholder.sublabel}
-          angle={data.placeholder.angle}
-          labelTone={data.placeholder.labelTone}
-        />
-      )}
+    <div class="container-site cs__cover-wrap">
+      <div class="cs__cover">
+        <span class="cs__cover-corner cs__cover-corner--tl" aria-hidden="true"></span>
+        <span class="cs__cover-corner cs__cover-corner--tr" aria-hidden="true"></span>
+        <span class="cs__cover-corner cs__cover-corner--bl" aria-hidden="true"></span>
+        <span class="cs__cover-corner cs__cover-corner--br" aria-hidden="true"></span>
+
+        {data.coverImage ? (
+          <img
+            src={data.coverImage}
+            alt={data.coverAlt ?? data.title}
+            class="cs__cover-image"
+            width="1440"
+            height="900"
+            loading="eager"
+          />
+        ) : Artifact ? (
+          <div class="cs__cover-artifact">
+            <Artifact />
+          </div>
+        ) : (
+          <Placeholder
+            from={data.placeholder.from}
+            to={data.placeholder.to}
+            label={data.placeholder.label}
+            sublabel={data.placeholder.sublabel}
+            angle={data.placeholder.angle}
+            labelTone={data.placeholder.labelTone}
+          />
+        )}
+      </div>
     </div>
 
     <div class="container-narrow cs__content">
+      <div class="cs__content-head">
+        <span class="cs__content-num">03</span>
+        <span class="cs__content-label">Notes</span>
+        <span class="cs__content-rule" aria-hidden="true"></span>
+      </div>
       <div class="prose cs__prose">
         <Content />
       </div>
@@ -185,7 +247,11 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
 
         <section class="container-site cs__post">
           <header class="cs__post-head">
-            <span class="cs__post-eyebrow">Marketing surface</span>
+            <div class="cs__post-sxn">
+              <span class="cs__post-num">04</span>
+              <span class="cs__post-eyebrow">Marketing surface</span>
+              <span class="cs__post-rule" aria-hidden="true"></span>
+            </div>
             <h2 class="cs__post-title">Same premise, different format.</h2>
             <p class="cs__post-sub">
               The marketing site carries the same product premise into a
@@ -228,7 +294,11 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
 
         <section class="container-site cs__post cs__post--alt">
           <header class="cs__post-head">
-            <span class="cs__post-eyebrow">Technical depth</span>
+            <div class="cs__post-sxn">
+              <span class="cs__post-num">05</span>
+              <span class="cs__post-eyebrow">Technical depth</span>
+              <span class="cs__post-rule" aria-hidden="true"></span>
+            </div>
             <h2 class="cs__post-title">The system underneath the surface.</h2>
             <p class="cs__post-sub">
               Six deterministic reasoning layers run before every model
@@ -276,7 +346,11 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
       <>
         <section class="container-site cs__post">
           <header class="cs__post-head">
-            <span class="cs__post-eyebrow">Hardware experience</span>
+            <div class="cs__post-sxn">
+              <span class="cs__post-num">04</span>
+              <span class="cs__post-eyebrow">Hardware experience</span>
+              <span class="cs__post-rule" aria-hidden="true"></span>
+            </div>
             <h2 class="cs__post-title">Pattern-driven product pages.</h2>
             <p class="cs__post-sub">
               The hardware portfolio spans card readers, OEM
@@ -343,7 +417,11 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
 
         <section class="container-site cs__post cs__post--alt">
           <header class="cs__post-head">
-            <span class="cs__post-eyebrow">Magensa, a MagTek company</span>
+            <div class="cs__post-sxn">
+              <span class="cs__post-num">05</span>
+              <span class="cs__post-eyebrow">Magensa, a MagTek company</span>
+              <span class="cs__post-rule" aria-hidden="true"></span>
+            </div>
             <h2 class="cs__post-title">A subsidiary that needed to feel its own.</h2>
             <p class="cs__post-sub">
               Magensa carries its own product identity inside the
@@ -399,7 +477,11 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
       <>
         <section class="container-site cs__post">
           <header class="cs__post-head">
-            <span class="cs__post-eyebrow">Earning trust through content</span>
+            <div class="cs__post-sxn">
+              <span class="cs__post-num">04</span>
+              <span class="cs__post-eyebrow">Earning trust through content</span>
+              <span class="cs__post-rule" aria-hidden="true"></span>
+            </div>
             <h2 class="cs__post-title">Two surfaces that do the convincing.</h2>
             <p class="cs__post-sub">
               A group-decision product has to feel low-friction before
@@ -444,7 +526,11 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
 
         <section class="container-site cs__post cs__post--alt">
           <header class="cs__post-head">
-            <span class="cs__post-eyebrow">Long-form content and conversion</span>
+            <div class="cs__post-sxn">
+              <span class="cs__post-num">05</span>
+              <span class="cs__post-eyebrow">Long-form content and conversion</span>
+              <span class="cs__post-rule" aria-hidden="true"></span>
+            </div>
             <h2 class="cs__post-title">Restaurant pieces double as the install path.</h2>
             <p class="cs__post-sub">
               Each city piece is its own page with its own URL. They
@@ -494,7 +580,11 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
         </section>
         <section class="container-site cs__post">
           <header class="cs__post-head">
-            <span class="cs__post-eyebrow">Client portals</span>
+            <div class="cs__post-sxn">
+              <span class="cs__post-num">04</span>
+              <span class="cs__post-eyebrow">Client portals</span>
+              <span class="cs__post-rule" aria-hidden="true"></span>
+            </div>
             <h2 class="cs__post-title">Across major wealth and banking institutions.</h2>
             <p class="cs__post-sub">
               A sample of advisor- and customer-facing portals built
@@ -535,16 +625,30 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
 
     <footer class="cs__footer">
       <div class="container-site">
+        <div class="cs__next-head">
+          <span class="cs__next-num">→</span>
+          <span class="cs__next-eyebrow">Next case study</span>
+          <span class="cs__next-rule" aria-hidden="true"></span>
+        </div>
+
         <a
           href={`/work/${next.slug}`}
-          class="cs__next"
+          class:list={['cs__next', `cs__next--${next.data.category.toLowerCase()}`]}
           data-track="cta_click"
           data-track-cta="next-project"
           data-track-project={next.slug}
           data-track-from={project.slug}
         >
+          <span class="cs__next-corner cs__next-corner--tl" aria-hidden="true"></span>
+          <span class="cs__next-corner cs__next-corner--tr" aria-hidden="true"></span>
+          <span class="cs__next-corner cs__next-corner--bl" aria-hidden="true"></span>
+          <span class="cs__next-corner cs__next-corner--br" aria-hidden="true"></span>
+
           <div class="cs__next-meta">
-            <span class="cs__next-label">Next project</span>
+            <span class="cs__next-tag">
+              <span class="cs__next-tag-dot" aria-hidden="true"></span>
+              {next.data.category}
+            </span>
             <span class="cs__next-title">{next.data.title}</span>
             <span class="cs__next-short">{next.data.short}</span>
           </div>
@@ -581,10 +685,47 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
       </div>
     </footer>
   </article>
+
+  <CaseStudyMobileBar projectTitle={data.title} />
 </BaseLayout>
 
 <style>
+  /* Per-project accent (mirrors ProjectCard token routing). Each case
+     study inherits its color signature from this single class chain. */
+  .cs {
+    --pc-accent: var(--color-accent);
+    --pc-accent-rgb: var(--project-flagship-rgb);
+    position: relative;
+  }
+  .cs--platform { --pc-accent-rgb: var(--project-platform-rgb); --pc-accent: rgb(var(--project-platform-rgb)); }
+  .cs--product { --pc-accent-rgb: var(--project-product-rgb); --pc-accent: rgb(var(--project-product-rgb)); }
+  .cs--frontend { --pc-accent-rgb: var(--project-frontend-rgb); --pc-accent: rgb(var(--project-frontend-rgb)); }
+  .cs--flagship { --pc-accent-rgb: var(--project-flagship-rgb); --pc-accent: var(--color-accent); }
+
+  /* Page-level accent atmosphere — sits behind the header. */
+  .cs__atmos {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 600px;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .cs__atmos-glow {
+    position: absolute;
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1200px;
+    height: 600px;
+    background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(var(--pc-accent-rgb), 0.10), transparent 70%);
+    filter: blur(20px);
+  }
+
   .cs__header {
+    position: relative;
     padding-top: calc(60px + var(--space-8));
     padding-bottom: var(--space-8);
   }
@@ -606,37 +747,100 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
     text-decoration: none;
     margin-bottom: var(--space-6);
     padding: 6px 0;
-    transition: color 150ms;
+    transition: color 150ms, transform 200ms var(--ease-out);
     -webkit-tap-highlight-color: transparent;
   }
 
-  .cs__back:hover { color: var(--color-accent); }
+  .cs__back:hover {
+    color: var(--pc-accent);
+    transform: translateX(-2px);
+  }
 
-  .cs__category {
+  /* Numbered case-study head */
+  .cs__sxn {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
-    margin-bottom: var(--space-5);
+    gap: 10px;
+    margin-bottom: var(--space-6);
     flex-wrap: wrap;
   }
 
-  .cs__flagship {
+  .cs__sxn-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-elevated);
+    color: var(--color-text);
+    font-family: var(--font-mono);
     font-size: 10px;
     font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--color-accent);
-    background-color: var(--color-accent-muted);
-    padding: 4px 10px;
-    border-radius: 9999px;
+    letter-spacing: 0.06em;
+    line-height: 1;
   }
 
-  .cs__category-label {
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 0.04em;
+  .cs__sxn-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    padding: 4px 10px;
+    border-radius: 9999px;
+    background-color: var(--color-bg-deep);
+    border: 1px solid var(--color-border);
+    line-height: 1;
+  }
+
+  .cs__sxn-tag-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--pc-accent);
+    box-shadow: 0 0 6px var(--pc-accent);
+  }
+
+  .cs__sxn-tag--flagship {
+    color: var(--color-accent);
+    background-color: var(--color-accent-dim);
+    border-color: var(--color-accent-muted);
+  }
+
+  .cs__sxn-company {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--color-text-subtle);
+    padding: 4px 10px;
+    border-radius: 9999px;
+    border: 1px dashed var(--color-border);
+    line-height: 1;
+  }
+
+  .cs__sxn-rule {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, var(--color-border), transparent);
+    min-width: 40px;
+  }
+
+  .cs__sxn-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-text-subtle);
+    letter-spacing: 0.06em;
   }
 
   .cs__title {
@@ -650,11 +854,24 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
     max-width: 16ch;
   }
 
+  /* Accent rule under the headline — picks up the project color */
+  .cs__title::after {
+    content: '';
+    display: block;
+    width: 36px;
+    height: 2px;
+    margin-top: var(--space-5);
+    background-color: var(--pc-accent);
+    opacity: 0.7;
+    border-radius: 2px;
+  }
+
   @media (min-width: 768px) {
     .cs__title {
       line-height: 1.02;
       margin-bottom: var(--space-5);
     }
+    .cs__title::after { margin-top: var(--space-6); }
   }
 
   .cs__short {
@@ -662,18 +879,18 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
     line-height: 1.55;
     color: var(--color-text-muted);
     max-width: 56ch;
-    margin-bottom: var(--space-6);
+    margin-bottom: var(--space-8);
   }
 
   @media (min-width: 768px) {
     .cs__short {
-      margin-bottom: var(--space-8);
+      margin-bottom: var(--space-10);
     }
   }
 
   .cs__meta {
     margin: 0;
-    padding-top: var(--space-5);
+    padding-top: var(--space-6);
     border-top: 1px solid var(--color-border);
     display: flex;
     gap: var(--space-6);
@@ -683,6 +900,7 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
   @media (min-width: 768px) {
     .cs__meta {
       gap: var(--space-12);
+      padding-top: var(--space-8);
     }
   }
 
@@ -701,9 +919,7 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
     color: var(--color-text-subtle);
   }
 
-  .cs__meta dd {
-    margin: 0;
-  }
+  .cs__meta dd { margin: 0; }
 
   .cs__meta ul {
     list-style: none;
@@ -739,12 +955,30 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
     font-family: var(--font-mono);
     font-size: 12px;
     letter-spacing: 0.04em;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
   }
 
-  /* Outcomes rail — sits below the header, above the cover.
-     Even partial / status-flavored outcomes ground the case study
-     in evidence. The audit's recommendation: every project earns
-     at least one number or a status statement. */
+  .cs__status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--color-success);
+    box-shadow: 0 0 6px color-mix(in srgb, var(--color-success) 65%, transparent);
+    animation: cs-status-pulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes cs-status-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(0.85); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cs__status-dot { animation: none; }
+  }
+
+  /* Outcomes panel */
   .cs__outcomes-wrap {
     padding-top: var(--space-6);
     padding-bottom: var(--space-2);
@@ -759,27 +993,79 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
   .cs__outcomes {
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
-    padding: var(--space-5) var(--space-5);
+    gap: var(--space-5);
+    padding: var(--space-6);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    background-color: var(--color-bg-elevated);
+    border-radius: var(--radius-2xl);
+    background:
+      linear-gradient(180deg, var(--color-bg-elevated), var(--color-bg-muted));
+    box-shadow: var(--shadow-card);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cs__outcomes::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 80%;
+    background: radial-gradient(ellipse 60% 80% at 0% 0%, rgba(var(--pc-accent-rgb), 0.08), transparent 60%);
+    pointer-events: none;
   }
 
   @media (min-width: 720px) {
     .cs__outcomes {
-      padding: var(--space-6) var(--space-7);
-      border-radius: var(--radius-xl);
+      padding: var(--space-7) var(--space-8);
     }
+  }
+
+  .cs__outcomes-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cs__outcomes-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 22px;
+    padding: 0 7px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-elevated);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1;
   }
 
   .cs__outcomes-eyebrow {
     font-family: var(--font-mono);
     font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
+    font-weight: 700;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
+    color: var(--color-text);
+  }
+
+  .cs__outcomes-rule {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, var(--color-border), transparent);
+  }
+
+  .cs__outcomes-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
     color: var(--color-text-subtle);
+    letter-spacing: 0.04em;
   }
 
   .cs__outcomes-list {
@@ -789,6 +1075,8 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
     gap: var(--space-5) var(--space-6);
+    position: relative;
+    z-index: 1;
   }
 
   .cs__outcome {
@@ -800,7 +1088,7 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
 
   .cs__outcome-value {
     font-family: var(--font-display);
-    font-size: clamp(22px, 2.6vw, 30px);
+    font-size: clamp(24px, 2.8vw, 32px);
     font-weight: 400;
     letter-spacing: -0.015em;
     line-height: 1.1;
@@ -830,44 +1118,123 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
     line-height: 1.4;
   }
 
-  .cs__meta .cs__stack li + li::before {
-    content: none;
-  }
+  .cs__meta .cs__stack li + li::before { content: none; }
 
-  .cs__cover {
+  /* Cover frame — wraps the cover image or artifact in a card-style
+     container with corner crosshairs matching the project cards. */
+  .cs__cover-wrap {
+    padding-top: var(--space-8);
     padding-bottom: var(--space-8);
   }
 
   @media (min-width: 768px) {
-    .cs__cover {
+    .cs__cover-wrap {
+      padding-top: var(--space-10);
       padding-bottom: var(--space-12);
     }
   }
 
+  .cs__cover {
+    position: relative;
+    border-radius: var(--radius-2xl);
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-elevated);
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+    transition: border-color 320ms var(--ease-out), box-shadow 320ms var(--ease-out);
+  }
+
+  .cs__cover:hover {
+    border-color: rgba(var(--pc-accent-rgb), 0.4);
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  .cs__cover-corner {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border: 1px solid var(--color-text-subtle);
+    pointer-events: none;
+    opacity: 0.4;
+    z-index: 4;
+    transition: opacity 240ms, border-color 240ms;
+  }
+
+  .cs__cover:hover .cs__cover-corner {
+    opacity: 1;
+    border-color: var(--pc-accent);
+  }
+
+  .cs__cover-corner--tl { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+  .cs__cover-corner--tr { top: 10px; right: 10px; border-left: none; border-bottom: none; }
+  .cs__cover-corner--bl { bottom: 10px; left: 10px; border-right: none; border-top: none; }
+  .cs__cover-corner--br { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+
   .cs__cover :global(.placeholder) {
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
+    border-radius: 0;
   }
 
   .cs__cover-image {
     display: block;
     width: 100%;
     height: auto;
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--color-border);
-    box-shadow: var(--shadow-md);
   }
 
-  @media (min-width: 600px) {
-    .cs__cover :global(.placeholder),
-    .cs__cover-image {
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-lg);
-    }
+  .cs__cover-artifact {
+    position: relative;
+    aspect-ratio: 16 / 9;
   }
 
+  .cs__cover-artifact :global(.vart),
+  .cs__cover-artifact :global(.part),
+  .cs__cover-artifact :global(.sart),
+  .cs__cover-artifact :global(.aart) {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* Notes head + content */
   .cs__content {
     padding-bottom: var(--space-12);
+  }
+
+  .cs__content-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: var(--space-6);
+  }
+
+  .cs__content-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 22px;
+    padding: 0 7px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-elevated);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1;
+  }
+
+  .cs__content-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-text);
+  }
+
+  .cs__content-rule {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, var(--color-border), transparent);
   }
 
   .cs__visuals {
@@ -878,7 +1245,7 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
     padding-bottom: var(--space-20);
   }
 
-  /* Inline pull-quote (replaces the deleted Thesis component) */
+  /* Inline pull-quote */
   .cs__pull {
     display: grid;
     grid-template-columns: 1px 1fr;
@@ -898,7 +1265,7 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
     content: '';
     width: 1px;
     min-height: 64px;
-    background: linear-gradient(to bottom, var(--color-accent), transparent 80%);
+    background: linear-gradient(to bottom, var(--pc-accent), transparent 80%);
   }
 
   .cs__pull-text {
@@ -924,6 +1291,7 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
     color: var(--color-text-subtle);
   }
 
+  /* Numbered post sections */
   .cs__post {
     padding-block: var(--space-12) var(--space-10);
     border-top: 1px solid var(--color-border-subtle);
@@ -950,15 +1318,44 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
     }
   }
 
+  .cs__post-sxn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: var(--space-4);
+  }
+
+  .cs__post-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 22px;
+    padding: 0 7px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-elevated);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1;
+  }
+
   .cs__post-eyebrow {
-    display: inline-block;
     font-family: var(--font-mono);
     font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
+    font-weight: 700;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--color-text-subtle);
-    margin-bottom: var(--space-3);
+    color: var(--color-text);
+  }
+
+  .cs__post-rule {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, var(--color-border), transparent);
+    max-width: 200px;
   }
 
   .cs__post-title {
@@ -1027,7 +1424,14 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
     height: auto;
     border-radius: var(--radius-lg);
     border: 1px solid var(--color-border);
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-card);
+    transition: border-color 320ms var(--ease-out), transform 320ms var(--ease-out), box-shadow 320ms var(--ease-out);
+  }
+
+  .cs__shot:hover img {
+    border-color: rgba(var(--pc-accent-rgb), 0.4);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card-hover);
   }
 
   .cs__shot figcaption {
@@ -1042,6 +1446,7 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
     margin-inline: auto;
   }
 
+  /* Prose */
   .cs__prose :global(h2) {
     font-family: var(--font-display);
     font-size: clamp(24px, 3vw, 32px);
@@ -1053,9 +1458,7 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
     margin-bottom: var(--space-4);
   }
 
-  .cs__prose :global(h2:first-child) {
-    margin-top: 0;
-  }
+  .cs__prose :global(h2:first-child) { margin-top: 0; }
 
   .cs__prose :global(h3) {
     font-size: 18px;
@@ -1081,9 +1484,7 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
     margin-bottom: var(--space-5);
   }
 
-  .cs__prose :global(li) {
-    margin-bottom: var(--space-2);
-  }
+  .cs__prose :global(li) { margin-bottom: var(--space-2); }
 
   .cs__prose :global(strong) {
     color: var(--color-text);
@@ -1096,62 +1497,181 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
     margin: var(--space-10) 0;
   }
 
+  /* Closing footer */
   .cs__footer {
     border-top: 1px solid var(--color-border-subtle);
     padding-block: var(--space-12);
   }
 
+  @media (min-width: 768px) {
+    .cs__footer {
+      padding-block: var(--space-16);
+    }
+  }
+
+  /* On mobile, the sticky bottom bar sits over the page. Push the
+     closing footer up so its actions remain comfortable to reach
+     without overlap. ~80px = bar height (60) + padding (16) + safe-area. */
+  @media (max-width: 760px) {
+    .cs__footer {
+      padding-bottom: calc(var(--space-12) + 80px);
+    }
+  }
+
+  .cs__next-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: var(--space-5);
+  }
+
+  .cs__next-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 22px;
+    width: 22px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-elevated);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .cs__next-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-text);
+  }
+
+  .cs__next-rule {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, var(--color-border), transparent);
+  }
+
+  /* Per-category accent for the next-project card */
   .cs__next {
+    --pc-accent: var(--color-accent);
+    --pc-accent-rgb: var(--project-flagship-rgb);
+  }
+  .cs__next--platform { --pc-accent-rgb: var(--project-platform-rgb); --pc-accent: rgb(var(--project-platform-rgb)); }
+  .cs__next--product { --pc-accent-rgb: var(--project-product-rgb); --pc-accent: rgb(var(--project-product-rgb)); }
+  .cs__next--frontend { --pc-accent-rgb: var(--project-frontend-rgb); --pc-accent: rgb(var(--project-frontend-rgb)); }
+  .cs__next--flagship { --pc-accent-rgb: var(--project-flagship-rgb); --pc-accent: var(--color-accent); }
+
+  .cs__next {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: var(--space-4);
-    padding: var(--space-5);
+    padding: var(--space-6);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    background-color: var(--color-bg-elevated);
+    border-radius: var(--radius-2xl);
+    background:
+      linear-gradient(180deg, var(--color-bg-elevated), var(--color-bg-muted));
     text-decoration: none;
     color: var(--color-text);
-    margin-bottom: var(--space-6);
+    margin-bottom: var(--space-8);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
     transition:
-      border-color 200ms,
-      transform 200ms var(--ease-out),
-      box-shadow 200ms;
+      border-color 280ms var(--ease-out),
+      transform 280ms var(--ease-out),
+      box-shadow 280ms var(--ease-out);
     -webkit-tap-highlight-color: transparent;
+  }
+
+  .cs__next::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 100% at 100% 50%, rgba(var(--pc-accent-rgb), 0.12), transparent 55%);
+    opacity: 0;
+    transition: opacity 320ms var(--ease-out);
+    pointer-events: none;
   }
 
   @media (min-width: 600px) {
     .cs__next {
-      padding: var(--space-6) var(--space-7);
-      border-radius: var(--radius-xl);
-      margin-bottom: var(--space-8);
+      padding: var(--space-7) var(--space-8);
     }
   }
 
   .cs__next:hover {
-    border-color: var(--color-accent);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md), 0 0 0 1px var(--color-accent-muted);
+    border-color: rgba(var(--pc-accent-rgb), 0.45);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-card-hover);
   }
+
+  .cs__next:hover::before {
+    opacity: 1;
+  }
+
+  .cs__next-corner {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border: 1px solid var(--color-text-subtle);
+    pointer-events: none;
+    opacity: 0.35;
+    transition: opacity 240ms, border-color 240ms;
+  }
+
+  .cs__next:hover .cs__next-corner {
+    opacity: 1;
+    border-color: var(--pc-accent);
+  }
+
+  .cs__next-corner--tl { top: 8px; left: 8px; border-right: none; border-bottom: none; }
+  .cs__next-corner--tr { top: 8px; right: 8px; border-left: none; border-bottom: none; }
+  .cs__next-corner--bl { bottom: 8px; left: 8px; border-right: none; border-top: none; }
+  .cs__next-corner--br { bottom: 8px; right: 8px; border-left: none; border-top: none; }
 
   .cs__next-meta {
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 8px;
+    z-index: 1;
   }
 
-  .cs__next-label {
+  .cs__next-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--color-text-subtle);
+    color: var(--color-text-muted);
+    padding: 4px 10px;
+    border-radius: 9999px;
+    background-color: var(--color-bg-deep);
+    border: 1px solid var(--color-border);
+    line-height: 1;
+    width: fit-content;
+  }
+
+  .cs__next-tag-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--pc-accent);
+    box-shadow: 0 0 6px var(--pc-accent);
   }
 
   .cs__next-title {
     font-family: var(--font-display);
-    font-size: clamp(22px, 3vw, 32px);
+    font-size: clamp(24px, 3vw, 36px);
     font-weight: 400;
     letter-spacing: -0.02em;
     line-height: 1.1;
@@ -1162,17 +1682,19 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
     font-size: 14px;
     color: var(--color-text-muted);
     margin-top: 2px;
+    max-width: 56ch;
   }
 
   .cs__next-arrow {
     color: var(--color-text-subtle);
     flex-shrink: 0;
-    transition: color 200ms, transform 200ms;
+    transition: color 200ms, transform 200ms var(--ease-out);
+    z-index: 1;
   }
 
   .cs__next:hover .cs__next-arrow {
-    color: var(--color-accent);
-    transform: translateX(4px);
+    color: var(--pc-accent);
+    transform: translateX(6px);
   }
 
   .cs__footer-actions {
@@ -1228,10 +1750,24 @@ const ogAlt = data.coverAlt ?? `${data.title} case study by Moe Qadan.`;
     transition: all 200ms var(--ease-out);
     letter-spacing: -0.01em;
     -webkit-tap-highlight-color: transparent;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.5) inset,
+      0 6px 16px rgba(0,0,0,0.15);
+  }
+
+  .cs__btn-primary svg {
+    transition: transform 200ms var(--ease-out);
   }
 
   .cs__btn-primary:hover {
     transform: translateY(-1px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.5) inset,
+      0 12px 28px rgba(0,0,0,0.18),
+      0 0 0 4px var(--color-accent-dim);
+  }
+
+  .cs__btn-primary:hover svg {
+    transform: translateX(2px);
   }
 </style>

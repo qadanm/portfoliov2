@@ -1,0 +1,205 @@
+---
+// Mobile-only sticky bar at the bottom of case study pages. Restrained
+// neutral actions: a project label on the left, then "Work" (back to
+// selected work) + "Send a message" (contact). No availability framing,
+// no marketing language. Safe-area aware. Hidden above 760px.
+
+interface Props {
+  projectTitle: string;
+}
+
+const { projectTitle } = Astro.props;
+---
+
+<aside class="csbar" aria-label="Case study actions">
+  <div class="csbar__inner">
+    <span class="csbar__label">
+      <span class="csbar__label-eyebrow">Reading</span>
+      <span class="csbar__label-title">{projectTitle}</span>
+    </span>
+
+    <div class="csbar__actions">
+      <a
+        href="/work"
+        class="csbar__action csbar__action--ghost"
+        data-track="cta_click"
+        data-track-cta="csbar-work"
+      >
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M13 8H3M7 12l-4-4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Work
+      </a>
+      <a
+        href="/contact"
+        class="csbar__action csbar__action--primary"
+        data-track="cta_click"
+        data-track-cta="csbar-contact"
+      >
+        Send a message
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</aside>
+
+<style>
+  .csbar {
+    display: none;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 90;
+    /* Safe-area aware bottom padding so the bar stays clear of the iOS
+       home indicator and Android gesture bar. */
+    padding-bottom: env(safe-area-inset-bottom);
+    background-color: color-mix(in srgb, var(--color-bg) 80%, transparent);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    border-top: 1px solid var(--color-border-subtle);
+    box-shadow: 0 -1px 0 rgba(255, 255, 255, 0.02) inset;
+  }
+
+  /* Mobile only — never visible on tablet/desktop. */
+  @media (max-width: 760px) {
+    .csbar { display: block; }
+  }
+
+  .csbar__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    height: 60px;
+    padding-inline: 16px;
+  }
+
+  /* Project label (left) — small, scannable, gives the user context
+     about what they're reading. Truncates if the title is long. */
+  .csbar__label {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .csbar__label-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+    line-height: 1;
+  }
+
+  .csbar__label-title {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Actions */
+  .csbar__actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .csbar__action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 9999px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    text-decoration: none;
+    transition:
+      transform 180ms var(--ease-out),
+      background-color 180ms,
+      border-color 180ms,
+      color 180ms,
+      box-shadow 180ms;
+    -webkit-tap-highlight-color: transparent;
+    white-space: nowrap;
+  }
+
+  .csbar__action:active {
+    transform: translateY(1px);
+  }
+
+  .csbar__action--ghost {
+    color: var(--color-text-muted);
+    background-color: transparent;
+    border: 1px solid var(--color-border);
+  }
+
+  .csbar__action--ghost:hover,
+  .csbar__action--ghost:focus-visible {
+    color: var(--color-text);
+    border-color: var(--color-text-subtle);
+    background-color: var(--color-bg-elevated);
+  }
+
+  .csbar__action--primary {
+    color: var(--color-bg);
+    background-color: var(--color-text);
+    border: 1px solid var(--color-text);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.5) inset,
+      0 1px 2px rgba(0, 0, 0, 0.2),
+      0 4px 12px rgba(0, 0, 0, 0.18);
+  }
+
+  :global([data-theme="dark"]) .csbar__action--primary {
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.6) inset,
+      0 1px 2px rgba(0, 0, 0, 0.4),
+      0 4px 12px rgba(0, 0, 0, 0.35);
+  }
+
+  .csbar__action--primary:hover,
+  .csbar__action--primary:focus-visible {
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.5) inset,
+      0 6px 16px rgba(0, 0, 0, 0.18),
+      0 0 0 3px var(--color-accent-dim);
+  }
+
+  /* On very narrow viewports, drop the Work back-button so the primary
+     action retains a comfortable size. The case study has its own back
+     link in the header anyway. */
+  @media (max-width: 360px) {
+    .csbar__action--ghost {
+      display: none;
+    }
+    .csbar__inner {
+      gap: 10px;
+      padding-inline: 14px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .csbar__action {
+      transition: none;
+    }
+    .csbar__action:active {
+      transform: none;
+    }
+  }
+</style>

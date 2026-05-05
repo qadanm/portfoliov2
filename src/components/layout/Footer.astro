@@ -6,136 +6,357 @@ const links = [
   { href: 'https://github.com/qadanm', label: 'GitHub', external: true },
   { href: 'mailto:moe@qadan.co', label: 'Email', external: false },
 ];
+
+const sitemap = [
+  { href: '/work', label: 'Work' },
+  { href: '/approach', label: 'Approach' },
+  { href: '/about', label: 'About' },
+  { href: '/uses', label: 'Uses' },
+  { href: '/contact', label: 'Contact' },
+];
 ---
 
 <footer class="site-footer">
   <div class="container-site footer-inner">
-    <div class="footer-left">
-      <a href="/" class="footer-logo">Qadan<span class="footer-logo-dot">.</span></a>
+    {/* Closing mark — large monogram + tagline. Acts as the final
+        editorial signature for the page. */}
+    <div class="footer-mark">
+      <a href="/" class="footer-monogram" aria-label="Qadan, home">
+        <span class="footer-monogram-mq">MQ</span>
+        <span class="footer-monogram-rule"></span>
+        <span class="footer-monogram-co">qadan.co</span>
+      </a>
       <p class="footer-tagline">
-        Product design, UX engineering, AI-native systems.
+        Independent senior UX &amp; frontend.<br />
+        Designing, building, and shipping the web.
       </p>
+      <a
+        href="mailto:moe@qadan.co"
+        class="footer-email"
+        data-track="contact_click"
+        data-track-channel="email"
+        data-track-loc="footer-mark"
+      >
+        moe@qadan.co
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
     </div>
 
-    <div class="footer-right">
-      <nav class="footer-nav" aria-label="Footer navigation">
-        {links.map(link => (
-          <a
-            href={link.href}
-            class="footer-link"
-            target={link.external ? '_blank' : undefined}
-            rel={link.external ? 'noopener noreferrer' : undefined}
-            data-track="contact_click"
-            data-track-channel={link.label.toLowerCase()}
-            data-track-loc="footer"
-          >
-            {link.label}
-            {link.external && (
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true" style="display:inline;margin-left:2px;opacity:0.5">
-                <path d="M3 1h6v6M9 1 1 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            )}
-          </a>
-        ))}
-      </nav>
-      <p class="footer-copy">© {year} Moe Qadan</p>
+    <div class="footer-cols">
+      <div class="footer-col">
+        <span class="footer-col-head">Sitemap</span>
+        <nav class="footer-col-list" aria-label="Sitemap">
+          {sitemap.map(item => (
+            <a href={item.href} class="footer-col-link">{item.label}</a>
+          ))}
+        </nav>
+      </div>
+
+      <div class="footer-col">
+        <span class="footer-col-head">Elsewhere</span>
+        <nav class="footer-col-list" aria-label="External profiles">
+          {links.map(link => (
+            <a
+              href={link.href}
+              class="footer-col-link footer-col-link--ext"
+              target={link.external ? '_blank' : undefined}
+              rel={link.external ? 'noopener noreferrer' : undefined}
+              data-track="contact_click"
+              data-track-channel={link.label.toLowerCase()}
+              data-track-loc="footer"
+            >
+              {link.label}
+              {link.external && (
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+                  <path d="M3 1h6v6M9 1 1 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              )}
+            </a>
+          ))}
+        </nav>
+      </div>
+
+      <div class="footer-col footer-col--colophon">
+        <span class="footer-col-head">Colophon</span>
+        <p class="footer-colophon">
+          Built with Astro &amp; hand-written CSS. Inter, Instrument
+          Serif, &amp; JetBrains Mono. No template.
+        </p>
+      </div>
     </div>
+  </div>
+
+  <div class="container-site footer-bottom">
+    <span class="footer-copy">© {year} Moe Qadan</span>
+    <span class="footer-loc">
+      <span class="footer-loc-dot"></span>
+      Los Angeles, CA
+    </span>
   </div>
 </footer>
 
 <style>
   .site-footer {
     border-top: 1px solid var(--color-border);
-    padding-block: var(--space-10);
+    padding-top: var(--space-12);
+    padding-bottom: var(--space-8);
     margin-top: var(--space-12);
+    background:
+      linear-gradient(180deg,
+        transparent,
+        color-mix(in srgb, var(--color-bg-deep) 60%, transparent));
   }
 
   @media (min-width: 768px) {
     .site-footer {
-      padding-block: var(--space-12);
+      padding-top: var(--space-20);
+      padding-bottom: var(--space-10);
       margin-top: var(--space-24);
     }
   }
 
   .footer-inner {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: var(--space-8);
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-10);
+    padding-bottom: var(--space-10);
+    border-bottom: 1px solid var(--color-border-subtle);
   }
 
-  .footer-logo {
-    display: inline-block;
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--color-text);
-    text-decoration: none;
-    letter-spacing: -0.02em;
-    margin-bottom: var(--space-2);
-    transition: color 150ms;
-  }
-
-  .footer-logo:hover { color: var(--color-accent); }
-  .footer-logo-dot { color: var(--color-accent); }
-
-  .footer-tagline {
-    font-size: 13px;
-    color: var(--color-text-subtle);
-    line-height: 1.5;
-    max-width: 280px;
-    margin-top: 4px;
-  }
-
-  .footer-right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: var(--space-3);
-  }
-
-  .footer-nav {
-    display: flex;
-    gap: var(--space-5);
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    margin-left: -2px;
-  }
-
-  @media (max-width: 600px) {
-    .footer-nav {
-      justify-content: flex-start;
-      gap: var(--space-4);
+  @media (min-width: 720px) {
+    .footer-inner {
+      grid-template-columns: 1.2fr 1fr;
+      gap: var(--space-16);
     }
   }
 
-  .footer-link {
+  @media (min-width: 1024px) {
+    .footer-inner {
+      grid-template-columns: 1.5fr 1fr;
+    }
+  }
+
+  /* Mark / monogram block */
+  .footer-mark {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  .footer-monogram {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--color-text);
+    text-decoration: none;
+    width: fit-content;
+  }
+
+  .footer-monogram-mq {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    border: 1px solid var(--color-border);
+    background:
+      linear-gradient(180deg, var(--color-bg-elevated), var(--color-bg-deep));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+    transition: border-color 200ms, color 200ms;
+  }
+
+  .footer-monogram:hover .footer-monogram-mq {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .footer-monogram-rule {
+    width: 16px;
+    height: 1px;
+    background-color: var(--color-border);
+  }
+
+  .footer-monogram-co {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--color-text-muted);
+    transition: color 200ms;
+  }
+
+  .footer-monogram:hover .footer-monogram-co {
+    color: var(--color-text);
+  }
+
+  .footer-tagline {
+    font-family: var(--font-display);
+    font-size: clamp(20px, 2vw, 24px);
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    line-height: 1.3;
+    color: var(--color-text);
+    max-width: 36ch;
+  }
+
+  .footer-email {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    padding: 8px 14px;
+    border-radius: 9999px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-elevated);
+    color: var(--color-text);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    transition: border-color 200ms, color 200ms, background-color 200ms, transform 200ms var(--ease-out);
+  }
+
+  .footer-email svg {
+    transition: transform 200ms var(--ease-out);
+  }
+
+  .footer-email:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    background-color: var(--color-accent-dim);
+    transform: translateY(-1px);
+  }
+
+  .footer-email:hover svg {
+    transform: translateX(2px);
+  }
+
+  /* Three-column index */
+  .footer-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+  }
+
+  @media (min-width: 600px) {
+    .footer-cols {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-8);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .footer-cols {
+      gap: var(--space-10);
+    }
+  }
+
+  .footer-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .footer-col--colophon {
+    grid-column: 1 / -1;
+  }
+
+  @media (min-width: 600px) {
+    .footer-col--colophon {
+      grid-column: auto;
+    }
+  }
+
+  .footer-col-head {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .footer-col-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .footer-col-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     font-size: 14px;
     font-weight: 500;
     color: var(--color-text-muted);
     text-decoration: none;
-    transition: color 150ms;
-    /* Comfortable tap target without inflating visual size */
-    padding: 6px 0;
+    padding: 4px 0;
+    transition: color 150ms, transform 150ms var(--ease-out);
     -webkit-tap-highlight-color: transparent;
+    width: fit-content;
   }
 
-  @media (min-width: 768px) {
-    .footer-link {
-      font-size: 13px;
-      padding: 0;
-    }
+  .footer-col-link:hover {
+    color: var(--color-accent);
+    transform: translateX(2px);
   }
 
-  .footer-link:hover { color: var(--color-accent); }
+  .footer-col-link svg {
+    opacity: 0.5;
+    transition: opacity 150ms;
+  }
+
+  .footer-col-link:hover svg {
+    opacity: 1;
+  }
+
+  .footer-colophon {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--color-text-muted);
+  }
+
+  /* Bottom row */
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    padding-top: var(--space-6);
+    margin-top: var(--space-6);
+  }
 
   .footer-copy {
-    font-size: 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
     color: var(--color-text-subtle);
+    letter-spacing: 0.04em;
   }
 
-  @media (max-width: 600px) {
-    .footer-inner { flex-direction: column; gap: var(--space-6); }
-    .footer-right { align-items: flex-start; }
+  .footer-loc {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-text-subtle);
+    letter-spacing: 0.04em;
+  }
+
+  .footer-loc-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: var(--color-text-subtle);
   }
 </style>

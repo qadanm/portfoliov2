@@ -9,10 +9,9 @@ const { variant = 'full', formId = 'contact-form' } = Astro.props;
 const accessKey = import.meta.env.PUBLIC_WEB3FORMS_KEY ?? '';
 
 const projectTypes = [
-  'Product or design engineering project',
-  'AI-native product',
-  'Platform or frontend systems',
-  'Contract or short-term scope',
+  'Project question',
+  'Design or engineering conversation',
+  'Speaking, writing, or interview',
   'Something else',
 ];
 ---
@@ -43,7 +42,7 @@ const projectTypes = [
       </div>
 
       <label class="cf__field">
-        <span class="cf__label">Project type</span>
+        <span class="cf__label">Topic</span>
         <div class="cf__select-wrap">
           <select name="project_type" class="cf__select">
             <option value="">Choose one (optional)</option>
@@ -59,7 +58,7 @@ const projectTypes = [
 
       <label class="cf__field">
         <span class="cf__label">Message</span>
-        <textarea name="message" required rows="5" minlength="10" placeholder="A few sentences on what you're building, the timeline, and why it might be a fit."></textarea>
+        <textarea name="message" required rows="5" minlength="10" placeholder="A few sentences. What you're working on, what you'd like to discuss, anything that helps me reply well."></textarea>
       </label>
     </>
   ) : (

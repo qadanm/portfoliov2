@@ -8,31 +8,42 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
 ---
 
 <BaseLayout
-  title="Work, Moe Qadan"
-  description="Selected work. ChatOBD2, MagTek's multi-site platform, the Sawa marketing site, and advisor portals deployed across 50+ wealth and banking institutions at InvestCloud."
+  title="Selected Work"
+  description="Selected case studies by Moe Qadan. ChatOBD2 AI-native diagnostics, MagTek's multi-site platform, the Sawa marketing site, and advisor portals deployed across more than 50 wealth and banking institutions at InvestCloud."
   keywords={[
     'Moe Qadan',
     'portfolio',
-    'product design portfolio',
     'UX engineering portfolio',
+    'frontend portfolio',
+    'design systems portfolio',
     'case studies',
     'ChatOBD2',
     'MagTek',
     'Sawa',
-    'advisor platforms',
+    'InvestCloud',
   ]}
 >
   <div class="work-index">
+    {/* Page atmosphere */}
+    <div class="work-index__atmos" aria-hidden="true">
+      <span class="work-index__atmos-glow"></span>
+    </div>
+
     <header class="work-index__hero">
       <div class="container-site">
-        <span class="work-index__eyebrow">Work</span>
+        <div class="work-index__sxn">
+          <span class="work-index__sxn-num">01</span>
+          <span class="work-index__sxn-label">Work</span>
+          <span class="work-index__sxn-rule" aria-hidden="true"></span>
+          <span class="work-index__sxn-meta">Case studies &amp; project notes</span>
+        </div>
         <h1 class="work-index__title">
-          Recent projects.
+          Selected work, in two passes.
         </h1>
         <p class="work-index__lede">
-          ChatOBD2, MagTek, Sawa, and the InvestCloud portal work. Each
-          case study covers the constraint, the decision, and what
-          landed.
+          Independent projects below, then the companies where I've
+          shipped work inside their team. Each one is a different
+          surface, a different platform, a different posture.
         </p>
       </div>
     </header>
@@ -44,7 +55,35 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
 </BaseLayout>
 
 <style>
+  .work-index {
+    position: relative;
+  }
+
+  /* Page atmosphere */
+  .work-index__atmos {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 600px;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .work-index__atmos-glow {
+    position: absolute;
+    top: -180px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1100px;
+    height: 540px;
+    background: radial-gradient(ellipse 50% 50% at 50% 50%, var(--color-accent-muted), transparent 70%);
+    filter: blur(28px);
+    opacity: 0.7;
+  }
+
   .work-index__hero {
+    position: relative;
     padding-top: calc(60px + var(--space-10));
     padding-bottom: var(--space-10);
     border-bottom: 1px solid var(--color-border-subtle);
@@ -59,15 +98,53 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
     }
   }
 
-  .work-index__eyebrow {
-    display: inline-block;
+  .work-index__sxn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: var(--space-5);
+    flex-wrap: wrap;
+  }
+
+  .work-index__sxn-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 22px;
+    padding: 0 7px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-elevated);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1;
+  }
+
+  .work-index__sxn-label {
     font-family: var(--font-mono);
     font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
+    color: var(--color-text);
+  }
+
+  .work-index__sxn-rule {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, var(--color-border), transparent);
+    min-width: 32px;
+  }
+
+  .work-index__sxn-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
     color: var(--color-text-subtle);
-    margin-bottom: var(--space-4);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
   }
 
   .work-index__title {
@@ -89,6 +166,7 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
   }
 
   .work-index__body {
+    position: relative;
     padding-bottom: var(--space-16);
   }
 

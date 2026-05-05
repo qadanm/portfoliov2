@@ -8,11 +8,17 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
   noindex={true}
 >
   <div class="nf">
+    <div class="nf__atmos" aria-hidden="true">
+      <span class="nf__atmos-glow"></span>
+    </div>
+
     <div class="container-site nf__inner">
-      <span class="nf__eyebrow">
-        <span class="eyebrow__index">404</span>
-        Off the path
-      </span>
+      <div class="nf__sxn">
+        <span class="nf__sxn-num">404</span>
+        <span class="nf__sxn-label">Off the path</span>
+        <span class="nf__sxn-rule" aria-hidden="true"></span>
+        <span class="nf__sxn-meta">Page not found</span>
+      </div>
 
       <h1 class="nf__title">
         This page <em>doesn't exist</em>.<br />
@@ -60,7 +66,7 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
           <span class="nf__link-num">05</span>
           <span class="nf__link-body">
             <span class="nf__link-title">Contact</span>
-            <span class="nf__link-sub">Open to hearing about projects.</span>
+            <span class="nf__link-sub">Send a message.</span>
           </span>
           <span class="nf__link-arrow" aria-hidden="true">→</span>
         </a>
@@ -71,6 +77,7 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
 
 <style>
   .nf {
+    position: relative;
     padding-top: calc(60px + var(--space-10));
     padding-bottom: var(--space-16);
     min-height: 80vh;
@@ -83,21 +90,82 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     }
   }
 
+  /* Page atmosphere */
+  .nf__atmos {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 600px;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .nf__atmos-glow {
+    position: absolute;
+    top: -180px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1100px;
+    height: 540px;
+    background: radial-gradient(ellipse 50% 50% at 50% 50%, var(--color-accent-muted), transparent 70%);
+    filter: blur(28px);
+    opacity: 0.6;
+  }
+
   .nf__inner {
+    position: relative;
     max-width: 720px;
   }
 
-  .nf__eyebrow {
+  /* Numbered head */
+  .nf__sxn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: var(--space-5);
+    flex-wrap: wrap;
+  }
+
+  .nf__sxn-num {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    justify-content: center;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-elevated);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1;
+  }
+
+  .nf__sxn-label {
     font-family: var(--font-mono);
     font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
+    font-weight: 700;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
+    color: var(--color-text);
+  }
+
+  .nf__sxn-rule {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, var(--color-border), transparent);
+    min-width: 32px;
+  }
+
+  .nf__sxn-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
     color: var(--color-text-subtle);
-    margin-bottom: var(--space-5);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
   }
 
   .nf__title {

@@ -3,7 +3,11 @@
 
 <figure class="verdict-mock" aria-label="A mock of the ChatOBD2 verdict card UI surface">
   <header class="verdict-mock__head">
-    <span class="verdict-mock__eyebrow">Product surface</span>
+    <div class="verdict-mock__sxn">
+      <span class="verdict-mock__sxn-num">A</span>
+      <span class="verdict-mock__sxn-label">Product surface</span>
+      <span class="verdict-mock__sxn-rule" aria-hidden="true"></span>
+    </div>
     <h3 class="verdict-mock__title">What a scan returns</h3>
   </header>
 
@@ -95,29 +99,57 @@
 
   .verdict-mock__head {
     display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--space-4);
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: var(--space-3);
     margin-bottom: var(--space-6);
     padding-bottom: var(--space-4);
     border-bottom: 1px solid var(--color-border-subtle);
   }
 
-  .verdict-mock__eyebrow {
+  .verdict-mock__sxn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .verdict-mock__sxn-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-elevated);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1;
+  }
+
+  .verdict-mock__sxn-label {
     font-family: var(--font-mono);
     font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.1em;
+    font-weight: 700;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--color-text-subtle);
+    color: var(--color-text);
+  }
+
+  .verdict-mock__sxn-rule {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, var(--color-border), transparent);
   }
 
   .verdict-mock__title {
     font-family: var(--font-display);
-    font-size: 18px;
+    font-size: clamp(20px, 2.4vw, 26px);
     font-weight: 400;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
     color: var(--color-text);
     margin: 0;
   }
@@ -136,7 +168,16 @@
     }
   }
 
-  /* Device shell */
+  /* Device stage — wraps the dark phone in a theme-aware backdrop so
+     it reads as a phone mockup, not an embedded dark card. In light
+     mode the phone sits on a cream stage with a soft amber glow. */
+  .verdict-mock__frame > .vm__device {
+    position: relative;
+    isolation: isolate;
+  }
+
+  /* Device shell — intentionally dark always, since this represents the
+     actual ChatOBD-2 mobile app, which is a dark product. */
   .vm__device {
     display: flex;
     flex-direction: column;
@@ -145,8 +186,18 @@
     background-color: #0A0A0C;
     border: 1px solid #18181B;
     border-radius: 28px;
-    box-shadow: var(--shadow-xl);
+    box-shadow:
+      var(--shadow-xl),
+      0 0 0 6px var(--color-bg-elevated),
+      0 0 0 7px var(--color-border);
     color: #FAFAFA;
+  }
+
+  :global([data-theme="light"]) .vm__device {
+    box-shadow:
+      0 24px 48px rgba(15, 15, 20, 0.18),
+      0 0 0 6px var(--color-bg-elevated),
+      0 0 0 7px var(--color-border);
   }
 
   .vm__device-bar {
@@ -434,11 +485,40 @@
 
   /* Right-side notes */
   .verdict-mock__notes {
+    position: relative;
     align-self: start;
-    padding: var(--space-5);
+    padding: var(--space-6);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    background-color: var(--color-bg-elevated);
+    border-radius: var(--radius-2xl);
+    background:
+      linear-gradient(180deg, var(--color-bg-elevated), var(--color-bg-muted));
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+  }
+
+  .verdict-mock__notes::before,
+  .verdict-mock__notes::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border: 1px solid var(--color-text-subtle);
+    pointer-events: none;
+    opacity: 0.4;
+  }
+
+  .verdict-mock__notes::before {
+    top: 8px;
+    left: 8px;
+    border-right: none;
+    border-bottom: none;
+  }
+
+  .verdict-mock__notes::after {
+    bottom: 8px;
+    right: 8px;
+    border-left: none;
+    border-top: none;
   }
 
   .verdict-mock__notes-eyebrow {

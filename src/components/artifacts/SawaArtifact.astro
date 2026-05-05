@@ -1,0 +1,301 @@
+---
+// Sawa thumbnail. Theme-aware violet atmosphere with chat thread + match
+// card composition. Both modes preserve the violet accent signature.
+---
+
+<div class="sart" aria-hidden="true">
+  <div class="sart__bg"></div>
+  <div class="sart__halo"></div>
+
+  <div class="sart__thread">
+    <div class="sart__bubble sart__bubble--in">idk you pick</div>
+
+    <div class="sart__match">
+      <div class="sart__match-badge">
+        <span class="sart__match-dot"></span>
+        Matched
+      </div>
+      <div class="sart__match-card">
+        <div class="sart__match-img"></div>
+        <div class="sart__match-body">
+          <div class="sart__match-name">Tsubaki</div>
+          <div class="sart__match-meta">Izakaya · Echo Park · 4 in</div>
+          <div class="sart__match-pills">
+            <span class="sart__match-pill">small plates</span>
+            <span class="sart__match-pill">walk-ins</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sart__bubble sart__bubble--out">yes</div>
+  </div>
+
+  <div class="sart__caption">
+    <span class="sart__caption-line"></span>
+    <span>Group match · Sawa</span>
+  </div>
+</div>
+
+<style>
+  .sart {
+    --sart-atmos:
+      radial-gradient(ellipse 60% 50% at 80% 10%, rgba(167, 139, 250, 0.18), transparent 60%),
+      radial-gradient(ellipse 60% 60% at 10% 90%, rgba(109, 91, 232, 0.10), transparent 60%),
+      linear-gradient(170deg, #150F2A 0%, #1A1340 50%, #0E0820 100%);
+    --sart-text: #FAFAFA;
+    --sart-text-muted: rgba(255, 255, 255, 0.55);
+    --sart-text-subtle: rgba(255, 255, 255, 0.5);
+    --sart-bg-dot: rgba(167, 139, 250, 0.06);
+    --sart-halo: radial-gradient(circle, rgba(167, 139, 250, 0.25), transparent 70%);
+    --sart-bubble-in-bg: rgba(255, 255, 255, 0.08);
+    --sart-bubble-in-border: rgba(255, 255, 255, 0.06);
+    --sart-bubble-in-text: rgba(255, 255, 255, 0.85);
+    --sart-match-card-bg: linear-gradient(180deg, rgba(40, 30, 70, 0.95), rgba(28, 20, 55, 0.95));
+    --sart-match-card-border: rgba(167, 139, 250, 0.25);
+    --sart-match-card-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 12px 28px rgba(0, 0, 0, 0.4);
+    --sart-match-meta: rgba(255, 255, 255, 0.55);
+    --sart-pill-bg: rgba(167, 139, 250, 0.14);
+    --sart-pill-text: #C4B5FD;
+    --sart-caption: rgba(255, 255, 255, 0.5);
+    --sart-caption-rule: rgba(255, 255, 255, 0.3);
+  }
+
+  :global([data-theme="light"]) .sart {
+    --sart-atmos:
+      radial-gradient(ellipse 60% 50% at 80% 10%, rgba(167, 139, 250, 0.22), transparent 60%),
+      radial-gradient(ellipse 60% 60% at 10% 90%, rgba(109, 91, 232, 0.12), transparent 60%),
+      linear-gradient(170deg, #F5F1FF 0%, #EDE5FF 50%, #FAF7FF 100%);
+    --sart-text: #1A1340;
+    --sart-text-muted: rgba(26, 19, 64, 0.62);
+    --sart-text-subtle: rgba(26, 19, 64, 0.5);
+    --sart-bg-dot: rgba(109, 91, 232, 0.08);
+    --sart-halo: radial-gradient(circle, rgba(167, 139, 250, 0.3), transparent 70%);
+    --sart-bubble-in-bg: rgba(255, 255, 255, 0.85);
+    --sart-bubble-in-border: rgba(26, 19, 64, 0.06);
+    --sart-bubble-in-text: rgba(26, 19, 64, 0.82);
+    --sart-match-card-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(250, 247, 255, 0.94));
+    --sart-match-card-border: rgba(167, 139, 250, 0.3);
+    --sart-match-card-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.7),
+      0 1px 2px rgba(26, 19, 64, 0.04),
+      0 12px 28px rgba(26, 19, 64, 0.1);
+    --sart-match-meta: rgba(26, 19, 64, 0.55);
+    --sart-pill-bg: rgba(167, 139, 250, 0.16);
+    --sart-pill-text: #5B43D9;
+    --sart-caption: rgba(26, 19, 64, 0.55);
+    --sart-caption-rule: rgba(26, 19, 64, 0.3);
+  }
+
+  .sart {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: var(--sart-atmos);
+    color: var(--sart-text);
+    container-type: inline-size;
+  }
+
+  .sart__bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(var(--sart-bg-dot) 1px, transparent 1px);
+    background-size: 18px 18px;
+    opacity: 0.7;
+  }
+
+  .sart__halo {
+    position: absolute;
+    top: -20%;
+    right: -10%;
+    width: 70%;
+    height: 70%;
+    border-radius: 50%;
+    background: var(--sart-halo);
+    filter: blur(28px);
+    pointer-events: none;
+  }
+
+  .sart__thread {
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    top: 56px;
+    bottom: 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    justify-content: flex-end;
+  }
+
+  @container (min-width: 360px) {
+    .sart__thread {
+      gap: 8px;
+    }
+  }
+
+  .sart__bubble {
+    align-self: flex-start;
+    padding: 6px 10px;
+    border-radius: 14px;
+    font-size: 11px;
+    line-height: 1.3;
+    max-width: 60%;
+  }
+
+  @container (min-width: 360px) {
+    .sart__bubble {
+      padding: 8px 12px;
+      font-size: 13px;
+      border-radius: 16px;
+    }
+  }
+
+  .sart__bubble--in {
+    background-color: var(--sart-bubble-in-bg);
+    border: 1px solid var(--sart-bubble-in-border);
+    color: var(--sart-bubble-in-text);
+    border-bottom-left-radius: 4px;
+  }
+
+  .sart__bubble--out {
+    align-self: flex-end;
+    background: linear-gradient(180deg, #A78BFA, #6D5BE8);
+    color: #0F0820;
+    font-weight: 600;
+    border-bottom-right-radius: 4px;
+    box-shadow: 0 6px 14px rgba(109, 91, 232, 0.3);
+  }
+
+  .sart__match {
+    align-self: stretch;
+    margin: 4px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .sart__match-badge {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    border-radius: 9999px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #5B43D9;
+    background-color: rgba(167, 139, 250, 0.18);
+    border: 1px solid rgba(167, 139, 250, 0.45);
+    line-height: 1;
+  }
+
+  :global([data-theme="dark"]) .sart__match-badge {
+    color: #C4B5FD;
+    background-color: rgba(167, 139, 250, 0.15);
+  }
+
+  .sart__match-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: #A78BFA;
+    box-shadow: 0 0 6px rgba(167, 139, 250, 0.7);
+  }
+
+  .sart__match-card {
+    display: flex;
+    gap: 10px;
+    padding: 9px;
+    border-radius: 12px;
+    background: var(--sart-match-card-bg);
+    border: 1px solid var(--sart-match-card-border);
+    box-shadow: var(--sart-match-card-shadow);
+  }
+
+  .sart__match-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background:
+      linear-gradient(135deg, #C4B5FD 0%, #6D5BE8 50%, #1A1340 100%);
+    flex-shrink: 0;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  }
+
+  @container (min-width: 360px) {
+    .sart__match-img {
+      width: 44px;
+      height: 44px;
+    }
+  }
+
+  .sart__match-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  .sart__match-name {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: 14px;
+    color: var(--sart-text);
+    line-height: 1.1;
+  }
+
+  @container (min-width: 360px) {
+    .sart__match-name {
+      font-size: 16px;
+    }
+  }
+
+  .sart__match-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--sart-match-meta);
+    letter-spacing: 0.02em;
+  }
+
+  .sart__match-pills {
+    display: flex;
+    gap: 4px;
+    margin-top: 2px;
+  }
+
+  .sart__match-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background-color: var(--sart-pill-bg);
+    color: var(--sart-pill-text);
+    letter-spacing: 0.04em;
+  }
+
+  .sart__caption {
+    position: absolute;
+    bottom: 12px;
+    left: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--sart-caption);
+    letter-spacing: 0.06em;
+  }
+
+  .sart__caption-line {
+    width: 14px;
+    height: 1px;
+    background-color: var(--sart-caption-rule);
+  }
+</style>

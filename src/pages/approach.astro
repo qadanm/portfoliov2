@@ -2,35 +2,77 @@
 import BaseLayout from '@/components/layout/BaseLayout.astro';
 import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
 import AIFlow from '@/components/diagrams/AIFlow.astro';
+
+const projects = [
+  {
+    slug: 'chatobd2',
+    title: 'ChatOBD2',
+    note: 'AI-native diagnostics, designed and engineered solo.',
+    src: '/images/chatobd2/hero.webp',
+    alt: 'ChatOBD2 marketing hero with phone mockup of a live diagnostic chat.',
+    category: 'flagship',
+  },
+  {
+    slug: 'magtek-platform',
+    title: 'MagTek',
+    note: 'Web experience across a multi-site platform on a long-running ASP.NET MVC stack.',
+    src: '/images/magtek/homepage.webp',
+    alt: 'MagTek homepage with metric story and team photography.',
+    category: 'platform',
+  },
+  {
+    slug: 'sawa',
+    title: 'Sawa',
+    note: 'Marketing site for an iMessage-native group dining app.',
+    src: '/images/sawa/hero.webp',
+    alt: 'Sawa marketing hero with phone mockup of a matched restaurant card.',
+    category: 'product',
+  },
+  {
+    slug: 'financial-platforms',
+    title: 'Advisor portals',
+    note: 'Multi-tenant frontend across 50+ wealth and banking institutions at InvestCloud.',
+    src: '/images/financial-platforms/chase.webp',
+    alt: 'Chase homepage built on the InvestCloud framework.',
+    category: 'product',
+  },
+];
 ---
 
 <BaseLayout
-  title="How Moe Qadan works"
-  description="The way I think about UX, frontend, design systems, AI-assisted prototyping, and platforms that already exist. Direct version: read the constraints, get the structure right, use AI where it earns its place."
+  title="Approach"
+  description="How Moe Qadan approaches UX, frontend, design systems, AI-assisted prototyping, and platforms that already exist. Read the constraints first, pick the structure carefully, use AI where it earns its place."
   keywords={[
     'Moe Qadan',
     'design approach',
     'design engineering',
     'UX engineering',
+    'frontend systems',
     'AI-assisted design',
     'prompt engineering',
     'design systems',
     'product design process',
-    'Claude Design',
-    'Figma',
-    'Cursor',
   ]}
 >
   <div class="apr">
-    <div class="apr__hero">
+    <div class="apr__atmos" aria-hidden="true">
+      <span class="apr__atmos-glow"></span>
+    </div>
+
+    <header class="apr__hero">
       <div class="container-site">
-        <span class="apr__eyebrow">Approach</span>
+        <div class="apr__sxn">
+          <span class="apr__sxn-num">01</span>
+          <span class="apr__sxn-label">Approach</span>
+          <span class="apr__sxn-rule" aria-hidden="true"></span>
+          <span class="apr__sxn-meta">A method, not a manifesto</span>
+        </div>
         <h1 class="apr__title">How I work.</h1>
         <p class="apr__subtitle">
           The short version. The long version is the rest of this page.
         </p>
       </div>
-    </div>
+    </header>
 
     <div class="container-site apr__body">
       {/* Lead — discursive, not symmetrical */}
@@ -53,15 +95,14 @@ import AIFlow from '@/components/diagrams/AIFlow.astro';
         </p>
       </section>
 
-      <hr class="apr__rule" />
-
       {/* What I actually do, day to day */}
       <section class="apr__section" data-reveal>
-        <h2 class="apr__h2">A normal week</h2>
-        <p class="apr__para">
-          Concretely, the recurring work in any given week looks
-          something like this.
-        </p>
+        <header class="apr__sxn apr__sxn--inner">
+          <span class="apr__sxn-num">02</span>
+          <span class="apr__sxn-label">A normal week</span>
+          <span class="apr__sxn-rule" aria-hidden="true"></span>
+        </header>
+        <h2 class="apr__h2">Concretely, the recurring work.</h2>
 
         <ul class="apr__bullets">
           <li>Modify a Razor partial that's used in fifty places, knowing the typed ViewModel will surface every consumer that needs to update.</li>
@@ -74,17 +115,19 @@ import AIFlow from '@/components/diagrams/AIFlow.astro';
         </ul>
       </section>
 
-      <hr class="apr__rule" />
-
-      {/* AI in the work — concrete, not slogans */}
+      {/* AI in the work */}
       <section class="apr__section" data-reveal>
-        <h2 class="apr__h2">How AI actually fits in</h2>
+        <header class="apr__sxn apr__sxn--inner">
+          <span class="apr__sxn-num">03</span>
+          <span class="apr__sxn-label">How AI actually fits in</span>
+          <span class="apr__sxn-rule" aria-hidden="true"></span>
+        </header>
+        <h2 class="apr__h2">Two places: products, and the build.</h2>
 
         <p class="apr__para">
-          Two places: in the products I ship, and in the way I build
-          them. The shape is the same in both: read the constraint,
-          translate it into a prompt that lives in source, execute
-          where the work fits best, ship reviewable output.
+          The shape is the same in both: read the constraint, translate
+          it into a prompt that lives in source, execute where the work
+          fits best, ship reviewable output.
         </p>
 
         <div class="apr__flow" data-reveal>
@@ -135,11 +178,14 @@ import AIFlow from '@/components/diagrams/AIFlow.astro';
         </p>
       </section>
 
-      <hr class="apr__rule" />
-
       {/* What I bring to a team */}
       <section class="apr__section" data-reveal>
-        <h2 class="apr__h2">What I'm best at on a team</h2>
+        <header class="apr__sxn apr__sxn--inner">
+          <span class="apr__sxn-num">04</span>
+          <span class="apr__sxn-label">What I'm best at on a team</span>
+          <span class="apr__sxn-rule" aria-hidden="true"></span>
+        </header>
+        <h2 class="apr__h2">Where I land naturally.</h2>
 
         <ul class="apr__bullets">
           <li><strong>Owning the whole web experience for a team that doesn't have a department for it.</strong> One person carrying UX, the design system, the frontend, the content model, the SEO graph, and the performance budget.</li>
@@ -150,104 +196,134 @@ import AIFlow from '@/components/diagrams/AIFlow.astro';
         </ul>
       </section>
 
-      <hr class="apr__rule" />
-
-      {/* Tools, plain */}
+      {/* Tools */}
       <section class="apr__section" data-reveal>
-        <h2 class="apr__h2">Tools I reach for</h2>
+        <header class="apr__sxn apr__sxn--inner">
+          <span class="apr__sxn-num">05</span>
+          <span class="apr__sxn-label">Tools I reach for</span>
+          <span class="apr__sxn-rule" aria-hidden="true"></span>
+          <span class="apr__sxn-meta">The judgment is the constant</span>
+        </header>
+        <h2 class="apr__h2">The default stack changes per project.</h2>
         <p class="apr__para">
-          The default stack changes per project. The judgment about
-          which tool to use for which job stays the same.
+          The judgment about which tool to use for which job stays the
+          same.
         </p>
 
         <ul class="apr__tools">
-          <li>
-            <span class="apr__tool-name">Claude</span>
+          <li class="apr__tool">
+            <span class="apr__tool-corner apr__tool-corner--tl" aria-hidden="true"></span>
+            <span class="apr__tool-corner apr__tool-corner--br" aria-hidden="true"></span>
+            <header class="apr__tool-head">
+              <span class="apr__tool-num">01</span>
+              <span class="apr__tool-name">Claude</span>
+            </header>
             <span class="apr__tool-role">Code work and reasoning. The default for non-trivial refactors and anything that needs to think across more than one file.</span>
           </li>
-          <li>
-            <span class="apr__tool-name">Cursor</span>
+          <li class="apr__tool">
+            <span class="apr__tool-corner apr__tool-corner--tl" aria-hidden="true"></span>
+            <span class="apr__tool-corner apr__tool-corner--br" aria-hidden="true"></span>
+            <header class="apr__tool-head">
+              <span class="apr__tool-num">02</span>
+              <span class="apr__tool-name">Cursor</span>
+            </header>
             <span class="apr__tool-role">Local iteration. Same code work as Claude, different interaction model. Whichever is faster on the task at hand.</span>
           </li>
-          <li>
-            <span class="apr__tool-name">Figma</span>
+          <li class="apr__tool">
+            <span class="apr__tool-corner apr__tool-corner--tl" aria-hidden="true"></span>
+            <span class="apr__tool-corner apr__tool-corner--br" aria-hidden="true"></span>
+            <header class="apr__tool-head">
+              <span class="apr__tool-num">03</span>
+              <span class="apr__tool-name">Figma</span>
+            </header>
             <span class="apr__tool-role">Precision design, component-system maintenance, handoff fidelity, and the occasional client review.</span>
           </li>
-          <li>
-            <span class="apr__tool-name">Claude Design</span>
+          <li class="apr__tool">
+            <span class="apr__tool-corner apr__tool-corner--tl" aria-hidden="true"></span>
+            <span class="apr__tool-corner apr__tool-corner--br" aria-hidden="true"></span>
+            <header class="apr__tool-head">
+              <span class="apr__tool-num">04</span>
+              <span class="apr__tool-name">Claude Design</span>
+            </header>
             <span class="apr__tool-role">Visual exploration when a frame is faster to think in than code. Output lands back in the codebase.</span>
           </li>
         </ul>
       </section>
 
-      <hr class="apr__rule" />
-
       {/* Across the work */}
       <section class="apr__section" data-reveal>
-        <h2 class="apr__h2">Across the work</h2>
+        <header class="apr__sxn apr__sxn--inner">
+          <span class="apr__sxn-num">06</span>
+          <span class="apr__sxn-label">Across the work</span>
+          <span class="apr__sxn-rule" aria-hidden="true"></span>
+        </header>
+        <h2 class="apr__h2">Different companies, different stacks, same question.</h2>
         <p class="apr__para">
-          Different companies, different stacks, the same question
-          underneath: how do I move this surface from where it is to
-          where it should be without breaking what's already running.
+          How do I move this surface from where it is to where it should
+          be without breaking what's already running.
         </p>
 
         <div class="apr__work-grid">
-          <figure class="apr__work-shot">
-            <img
-              src="/images/chatobd2/hero.webp"
-              alt="ChatOBD2 marketing hero with phone mockup of a live diagnostic chat."
-              width="1440"
-              height="900"
-              loading="lazy"
-            />
-            <figcaption>
-              <strong>ChatOBD2.</strong> AI-native diagnostics, designed
-              and engineered solo.
-              <a href="/work/chatobd2">Case study</a>
-            </figcaption>
-          </figure>
-          <figure class="apr__work-shot">
-            <img
-              src="/images/magtek/homepage.webp"
-              alt="MagTek homepage with metric story and team photography."
-              width="1440"
-              height="900"
-              loading="lazy"
-            />
-            <figcaption>
-              <strong>MagTek.</strong> Web experience across a multi-site
-              platform on a long-running ASP.NET MVC stack.
-              <a href="/work/magtek-platform">Case study</a>
-            </figcaption>
-          </figure>
-          <figure class="apr__work-shot">
-            <img
-              src="/images/sawa/hero.webp"
-              alt="Sawa marketing hero with phone mockup of a matched restaurant card."
-              width="1440"
-              height="900"
-              loading="lazy"
-            />
-            <figcaption>
-              <strong>Sawa.</strong> Marketing site for an iMessage-native
-              group dining app.
-              <a href="/work/sawa">Case study</a>
-            </figcaption>
-          </figure>
-          <figure class="apr__work-shot">
-            <img
-              src="/images/financial-platforms/chase.webp"
-              alt="Chase homepage built on the InvestCloud framework."
-              width="1440"
-              height="900"
-              loading="lazy"
-            />
-            <figcaption>
-              <strong>Advisor portals.</strong> Multi-tenant frontend
-              across 50+ wealth and banking institutions at InvestCloud.
-              <a href="/work/financial-platforms">Case study</a>
-            </figcaption>
-          </figure>
+          {projects.map(p => (
+            <a
+              href={`/work/${p.slug}`}
+              class:list={['apr__work', `apr__work--${p.category}`]}
+            >
+              <span class="apr__work-corner apr__work-corner--tl" aria-hidden="true"></span>
+              <span class="apr__work-corner apr__work-corner--tr" aria-hidden="true"></span>
+              <span class="apr__work-corner apr__work-corner--bl" aria-hidden="true"></span>
+              <span class="apr__work-corner apr__work-corner--br" aria-hidden="true"></span>
+
+              <div class="apr__work-shot">
+                <img
+                  src={p.src}
+                  alt={p.alt}
+                  width="1440"
+                  height="900"
+                  loading="lazy"
+                />
+              </div>
+              <div class="apr__work-meta">
+                <h3 class="apr__work-title">{p.title}</h3>
+                <p class="apr__work-note">{p.note}</p>
+                <span class="apr__work-cta">
+                  Case study
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      {/* Closing CTA */}
+      <section class="apr__cta" data-reveal>
+        <span class="apr__cta-corner apr__cta-corner--tl" aria-hidden="true"></span>
+        <span class="apr__cta-corner apr__cta-corner--tr" aria-hidden="true"></span>
+        <span class="apr__cta-corner apr__cta-corner--bl" aria-hidden="true"></span>
+        <span class="apr__cta-corner apr__cta-corner--br" aria-hidden="true"></span>
+        <span class="apr__cta-glow" aria-hidden="true"></span>
+
+        <div class="apr__cta-text">
+          <div class="apr__cta-eyebrow">
+            <span class="apr__cta-dot"></span>
+            <span>Get in touch</span>
+          </div>
+          <h2 class="apr__cta-title">Working on something on the web?</h2>
+          <p class="apr__cta-sub">
+            Send a few sentences. Replies within a day.
+          </p>
+        </div>
+        <div class="apr__cta-actions">
+          <a href="/contact" class="apr__cta-primary">
+            Send a message
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+          <a href="mailto:moe@qadan.co" class="apr__cta-ghost">moe@qadan.co</a>
         </div>
       </section>
     </div>
@@ -255,7 +331,34 @@ import AIFlow from '@/components/diagrams/AIFlow.astro';
 </BaseLayout>
 
 <style>
+  .apr {
+    position: relative;
+  }
+
+  .apr__atmos {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 600px;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .apr__atmos-glow {
+    position: absolute;
+    top: -180px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1100px;
+    height: 540px;
+    background: radial-gradient(ellipse 50% 50% at 50% 50%, var(--color-accent-muted), transparent 70%);
+    filter: blur(28px);
+    opacity: 0.7;
+  }
+
   .apr__hero {
+    position: relative;
     padding-top: calc(60px + var(--space-10));
     padding-bottom: var(--space-10);
     border-bottom: 1px solid var(--color-border-subtle);
@@ -270,15 +373,58 @@ import AIFlow from '@/components/diagrams/AIFlow.astro';
     }
   }
 
-  .apr__eyebrow {
-    display: inline-block;
+  /* Shared section-head pattern */
+  .apr__sxn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: var(--space-5);
+    flex-wrap: wrap;
+  }
+
+  .apr__sxn--inner {
+    margin-bottom: var(--space-4);
+  }
+
+  .apr__sxn-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 22px;
+    padding: 0 7px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-elevated);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1;
+  }
+
+  .apr__sxn-label {
     font-family: var(--font-mono);
     font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
+    color: var(--color-text);
+  }
+
+  .apr__sxn-rule {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, var(--color-border), transparent);
+    min-width: 32px;
+  }
+
+  .apr__sxn-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
     color: var(--color-text-subtle);
-    margin-bottom: var(--space-4);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
   }
 
   .apr__title {
@@ -314,12 +460,6 @@ import AIFlow from '@/components/diagrams/AIFlow.astro';
     }
   }
 
-  .apr__rule {
-    border: none;
-    border-top: 1px solid var(--color-border);
-    margin: 0;
-  }
-
   .apr__section {
     display: flex;
     flex-direction: column;
@@ -332,12 +472,13 @@ import AIFlow from '@/components/diagrams/AIFlow.astro';
 
   .apr__h2 {
     font-family: var(--font-display);
-    font-size: clamp(24px, 3vw, 36px);
+    font-size: clamp(26px, 3.2vw, 40px);
     font-weight: 400;
     letter-spacing: -0.02em;
     line-height: 1.15;
     color: var(--color-text);
     margin-bottom: var(--space-3);
+    max-width: 24ch;
   }
 
   .apr__lead {
@@ -423,6 +564,7 @@ import AIFlow from '@/components/diagrams/AIFlow.astro';
     margin: var(--space-2) 0 var(--space-4);
   }
 
+  /* Tools cards */
   .apr__tools {
     list-style: none;
     padding: 0;
@@ -439,30 +581,85 @@ import AIFlow from '@/components/diagrams/AIFlow.astro';
     }
   }
 
-  .apr__tools li {
+  .apr__tool {
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    padding: var(--space-4) var(--space-5);
+    gap: var(--space-3);
+    padding: var(--space-5) var(--space-6);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    background-color: var(--color-bg-elevated);
+    border-radius: var(--radius-xl);
+    background:
+      linear-gradient(180deg, var(--color-bg-elevated), var(--color-bg-muted));
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    transition: border-color 280ms, transform 280ms var(--ease-out), box-shadow 280ms;
+  }
+
+  .apr__tool:hover {
+    border-color: var(--color-accent-muted);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  .apr__tool-corner {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border: 1px solid var(--color-text-subtle);
+    pointer-events: none;
+    opacity: 0.4;
+    transition: opacity 240ms, border-color 240ms;
+  }
+
+  .apr__tool-corner--tl { top: 8px; left: 8px; border-right: none; border-bottom: none; }
+  .apr__tool-corner--br { bottom: 8px; right: 8px; border-left: none; border-top: none; }
+
+  .apr__tool:hover .apr__tool-corner {
+    opacity: 1;
+    border-color: var(--color-accent);
+  }
+
+  .apr__tool-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .apr__tool-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 5px;
+    background:
+      linear-gradient(180deg, var(--color-bg-elevated), var(--color-bg-deep));
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1;
   }
 
   .apr__tool-name {
     font-family: var(--font-display);
-    font-size: 18px;
+    font-size: 22px;
     font-weight: 400;
     color: var(--color-text);
     letter-spacing: -0.01em;
+    line-height: 1;
   }
 
   .apr__tool-role {
     font-size: 13px;
     color: var(--color-text-muted);
-    line-height: 1.55;
+    line-height: 1.6;
   }
 
+  /* Work grid — across-the-work */
   .apr__work-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -477,47 +674,301 @@ import AIFlow from '@/components/diagrams/AIFlow.astro';
     }
   }
 
-  .apr__work-shot {
-    margin: 0;
+  .apr__work {
+    --pc-accent: var(--color-accent);
+    --pc-accent-rgb: var(--project-flagship-rgb);
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: var(--space-2);
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
+    background:
+      linear-gradient(180deg, var(--color-bg-elevated), var(--color-bg-muted));
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+    transition: border-color 320ms var(--ease-out), transform 320ms var(--ease-out), box-shadow 320ms var(--ease-out);
+  }
+
+  .apr__work--platform { --pc-accent-rgb: var(--project-platform-rgb); --pc-accent: rgb(var(--project-platform-rgb)); }
+  .apr__work--product { --pc-accent-rgb: var(--project-product-rgb); --pc-accent: rgb(var(--project-product-rgb)); }
+  .apr__work--frontend { --pc-accent-rgb: var(--project-frontend-rgb); --pc-accent: rgb(var(--project-frontend-rgb)); }
+
+  .apr__work:hover {
+    border-color: rgba(var(--pc-accent-rgb), 0.45);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  .apr__work-corner {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border: 1px solid var(--color-text-subtle);
+    pointer-events: none;
+    opacity: 0.35;
+    transition: opacity 240ms, border-color 240ms;
+    z-index: 3;
+  }
+
+  .apr__work:hover .apr__work-corner {
+    opacity: 1;
+    border-color: var(--pc-accent);
+  }
+
+  .apr__work-corner--tl { top: 8px; left: 8px; border-right: none; border-bottom: none; }
+  .apr__work-corner--tr { top: 8px; right: 8px; border-left: none; border-bottom: none; }
+  .apr__work-corner--bl { bottom: 8px; left: 8px; border-right: none; border-top: none; }
+  .apr__work-corner--br { bottom: 8px; right: 8px; border-left: none; border-top: none; }
+
+  .apr__work-shot {
+    overflow: hidden;
+    border-bottom: 1px solid var(--color-border);
   }
 
   .apr__work-shot img {
     display: block;
     width: 100%;
     height: auto;
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--color-border);
-    box-shadow: var(--shadow-md);
+    transition: transform 700ms var(--ease-out);
   }
 
-  .apr__work-shot figcaption {
+  .apr__work:hover .apr__work-shot img {
+    transform: scale(1.025);
+  }
+
+  .apr__work-meta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-5) var(--space-6) var(--space-6);
+  }
+
+  .apr__work-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    color: var(--color-text);
+    line-height: 1.1;
+    margin: 0;
+  }
+
+  .apr__work-note {
     font-size: 13px;
     line-height: 1.55;
     color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  .apr__work-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: var(--space-2);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-border-subtle);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    transition: color 200ms;
+  }
+
+  .apr__work:hover .apr__work-cta {
+    color: var(--pc-accent);
+  }
+
+  .apr__work-cta svg {
+    transition: transform 200ms var(--ease-out);
+  }
+
+  .apr__work:hover .apr__work-cta svg {
+    transform: translateX(2px);
+  }
+
+  /* ─── Closing CTA ─────────────────────────────────────────────────── */
+  .apr__cta {
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: var(--space-7);
+    padding: var(--space-8) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
+    background:
+      linear-gradient(180deg, var(--color-bg-elevated), var(--color-bg-muted));
+    box-shadow:
+      var(--shadow-card),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    overflow: hidden;
   }
 
-  .apr__work-shot figcaption strong {
-    color: var(--color-text);
-    font-weight: 600;
+  @media (min-width: 720px) {
+    .apr__cta {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-10);
+      padding: var(--space-10) var(--space-12);
+    }
   }
 
-  .apr__work-shot figcaption a {
-    color: var(--color-text);
-    text-decoration: underline;
-    text-decoration-color: var(--color-border);
-    text-underline-offset: 3px;
-    font-size: 12px;
-    transition: color 150ms, text-decoration-color 150ms;
+  .apr__cta-glow {
+    position: absolute;
+    top: -40%;
+    right: -10%;
+    width: 60%;
+    height: 100%;
+    background: radial-gradient(circle, var(--color-accent-muted), transparent 65%);
+    filter: blur(40px);
+    pointer-events: none;
   }
 
-  .apr__work-shot figcaption a:hover {
+  .apr__cta-corner {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border: 1px solid var(--color-text-subtle);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .apr__cta-corner--tl { top: 12px; left: 12px; border-right: none; border-bottom: none; }
+  .apr__cta-corner--tr { top: 12px; right: 12px; border-left: none; border-bottom: none; }
+  .apr__cta-corner--bl { bottom: 12px; left: 12px; border-right: none; border-top: none; }
+  .apr__cta-corner--br { bottom: 12px; right: 12px; border-left: none; border-top: none; }
+
+  .apr__cta-text {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    z-index: 1;
+  }
+
+  .apr__cta-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     color: var(--color-accent);
-    text-decoration-color: var(--color-accent);
+    width: fit-content;
+  }
+
+  .apr__cta-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--color-accent) 60%, transparent);
+  }
+
+  @keyframes cs-status-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(0.85); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .apr__cta-dot { animation: none; }
+  }
+
+  .apr__cta-title {
+    font-family: var(--font-display);
+    font-size: clamp(24px, 3vw, 36px);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.18;
+    color: var(--color-text);
+    max-width: 24ch;
+    margin: 0;
+  }
+
+  .apr__cta-sub {
+    font-size: 15px;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    max-width: 38ch;
+    margin: 0;
+  }
+
+  .apr__cta-actions {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    flex-shrink: 0;
+    z-index: 1;
+  }
+
+  @media (min-width: 380px) and (max-width: 720px) {
+    .apr__cta-actions {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+  }
+
+  .apr__cta-primary,
+  .apr__cta-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 48px;
+    padding: 0 22px;
+    border-radius: 9999px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+    transition: transform 200ms var(--ease-out), background-color 200ms, border-color 200ms, color 200ms, box-shadow 200ms;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .apr__cta-primary {
+    background-color: var(--color-text);
+    color: var(--color-bg);
+    border: 1px solid var(--color-text);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.5) inset,
+      0 8px 20px rgba(0,0,0,0.2);
+  }
+
+  .apr__cta-primary:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.5) inset,
+      0 12px 28px rgba(0,0,0,0.18),
+      0 0 0 4px var(--color-accent-dim);
+  }
+
+  .apr__cta-primary svg {
+    transition: transform 200ms var(--ease-out);
+  }
+
+  .apr__cta-primary:hover svg {
+    transform: translateX(2px);
+  }
+
+  .apr__cta-ghost {
+    background-color: transparent;
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 0.02em;
+  }
+
+  .apr__cta-ghost:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    background-color: var(--color-accent-dim);
   }
 </style>

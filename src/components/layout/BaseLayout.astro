@@ -18,10 +18,10 @@ interface Props {
 }
 
 const {
-  title = 'Moe Qadan, Senior UX & Front-end',
-  description = "Moe Qadan is a senior UX and frontend practitioner. UX, design systems, content architecture, SEO, performance, accessibility, and AI-assisted prototyping, on whatever platform the work has to live on.",
-  image = '/og.png',
-  imageAlt = 'Moe Qadan, Senior UX & Front-end. Verdict card from ChatOBD2 showing a structured AI output.',
+  title = 'Moe Qadan, UX Engineer & Frontend Systems',
+  description = "Portfolio of Moe Qadan, a senior UX and frontend practitioner in Los Angeles. UX engineering, frontend systems, design systems, content architecture, accessibility, and AI-assisted product work.",
+  image = '/og.jpg',
+  imageAlt = 'Moe Qadan, UX Engineer & Frontend Systems. Portfolio of selected work.',
   article = false,
   noindex = false,
   keywords,
@@ -38,39 +38,53 @@ const ogImageType = image.endsWith('.webp') ? 'image/webp'
 
 // WebSite schema describes the *site*, not the page — keep its description
 // stable across navigations so Google's site card stays coherent.
-const SITE_DESCRIPTION = "Moe Qadan is a senior UX and frontend practitioner. UX, design systems, content architecture, SEO, performance, accessibility, and AI-assisted prototyping, on whatever platform the work has to live on.";
+const SITE_DESCRIPTION = "Portfolio of Moe Qadan, a senior UX and frontend practitioner in Los Angeles. UX engineering, frontend systems, design systems, content architecture, accessibility, and AI-assisted product work.";
 
 const defaultKeywords = [
   'Moe Qadan',
-  'product designer',
+  'Muhammed Qadan',
   'UX engineer',
+  'frontend engineer',
   'design engineer',
-  'frontend architecture',
   'design systems',
-  'AI product design',
-  'AI-native products',
-  'platform UX',
+  'web experience',
+  'creative technologist',
+  'AI-assisted product design',
+  'Los Angeles',
 ];
 const metaKeywords = (keywords && keywords.length > 0 ? keywords : defaultKeywords).join(', ');
 
-// Person schema is global — every page asserts the same author identity so
-// Google can collapse mentions across the site into one entity card.
+// Person schema — describes professional identity. No availability/job
+// signal here on purpose; this stays stable whether or not Moe is open
+// to projects.
 const personSchema = {
   '@context': 'https://schema.org',
   '@type': 'Person',
   name: 'Moe Qadan',
   alternateName: 'Muhammed Qadan',
   url: Astro.site?.toString(),
-  jobTitle: 'Product Designer & UX Engineer',
-  description: 'Product design and UX engineering for long-running platforms and AI-native products.',
+  jobTitle: 'UX Engineer & Frontend Systems',
+  description: 'UX engineering, frontend systems, and design systems for long-running platforms and AI-native products.',
   knowsAbout: [
-    'Product Design',
     'UX Engineering',
+    'Frontend Engineering',
     'Design Systems',
-    'Frontend Architecture',
-    'AI-Native Products',
-    'Platform UX',
+    'Web Experience',
+    'Content Architecture',
+    'Accessibility',
+    'AI-Assisted Product Design',
+    'Razor Components',
+    'ASP.NET MVC',
+    'React',
+    'Astro',
+    'TypeScript',
   ],
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Los Angeles',
+    addressRegion: 'CA',
+    addressCountry: 'US',
+  },
   sameAs: [
     'https://linkedin.com/in/mqadan',
     'https://github.com/qadanm',

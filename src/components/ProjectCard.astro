@@ -1,51 +1,92 @@
 ---
 import Placeholder from './Placeholder.astro';
+import VerdictArtifact from './artifacts/VerdictArtifact.astro';
+import PlatformArtifact from './artifacts/PlatformArtifact.astro';
+import SawaArtifact from './artifacts/SawaArtifact.astro';
+import AdvisorArtifact from './artifacts/AdvisorArtifact.astro';
 import type { CollectionEntry } from 'astro:content';
 
 interface Props {
   project: CollectionEntry<'build'>;
   size?: 'default' | 'feature';
   index?: number;
+  number?: string;
 }
 
-const { project, size = 'default', index = 0 } = Astro.props;
+const { project, size = 'default', index = 0, number } = Astro.props;
 const { data, slug } = project;
+
+// Map slugs to bespoke artifact components. Falls back to the gradient
+// placeholder if a project hasn't been hand-illustrated yet.
+const artifactMap: Record<string, any> = {
+  'chatobd2': VerdictArtifact,
+  'magtek-platform': PlatformArtifact,
+  'sawa': SawaArtifact,
+  'financial-platforms': AdvisorArtifact,
+};
+
+const Artifact = artifactMap[slug] ?? null;
+const categoryKey = data.category.toLowerCase();
 ---
 
 <a
   href={`/work/${slug}`}
-  class:list={['project-card', `project-card--${size}`, { 'project-card--flagship': data.category === 'Flagship' }]}
+  class:list={[
+    'pcard',
+    `pcard--${size}`,
+    `pcard--${categoryKey}`,
+    { 'pcard--flagship': data.category === 'Flagship' },
+  ]}
   style={`animation-delay: ${index * 60}ms;`}
   data-category={data.category}
   data-track="cta_click"
   data-track-cta="project-card"
   data-track-project={slug}
-  data-track-category={data.category.toLowerCase()}
+  data-track-category={categoryKey}
   data-track-size={size}
 >
-  <div class="project-card__media">
-    <Placeholder
-      from={data.placeholder.from}
-      to={data.placeholder.to}
-      label={data.placeholder.label}
-      sublabel={data.placeholder.sublabel}
-      angle={data.placeholder.angle}
-      labelTone={data.placeholder.labelTone}
-    />
-    {data.category === 'Flagship' && (
-      <span class="project-card__pill">Flagship</span>
+  <span class="pcard__corner pcard__corner--tl" aria-hidden="true"></span>
+  <span class="pcard__corner pcard__corner--tr" aria-hidden="true"></span>
+  <span class="pcard__corner pcard__corner--bl" aria-hidden="true"></span>
+  <span class="pcard__corner pcard__corner--br" aria-hidden="true"></span>
+
+  <div class="pcard__media">
+    {Artifact ? (
+      <Artifact />
+    ) : (
+      <Placeholder
+        from={data.placeholder.from}
+        to={data.placeholder.to}
+        label={data.placeholder.label}
+        sublabel={data.placeholder.sublabel}
+        angle={data.placeholder.angle}
+        labelTone={data.placeholder.labelTone}
+      />
     )}
+
+    {/* Floating header strip on the artifact: sequence number + flagship pill */}
+    <div class="pcard__media-overlay">
+      {number && (
+        <span class="pcard__seq">{number}</span>
+      )}
+      {data.category === 'Flagship' && (
+        <span class="pcard__pill">
+          <span class="pcard__pill-dot" aria-hidden="true"></span>
+          Flagship
+        </span>
+      )}
+    </div>
   </div>
 
-  <div class="project-card__body">
-    <div class="project-card__meta">
-      <span class="project-card__tags">
-        <span class:list={['project-card__tag', `project-card__tag--${data.category.toLowerCase()}`]}>
-          <span class="project-card__tag-dot" aria-hidden="true"></span>
+  <div class="pcard__body">
+    <div class="pcard__meta">
+      <span class="pcard__tags">
+        <span class:list={['pcard__tag', `pcard__tag--${categoryKey}`]}>
+          <span class="pcard__tag-dot" aria-hidden="true"></span>
           {data.category}
         </span>
         {data.engagement === 'work' && data.company && (
-          <span class="project-card__work">
+          <span class="pcard__work">
             <svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true">
               <rect x="1.5" y="3.5" width="9" height="6.5" rx="1" stroke="currentColor" stroke-width="1"/>
               <path d="M4.5 3.5V2.5a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1" stroke="currentColor" stroke-width="1"/>
@@ -54,16 +95,18 @@ const { data, slug } = project;
           </span>
         )}
       </span>
-      <span class="project-card__arrow" aria-hidden="true">
+      <span class="pcard__arrow" aria-hidden="true">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
           <path d="M3 13L13 3M13 3H5M13 3v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </span>
     </div>
-    <h3 class="project-card__title">{data.title}</h3>
-    <p class="project-card__short">{data.short}</p>
+
+    <h3 class="pcard__title">{data.title}</h3>
+    <p class="pcard__short">{data.short}</p>
+
     {(data.role || data.period || data.scope) && (
-      <dl class="project-card__details">
+      <dl class="pcard__details">
         {data.role && (
           <div>
             <dt>Role</dt>
@@ -84,7 +127,8 @@ const { data, slug } = project;
         )}
       </dl>
     )}
-    <ul class="project-card__focus">
+
+    <ul class="pcard__focus">
       {data.keyFocus.map(item => (
         <li>{item}</li>
       ))}
@@ -93,15 +137,43 @@ const { data, slug } = project;
 </a>
 
 <style>
-  .project-card {
+  /* ─── Per-category accent ──────────────────────────────────────────────
+     Each card carries its own RGB accent, used in the corner crosshairs,
+     hover halo, tag dot, and outer ring. Default falls back to the
+     amber accent if a category isn't mapped. */
+  .pcard {
+    --pc-accent: var(--color-accent);
+    --pc-accent-rgb: var(--project-flagship-rgb);
+  }
+  .pcard--platform {
+    --pc-accent-rgb: var(--project-platform-rgb);
+    --pc-accent: rgb(var(--project-platform-rgb));
+  }
+  .pcard--product {
+    --pc-accent-rgb: var(--project-product-rgb);
+    --pc-accent: rgb(var(--project-product-rgb));
+  }
+  .pcard--frontend {
+    --pc-accent-rgb: var(--project-frontend-rgb);
+    --pc-accent: rgb(var(--project-frontend-rgb));
+  }
+  .pcard--flagship {
+    --pc-accent-rgb: var(--project-flagship-rgb);
+    --pc-accent: var(--color-accent);
+  }
+
+  .pcard {
     position: relative;
     display: flex;
     flex-direction: column;
     text-decoration: none;
     color: inherit;
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-2xl);
     border: 1px solid var(--color-border);
-    background-color: var(--color-bg-elevated);
+    background:
+      linear-gradient(180deg,
+        var(--color-bg-elevated) 0%,
+        var(--color-bg-muted) 100%);
     overflow: hidden;
     transition:
       border-color 360ms var(--ease-out),
@@ -109,93 +181,188 @@ const { data, slug } = project;
       transform 360ms var(--ease-out);
     height: 100%;
     will-change: transform;
+    box-shadow: var(--shadow-card);
   }
 
-  .project-card::after {
+  /* Inner highlight + outer halo — both invisible until hover */
+  .pcard::before {
     content: '';
     position: absolute;
     inset: 0;
+    border-radius: inherit;
     pointer-events: none;
-    background: radial-gradient(ellipse 60% 80% at 80% 0%, var(--color-accent-dim), transparent 60%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  .pcard::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(
+      ellipse 80% 100% at 50% 0%,
+      rgba(var(--pc-accent-rgb), 0.18),
+      transparent 55%
+    );
     opacity: 0;
     transition: opacity 420ms var(--ease-out);
-    border-radius: inherit;
   }
 
-  .project-card:hover {
-    border-color: var(--color-accent-muted);
+  .pcard:hover {
+    border-color: rgba(var(--pc-accent-rgb), 0.5);
+    transform: translateY(-4px);
     box-shadow:
-      0 1px 0 var(--color-border-subtle),
-      0 16px 40px rgba(0, 0, 0, 0.06),
-      0 4px 14px rgba(0, 0, 0, 0.04);
-    transform: translateY(-3px) scale(1.012);
+      var(--shadow-card-hover),
+      0 0 0 1px rgba(var(--pc-accent-rgb), 0.2);
   }
 
-  .project-card:hover::after {
-    opacity: 0.7;
+  .pcard:hover::after {
+    opacity: 1;
   }
 
-  :global([data-theme="dark"]) .project-card:hover {
-    box-shadow:
-      0 0 0 1px var(--color-accent-muted),
-      0 20px 60px rgba(0, 0, 0, 0.45),
-      0 6px 16px rgba(0, 0, 0, 0.3);
+  /* Corner crosshairs — designer fingerprint. Faint by default, pick up
+     the project's accent on hover. */
+  .pcard__corner {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border: 1px solid var(--color-text-subtle);
+    pointer-events: none;
+    opacity: 0.35;
+    transition: opacity 240ms var(--ease-out), border-color 240ms var(--ease-out);
+    z-index: 4;
   }
 
-  .project-card__media {
+  .pcard:hover .pcard__corner {
+    opacity: 1;
+    border-color: var(--pc-accent);
+  }
+
+  .pcard__corner--tl { top: 8px; left: 8px; border-right: none; border-bottom: none; }
+  .pcard__corner--tr { top: 8px; right: 8px; border-left: none; border-bottom: none; }
+  .pcard__corner--bl { bottom: 8px; left: 8px; border-right: none; border-top: none; }
+  .pcard__corner--br { bottom: 8px; right: 8px; border-left: none; border-top: none; }
+
+  .pcard__media {
     position: relative;
     border-bottom: 1px solid var(--color-border);
     overflow: hidden;
+    aspect-ratio: 4 / 3;
   }
 
-  .project-card__media :global(.placeholder) {
+  @media (min-width: 600px) {
+    .pcard__media {
+      aspect-ratio: 5 / 3;
+    }
+  }
+
+  @media (min-width: 900px) {
+    .pcard:not(.pcard--feature) .pcard__media {
+      aspect-ratio: 3 / 2;
+    }
+  }
+
+  /* Allow the artifact components to fill the media area */
+  .pcard__media :global(.vart),
+  .pcard__media :global(.part),
+  .pcard__media :global(.sart),
+  .pcard__media :global(.aart),
+  .pcard__media :global(.placeholder) {
+    position: absolute;
+    inset: 0;
     transition: transform 700ms var(--ease-out);
     will-change: transform;
   }
 
-  .project-card:hover .project-card__media :global(.placeholder) {
+  .pcard:hover .pcard__media :global(.vart),
+  .pcard:hover .pcard__media :global(.part),
+  .pcard:hover .pcard__media :global(.sart),
+  .pcard:hover .pcard__media :global(.aart) {
+    transform: scale(1.025);
+  }
+
+  .pcard:hover .pcard__media :global(.placeholder) {
     transform: scale(1.04);
   }
 
-  .project-card__pill {
+  .pcard__media-overlay {
     position: absolute;
     top: 12px;
     left: 12px;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  .pcard__seq {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.6);
+    padding: 4px 8px;
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .pcard__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     padding: 4px 10px;
     border-radius: 9999px;
-    background-color: rgba(0, 0, 0, 0.5);
-    color: #FAFAFA;
+    background-color: rgba(245, 158, 11, 0.18);
+    color: #FBBF24;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    margin-left: auto;
   }
 
-  .project-card__body {
+  .pcard__pill-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: #FBBF24;
+    box-shadow: 0 0 6px #F59E0B;
+  }
+
+  .pcard__body {
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
-    padding: var(--space-4);
+    padding: var(--space-5);
     flex: 1;
+    position: relative;
+    z-index: 2;
   }
 
   @media (min-width: 600px) {
-    .project-card__body {
-      padding: var(--space-5);
+    .pcard__body {
+      padding: var(--space-6);
     }
   }
 
-  .project-card__meta {
+  .pcard__meta {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: var(--space-2);
   }
 
-  .project-card__tags {
+  .pcard__tags {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -204,7 +371,7 @@ const { data, slug } = project;
     flex: 1;
   }
 
-  .project-card__tag {
+  .pcard__tag {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -216,12 +383,12 @@ const { data, slug } = project;
     color: var(--color-text-muted);
     padding: 4px 10px;
     border-radius: 9999px;
-    background-color: var(--color-bg-muted);
+    background-color: var(--color-bg-deep);
     border: 1px solid var(--color-border);
     line-height: 1;
   }
 
-  .project-card__work {
+  .pcard__work {
     display: inline-flex;
     align-items: center;
     gap: 5px;
@@ -238,54 +405,38 @@ const { data, slug } = project;
     line-height: 1;
   }
 
-  .project-card__work svg {
+  .pcard__work svg {
     color: var(--color-text-subtle);
     flex-shrink: 0;
   }
 
-  .project-card__tag-dot {
-    width: 5px;
-    height: 5px;
+  .pcard__tag-dot {
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    background-color: var(--color-text-subtle);
+    background-color: var(--pc-accent);
+    box-shadow: 0 0 6px var(--pc-accent);
   }
 
-  .project-card__tag--flagship {
+  .pcard__tag--flagship {
     color: var(--color-accent);
     background-color: var(--color-accent-dim);
     border-color: var(--color-accent-muted);
   }
 
-  .project-card__tag--flagship .project-card__tag-dot {
-    background-color: var(--color-accent);
-    box-shadow: 0 0 8px var(--color-accent);
-  }
-
-  .project-card__tag--platform .project-card__tag-dot {
-    background-color: #60A5FA;
-  }
-
-  .project-card__tag--product .project-card__tag-dot {
-    background-color: #A78BFA;
-  }
-
-  .project-card__tag--frontend .project-card__tag-dot {
-    background-color: #34D399;
-  }
-
-  .project-card__arrow {
+  .pcard__arrow {
     color: var(--color-text-subtle);
     transition: color 200ms, transform 200ms var(--ease-out);
     line-height: 0;
   }
 
-  .project-card:hover .project-card__arrow {
-    color: var(--color-accent);
+  .pcard:hover .pcard__arrow {
+    color: var(--pc-accent);
     transform: translate(2px, -2px);
   }
 
-  .project-card__title {
-    font-size: 20px;
+  .pcard__title {
+    font-size: 22px;
     font-weight: 700;
     letter-spacing: -0.02em;
     line-height: 1.15;
@@ -293,24 +444,24 @@ const { data, slug } = project;
   }
 
   @media (min-width: 600px) {
-    .project-card__title {
-      font-size: 22px;
+    .pcard__title {
+      font-size: 24px;
     }
   }
 
-  .project-card__short {
+  .pcard__short {
     font-size: 14px;
     line-height: 1.6;
     color: var(--color-text-muted);
   }
 
   @media (min-width: 600px) {
-    .project-card__short {
+    .pcard__short {
       font-size: 15px;
     }
   }
 
-  .project-card__details {
+  .pcard__details {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
     gap: var(--space-2) var(--space-4);
@@ -318,13 +469,13 @@ const { data, slug } = project;
     padding: 0;
   }
 
-  .project-card__details > div {
+  .pcard__details > div {
     display: flex;
     flex-direction: column;
     gap: 2px;
   }
 
-  .project-card__details dt {
+  .pcard__details dt {
     font-family: var(--font-mono);
     font-size: 10px;
     font-weight: 600;
@@ -333,14 +484,14 @@ const { data, slug } = project;
     color: var(--color-text-subtle);
   }
 
-  .project-card__details dd {
+  .pcard__details dd {
     margin: 0;
     font-size: 12px;
     line-height: 1.45;
     color: var(--color-text);
   }
 
-  .project-card__focus {
+  .pcard__focus {
     list-style: none;
     padding: 0;
     margin: 0;
@@ -352,59 +503,77 @@ const { data, slug } = project;
     gap: 4px 8px;
   }
 
-  .project-card__focus li {
+  .pcard__focus li {
     font-family: var(--font-mono);
     font-size: 11px;
     color: var(--color-text-subtle);
     line-height: 1.4;
   }
 
-  .project-card__focus li + li::before {
+  .pcard__focus li + li::before {
     content: '·';
     margin-right: 8px;
     color: var(--color-border);
   }
 
-  /* Feature size — used as the lead card in each section */
+  /* ─── Feature size — used as the lead card in each section ─────────── */
   @media (min-width: 900px) {
-    .project-card--feature {
+    .pcard--feature {
       display: grid;
       grid-template-columns: 1.15fr 1fr;
     }
 
-    .project-card--flagship.project-card--feature {
-      grid-template-columns: 1.25fr 1fr;
+    .pcard--flagship.pcard--feature {
+      grid-template-columns: 1.3fr 1fr;
     }
 
-    .project-card--feature .project-card__media {
+    .pcard--feature .pcard__media {
       border-bottom: none;
       border-right: 1px solid var(--color-border);
+      aspect-ratio: auto;
+      min-height: 360px;
     }
 
-    .project-card--feature .project-card__body {
+    .pcard--flagship.pcard--feature .pcard__media {
+      min-height: 440px;
+    }
+
+    .pcard--feature .pcard__body {
       padding: var(--space-8);
       justify-content: center;
     }
 
-    .project-card--feature .project-card__title {
+    .pcard--feature .pcard__title {
       font-family: var(--font-display);
       font-weight: 400;
       letter-spacing: -0.025em;
-      font-size: 36px;
+      font-size: 38px;
       line-height: 1.05;
     }
 
-    .project-card--flagship.project-card--feature .project-card__title {
-      font-size: 44px;
+    .pcard--flagship.pcard--feature .pcard__title {
+      font-size: 48px;
     }
 
-    .project-card--feature .project-card__short {
+    .pcard--feature .pcard__short {
       font-size: 16px;
       line-height: 1.65;
     }
 
-    .project-card--flagship.project-card--feature .project-card__short {
+    .pcard--flagship.pcard--feature .pcard__short {
       font-size: 17px;
+    }
+
+    /* Subtle accent rule under the title on feature cards */
+    .pcard--feature .pcard__title::after {
+      content: '';
+      display: block;
+      width: 28px;
+      height: 2px;
+      margin-top: var(--space-4);
+      background-color: var(--pc-accent);
+      opacity: 0.6;
+      border-radius: 2px;
     }
   }
 </style>

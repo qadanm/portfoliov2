@@ -1,0 +1,402 @@
+---
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+
+const sections = [
+  {
+    num: '02',
+    label: 'Editor & code',
+    items: [
+      { name: 'VS Code', note: 'Daily driver. JetBrains keymap, no theme overrides.' },
+      { name: 'Cursor', note: 'When the work is local iteration on a tight loop.' },
+      { name: 'Claude Code', note: 'When the work needs to think across more than one file.' },
+      { name: 'iTerm2 + zsh', note: 'Tabbed sessions, per-project profiles.' },
+      { name: 'GitHub Desktop', note: 'For diffs and quick commits. Branching and rebasing in CLI.' },
+    ],
+  },
+  {
+    num: '03',
+    label: 'Design',
+    items: [
+      { name: 'Figma', note: 'Precision design, component-system maintenance, handoff fidelity.' },
+      { name: 'Claude Design', note: 'Visual exploration when a frame is faster to think in than markup.' },
+      { name: 'iA Writer', note: 'Writing-first for long-form content and case study drafts.' },
+    ],
+  },
+  {
+    num: '04',
+    label: 'Stack',
+    items: [
+      { name: 'TypeScript', note: 'Default for everything I author from scratch.' },
+      { name: 'Astro', note: 'This site. Static-first, content collections, MDX, view transitions.' },
+      { name: 'React + React Native (Expo)', note: 'ChatOBD2 mobile + web surfaces.' },
+      { name: 'ASP.NET MVC + Razor', note: 'MagTek platform. Razor partial library past 100 typed components.' },
+      { name: 'Hand-written CSS', note: 'Tokens, layout primitives. No utility-class framework on this site.' },
+      { name: 'Tailwind', note: 'On projects where the team is already on it.' },
+      { name: 'Supabase', note: 'Database, auth, edge functions for ChatOBD2.' },
+    ],
+  },
+  {
+    num: '05',
+    label: 'AI workflow',
+    items: [
+      { name: 'Prompt modules in source', note: 'Typed, versioned, reviewed in PRs like any other code.' },
+      { name: 'Schema-bound outputs', note: 'Model output is constrained at the boundary, not at the UI layer.' },
+      { name: 'Deterministic layers in front', note: 'Six reasoning layers run before every model call in ChatOBD2.' },
+      { name: 'Token budgets as resource budgets', note: '38,000-token system prompt assembled per scan, P0 sections always make the cut.' },
+    ],
+  },
+  {
+    num: '06',
+    label: 'Hardware',
+    items: [
+      { name: 'MacBook Pro 14"', note: 'M3 Pro, 36 GB. Daily.' },
+      { name: 'Studio Display', note: 'Single screen, no second monitor. Forces tab discipline.' },
+      { name: 'iPhone 15 Pro', note: 'Always nearby, mostly because of ChatOBD2 testing.' },
+    ],
+  },
+  {
+    num: '07',
+    label: 'This site',
+    items: [
+      { name: 'Astro 4', note: 'Static-first, content collections for case studies, MDX.' },
+      { name: 'Hand-written CSS', note: 'No CSS framework. ~12 KB of design tokens carry the system.' },
+      { name: 'Inter, Instrument Serif, JetBrains Mono', note: 'Loaded from Google Fonts via preconnect.' },
+      { name: 'Plausible analytics', note: 'Privacy-respecting. No cookies, no fingerprinting.' },
+      { name: 'Web3Forms', note: 'Static contact form, no backend required.' },
+      { name: 'Cloudflare Pages', note: 'Static deploy, edge caching.' },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Uses"
+  description="The tools, stack, and AI workflow Moe Qadan uses for UX engineering, frontend systems, and product work. A practical colophon."
+  keywords={[
+    'Moe Qadan',
+    'colophon',
+    'tools',
+    'stack',
+    'workflow',
+    'Astro',
+    'React',
+    'TypeScript',
+    'design systems',
+    'AI workflow',
+  ]}
+>
+  <div class="uses">
+    <div class="uses__atmos" aria-hidden="true">
+      <span class="uses__atmos-glow"></span>
+    </div>
+
+    <header class="uses__hero">
+      <div class="container-site">
+        <div class="uses__sxn">
+          <span class="uses__sxn-num">01</span>
+          <span class="uses__sxn-label">Uses</span>
+          <span class="uses__sxn-rule" aria-hidden="true"></span>
+          <span class="uses__sxn-meta">A practical colophon</span>
+        </div>
+        <h1 class="uses__title">What I work with.</h1>
+        <p class="uses__lede">
+          The actual tools, stack, and workflow behind the work on this
+          site. Updated when something changes, not on a schedule.
+        </p>
+      </div>
+    </header>
+
+    <div class="container-site uses__body">
+      {sections.map(section => (
+        <section class="uses__section" data-reveal>
+          <header class="uses__section-head">
+            <span class="uses__section-num">{section.num}</span>
+            <h2 class="uses__section-label">{section.label}</h2>
+            <span class="uses__section-rule" aria-hidden="true"></span>
+            <span class="uses__section-count">{String(section.items.length).padStart(2, '0')}</span>
+          </header>
+          <dl class="uses__list">
+            {section.items.map(item => (
+              <div class="uses__row">
+                <dt class="uses__row-name">{item.name}</dt>
+                <dd class="uses__row-note">{item.note}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      ))}
+
+      <footer class="uses__foot">
+        <span class="uses__foot-line" aria-hidden="true"></span>
+        <p class="uses__foot-text">
+          Inspired by the <a href="https://uses.tech/" target="_blank" rel="noopener noreferrer" class="uses__foot-link">/uses</a>
+          tradition. Last reviewed May 2026.
+        </p>
+      </footer>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .uses {
+    position: relative;
+  }
+
+  .uses__atmos {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 600px;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .uses__atmos-glow {
+    position: absolute;
+    top: -180px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1100px;
+    height: 540px;
+    background: radial-gradient(ellipse 50% 50% at 50% 50%, var(--color-accent-muted), transparent 70%);
+    filter: blur(28px);
+    opacity: 0.7;
+  }
+
+  .uses__hero {
+    position: relative;
+    padding-top: calc(60px + var(--space-10));
+    padding-bottom: var(--space-10);
+    border-bottom: 1px solid var(--color-border-subtle);
+    margin-bottom: var(--space-10);
+  }
+
+  @media (min-width: 768px) {
+    .uses__hero {
+      padding-top: calc(64px + var(--space-16));
+      padding-bottom: var(--space-12);
+      margin-bottom: var(--space-12);
+    }
+  }
+
+  .uses__sxn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: var(--space-5);
+    flex-wrap: wrap;
+  }
+
+  .uses__sxn-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 22px;
+    padding: 0 7px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-elevated);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1;
+  }
+
+  .uses__sxn-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-text);
+  }
+
+  .uses__sxn-rule {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, var(--color-border), transparent);
+    min-width: 32px;
+  }
+
+  .uses__sxn-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-text-subtle);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .uses__title {
+    font-family: var(--font-display);
+    font-size: clamp(40px, 9vw, 80px);
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    line-height: 1.05;
+    color: var(--color-text);
+    max-width: 18ch;
+    margin-bottom: var(--space-5);
+  }
+
+  .uses__lede {
+    font-size: clamp(15px, 1.5vw, 17px);
+    line-height: 1.65;
+    color: var(--color-text-muted);
+    max-width: 60ch;
+  }
+
+  .uses__body {
+    position: relative;
+    padding-bottom: var(--space-16);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+    max-width: 880px;
+  }
+
+  @media (min-width: 768px) {
+    .uses__body {
+      padding-bottom: var(--space-24);
+      gap: var(--space-16);
+    }
+  }
+
+  /* Section */
+  .uses__section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  .uses__section-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .uses__section-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 22px;
+    padding: 0 7px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-elevated);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1;
+  }
+
+  .uses__section-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .uses__section-rule {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, var(--color-border), transparent);
+  }
+
+  .uses__section-count {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-text-subtle);
+    letter-spacing: 0.04em;
+  }
+
+  /* List */
+  .uses__list {
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .uses__row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px;
+    padding: var(--space-4) 4px;
+    border-bottom: 1px dashed var(--color-border-subtle);
+  }
+
+  @media (min-width: 720px) {
+    .uses__row {
+      grid-template-columns: 220px 1fr;
+      gap: var(--space-5);
+      align-items: baseline;
+      padding: var(--space-4) 4px;
+    }
+  }
+
+  .uses__row:last-child {
+    border-bottom: none;
+  }
+
+  .uses__row-name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+    line-height: 1.2;
+  }
+
+  .uses__row-note {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+  }
+
+  /* Footer note */
+  .uses__foot {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding-top: var(--space-3);
+  }
+
+  .uses__foot-line {
+    flex-shrink: 0;
+    width: 18px;
+    height: 1px;
+    margin-top: 9px;
+    background-color: var(--color-text-subtle);
+  }
+
+  .uses__foot-text {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-text-subtle);
+    line-height: 1.55;
+    letter-spacing: 0.02em;
+    margin: 0;
+  }
+
+  .uses__foot-link {
+    color: var(--color-text);
+    text-decoration: underline;
+    text-decoration-color: var(--color-border);
+    text-underline-offset: 3px;
+    transition: color 150ms, text-decoration-color 150ms;
+  }
+
+  .uses__foot-link:hover {
+    color: var(--color-accent);
+    text-decoration-color: var(--color-accent);
+  }
+</style>

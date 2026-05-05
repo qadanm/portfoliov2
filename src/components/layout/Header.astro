@@ -5,7 +5,7 @@ const nav = [
   { href: '/work', label: 'Work', sub: 'Selected projects and case studies.' },
   { href: '/approach', label: 'Approach', sub: 'How I design, build, and use AI.' },
   { href: '/about', label: 'About', sub: 'Background and how I think.' },
-  { href: '/contact', label: 'Contact', sub: 'Open to hearing about projects.' },
+  { href: '/contact', label: 'Contact', sub: 'Send a message.' },
 ];
 
 function isActive(href: string) {
@@ -17,8 +17,7 @@ function isActive(href: string) {
 <header class="site-header" id="site-header" transition:persist>
   <div class="container-site header-inner">
     <a href="/" class="logo" aria-label="Qadan, Home">
-      <span class="logo-name">Qadan</span>
-      <span class="logo-dot" aria-hidden="true">.</span>
+      <span class="logo-name">Qadan<span class="logo-dot" aria-hidden="true">.</span></span>
     </a>
 
     <nav class="nav-desktop" aria-label="Primary navigation">
@@ -37,11 +36,11 @@ function isActive(href: string) {
       <a
         href="/contact"
         class="status-pill"
-        aria-label="Open to hearing about projects, go to contact"
-        title="Open to hearing about new projects"
+        aria-label="Send a message"
+        title="Send a message"
       >
         <span class="status-pill__dot" aria-hidden="true"></span>
-        <span class="status-pill__text">Open to projects</span>
+        <span class="status-pill__text">Send a message</span>
       </a>
 
       <button
@@ -78,7 +77,7 @@ function isActive(href: string) {
       <span class="nav-mobile__eyebrow">
         <span class="nav-mobile__status">
           <span class="status-pill__dot" aria-hidden="true"></span>
-          Open to hearing about projects
+          moe@qadan.co
         </span>
       </span>
       <ul class="nav-mobile__list">
@@ -261,14 +260,15 @@ function isActive(href: string) {
     right: 0;
     z-index: 100;
     border-bottom: 1px solid transparent;
-    transition: background-color 250ms ease, border-color 250ms ease, backdrop-filter 250ms ease;
+    transition: background-color 280ms ease, border-color 280ms ease, backdrop-filter 280ms ease;
   }
 
   .header--scrolled {
-    background-color: color-mix(in srgb, var(--color-bg) 85%, transparent);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background-color: color-mix(in srgb, var(--color-bg) 78%, transparent);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
     border-bottom-color: var(--color-border-subtle);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.02) inset;
   }
 
   .header-inner {
@@ -289,16 +289,40 @@ function isActive(href: string) {
   .logo {
     display: flex;
     align-items: center;
+    gap: 10px;
     text-decoration: none;
     color: var(--color-text);
     font-weight: 700;
-    font-size: 18px;
+    font-size: 17px;
     letter-spacing: -0.02em;
     transition: color 150ms;
     padding-block: 8px;
   }
 
+  .logo::before {
+    content: 'MQ';
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    background: linear-gradient(180deg, var(--color-bg-elevated), var(--color-bg-muted));
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--color-text);
+    letter-spacing: 0.04em;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    transition: border-color 150ms, color 150ms;
+  }
+
   .logo:hover { color: var(--color-accent); }
+  .logo:hover::before {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
 
   .logo-dot {
     color: var(--color-accent);
@@ -308,7 +332,7 @@ function isActive(href: string) {
   .nav-desktop {
     display: none;
     align-items: center;
-    gap: 4px;
+    gap: 2px;
     flex: 1;
     justify-content: center;
   }
@@ -318,24 +342,45 @@ function isActive(href: string) {
   }
 
   .nav-link {
-    padding: 6px 14px;
+    position: relative;
+    padding: 8px 14px;
     border-radius: 9999px;
     font-size: 14px;
     font-weight: 500;
     color: var(--color-text-muted);
     text-decoration: none;
-    transition: color 150ms, background-color 150ms;
+    transition: color 180ms;
     letter-spacing: -0.01em;
+  }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 4px;
+    height: 1px;
+    background-color: var(--color-accent);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 240ms var(--ease-out);
   }
 
   .nav-link:hover {
     color: var(--color-text);
-    background-color: var(--color-bg-muted);
+  }
+
+  .nav-link:hover::after {
+    transform: scaleX(0.6);
   }
 
   .nav-link--active {
     color: var(--color-text);
-    background-color: var(--color-bg-muted);
+  }
+
+  .nav-link--active::after {
+    transform: scaleX(1);
+    background-color: var(--color-accent);
   }
 
   .header-actions {
@@ -344,23 +389,24 @@ function isActive(href: string) {
     gap: 8px;
   }
 
-  /* "Open to projects" pill — soft availability signal that doesn't read as job-hunting */
+  /* Header contact pill — neutral entry point to the contact page */
   .status-pill {
     display: none;
     align-items: center;
-    gap: 6px;
-    padding: 5px 10px 5px 9px;
+    gap: 7px;
+    padding: 6px 12px 6px 11px;
     border-radius: 9999px;
     font-family: var(--font-mono);
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.04em;
-    color: var(--color-success);
-    background-color: color-mix(in srgb, var(--color-success) 8%, transparent);
-    border: 1px solid color-mix(in srgb, var(--color-success) 28%, transparent);
+    color: var(--color-text);
+    background-color: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
     text-decoration: none;
-    transition: background-color 150ms, border-color 150ms, transform 150ms var(--ease-out);
+    transition: background-color 150ms, border-color 150ms, color 150ms, transform 150ms var(--ease-out);
     -webkit-tap-highlight-color: transparent;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
   }
 
   @media (min-width: 600px) {
@@ -368,19 +414,23 @@ function isActive(href: string) {
   }
 
   .status-pill:hover {
-    background-color: color-mix(in srgb, var(--color-success) 14%, transparent);
-    border-color: color-mix(in srgb, var(--color-success) 50%, transparent);
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+    background-color: var(--color-accent-dim);
     transform: translateY(-1px);
   }
 
   .status-pill__dot {
-    width: 7px;
-    height: 7px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    background-color: var(--color-success);
-    box-shadow: 0 0 8px color-mix(in srgb, var(--color-success) 65%, transparent);
-    animation: status-pulse 2.4s ease-in-out infinite;
+    background-color: var(--color-text-subtle);
     flex-shrink: 0;
+    transition: background-color 150ms;
+  }
+
+  .status-pill:hover .status-pill__dot {
+    background-color: var(--color-accent);
   }
 
   @keyframes status-pulse {
@@ -396,22 +446,28 @@ function isActive(href: string) {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 44px;
-    height: 44px;
+    width: 38px;
+    height: 38px;
     border-radius: 9999px;
     border: 1px solid var(--color-border);
-    background: transparent;
+    background: linear-gradient(180deg, var(--color-bg-elevated), var(--color-bg-muted));
     color: var(--color-text-muted);
     cursor: pointer;
-    transition: all 150ms;
+    transition: all 180ms var(--ease-out);
     flex-shrink: 0;
     -webkit-tap-highlight-color: transparent;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
   }
 
   .theme-toggle:hover {
-    color: var(--color-text);
+    color: var(--color-accent);
     border-color: var(--color-accent);
     background-color: var(--color-accent-dim);
+    transform: rotate(15deg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .theme-toggle:hover { transform: none; }
   }
 
   .icon-moon { display: none; }
@@ -540,8 +596,13 @@ function isActive(href: string) {
     font-family: var(--font-mono);
     font-size: 11px;
     font-weight: 600;
-    letter-spacing: 0.06em;
-    color: var(--color-success);
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+  }
+
+  .nav-mobile__status .status-pill__dot {
+    background-color: var(--color-text-subtle);
+    box-shadow: none;
   }
 
   .nav-mobile__list {

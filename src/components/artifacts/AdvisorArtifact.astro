@@ -1,0 +1,335 @@
+---
+// Advisor Platforms thumbnail. Theme-aware deep blue atmosphere.
+// Tenant grid + portfolio overview plate.
+---
+
+<div class="aart" aria-hidden="true">
+  <div class="aart__bg"></div>
+  <div class="aart__halo"></div>
+
+  <div class="aart__tenants">
+    <div class="aart__tenant">CH</div>
+    <div class="aart__tenant">CT</div>
+    <div class="aart__tenant aart__tenant--active">NM</div>
+    <div class="aart__tenant">VY</div>
+    <div class="aart__tenant">SV</div>
+    <div class="aart__tenant aart__tenant--ghost">EW</div>
+    <div class="aart__tenant aart__tenant--ghost">+45</div>
+    <div class="aart__tenant aart__tenant--ghost"></div>
+  </div>
+
+  <div class="aart__plate">
+    <div class="aart__plate-head">
+      <span class="aart__plate-tag">
+        <span class="aart__plate-tag-dot"></span>
+        Tenant
+      </span>
+      <span class="aart__plate-mono">institution.northwestern</span>
+    </div>
+    <div class="aart__plate-body">
+      <div class="aart__plate-title">Portfolio overview</div>
+      <div class="aart__plate-bars">
+        <span class="aart__plate-bar aart__plate-bar--1"></span>
+        <span class="aart__plate-bar aart__plate-bar--2"></span>
+        <span class="aart__plate-bar aart__plate-bar--3"></span>
+        <span class="aart__plate-bar aart__plate-bar--4"></span>
+      </div>
+      <div class="aart__plate-foot">
+        <span>One framework</span>
+        <span class="aart__plate-foot-sep">·</span>
+        <span>50+ deploys</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="aart__caption">
+    <span class="aart__caption-line"></span>
+    <span>Tenant frame · InvestCloud</span>
+  </div>
+</div>
+
+<style>
+  .aart {
+    --aart-atmos:
+      radial-gradient(ellipse 70% 50% at 20% 0%, rgba(59, 130, 246, 0.15), transparent 60%),
+      radial-gradient(ellipse 60% 60% at 90% 90%, rgba(30, 64, 175, 0.10), transparent 60%),
+      linear-gradient(150deg, #060B18 0%, #0E1A33 60%, #04081A 100%);
+    --aart-text: #FAFAFA;
+    --aart-text-muted: rgba(255, 255, 255, 0.55);
+    --aart-text-subtle: rgba(255, 255, 255, 0.5);
+    --aart-grid: rgba(255, 255, 255, 0.025);
+    --aart-halo: radial-gradient(circle, rgba(59, 130, 246, 0.22), transparent 70%);
+    --aart-tenant-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.015));
+    --aart-tenant-border: rgba(255, 255, 255, 0.08);
+    --aart-tenant-text: rgba(255, 255, 255, 0.55);
+    --aart-tenant-ghost-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent);
+    --aart-tenant-ghost-border: rgba(255, 255, 255, 0.04);
+    --aart-tenant-ghost-text: rgba(255, 255, 255, 0.25);
+    --aart-plate-bg: linear-gradient(180deg, rgba(15, 25, 50, 0.95), rgba(8, 14, 30, 0.95));
+    --aart-plate-border: rgba(96, 165, 250, 0.3);
+    --aart-plate-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 16px 32px rgba(0, 0, 0, 0.45);
+    --aart-divider: rgba(255, 255, 255, 0.05);
+    --aart-caption: rgba(255, 255, 255, 0.5);
+    --aart-caption-rule: rgba(255, 255, 255, 0.3);
+  }
+
+  :global([data-theme="light"]) .aart {
+    --aart-atmos:
+      radial-gradient(ellipse 70% 50% at 20% 0%, rgba(59, 130, 246, 0.20), transparent 60%),
+      radial-gradient(ellipse 60% 60% at 90% 90%, rgba(30, 64, 175, 0.12), transparent 60%),
+      linear-gradient(150deg, #EFF4FF 0%, #DCE7FB 60%, #F4F7FE 100%);
+    --aart-text: #0E1A33;
+    --aart-text-muted: rgba(14, 26, 51, 0.62);
+    --aart-text-subtle: rgba(14, 26, 51, 0.5);
+    --aart-grid: rgba(14, 26, 51, 0.05);
+    --aart-halo: radial-gradient(circle, rgba(59, 130, 246, 0.3), transparent 70%);
+    --aart-tenant-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.45));
+    --aart-tenant-border: rgba(14, 26, 51, 0.08);
+    --aart-tenant-text: rgba(14, 26, 51, 0.65);
+    --aart-tenant-ghost-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.2));
+    --aart-tenant-ghost-border: rgba(14, 26, 51, 0.05);
+    --aart-tenant-ghost-text: rgba(14, 26, 51, 0.3);
+    --aart-plate-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(244, 247, 254, 0.94));
+    --aart-plate-border: rgba(96, 165, 250, 0.4);
+    --aart-plate-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.7),
+      0 1px 2px rgba(14, 26, 51, 0.04),
+      0 16px 32px rgba(14, 26, 51, 0.1);
+    --aart-divider: rgba(14, 26, 51, 0.06);
+    --aart-caption: rgba(14, 26, 51, 0.55);
+    --aart-caption-rule: rgba(14, 26, 51, 0.3);
+  }
+
+  .aart {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: var(--aart-atmos);
+    color: var(--aart-text);
+    container-type: inline-size;
+  }
+
+  .aart__bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, var(--aart-grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--aart-grid) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .aart__halo {
+    position: absolute;
+    top: -20%;
+    left: 30%;
+    width: 60%;
+    height: 60%;
+    border-radius: 50%;
+    background: var(--aart-halo);
+    filter: blur(24px);
+    pointer-events: none;
+  }
+
+  .aart__tenants {
+    position: absolute;
+    top: 8%;
+    left: 8%;
+    right: 8%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+
+  @container (min-width: 360px) {
+    .aart__tenants {
+      gap: 8px;
+    }
+  }
+
+  .aart__tenant {
+    aspect-ratio: 1;
+    border-radius: 6px;
+    background: var(--aart-tenant-bg);
+    border: 1px solid var(--aart-tenant-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--aart-tenant-text);
+    letter-spacing: 0.04em;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  @container (min-width: 360px) {
+    .aart__tenant {
+      font-size: 12px;
+      border-radius: 8px;
+    }
+  }
+
+  .aart__tenant--active {
+    background: linear-gradient(180deg, rgba(96, 165, 250, 0.4), rgba(59, 130, 246, 0.18));
+    border-color: rgba(96, 165, 250, 0.7);
+    color: #0E1A33;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.2),
+      0 0 12px rgba(96, 165, 250, 0.4);
+  }
+
+  :global([data-theme="dark"]) .aart__tenant--active {
+    color: #FFFFFF;
+  }
+
+  .aart__tenant--ghost {
+    background: var(--aart-tenant-ghost-bg);
+    border-color: var(--aart-tenant-ghost-border);
+    color: var(--aart-tenant-ghost-text);
+  }
+
+  .aart__plate {
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    bottom: 18%;
+    border: 1px solid var(--aart-plate-border);
+    border-radius: 10px;
+    background: var(--aart-plate-bg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: var(--aart-plate-shadow);
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  @container (min-width: 360px) {
+    .aart__plate {
+      padding: 12px 14px;
+    }
+  }
+
+  .aart__plate-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .aart__plate-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    border-radius: 9999px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #1E40AF;
+    background-color: rgba(96, 165, 250, 0.16);
+    border: 1px solid rgba(96, 165, 250, 0.5);
+    line-height: 1;
+  }
+
+  :global([data-theme="dark"]) .aart__plate-tag {
+    color: #93C5FD;
+    background-color: rgba(96, 165, 250, 0.14);
+  }
+
+  .aart__plate-tag-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: #60A5FA;
+    box-shadow: 0 0 6px rgba(96, 165, 250, 0.7);
+  }
+
+  .aart__plate-mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--aart-text-subtle);
+    letter-spacing: 0.02em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .aart__plate-body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .aart__plate-title {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: 14px;
+    color: var(--aart-text);
+    letter-spacing: -0.005em;
+  }
+
+  @container (min-width: 360px) {
+    .aart__plate-title {
+      font-size: 16px;
+    }
+  }
+
+  .aart__plate-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 20px;
+  }
+
+  .aart__plate-bar {
+    flex: 1;
+    border-radius: 2px 2px 0 0;
+    background: linear-gradient(180deg, #60A5FA, rgba(96, 165, 250, 0.3));
+  }
+
+  .aart__plate-bar--1 { height: 60%; }
+  .aart__plate-bar--2 { height: 90%; }
+  .aart__plate-bar--3 { height: 45%; opacity: 0.65; }
+  .aart__plate-bar--4 { height: 75%; opacity: 0.85; }
+
+  .aart__plate-foot {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--aart-text-muted);
+    letter-spacing: 0.04em;
+    padding-top: 6px;
+    border-top: 1px solid var(--aart-divider);
+  }
+
+  .aart__plate-foot-sep {
+    color: var(--aart-text-subtle);
+    opacity: 0.5;
+  }
+
+  .aart__caption {
+    position: absolute;
+    bottom: 12px;
+    left: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--aart-caption);
+    letter-spacing: 0.06em;
+  }
+
+  .aart__caption-line {
+    width: 14px;
+    height: 1px;
+    background-color: var(--aart-caption-rule);
+  }
+</style>

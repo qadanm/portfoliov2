@@ -1,0 +1,305 @@
+---
+// MagTek Platform thumbnail. Theme-aware steel-blue atmosphere.
+// Multi-site tile grid + foreground partial component.
+---
+
+<div class="part" aria-hidden="true">
+  <div class="part__bg"></div>
+  <div class="part__halo"></div>
+
+  <div class="part__grid">
+    {Array.from({ length: 24 }).map((_, i) => (
+      <span class:list={['part__tile', { 'is-active': [3, 7, 12, 16, 19].includes(i) }]}></span>
+    ))}
+  </div>
+
+  <div class="part__plate">
+    <div class="part__plate-head">
+      <span class="part__plate-tag">
+        <span class="part__plate-tag-dot"></span>
+        Razor partial
+      </span>
+      <span class="part__plate-mono">Card.Hardware.cshtml</span>
+    </div>
+    <div class="part__plate-row">
+      <div class="part__plate-thumb"></div>
+      <div class="part__plate-lines">
+        <span class="part__plate-line part__plate-line--w1"></span>
+        <span class="part__plate-line part__plate-line--w2"></span>
+        <span class="part__plate-line part__plate-line--w3"></span>
+      </div>
+    </div>
+    <div class="part__plate-foot">
+      <span>11 sites</span>
+      <span class="part__plate-foot-sep">·</span>
+      <span>1 partial</span>
+      <span class="part__plate-foot-sep">·</span>
+      <span class="part__plate-foot-typed">typed VM</span>
+    </div>
+  </div>
+
+  <div class="part__caption">
+    <span class="part__caption-line"></span>
+    <span>Shared partial · MagTek</span>
+  </div>
+</div>
+
+<style>
+  .part {
+    --part-atmos:
+      radial-gradient(ellipse 70% 60% at 80% 20%, rgba(96, 165, 250, 0.10), transparent 60%),
+      radial-gradient(ellipse 60% 60% at 20% 90%, rgba(96, 165, 250, 0.05), transparent 60%),
+      linear-gradient(155deg, #0A0F18 0%, #11192A 60%, #060A12 100%);
+    --part-text: #FAFAFA;
+    --part-text-muted: rgba(255, 255, 255, 0.55);
+    --part-text-subtle: rgba(255, 255, 255, 0.45);
+    --part-grid: rgba(255, 255, 255, 0.025);
+    --part-halo: radial-gradient(circle, rgba(96, 165, 250, 0.18), transparent 65%);
+    --part-tile-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015));
+    --part-tile-border: rgba(255, 255, 255, 0.06);
+    --part-plate-bg: linear-gradient(180deg, rgba(20, 26, 40, 0.95), rgba(14, 18, 30, 0.95));
+    --part-plate-border: rgba(255, 255, 255, 0.1);
+    --part-plate-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.07),
+      0 16px 32px rgba(0, 0, 0, 0.4);
+    --part-divider: rgba(255, 255, 255, 0.05);
+    --part-line-bg: rgba(255, 255, 255, 0.1);
+    --part-line-bg-2: rgba(255, 255, 255, 0.06);
+    --part-caption: rgba(255, 255, 255, 0.45);
+    --part-caption-rule: rgba(255, 255, 255, 0.3);
+  }
+
+  :global([data-theme="light"]) .part {
+    --part-atmos:
+      radial-gradient(ellipse 70% 60% at 80% 20%, rgba(96, 165, 250, 0.16), transparent 60%),
+      radial-gradient(ellipse 60% 60% at 20% 90%, rgba(96, 165, 250, 0.08), transparent 60%),
+      linear-gradient(155deg, #F4F8FF 0%, #E8F0FE 60%, #F8FAFD 100%);
+    --part-text: #0E1A33;
+    --part-text-muted: rgba(14, 26, 51, 0.62);
+    --part-text-subtle: rgba(14, 26, 51, 0.5);
+    --part-grid: rgba(14, 26, 51, 0.05);
+    --part-halo: radial-gradient(circle, rgba(96, 165, 250, 0.22), transparent 65%);
+    --part-tile-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.45));
+    --part-tile-border: rgba(14, 26, 51, 0.08);
+    --part-plate-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 253, 0.94));
+    --part-plate-border: rgba(96, 165, 250, 0.3);
+    --part-plate-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.7),
+      0 1px 2px rgba(14, 26, 51, 0.04),
+      0 16px 32px rgba(14, 26, 51, 0.1);
+    --part-divider: rgba(14, 26, 51, 0.06);
+    --part-line-bg: rgba(14, 26, 51, 0.12);
+    --part-line-bg-2: rgba(14, 26, 51, 0.07);
+    --part-caption: rgba(14, 26, 51, 0.55);
+    --part-caption-rule: rgba(14, 26, 51, 0.3);
+  }
+
+  .part {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: var(--part-atmos);
+    color: var(--part-text);
+    container-type: inline-size;
+  }
+
+  .part__bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, var(--part-grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--part-grid) 1px, transparent 1px);
+    background-size: 20px 20px;
+    mask-image: radial-gradient(ellipse 100% 100% at 50% 50%, #000 0%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 100% 100% at 50% 50%, #000 0%, transparent 80%);
+  }
+
+  .part__halo {
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    width: 50%;
+    height: 60%;
+    border-radius: 50%;
+    background: var(--part-halo);
+    filter: blur(24px);
+    pointer-events: none;
+  }
+
+  .part__grid {
+    position: absolute;
+    inset: 8% 6% auto 6%;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 6px;
+    opacity: 0.85;
+  }
+
+  @container (min-width: 360px) {
+    .part__grid {
+      gap: 8px;
+    }
+  }
+
+  .part__tile {
+    aspect-ratio: 1.6;
+    border-radius: 3px;
+    background: var(--part-tile-bg);
+    border: 1px solid var(--part-tile-border);
+  }
+
+  .part__tile.is-active {
+    background: linear-gradient(180deg, rgba(96, 165, 250, 0.35), rgba(96, 165, 250, 0.12));
+    border-color: rgba(96, 165, 250, 0.55);
+    box-shadow: 0 0 8px rgba(96, 165, 250, 0.3);
+  }
+
+  .part__plate {
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    bottom: 18%;
+    border: 1px solid var(--part-plate-border);
+    border-radius: 10px;
+    background: var(--part-plate-bg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: var(--part-plate-shadow);
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  @container (min-width: 360px) {
+    .part__plate {
+      padding: 12px 14px;
+      gap: 10px;
+    }
+  }
+
+  .part__plate-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .part__plate-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    border-radius: 9999px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #1E40AF;
+    background-color: rgba(96, 165, 250, 0.14);
+    border: 1px solid rgba(96, 165, 250, 0.45);
+    line-height: 1;
+  }
+
+  :global([data-theme="dark"]) .part__plate-tag {
+    color: #93C5FD;
+    background-color: rgba(96, 165, 250, 0.12);
+  }
+
+  .part__plate-tag-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: #60A5FA;
+    box-shadow: 0 0 6px rgba(96, 165, 250, 0.7);
+  }
+
+  .part__plate-mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--part-text-muted);
+    letter-spacing: 0.04em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .part__plate-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .part__plate-thumb {
+    width: 40px;
+    height: 28px;
+    border-radius: 4px;
+    background:
+      linear-gradient(135deg, rgba(96, 165, 250, 0.3), rgba(96, 165, 250, 0.08)),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent);
+    border: 1px solid rgba(96, 165, 250, 0.3);
+    flex-shrink: 0;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .part__plate-lines {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .part__plate-line {
+    height: 4px;
+    border-radius: 4px;
+    background-color: var(--part-line-bg);
+  }
+
+  .part__plate-line--w1 { width: 100%; }
+  .part__plate-line--w2 { width: 70%; background-color: var(--part-line-bg-2); }
+  .part__plate-line--w3 { width: 40%; background-color: rgba(96, 165, 250, 0.55); }
+
+  .part__plate-foot {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--part-text-subtle);
+    letter-spacing: 0.04em;
+    padding-top: 6px;
+    border-top: 1px solid var(--part-divider);
+  }
+
+  .part__plate-foot-sep {
+    color: var(--part-line-bg);
+  }
+
+  .part__plate-foot-typed {
+    color: #1E40AF;
+  }
+
+  :global([data-theme="dark"]) .part__plate-foot-typed {
+    color: #93C5FD;
+  }
+
+  .part__caption {
+    position: absolute;
+    bottom: 12px;
+    left: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--part-caption);
+    letter-spacing: 0.06em;
+  }
+
+  .part__caption-line {
+    width: 14px;
+    height: 1px;
+    background-color: var(--part-caption-rule);
+  }
+</style>

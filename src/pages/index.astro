@@ -9,33 +9,42 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
 ---
 
 <BaseLayout
-  title="Moe Qadan, Senior UX & Front-end"
-  description="Moe Qadan is a senior UX and frontend practitioner in Los Angeles. UX, design systems, content architecture, SEO, performance, accessibility, and AI-assisted prototyping. Currently leading web experience at MagTek; shipping ChatOBD2 solo; previously deployed advisor portals at InvestCloud across 50+ wealth and banking institutions."
+  title="Moe Qadan, UX Engineer & Frontend Systems"
+  description="Portfolio of Moe Qadan, a senior UX and frontend practitioner in Los Angeles. UX engineering, frontend systems, design systems, content architecture, SEO, accessibility, and AI-assisted product work. Selected projects include ChatOBD2, MagTek's multi-site platform, and advisor portals deployed across more than 50 wealth and banking institutions."
   keywords={[
     'Moe Qadan',
     'Muhammed Qadan',
     'UX engineer',
-    'senior UX engineer',
     'frontend engineer',
+    'design engineer',
     'web experience',
     'design systems',
-    'Razor partials',
-    'ASP.NET MVC',
-    'AI-assisted prototyping',
+    'creative technologist',
+    'AI-assisted product design',
+    'Los Angeles UX engineer',
     'portfolio',
   ]}
 >
   <Hero />
 
-  {/* Selected work. No section number, no manifesto lede.
-      The cards do the work. */}
+  {/* Selected work. Numbered editorial head, then the cards do the rest. */}
   <section class="home-work" id="work">
     <div class="container-site">
       <div class="home-work__head" data-reveal>
-        <span class="home-work__eyebrow">Work</span>
+        <div class="home-work__sxn">
+          <span class="home-work__sxn-num">02</span>
+          <span class="home-work__sxn-label">Selected work</span>
+          <span class="home-work__sxn-rule" aria-hidden="true"></span>
+          <span class="home-work__sxn-meta">2026 / case studies</span>
+        </div>
         <h2 class="home-work__title">
-          Recent projects.
+          Recent work, in two passes.
         </h2>
+        <p class="home-work__lede">
+          Independent projects below, then the companies I've worked at.
+          Each one is a different surface, a different platform, a
+          different posture.
+        </p>
       </div>
 
       <div data-reveal data-reveal-delay="2">
@@ -44,58 +53,116 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
     </div>
   </section>
 
-  {/* Approach teaser. Three lines, links into the dedicated page.
-      The /approach page carries the depth so the homepage stays
-      a fast read. */}
+  {/* Approach module. A 3-card process strip. The text from the previous
+      version is preserved across the lead and the third card. */}
   <section class="home-approach" id="approach-teaser">
     <div class="container-site">
-      <div class="home-approach__inner" data-reveal>
-        <div class="home-approach__col-l">
-          <span class="home-approach__eyebrow">How I work</span>
-          <p class="home-approach__lead">
-            A lot of the work I take on looks like repair. A platform
-            that grew without a system. A site that ranks well and
-            converts badly. A frontend that ships fine on Chrome and
-            falls apart on iOS. Existing AI tooling that needs a real
-            home in the codebase.
-          </p>
+      <div class="home-approach__head" data-reveal>
+        <div class="home-approach__sxn">
+          <span class="home-approach__sxn-num">03</span>
+          <span class="home-approach__sxn-label">How I work</span>
+          <span class="home-approach__sxn-rule" aria-hidden="true"></span>
+          <span class="home-approach__sxn-meta">A method, not a manifesto</span>
         </div>
-        <div class="home-approach__col-r">
-          <p class="home-approach__body">
-            The way I approach it is the same in each case. Read the
-            constraints first. Pick the structure carefully. Use AI
-            where it earns its place.
+        <p class="home-approach__lead">
+          A lot of the work I take on looks like repair. A platform
+          that grew without a system. A site that ranks well and
+          converts badly. A frontend that ships fine on Chrome and
+          falls apart on iOS. Existing AI tooling that needs a real
+          home in the codebase.
+        </p>
+      </div>
+
+      <div class="home-approach__strip" data-reveal data-reveal-delay="2">
+        <article class="home-approach__step">
+          <header class="home-approach__step-head">
+            <span class="home-approach__step-num">01</span>
+            <span class="home-approach__step-tag">Read</span>
+          </header>
+          <h3 class="home-approach__step-title">The constraints first.</h3>
+          <p class="home-approach__step-body">
+            Every long-running platform has opinions. Every team has
+            history the wireframes don't capture. The first job is
+            reading what's already true before drawing anything.
           </p>
-          <a
-            href="/approach"
-            class="home-approach__link"
-            data-track="cta_click"
-            data-track-cta="more-approach"
-            data-track-loc="home-approach"
-          >
-            Read more on how I work
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </a>
-        </div>
+          <span class="home-approach__step-rule" aria-hidden="true"></span>
+        </article>
+
+        <article class="home-approach__step">
+          <header class="home-approach__step-head">
+            <span class="home-approach__step-num">02</span>
+            <span class="home-approach__step-tag">Pick</span>
+          </header>
+          <h3 class="home-approach__step-title">The structure carefully.</h3>
+          <p class="home-approach__step-body">
+            Most production breakage lives in the gap between intent
+            and structure. Pick the right substrate (typed components,
+            shared partials, prompt modules) once, ship for years.
+          </p>
+          <span class="home-approach__step-rule" aria-hidden="true"></span>
+        </article>
+
+        <article class="home-approach__step home-approach__step--accent">
+          <header class="home-approach__step-head">
+            <span class="home-approach__step-num">03</span>
+            <span class="home-approach__step-tag">Use</span>
+          </header>
+          <h3 class="home-approach__step-title">AI where it earns its place.</h3>
+          <p class="home-approach__step-body">
+            Prompts as production code. Schema-bound outputs.
+            Deterministic layers in front of every model call. AI in
+            the build, not the product, until it's structured enough
+            to ship.
+          </p>
+          <span class="home-approach__step-rule" aria-hidden="true"></span>
+        </article>
+      </div>
+
+      <div class="home-approach__foot" data-reveal data-reveal-delay="3">
+        <a
+          href="/approach"
+          class="home-approach__link"
+          data-track="cta_click"
+          data-track-cta="more-approach"
+          data-track-loc="home-approach"
+        >
+          <span>Read the long version</span>
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
       </div>
     </div>
   </section>
 
-  {/* Single, plain CTA. No section number. */}
+  {/* Contact card. Layered surface with a live availability mark and a
+      strong email/CTA pair. Sits as a finished closing object. */}
   <section class="home-contact" id="contact-cta">
     <div class="container-site">
       <div class="home-contact__card" data-reveal>
+        <span class="home-contact__card-glow" aria-hidden="true"></span>
+        <span class="home-contact__card-grid" aria-hidden="true"></span>
+        <span class="home-contact__card-corner home-contact__card-corner--tl" aria-hidden="true"></span>
+        <span class="home-contact__card-corner home-contact__card-corner--tr" aria-hidden="true"></span>
+        <span class="home-contact__card-corner home-contact__card-corner--bl" aria-hidden="true"></span>
+        <span class="home-contact__card-corner home-contact__card-corner--br" aria-hidden="true"></span>
+
         <div class="home-contact__card-text">
-          <span class="home-contact__eyebrow">Contact</span>
+          <div class="home-contact__sxn">
+            <span class="home-contact__sxn-dot"></span>
+            <span class="home-contact__sxn-num">04</span>
+            <span class="home-contact__sxn-label">Contact</span>
+          </div>
           <h2 class="home-contact__title">
-            If you're putting something on the web,<br />
+            If you're working on something for the web,<br />
             I'd like to hear about it.
           </h2>
           <p class="home-contact__sub">
-            Contracts, advisory, or a half-hour conversation. Reply
-            within a day.
+            For project questions, design or engineering conversations.
+            <span class="home-contact__sub-mark">
+              <span class="home-contact__sub-dot"></span>
+              Replies within a day.
+            </span>
           </p>
         </div>
         <div class="home-contact__card-actions">
@@ -127,6 +194,62 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
 </BaseLayout>
 
 <style>
+  /* Shared section-head pattern — used in work, approach, contact. */
+  .home-work__sxn,
+  .home-approach__sxn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: var(--space-5);
+  }
+
+  .home-work__sxn-num,
+  .home-approach__sxn-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 22px;
+    padding: 0 7px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-elevated);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1;
+  }
+
+  .home-work__sxn-label,
+  .home-approach__sxn-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-text);
+  }
+
+  .home-work__sxn-rule,
+  .home-approach__sxn-rule {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, var(--color-border) 0%, transparent 100%);
+    min-width: 24px;
+    max-width: 480px;
+  }
+
+  .home-work__sxn-meta,
+  .home-approach__sxn-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-text-subtle);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  /* ─── Work section ───────────────────────────────────────────────── */
   .home-work {
     padding-top: var(--space-12);
     padding-bottom: var(--space-16);
@@ -141,8 +264,8 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
   }
 
   .home-work__head {
-    margin-bottom: var(--space-8);
-    max-width: 720px;
+    margin-bottom: var(--space-10);
+    max-width: 760px;
   }
 
   @media (min-width: 768px) {
@@ -151,22 +274,9 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
     }
   }
 
-  .home-work__eyebrow,
-  .home-approach__eyebrow,
-  .home-contact__eyebrow {
-    display: inline-block;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--color-text-subtle);
-    margin-bottom: var(--space-4);
-  }
-
   .home-work__title {
     font-family: var(--font-display);
-    font-size: clamp(34px, 5vw, 56px);
+    font-size: clamp(34px, 5.4vw, 60px);
     font-weight: 400;
     letter-spacing: -0.022em;
     line-height: 1.05;
@@ -181,7 +291,7 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
     max-width: 60ch;
   }
 
-  /* Approach teaser */
+  /* ─── Approach process strip ─────────────────────────────────────── */
   .home-approach {
     padding-top: var(--space-16);
     padding-bottom: var(--space-16);
@@ -195,57 +305,218 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
     }
   }
 
-  .home-approach__inner {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-6);
+  .home-approach__head {
+    max-width: 760px;
+    margin-bottom: var(--space-10);
   }
 
-  @media (min-width: 900px) {
-    .home-approach__inner {
-      grid-template-columns: 1fr 1fr;
-      gap: var(--space-12);
-      align-items: start;
+  @media (min-width: 768px) {
+    .home-approach__head {
+      margin-bottom: var(--space-12);
     }
   }
 
   .home-approach__lead {
     font-family: var(--font-display);
-    font-size: clamp(20px, 2.4vw, 28px);
+    font-size: clamp(22px, 2.6vw, 30px);
     font-weight: 400;
-    letter-spacing: -0.015em;
+    letter-spacing: -0.018em;
     line-height: 1.35;
     color: var(--color-text);
     max-width: 32ch;
   }
 
-  .home-approach__body {
-    font-size: clamp(15px, 1.5vw, 17px);
-    line-height: 1.7;
+  .home-approach__strip {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 720px) {
+    .home-approach__strip {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-5);
+    }
+  }
+
+  .home-approach__step {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-6) var(--space-5) var(--space-7);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    background:
+      linear-gradient(180deg,
+        var(--color-bg-elevated) 0%,
+        var(--color-bg-muted) 100%);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    transition:
+      transform 280ms var(--ease-out),
+      border-color 280ms var(--ease-out),
+      box-shadow 280ms var(--ease-out);
+  }
+
+  @media (min-width: 720px) {
+    .home-approach__step {
+      padding: var(--space-7) var(--space-6) var(--space-8);
+    }
+  }
+
+  .home-approach__step::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse 80% 60% at 0% 0%, var(--color-accent-dim), transparent 55%);
+    opacity: 0;
+    transition: opacity 320ms var(--ease-out);
+    border-radius: inherit;
+  }
+
+  .home-approach__step:hover {
+    transform: translateY(-3px);
+    border-color: rgba(245, 158, 11, 0.3);
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  .home-approach__step:hover::before {
+    opacity: 1;
+  }
+
+  .home-approach__step--accent {
+    border-color: var(--color-accent-muted);
+    background:
+      linear-gradient(180deg,
+        color-mix(in srgb, var(--color-accent) 8%, var(--color-bg-elevated)) 0%,
+        var(--color-bg-muted) 100%);
+  }
+
+  .home-approach__step--accent::before {
+    opacity: 0.5;
+  }
+
+  .home-approach__step-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .home-approach__step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background:
+      linear-gradient(180deg, var(--color-bg-elevated), var(--color-bg-deep));
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+
+  .home-approach__step--accent .home-approach__step-num {
+    background:
+      linear-gradient(180deg, var(--color-accent), var(--color-accent-hover));
+    border-color: var(--color-accent);
+    color: #0B0B10;
+  }
+
+  .home-approach__step-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+  }
+
+  .home-approach__step--accent .home-approach__step-tag {
+    color: var(--color-accent);
+  }
+
+  .home-approach__step-title {
+    font-family: var(--font-display);
+    font-size: clamp(22px, 2.4vw, 28px);
+    font-weight: 400;
+    letter-spacing: -0.018em;
+    line-height: 1.15;
+    color: var(--color-text);
+    text-wrap: balance;
+  }
+
+  .home-approach__step-body {
+    font-size: 14px;
+    line-height: 1.65;
     color: var(--color-text-muted);
-    max-width: 56ch;
-    margin-bottom: var(--space-5);
+    flex: 1;
+  }
+
+  .home-approach__step-rule {
+    margin-top: var(--space-3);
+    width: 28px;
+    height: 2px;
+    border-radius: 2px;
+    background-color: var(--color-text-subtle);
+    opacity: 0.5;
+    transition: width 320ms var(--ease-out), background-color 320ms var(--ease-out), opacity 320ms var(--ease-out);
+  }
+
+  .home-approach__step:hover .home-approach__step-rule {
+    width: 48px;
+    opacity: 1;
+    background-color: var(--color-accent);
+  }
+
+  .home-approach__step--accent .home-approach__step-rule {
+    background-color: var(--color-accent);
+    opacity: 1;
+  }
+
+  .home-approach__foot {
+    margin-top: var(--space-8);
+    display: flex;
+    justify-content: flex-start;
   }
 
   .home-approach__link {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    padding: 10px 16px;
+    border-radius: 9999px;
     font-size: 14px;
     font-weight: 600;
     color: var(--color-text);
     text-decoration: none;
-    border-bottom: 1px solid var(--color-border);
-    padding-bottom: 6px;
-    transition: color 150ms, border-color 150ms;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-elevated);
+    transition: color 200ms, border-color 200ms, background-color 200ms, transform 200ms var(--ease-out);
+  }
+
+  .home-approach__link svg {
+    transition: transform 200ms var(--ease-out);
   }
 
   .home-approach__link:hover {
     color: var(--color-accent);
-    border-bottom-color: var(--color-accent);
+    border-color: var(--color-accent);
+    background-color: var(--color-accent-dim);
+    transform: translateY(-1px);
   }
 
-  /* Contact CTA card */
+  .home-approach__link:hover svg {
+    transform: translateX(2px);
+  }
+
+  /* ─── Contact closing card ──────────────────────────────────────── */
   .home-contact {
     padding-top: var(--space-12);
     padding-bottom: var(--space-16);
@@ -260,13 +531,21 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
   }
 
   .home-contact__card {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: var(--space-7);
-    padding: var(--space-7) var(--space-6);
+    padding: var(--space-8) var(--space-6);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl);
-    background-color: var(--color-bg-elevated);
+    border-radius: var(--radius-2xl);
+    background:
+      linear-gradient(180deg,
+        var(--color-bg-elevated) 0%,
+        var(--color-bg-muted) 100%);
+    box-shadow:
+      var(--shadow-card),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    overflow: hidden;
   }
 
   @media (min-width: 720px) {
@@ -275,22 +554,99 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
       align-items: center;
       justify-content: space-between;
       gap: var(--space-10);
-      padding: var(--space-9) var(--space-10);
+      padding: var(--space-10) var(--space-12);
     }
   }
 
+  /* Soft directional glow + low-opacity grid behind the card text */
+  .home-contact__card-glow {
+    position: absolute;
+    top: -40%;
+    right: -10%;
+    width: 60%;
+    height: 100%;
+    background: radial-gradient(circle, var(--color-accent-muted), transparent 65%);
+    filter: blur(40px);
+    pointer-events: none;
+  }
+
+  .home-contact__card-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, var(--viz-grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--viz-grid) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.6;
+    pointer-events: none;
+    mask-image: radial-gradient(ellipse 60% 80% at 30% 50%, #000 0%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 60% 80% at 30% 50%, #000 0%, transparent 80%);
+  }
+
+  .home-contact__card-corner {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border: 1px solid var(--color-text-subtle);
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .home-contact__card-corner--tl { top: 12px; left: 12px; border-right: none; border-bottom: none; }
+  .home-contact__card-corner--tr { top: 12px; right: 12px; border-left: none; border-bottom: none; }
+  .home-contact__card-corner--bl { bottom: 12px; left: 12px; border-right: none; border-top: none; }
+  .home-contact__card-corner--br { bottom: 12px; right: 12px; border-left: none; border-top: none; }
+
   .home-contact__card-text {
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
+    gap: var(--space-4);
+    z-index: 1;
+  }
+
+  .home-contact__sxn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .home-contact__sxn-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    box-shadow: 0 0 6px var(--color-accent);
+  }
+
+  .home-contact__sxn-num {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--color-text);
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-elevated);
+    line-height: 1;
+  }
+
+  .home-contact__sxn-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
   }
 
   .home-contact__title {
     font-family: var(--font-display);
-    font-size: clamp(22px, 2.8vw, 32px);
+    font-size: clamp(24px, 3vw, 36px);
     font-weight: 400;
     letter-spacing: -0.02em;
-    line-height: 1.2;
+    line-height: 1.18;
     color: var(--color-text);
     max-width: 30ch;
   }
@@ -302,11 +658,31 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
     max-width: 38ch;
   }
 
+  .home-contact__sub-mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-text);
+    font-weight: 500;
+    margin-left: 4px;
+  }
+
+  .home-contact__sub-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    box-shadow: 0 0 6px color-mix(in srgb, var(--color-accent) 60%, transparent);
+    flex-shrink: 0;
+  }
+
   .home-contact__card-actions {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
     flex-shrink: 0;
+    z-index: 1;
   }
 
   @media (min-width: 380px) and (max-width: 720px) {
@@ -336,11 +712,25 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
     background-color: var(--color-text);
     color: var(--color-bg);
     border: 1px solid var(--color-text);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.5) inset,
+      0 8px 20px rgba(0,0,0,0.2);
   }
 
   .home-contact__cta--primary:hover {
     transform: translateY(-1px);
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.5) inset,
+      0 12px 28px rgba(0,0,0,0.18),
+      0 0 0 4px var(--color-accent-dim);
+  }
+
+  .home-contact__cta--primary svg {
+    transition: transform 200ms var(--ease-out);
+  }
+
+  .home-contact__cta--primary:hover svg {
+    transform: translateX(2px);
   }
 
   .home-contact__cta--ghost {
