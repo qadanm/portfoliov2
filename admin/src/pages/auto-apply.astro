@@ -289,7 +289,7 @@ import Admin from '@/layouts/Admin.astro';
   .aa__attempts { display: flex; flex-direction: column; gap: 6px; }
   .aa__attempt {
     display: grid;
-    grid-template-columns: 1fr 80px 80px 90px 24px;
+    grid-template-columns: 1fr 80px 80px 90px 70px 24px;
     gap: 8px;
     align-items: center;
     padding: 8px 12px;
@@ -298,6 +298,7 @@ import Admin from '@/layouts/Admin.astro';
     border-radius: var(--r-sm);
     font-family: var(--font-mono); font-size: 11px;
   }
+  .aa__attempt:has(.aa-open-attempt) { /* same template */ }
   .aa__attempt.is-submitted { border-color: rgba(16, 185, 129, 0.4); }
   .aa__attempt.is-running { border-color: var(--c-accent); }
   .aa__attempt.is-needs-review { border-color: rgba(245, 158, 11, 0.5); }
@@ -306,6 +307,17 @@ import Admin from '@/layouts/Admin.astro';
   .aa__attempt .status { color: var(--c-text-muted); }
   .aa__attempt .ats { color: var(--c-text-subtle); }
   .aa__attempt .reason { color: var(--c-accent); font-size: 10px; }
+  .aa-open-attempt {
+    background: var(--c-accent-dim);
+    border: 1px solid var(--c-accent);
+    color: var(--c-accent);
+    padding: 3px 10px;
+    border-radius: var(--r-full);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    cursor: pointer;
+  }
+  .aa-open-attempt:hover { background: var(--c-accent); color: var(--c-bg); }
 
   .aa__log {
     max-height: 360px; overflow-y: auto;
@@ -441,6 +453,9 @@ import Admin from '@/layouts/Admin.astro';
     dot.className = 'aa__ext-dot ' + (connected ? 'is-connected' : 'is-disconnected');
     text.textContent = connected ? 'Extension connected.' : 'Extension not detected on this page.';
     (help as HTMLElement).hidden = connected;
+    // Health panel reads `extConnected` — re-render so the top cell stays in sync
+    // with the bottom card.
+    try { renderHealth(); } catch { /* ignore */ }
   }
   window.addEventListener('message', async (e) => {
     if (e.source !== window) return;
@@ -753,17 +768,51 @@ import Admin from '@/layouts/Admin.astro';
       return;
     }
     el.innerHTML = attempts.map(renderAttempt).join('');
+    el.querySelectorAll<HTMLButtonElement>('.aa-open-attempt').forEach(btn => {
+      btn.addEventListener('click', () => openAttemptTab(btn.dataset.aid!));
+    });
+  }
+
+  async function openAttemptTab(attemptId: string) {
+    const a = attemptsStore.get(attemptId);
+    if (!a) return;
+    const job = jobsStore.get(a.jobId);
+    if (!job?.url) {
+      alert('This job has no application URL.');
+      return;
+    }
+    if (!extConnected) {
+      alert('Extension not connected to this page. Re-install the extension or refresh.');
+      return;
+    }
+    // Ask SW (via admin-bridge) to open the URL and bind the new tab to
+    // this attempt so the agent runner can find its context.
+    window.postMessage({
+      source: 'qa-admin',
+      kind: 'agent.attempt.open',
+      sessionId: a.sessionId,
+      attemptId: a.id,
+      jobId: a.jobId,
+      url: job.url,
+      autonomyLevel: a.autonomyLevel,
+      atsType: a.atsType,
+    }, '*');
   }
   function renderAttempt(a: ApplyAttempt): string {
     const job = jobsStore.get(a.jobId);
     const cls = `aa__attempt is-${a.status}`;
     const summary = job ? `${esc(job.company ?? '')} · ${esc(job.role ?? '')}` : '(unknown job)';
     const reason = a.blockReason ? esc(a.blockReason) : '';
+    const canOpen = (a.status === 'queued' || a.status === 'paused' || a.status === 'needs-review') && !!job?.url;
+    const openBtn = canOpen
+      ? `<button class="aa-open-attempt" data-aid="${esc(a.id)}" data-jid="${esc(a.jobId)}" title="Open this attempt in a new tab and bind it to the agent">Open ▶</button>`
+      : '';
     return `<div class="${cls}" data-aid="${esc(a.id)}">
       <span class="summary">${summary}</span>
       <span class="ats">${esc(atsLabel(a.atsType))}</span>
       <span class="status">${esc(a.status)}</span>
       <span class="reason">${reason}</span>
+      ${openBtn}
       <a href="/packet?jobId=${esc(a.jobId)}" title="Open packet">→</a>
     </div>`;
   }

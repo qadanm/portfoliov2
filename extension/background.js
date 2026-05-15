@@ -513,6 +513,84 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       sendResponse({ ok: true });
       return;
     }
+    if (msg.kind === 'agent.attempt.open') {
+      // Admin asks SW to open the URL in a new tab and bind it to attempt.
+      // This is the entry point for L2-L4 sessions — admin can't open the
+      // tab itself and tell SW the tabId, so SW creates it.
+      if (!msg.url || !msg.attemptId || !msg.jobId) {
+        sendResponse({ ok: false, error: 'missing fields' });
+        return;
+      }
+      try {
+        const tab = await chrome.tabs.create({ url: msg.url, active: true });
+        const tabId = tab?.id;
+        if (!tabId) {
+          sendResponse({ ok: false, error: 'no tab id' });
+          return;
+        }
+        state.activeAttempts[String(tabId)] = {
+          sessionId: msg.sessionId,
+          attemptId: msg.attemptId,
+          jobId: msg.jobId,
+          autonomyLevel: msg.autonomyLevel ?? 2,
+          atsType: msg.atsType,
+        };
+        // Update attempt status → running
+        if (state.attemptsById[msg.attemptId]) {
+          state.attemptsById[msg.attemptId].status = 'running';
+          state.attemptsById[msg.attemptId].tabId = tabId;
+        }
+        pushLog(state, {
+          id: rid(), at: Date.now(),
+          sessionId: msg.sessionId,
+          attemptId: msg.attemptId,
+          kind: 'attempt-started',
+          message: `Opened tab ${tabId} → ${msg.url}`,
+        });
+        notifyAdmin({
+          kind: 'agent.bridge.state-update',
+          attemptUpdate: { id: msg.attemptId, status: 'running', tabId, currentUrl: msg.url },
+        });
+        await writeState(state);
+
+        // Unsupported-host timeout: if the content script doesn't ping
+        // within 6s, the extension has no permission for this host and
+        // the agent literally cannot run. Mark as unsupported.
+        setTimeout(async () => {
+          const fresh = await readState();
+          const stillAssigned = fresh.activeAttempts[String(tabId)];
+          if (!stillAssigned) return; // tab closed or replaced
+          // Did the runner produce any log entry for this attempt? If not, host is unsupported.
+          const sawRunner = fresh.pendingLogs.some(l =>
+            l.attemptId === msg.attemptId && (l.kind === 'attempt-page-loaded' || l.kind === 'attempt-fields-detected'));
+          if (sawRunner) return;
+          // Still no runner activity — mark unsupported, free the tabId mapping.
+          delete fresh.activeAttempts[String(tabId)];
+          pushLog(fresh, {
+            id: rid(), at: Date.now(),
+            sessionId: msg.sessionId,
+            attemptId: msg.attemptId,
+            kind: 'attempt-blocked',
+            message: 'Host not in extension permissions — agent can\'t inject. Mark this job manually.',
+          });
+          notifyAdmin({
+            kind: 'agent.bridge.state-update',
+            attemptUpdate: {
+              id: msg.attemptId,
+              status: 'unsupported',
+              blockReason: 'unsupported-ats',
+              blockNote: `Extension has no content-script permission on this host. Supported: Greenhouse / Lever / Ashby / Workday / SmartRecruiters / LinkedIn.`,
+            },
+          });
+          await writeState(fresh);
+        }, 6500);
+
+        sendResponse({ ok: true, tabId });
+      } catch (e) {
+        sendResponse({ ok: false, error: String(e && e.message || e) });
+      }
+      return;
+    }
     if (msg.kind === 'agent.attempt.retry') {
       // Admin asks to retry an attempt; reset SW-side block state if any
       // The actual retry happens when the tab loads again.

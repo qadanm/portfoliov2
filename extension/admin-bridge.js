@@ -71,6 +71,14 @@
       send('attempt-retry-ack', { sessionId: d.sessionId, attemptId: d.attemptId });
       return;
     }
+    if (d.kind === 'agent.attempt.open') {
+      const resp = await ask('agent.attempt.open', {
+        sessionId: d.sessionId, attemptId: d.attemptId, jobId: d.jobId,
+        url: d.url, autonomyLevel: d.autonomyLevel, atsType: d.atsType,
+      });
+      send('attempt-open-ack', { attemptId: d.attemptId, ok: !!resp?.ok, error: resp?.error });
+      return;
+    }
     if (d.kind === 'agent.session.snapshot.push') {
       // Admin pushed a full snapshot. Forward to SW.
       await ask('agent.session.snapshot', {
