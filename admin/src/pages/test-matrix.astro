@@ -1,0 +1,758 @@
+---
+import Admin from '@/layouts/Admin.astro';
+---
+
+<Admin
+  title="Test matrix"
+  intro="Fixture forms shaped like each ATS. Run the agent's detect/fill/advance logic against them to verify behavior without leaving the admin. Strictly local — no remote calls, no real submits."
+>
+  <section class="tm">
+    <div class="tm__controls">
+      <button class="btn btn--primary" id="tm-run-all">Run all fixtures</button>
+      <button class="btn" id="tm-run-safety">Run safety regression</button>
+      <button class="btn" id="tm-clear">Reset fixtures</button>
+      <span class="muted" id="tm-summary">Idle.</span>
+    </div>
+
+    <!-- Live-paste validator — paste outerHTML from a real ATS page and classify -->
+    <details class="tm__expand" open>
+      <summary><h2 class="tm__h2">Live-paste validator</h2></summary>
+      <p class="muted">
+        Paste an ATS application page's <code>outerHTML</code> below. On the live page open DevTools →
+        Elements → right-click the <code>&lt;form&gt;</code> (or the wrapping container) → <em>Copy outerHTML</em> → paste here.
+        Runs the same classifier the extension agent uses, offline. Nothing leaves your browser.
+      </p>
+      <div class="tm__paste-row">
+        <textarea id="tm-paste-input" rows="6" placeholder="Paste outerHTML here…"></textarea>
+        <div class="tm__paste-actions">
+          <button class="btn btn--primary" id="tm-paste-run">Classify</button>
+          <button class="btn" id="tm-paste-clear">Clear</button>
+        </div>
+      </div>
+      <div id="tm-paste-result" class="tm__paste-result"></div>
+    </details>
+
+    <details class="tm__expand" id="tm-results-card" open>
+      <summary><h2 class="tm__h2">Results</h2></summary>
+      <div id="tm-results" class="tm__results"></div>
+    </details>
+
+    <details class="tm__expand">
+      <summary><h2 class="tm__h2">Safety regression</h2></summary>
+      <div id="tm-safety" class="tm__safety"></div>
+    </details>
+
+    <!-- The fixture iframes live below, isolated so they can't influence the admin DOM directly. -->
+    <details class="tm__expand">
+      <summary><h2 class="tm__h2">Fixture forms (inspect manually)</h2></summary>
+      <div id="tm-fixtures-host" class="tm__fixtures">
+        <div data-fixture="greenhouse">
+          <h3>Greenhouse-style (clean one-page form)</h3>
+          <form>
+            <label>First Name <input id="g-first" name="job_application[first_name]" /></label>
+            <label>Last Name <input id="g-last" name="job_application[last_name]" /></label>
+            <label>Email <input id="g-email" name="job_application[email]" type="email" /></label>
+            <label>Phone <input id="g-phone" name="job_application[phone]" type="tel" /></label>
+            <label>LinkedIn URL <input id="g-li" /></label>
+            <label>Portfolio URL <input id="g-portfolio" /></label>
+            <label>Cover letter <textarea id="g-cover" maxlength="2000"></textarea></label>
+            <label>Why are you interested in this role? <textarea id="g-why" required></textarea></label>
+            <label>How did you hear about us? <input id="g-source" /></label>
+            <label>Salary expectation <input id="g-sal" /></label>
+            <label>Resume / CV <input id="g-resume" type="file" name="resume" /></label>
+            <label>Gender <select id="g-gender"><option>Prefer not to say</option></select></label>
+            <label>Are you authorized to work in the US? <select id="g-wa"><option>Yes</option><option>No</option></select></label>
+            <button type="button">Submit Application</button>
+          </form>
+        </div>
+
+        <div data-fixture="lever">
+          <h3>Lever-style (open prompts up front)</h3>
+          <form>
+            <label>Full name <input id="l-name" /></label>
+            <label>Email <input id="l-email" type="email" /></label>
+            <label>Phone <input id="l-phone" /></label>
+            <label>Current company <input id="l-co" /></label>
+            <label>LinkedIn <input id="l-li" /></label>
+            <label>Resume <input id="l-resume" type="file" /></label>
+            <label>Tell us about yourself <textarea id="l-tmay" maxlength="800"></textarea></label>
+            <label>Why this role? <textarea id="l-why-role" required maxlength="500"></textarea></label>
+            <label>Why us? <textarea id="l-why-co" required></textarea></label>
+            <label>Describe a time you led a difficult negotiation. <textarea id="l-narrative" required></textarea></label>
+            <label>Race / ethnicity <select id="l-race"><option>Decline to state</option></select></label>
+            <button type="button">Continue</button>
+          </form>
+        </div>
+
+        <div data-fixture="ashby">
+          <h3>Ashby-style (single page, clean)</h3>
+          <form>
+            <label>First name <input id="a-first" /></label>
+            <label>Last name <input id="a-last" /></label>
+            <label>Email <input id="a-email" type="email" /></label>
+            <label>Resume <input id="a-resume" type="file" /></label>
+            <label>Cover letter <textarea id="a-cover"></textarea></label>
+            <button type="button">Submit Application</button>
+          </form>
+        </div>
+
+        <div data-fixture="workday">
+          <h3>Workday-style (multi-step, validation-heavy)</h3>
+          <form>
+            <label>First Name <input id="w-first" required /></label>
+            <label>Last Name <input id="w-last" required /></label>
+            <label>Email <input id="w-email" type="email" required /></label>
+            <label>Phone <input id="w-phone" required /></label>
+            <label>Resume <input id="w-resume" type="file" /></label>
+            <label>How did you find us <input id="w-source" /></label>
+            <label>Did you work here previously? <select id="w-prev"><option>No</option><option>Yes</option></select></label>
+            <label>SSN <input id="w-ssn" /></label>
+            <label>Have you been convicted of a felony? <select id="w-conv"><option>No</option></select></label>
+            <button type="button">Save and Continue</button>
+          </form>
+        </div>
+
+        <div data-fixture="generic-rte">
+          <h3>Generic ATS with rich-text editor</h3>
+          <form>
+            <label>Name <input id="r-name" /></label>
+            <label>Email <input id="r-email" type="email" /></label>
+            <label>Cover letter</label>
+            <div id="r-rte" contenteditable="true" style="min-height: 80px; border: 1px solid #444; padding: 8px;"></div>
+            <label>Resume <input id="r-resume" type="file" /></label>
+            <button type="button">Apply Now</button>
+          </form>
+        </div>
+
+        <div data-fixture="captcha">
+          <h3>ATS with visible CAPTCHA</h3>
+          <form>
+            <label>Name <input id="c-name" /></label>
+            <label>Email <input id="c-email" type="email" /></label>
+            <div class="g-recaptcha" data-sitekey="dummy" style="width: 200px; height: 60px; border: 1px solid #444;">[recaptcha placeholder]</div>
+            <button type="button">Submit</button>
+          </form>
+        </div>
+
+        <div data-fixture="login-wall">
+          <h3>Login wall fixture</h3>
+          <form>
+            <label>Email <input id="lw-email" type="email" /></label>
+            <label>Password <input id="lw-pass" type="password" /></label>
+            <button type="button">Sign in to apply</button>
+          </form>
+        </div>
+
+        <div data-fixture="generic-dropzone">
+          <h3>Drag-drop upload widget (no addressable input)</h3>
+          <form>
+            <label>Name <input id="d-name" /></label>
+            <label>Email <input id="d-email" type="email" /></label>
+            <div class="dropzone" data-testid="resume-dropzone" style="border: 2px dashed #888; padding: 24px; text-align: center;">Drag and drop your resume here</div>
+            <button type="button">Submit</button>
+          </form>
+        </div>
+      </div>
+    </details>
+  </section>
+</Admin>
+
+<style>
+  .tm { display: flex; flex-direction: column; gap: 14px; max-width: 100%; }
+  .tm__h2 { font-family: var(--font-display); font-size: 22px; font-weight: 400; display: inline-block; }
+  .tm__expand { background: var(--c-bg-elev); border: 1px solid var(--c-border); border-radius: var(--r-md); padding: 12px 16px; }
+  .tm__expand summary { list-style: none; cursor: pointer; }
+  .tm__expand summary::-webkit-details-marker { display: none; }
+  .tm__expand summary::after { content: ' ▾'; color: var(--c-text-subtle); font-size: 11px; }
+  .tm__expand:not([open]) summary::after { content: ' ▸'; }
+
+  .tm__controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .muted { color: var(--c-text-subtle); font-size: 12px; margin-left: auto; }
+
+  .tm__results { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+  .tm-row {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 12px;
+    padding: 10px 12px;
+    background: var(--c-bg);
+    border-left: 3px solid var(--c-border);
+    border-radius: var(--r-sm);
+  }
+  .tm-row.is-pass { border-left-color: var(--c-success); }
+  .tm-row.is-warn { border-left-color: var(--c-accent); }
+  .tm-row.is-fail { border-left-color: #F87171; }
+  .tm-row .name { font-family: var(--font-display); font-size: 16px; }
+  .tm-row .meta { font-family: var(--font-mono); font-size: 11px; color: var(--c-text-muted); line-height: 1.6; }
+  .tm-row .meta strong { color: var(--c-text); }
+  .tm-row ul { margin: 4px 0 0; padding-left: 18px; font-size: 11px; color: var(--c-text-muted); }
+  .tm-row .check { display: flex; gap: 6px; align-items: baseline; }
+  .tm-row .check .k { color: var(--c-text-subtle); min-width: 88px; }
+  .tm-row .check .v.is-ok { color: var(--c-success); }
+  .tm-row .check .v.is-warn { color: var(--c-accent); }
+  .tm-row .check .v.is-bad { color: #F87171; }
+
+  .tm__paste-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-top: 10px; }
+  .tm__paste-actions { display: flex; flex-direction: column; gap: 6px; }
+  .tm__paste-input { font-family: var(--font-mono); font-size: 11px; }
+  .tm__paste-result { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+  .tm__paste-summary {
+    padding: 10px 12px; background: var(--c-bg); border-radius: var(--r-md);
+    font-family: var(--font-mono); font-size: 11px; line-height: 1.6;
+  }
+  .tm__paste-summary strong { color: var(--c-text); }
+  .tm__paste-summary .pill { padding: 1px 6px; border-radius: var(--r-full); margin-right: 4px; }
+  .tm__paste-summary .pill.is-high { background: rgba(16, 185, 129, 0.15); color: var(--c-success); }
+  .tm__paste-summary .pill.is-packet { background: rgba(245, 158, 11, 0.15); color: var(--c-accent); }
+  .tm__paste-summary .pill.is-medium { background: rgba(96, 165, 250, 0.15); color: #93C5FD; }
+  .tm__paste-summary .pill.is-low { background: var(--c-bg-muted); color: var(--c-text-muted); }
+  .tm__paste-summary .pill.is-never { background: rgba(248, 113, 113, 0.15); color: #FCA5A5; }
+  .tm__paste-fields {
+    display: grid; grid-template-columns: 1fr 100px 80px 50px;
+    gap: 6px; font-family: var(--font-mono); font-size: 11px;
+    padding: 6px 0;
+  }
+  .tm__paste-fields .row { display: contents; }
+  .tm__paste-fields .row .lbl { color: var(--c-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tm__paste-fields .row .key { color: var(--c-text-muted); }
+  .tm__paste-fields .row .conf.is-high { color: var(--c-success); }
+  .tm__paste-fields .row .conf.is-packet { color: var(--c-accent); }
+  .tm__paste-fields .row .conf.is-medium { color: #93C5FD; }
+  .tm__paste-fields .row .conf.is-low { color: var(--c-text-muted); }
+  .tm__paste-fields .row .conf.is-never { color: #FCA5A5; }
+  .tm__paste-fields .row .req { color: var(--c-accent); }
+  .tm__paste-fields .head { color: var(--c-text-subtle); border-bottom: 1px solid var(--c-border-subtle); padding-bottom: 4px; margin-bottom: 4px; }
+
+  .tm__safety { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+  .safety-row {
+    display: grid;
+    grid-template-columns: 24px 1fr 60px;
+    gap: 8px;
+    padding: 6px 10px;
+    background: var(--c-bg);
+    border: 1px solid var(--c-border-subtle);
+    border-radius: var(--r-sm);
+    font-family: var(--font-mono); font-size: 11px;
+  }
+  .safety-row.is-pass { border-color: rgba(16, 185, 129, 0.4); }
+  .safety-row.is-fail { border-color: rgba(248, 113, 113, 0.4); }
+  .safety-row .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c-text-subtle); margin-top: 6px; }
+  .safety-row.is-pass .dot { background: var(--c-success); }
+  .safety-row.is-fail .dot { background: #F87171; }
+
+  .tm__fixtures { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+  @media (max-width: 900px) { .tm__fixtures { grid-template-columns: 1fr; } }
+  .tm__fixtures > div {
+    padding: 12px;
+    background: var(--c-bg);
+    border: 1px solid var(--c-border-subtle);
+    border-radius: var(--r-md);
+  }
+  .tm__fixtures h3 {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 400;
+    margin-bottom: 8px;
+    color: var(--c-text-muted);
+  }
+  .tm__fixtures form { display: flex; flex-direction: column; gap: 6px; }
+  .tm__fixtures label {
+    display: flex; flex-direction: column; gap: 2px;
+    font-family: var(--font-mono); font-size: 10.5px; color: var(--c-text-subtle);
+  }
+  .tm__fixtures input, .tm__fixtures textarea, .tm__fixtures select {
+    background: var(--c-bg-elev); color: var(--c-text);
+    border: 1px solid var(--c-border-subtle); border-radius: 3px;
+    padding: 4px 6px; font-family: inherit; font-size: 11px;
+  }
+  .tm__fixtures button {
+    background: var(--c-bg-muted);
+    color: var(--c-text-muted);
+    border: 1px solid var(--c-border-subtle);
+    border-radius: var(--r-sm);
+    padding: 4px 10px;
+    font-family: var(--font-mono); font-size: 10px;
+    cursor: pointer;
+    align-self: flex-start;
+    margin-top: 6px;
+  }
+</style>
+
+<script>
+  // Inline the field-classification + helper logic so the test page can
+  // exercise the same algorithms the extension uses. This is intentionally
+  // a duplicate of extension/ats-adapters.js — keeping it inline means the
+  // admin can run the test matrix without the extension installed.
+
+  function labelFor(input: Element & { id?: string; name?: string; placeholder?: string; }): string {
+    if (!input) return '';
+    if ((input as HTMLElement).id) {
+      const lab = document.querySelector(`label[for="${CSS.escape((input as HTMLElement).id)}"]`);
+      if (lab) return lab.textContent?.trim() ?? '';
+    }
+    const wrap = input.closest('label');
+    if (wrap) {
+      const clone = wrap.cloneNode(true) as HTMLElement;
+      clone.querySelectorAll('input, textarea, select').forEach(n => n.remove());
+      return clone.textContent?.trim() ?? '';
+    }
+    const aria = (input as HTMLElement).getAttribute?.('aria-label');
+    if (aria) return aria;
+    return ((input as HTMLInputElement).placeholder || (input as HTMLInputElement).name || (input as HTMLElement).id || '');
+  }
+
+  const NEVER_PATTERNS = [
+    /\b(race|ethnicity|hispanic|latin[ao])\b/i,
+    /\b(gender|gender\s*identity|pronoun)\b/i,
+    /\b(sexual\s*orientation)\b/i,
+    /\b(disability|disabled)\b/i,
+    /\b(veteran|military)\b/i,
+    /\b(date\s*of\s*birth|dob|birth\s*date|\bage\b)\b/i,
+    /\b(ssn|social\s*security)\b/i,
+    /\b(citizenship|national\s*origin)\b/i,
+    /\b(criminal|conviction|felony)\b/i,
+    /\b(religion|marital\s*status|drug\s*test)\b/i,
+  ];
+  const SENSITIVE_PATTERNS = [
+    /\b(work\s*auth(orization)?|authorized\s*to\s*work)\b/i,
+    /\b(sponsorship|visa|h-1b|opt|ead)\b/i,
+    /\b(salary|compensation|expected\s*pay|target\s*pay)\b/i,
+  ];
+
+  // Kept in sync with extension/ats-adapters.js FIELD_KEY_MATCHERS.
+  const MATCHERS = [
+    { key: 'firstName', tests: [/^first[\s_-]?name/i, /^given[\s_-]?name/i] },
+    { key: 'lastName', tests: [/^last[\s_-]?name/i, /^surname/i, /^family[\s_-]?name/i] },
+    { key: 'preferredName', tests: [/preferred[\s_-]?name/i, /^nickname/i] },
+    { key: 'fullName', tests: [/^full[\s_-]?name/i, /^name$/i] },
+    { key: 'email', tests: [/^e-?mail/i] },
+    { key: 'phone', tests: [/^phone/i, /mobile/i, /\bcell\b/i] },
+    { key: 'city', tests: [/^city/i, /\btown\b/i] },
+    { key: 'state', tests: [/^state/i, /province/i] },
+    { key: 'country', tests: [/^country/i] },
+    { key: 'location', tests: [/^location/i, /^address/i] },
+    { key: 'linkedin', tests: [/linkedin/i] },
+    { key: 'portfolio', tests: [/portfolio/i, /personal\s*site/i, /^website/i, /\burl\b/i] },
+    { key: 'github', tests: [/github/i] },
+    { key: 'currentEmployer', tests: [/current\s*employer/i, /current\s*company/i, /^company$/i] },
+    { key: 'currentTitle', tests: [/current\s*title/i, /job\s*title/i, /^position/i, /^title$/i] },
+    { key: 'yearsExperience', tests: [/years\s*(of\s*)?experience/i, /\byoe\b/i] },
+    { key: 'source', tests: [/how\s*did\s*you\s*hear/i, /how\s*you\s*hear/i, /referral\s*source/i, /where\s*did\s*you\s*find/i] },
+    { key: 'coverLetterText', tests: [/cover\s*letter/i, /letter\s*of\s*interest/i] },
+    { key: 'whyRole', tests: [/why.*(this|the).*(role|position|job)/i, /interest.*role/i] },
+    { key: 'whyCompany', tests: [/why.*(this|the|us)\s*(company|team)?/i, /interest.*company/i, /why\s+us\b/i] },
+    { key: 'tellMeAboutYourself', tests: [/tell\s*us?\s*about\s*your(self|s)/i, /brief\s*(intro|bio)/i, /^bio\b/i] },
+    { key: 'salaryExpectation', tests: [/salary\s*(expectation|range|requirement|requirements)/i, /expected\s*(pay|salary)/i, /comp\s*expectation/i, /target\s*(pay|salary)/i] },
+  ];
+  function classifyLabel(label: string): string | null {
+    for (const { key, tests } of MATCHERS) if (tests.some(t => t.test(label))) return key;
+    return null;
+  }
+
+  type FieldRecord = {
+    label: string;
+    key: string | null;
+    confidence: 'high' | 'medium' | 'low' | 'never' | 'packet' | 'resume-upload' | 'file-other';
+    type: string;
+    required: boolean;
+  };
+
+  function detectFields(root: Element): FieldRecord[] {
+    const els = Array.from(root.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>('input, textarea, select'));
+    const out: FieldRecord[] = [];
+    for (const el of els) {
+      const type = ((el as HTMLInputElement).type || el.tagName).toLowerCase();
+      if (['hidden', 'submit', 'button', 'reset', 'image'].includes(type)) continue;
+      const label = labelFor(el);
+      const key = classifyLabel(label);
+      let conf: FieldRecord['confidence'] = 'low';
+      if (key) {
+        if (['firstName','lastName','fullName','email','phone','linkedin','portfolio','github','currentEmployer','currentTitle'].includes(key)) conf = 'high';
+        else if (['coverLetterText','whyRole','whyCompany','tellMeAboutYourself','salaryExpectation'].includes(key)) conf = 'packet';
+        else conf = 'medium';
+      }
+      if (NEVER_PATTERNS.some(p => p.test(label))) conf = 'never';
+      else if (SENSITIVE_PATTERNS.some(p => p.test(label))) conf = 'medium';
+      if (type === 'file') {
+        const isResume = /resume|cv\b/i.test(label) || /resume|cv\b/i.test((el as HTMLInputElement).name || '') || /resume|cv\b/i.test(el.id || '');
+        conf = isResume ? 'resume-upload' : 'file-other';
+      }
+      out.push({
+        label, key, confidence: conf,
+        type: type === 'file' ? 'file' : (el.tagName.toLowerCase() === 'textarea' ? 'textarea' : type),
+        required: !!(el.required || el.getAttribute('aria-required') === 'true'),
+      });
+    }
+    return out;
+  }
+
+  function detectCaptcha(root: Element): boolean {
+    return !!root.querySelector('.g-recaptcha, .h-captcha, [data-sitekey], iframe[src*="recaptcha"]');
+  }
+  function detectLogin(root: Element): boolean {
+    return root.querySelectorAll<HTMLInputElement>('input[type="password"]').length > 0;
+  }
+  function detectRichText(root: Element): boolean {
+    return !!root.querySelector('[contenteditable="true"]');
+  }
+  function detectDropzone(root: Element): { hasInput: boolean; hasZone: boolean } {
+    const zone = root.querySelector('[data-testid*="drop" i], [class*="dropzone" i], [aria-label*="drag" i]');
+    if (!zone) return { hasInput: !!root.querySelector('input[type=file]'), hasZone: false };
+    const inputInZone = zone.querySelector('input[type=file]') || zone.closest('form')?.querySelector('input[type=file]');
+    return { hasInput: !!inputInZone, hasZone: true };
+  }
+
+  function $(sel: string): HTMLElement | null { return document.querySelector(sel); }
+  function esc(s: string): string {
+    return s.replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]!));
+  }
+
+  interface FixtureExpect {
+    minSafeFields: number;
+    minPacketFields: number;
+    expectCaptcha?: boolean;
+    expectLogin?: boolean;
+    expectRichText?: boolean;
+    expectDropzoneUnbound?: boolean;
+    expectNeverFields: number;
+    expectRequiredUnknown?: number;
+  }
+
+  const EXPECTATIONS: Record<string, { label: string; expect: FixtureExpect }> = {
+    greenhouse: { label: 'Greenhouse', expect: { minSafeFields: 6, minPacketFields: 2, expectNeverFields: 1 } },
+    lever: { label: 'Lever', expect: { minSafeFields: 4, minPacketFields: 3, expectNeverFields: 1, expectRequiredUnknown: 1 } },
+    ashby: { label: 'Ashby', expect: { minSafeFields: 3, minPacketFields: 1, expectNeverFields: 0 } },
+    workday: { label: 'Workday', expect: { minSafeFields: 4, minPacketFields: 0, expectNeverFields: 2 } },
+    'generic-rte': { label: 'Generic + RTE', expect: { minSafeFields: 1, minPacketFields: 0, expectNeverFields: 0, expectRichText: true } },
+    captcha: { label: 'CAPTCHA fixture', expect: { minSafeFields: 1, minPacketFields: 0, expectNeverFields: 0, expectCaptcha: true } },
+    'login-wall': { label: 'Login wall', expect: { minSafeFields: 0, minPacketFields: 0, expectNeverFields: 0, expectLogin: true } },
+    'generic-dropzone': { label: 'Drag-drop widget', expect: { minSafeFields: 1, minPacketFields: 0, expectNeverFields: 0, expectDropzoneUnbound: true } },
+  };
+
+  function runFixture(name: string) {
+    const root = document.querySelector(`[data-fixture="${name}"]`);
+    if (!root) return null;
+    const fields = detectFields(root);
+    const exp = EXPECTATIONS[name].expect;
+    const counts = {
+      high: fields.filter(f => f.confidence === 'high').length,
+      packet: fields.filter(f => f.confidence === 'packet').length,
+      medium: fields.filter(f => f.confidence === 'medium').length,
+      never: fields.filter(f => f.confidence === 'never').length,
+      resume: fields.filter(f => f.confidence === 'resume-upload').length,
+      file: fields.filter(f => f.confidence === 'file-other').length,
+      requiredUnknown: fields.filter(f => f.confidence === 'low' && f.required).length,
+    };
+    const captcha = detectCaptcha(root);
+    const login = detectLogin(root);
+    const richText = detectRichText(root);
+    const dz = detectDropzone(root);
+    const unboundDropzone = dz.hasZone && !dz.hasInput;
+
+    const checks = [
+      { k: 'Safe fields', v: counts.high, ok: counts.high >= exp.minSafeFields, expected: `≥${exp.minSafeFields}` },
+      { k: 'Packet fields', v: counts.packet, ok: counts.packet >= exp.minPacketFields, expected: `≥${exp.minPacketFields}` },
+      { k: 'Never fields', v: counts.never, ok: counts.never >= exp.expectNeverFields, expected: `≥${exp.expectNeverFields}` },
+      { k: 'Required unknown', v: counts.requiredUnknown, ok: exp.expectRequiredUnknown == null ? counts.requiredUnknown <= 1 : counts.requiredUnknown >= exp.expectRequiredUnknown, expected: exp.expectRequiredUnknown != null ? `≥${exp.expectRequiredUnknown}` : '≤1' },
+      { k: 'CAPTCHA', v: captcha ? 'yes' : 'no', ok: captcha === !!exp.expectCaptcha, expected: exp.expectCaptcha ? 'yes' : 'no' },
+      { k: 'Login wall', v: login ? 'yes' : 'no', ok: login === !!exp.expectLogin, expected: exp.expectLogin ? 'yes' : 'no' },
+      { k: 'Rich-text', v: richText ? 'yes' : 'no', ok: richText === !!exp.expectRichText, expected: exp.expectRichText ? 'yes' : 'no' },
+      { k: 'Dropzone w/o input', v: unboundDropzone ? 'yes' : 'no', ok: unboundDropzone === !!exp.expectDropzoneUnbound, expected: exp.expectDropzoneUnbound ? 'yes' : 'no' },
+    ];
+    const pass = checks.every(c => c.ok);
+    return { name, label: EXPECTATIONS[name].label, fields, counts, checks, pass };
+  }
+
+  function renderResult(r: ReturnType<typeof runFixture>) {
+    if (!r) return '';
+    const cls = r.pass ? 'is-pass' : 'is-fail';
+    return `<div class="tm-row ${cls}">
+      <div class="name">${esc(r.label)}<div class="muted" style="font-size:10px;margin-top:4px;">${r.fields.length} fields</div></div>
+      <div class="meta">
+        ${r.checks.map(c => `<div class="check"><span class="k">${esc(c.k)}</span>: <span class="v ${c.ok ? 'is-ok' : 'is-bad'}">${esc(String(c.v))}</span> <span class="muted">(expected ${esc(c.expected)})</span></div>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  $('#tm-run-all')?.addEventListener('click', () => {
+    const names = Object.keys(EXPECTATIONS);
+    const results = names.map(n => runFixture(n)).filter(Boolean) as Array<NonNullable<ReturnType<typeof runFixture>>>;
+    $('#tm-results')!.innerHTML = results.map(renderResult).join('');
+    const passed = results.filter(r => r.pass).length;
+    $('#tm-summary')!.textContent = `${passed}/${results.length} fixtures pass`;
+  });
+
+  $('#tm-clear')?.addEventListener('click', () => {
+    document.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>('.tm__fixtures input, .tm__fixtures textarea, .tm__fixtures select').forEach(el => {
+      if ('value' in el && el.type !== 'file') (el as HTMLInputElement).value = '';
+    });
+    document.querySelectorAll<HTMLDivElement>('[contenteditable="true"]').forEach(el => el.innerHTML = '');
+    $('#tm-results')!.innerHTML = '';
+    $('#tm-summary')!.textContent = 'Idle.';
+  });
+
+  // ── Safety regression ──────────────────────────────────────────
+  async function runSafetyRegression() {
+    const { gatesForSubmit } = await import('@/lib/agent/gates');
+    const { SESSION_SETTINGS_DEFAULTS } = await import('@/lib/storage');
+    // Build a fully-synthetic job + packet that DOES NOT exist in any store.
+    // This avoids tripping the duplicate / source-cap / dateApplied gates
+    // that read from real stores. We're testing pure gate logic here.
+    const syntheticId = 'safety-test-' + Math.random().toString(36).slice(2, 10);
+    const packet = {
+      id: 'sp', jobId: syntheticId,
+      resumeAngleId: 'product-designer', recommendedAngleReason: '',
+      resumeSelection: { projectIds: [], bulletIdsByProject: {}, skillGroupOrder: [] },
+      summaryKicker: '', coverLetter: 'Hi.', whyRoleAnswer: 'Yes.', whyCompanyAnswer: 'Yes.', tellMeAboutYourself: 'Yes.',
+      salaryGuidance: '$120k-$160k', portfolioMentions: [], recruiterDm: '', followUpMessage: '', jdSummary: '',
+      scores: { fit: 80, quality: 80, authenticity: 90, effort: 50, callback: 'strong' as const },
+      warnings: { missingKeywords: [], redFlags: [], authenticityConcerns: [], ghostFlags: [], salaryConflicts: [], workArrangementConflicts: [] },
+      ghostRisk: 'low' as const, ghostReasons: [], fieldMap: [],
+      status: 'ready' as const, applyMode: 'guided' as const,
+      atsType: 'greenhouse' as const, atsFrictionScore: 35, estimatedMinutes: 6,
+      checklist: [], llmUsed: [], createdAt: Date.now(), updatedAt: Date.now(),
+    };
+    const baseSession = {
+      id: 'safety-test', startedAt: Date.now(), status: 'running' as const,
+      settings: { ...SESSION_SETTINGS_DEFAULTS, autonomyLevel: 3 as const, dryRun: false },
+      jobIds: [syntheticId], submittedCount: 0, reviewCount: 0, blockedCount: 0, failedCount: 0, skippedCount: 0,
+      updatedAt: Date.now(),
+    };
+    const baseAttempt = {
+      id: 'sa', sessionId: baseSession.id, jobId: syntheticId, packetId: packet.id,
+      atsType: 'greenhouse' as const, atsTier: 1 as const, autonomyLevel: 3 as const,
+      status: 'running' as const, startedAt: Date.now(), steps: [],
+      filledFields: [], reviewFields: [], neverFields: [], unknownQuestions: [], errors: [],
+      updatedAt: Date.now(),
+    };
+    const cleanPage = { captchaPresent: false, loginPresent: false, unknownRequiredFields: 0, demographicFieldsRequired: 0, legalFieldsRequired: 0, uploadFailed: false, pageError: false };
+
+    const tests: Array<{ name: string; should: 'pass' | 'block'; run: () => { ok: boolean; blockReason?: string } }> = [
+      { name: 'Clean baseline → should pass', should: 'pass',
+        run: () => gatesForSubmit({ attempt: baseAttempt, session: baseSession, packet, ...cleanPage }) },
+      { name: 'CAPTCHA present → blocked', should: 'block',
+        run: () => gatesForSubmit({ attempt: baseAttempt, session: baseSession, packet, ...cleanPage, captchaPresent: true }) },
+      { name: 'Login wall → blocked', should: 'block',
+        run: () => gatesForSubmit({ attempt: baseAttempt, session: baseSession, packet, ...cleanPage, loginPresent: true }) },
+      { name: 'Demographic required → blocked', should: 'block',
+        run: () => gatesForSubmit({ attempt: baseAttempt, session: baseSession, packet, ...cleanPage, demographicFieldsRequired: 1 }) },
+      { name: 'Legal required → blocked', should: 'block',
+        run: () => gatesForSubmit({ attempt: baseAttempt, session: baseSession, packet, ...cleanPage, legalFieldsRequired: 1 }) },
+      { name: 'Upload failed → blocked', should: 'block',
+        run: () => gatesForSubmit({ attempt: baseAttempt, session: baseSession, packet, ...cleanPage, uploadFailed: true }) },
+      { name: 'Unknown required field → blocked', should: 'block',
+        run: () => gatesForSubmit({ attempt: baseAttempt, session: baseSession, packet, ...cleanPage, unknownRequiredFields: 2 }) },
+      { name: 'Authenticity 30 vs threshold 70 → blocked', should: 'block',
+        run: () => gatesForSubmit({ attempt: baseAttempt, session: baseSession, packet: { ...packet, scores: { ...packet.scores, authenticity: 30 } }, ...cleanPage }) },
+      { name: 'Fit 30 vs threshold 60 → blocked', should: 'block',
+        run: () => gatesForSubmit({ attempt: baseAttempt, session: baseSession, packet: { ...packet, scores: { ...packet.scores, fit: 30 } }, ...cleanPage }) },
+      { name: 'Unsupported claims (Microsoft Azure) → blocked', should: 'block',
+        run: () => gatesForSubmit({ attempt: baseAttempt, session: baseSession, packet: { ...packet, warnings: { ...packet.warnings, authenticityConcerns: ['Microsoft Azure'] } }, ...cleanPage }) },
+      { name: 'Autonomy L2 → blocked (no auto-submit)', should: 'block',
+        run: () => gatesForSubmit({ attempt: { ...baseAttempt, autonomyLevel: 2 as const }, session: baseSession, packet, ...cleanPage }) },
+      { name: 'Tier 3 + tier-3 disabled → blocked', should: 'block',
+        run: () => gatesForSubmit({ attempt: { ...baseAttempt, atsType: 'workday' as const, atsTier: 3 as const }, session: { ...baseSession, settings: { ...baseSession.settings, allowAutoSubmitTier3: false } }, packet: { ...packet, atsType: 'workday' as const }, ...cleanPage }) },
+      { name: 'Denylist → blocked', should: 'block',
+        run: () => gatesForSubmit({ attempt: baseAttempt, session: { ...baseSession, settings: { ...baseSession.settings, autoSubmitDenylist: [syntheticId] } }, packet, ...cleanPage }) },
+      { name: 'Daily cap exhausted → blocked', should: 'block',
+        run: () => gatesForSubmit({ attempt: baseAttempt, session: { ...baseSession, settings: { ...baseSession.settings, dailySubmitCap: 0 } }, packet, ...cleanPage }) },
+      { name: 'Dry-run mode → blocked', should: 'block',
+        run: () => gatesForSubmit({ attempt: baseAttempt, session: { ...baseSession, settings: { ...baseSession.settings, dryRun: true } }, packet, ...cleanPage }) },
+    ];
+
+    const rows: string[] = [];
+    let passed = 0;
+    for (const t of tests) {
+      const res = t.run();
+      const passCondition = t.should === 'pass' ? res.ok : !res.ok;
+      if (passCondition) passed++;
+      rows.push(`<div class="safety-row ${passCondition ? 'is-pass' : 'is-fail'}">
+        <span class="dot"></span>
+        <span>${esc(t.name)}${res.blockReason ? ` <span class="muted">→ ${esc(res.blockReason)}</span>` : ''}</span>
+        <span>${passCondition ? 'PASS' : 'FAIL'}</span>
+      </div>`);
+    }
+    $('#tm-safety')!.innerHTML = rows.join('');
+    $('#tm-summary')!.textContent = `Safety: ${passed}/${tests.length} pass`;
+  }
+
+  $('#tm-run-safety')?.addEventListener('click', () => runSafetyRegression());
+
+  // ── Live-paste validator ────────────────────────────────────────
+  function classifyPastedHtml(html: string) {
+    // Parse into a detached DocumentFragment so the page DOM is unaffected.
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const root = doc.body;
+    if (!root) return null;
+    const fields = detectFieldsFromRoot(root);
+    const captcha = !!root.querySelector('.g-recaptcha, .h-captcha, [data-sitekey], iframe[src*="recaptcha"]');
+    const login = !!root.querySelector('input[type=password]');
+    const richText = !!root.querySelector('[contenteditable="true"]');
+    const dropzone = root.querySelector('[data-testid*="drop" i], [class*="dropzone" i], [aria-label*="drag" i]');
+    const dropzoneUnbound = !!dropzone && !dropzone.querySelector('input[type=file]') && !root.querySelector('input[type=file]');
+    const customSelects = [
+      ...root.querySelectorAll('[class*="react-select" i]'),
+      ...root.querySelectorAll('[role="combobox"]'),
+      ...root.querySelectorAll('[aria-haspopup="listbox"]'),
+    ].length;
+    const buttons = Array.from(root.querySelectorAll('button, input[type=submit], a[role=button]'))
+      .map(b => ((b as HTMLElement).textContent || (b as HTMLInputElement).value || '').trim())
+      .filter(t => t.length > 0)
+      .slice(0, 12);
+    return { fields, captcha, login, richText, dropzoneUnbound, customSelects, buttons };
+  }
+
+  // Variant that uses the same field-detection logic against an arbitrary root.
+  function detectFieldsFromRoot(root: Element): FieldRecord[] {
+    // Patch the labelFor lookup so id-based <label for> queries the detached doc.
+    function labelForDetached(input: Element): string {
+      if (!input) return '';
+      const id = (input as HTMLElement).id;
+      if (id) {
+        try {
+          const lab = root.querySelector(`label[for="${CSS.escape(id)}"]`);
+          if (lab) return lab.textContent?.trim() ?? '';
+        } catch { /* ignore */ }
+      }
+      const wrap = (input as HTMLElement).closest('label');
+      if (wrap) {
+        const clone = wrap.cloneNode(true) as HTMLElement;
+        clone.querySelectorAll('input, textarea, select').forEach(n => n.remove());
+        const t = clone.textContent?.trim() ?? '';
+        if (t) return t;
+      }
+      const labelledBy = (input as HTMLElement).getAttribute('aria-labelledby');
+      if (labelledBy) {
+        const parts = labelledBy.split(/\s+/).map(rid => root.querySelector(`#${CSS.escape(rid)}`)?.textContent?.trim()).filter(Boolean);
+        if (parts.length > 0) return parts.join(' ');
+      }
+      const aria = (input as HTMLElement).getAttribute('aria-label');
+      if (aria) return aria;
+      const fieldset = (input as HTMLElement).closest('fieldset');
+      if (fieldset) {
+        // Direct child only — avoid leaking a nested EEO legend.
+        let legend: Element | null = null;
+        for (const child of Array.from(fieldset.children)) {
+          if (child.tagName.toLowerCase() === 'legend') { legend = child; break; }
+        }
+        if (legend) return legend.textContent?.trim() ?? '';
+      }
+      let sib = input.previousElementSibling;
+      let hops = 0;
+      while (sib && hops < 3) {
+        const tag = sib.tagName.toLowerCase();
+        const cls = typeof (sib as HTMLElement).className === 'string' ? (sib as HTMLElement).className.toLowerCase() : '';
+        if (tag === 'label' || /label|fieldlabel|field__label/.test(cls)) {
+          const t = sib.textContent?.trim() ?? '';
+          if (t) return t;
+        }
+        sib = sib.previousElementSibling; hops++;
+      }
+      const fc = (input as HTMLElement).closest('[class*="field" i], [class*="form-row" i], [class*="form-group" i]');
+      if (fc) {
+        const h = fc.querySelector('label, [class*="label" i], legend, h3, h4');
+        if (h) {
+          const c = h.cloneNode(true) as HTMLElement;
+          c.querySelectorAll('input, textarea, select').forEach(n => n.remove());
+          const t = c.textContent?.trim() ?? '';
+          if (t) return t;
+        }
+      }
+      return (input as HTMLInputElement).placeholder || (input as HTMLInputElement).name || (input as HTMLElement).id || '';
+    }
+
+    const els = Array.from(root.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>('input, textarea, select'));
+    const out: FieldRecord[] = [];
+    for (const el of els) {
+      const type = ((el as HTMLInputElement).type || el.tagName).toLowerCase();
+      if (['hidden', 'submit', 'button', 'reset', 'image'].includes(type)) continue;
+      const label = labelForDetached(el);
+      const key = classifyLabel(label);
+      let conf: FieldRecord['confidence'] = 'low';
+      if (key) {
+        if (['firstName','lastName','fullName','email','phone','linkedin','portfolio','github','currentEmployer','currentTitle'].includes(key)) conf = 'high';
+        else if (['coverLetterText','whyRole','whyCompany','tellMeAboutYourself','salaryExpectation'].includes(key)) conf = 'packet';
+        else conf = 'medium';
+      }
+      if (NEVER_PATTERNS.some(p => p.test(label))) conf = 'never';
+      else if (SENSITIVE_PATTERNS.some(p => p.test(label))) conf = 'medium';
+      if (type === 'file') {
+        const isResume = /resume|cv\b/i.test(label) || /resume|cv\b/i.test((el as HTMLInputElement).name || '') || /resume|cv\b/i.test(el.id || '');
+        conf = isResume ? 'resume-upload' : 'file-other';
+      }
+      out.push({
+        label, key, confidence: conf,
+        type: type === 'file' ? 'file' : (el.tagName.toLowerCase() === 'textarea' ? 'textarea' : type),
+        required: !!(el.required || el.getAttribute('aria-required') === 'true'),
+      });
+    }
+    return out;
+  }
+
+  function renderPasteResult(html: string) {
+    const out = classifyPastedHtml(html);
+    const target = $('#tm-paste-result')!;
+    if (!out) {
+      target.innerHTML = '<div class="muted">Could not parse the HTML.</div>';
+      return;
+    }
+    const counts = {
+      high: out.fields.filter(f => f.confidence === 'high').length,
+      packet: out.fields.filter(f => f.confidence === 'packet').length,
+      medium: out.fields.filter(f => f.confidence === 'medium').length,
+      low: out.fields.filter(f => f.confidence === 'low').length,
+      never: out.fields.filter(f => f.confidence === 'never').length,
+      resume: out.fields.filter(f => f.confidence === 'resume-upload').length,
+      file: out.fields.filter(f => f.confidence === 'file-other').length,
+      requiredUnknown: out.fields.filter(f => f.confidence === 'low' && f.required).length,
+    };
+    const pills = `
+      <span class="pill is-high">${counts.high} safe</span>
+      <span class="pill is-packet">${counts.packet} packet</span>
+      <span class="pill is-medium">${counts.medium} review</span>
+      <span class="pill is-low">${counts.low} manual</span>
+      <span class="pill is-never">${counts.never} never</span>
+    `;
+    const flags = [
+      out.captcha ? '<strong style="color:#FCA5A5">CAPTCHA detected</strong>' : '',
+      out.login ? '<strong style="color:#FCA5A5">login wall (password input)</strong>' : '',
+      out.richText ? '<strong style="color:var(--c-accent)">rich-text editor</strong>' : '',
+      out.dropzoneUnbound ? '<strong style="color:var(--c-accent)">unbound dropzone</strong>' : '',
+      out.customSelects ? `<strong>${out.customSelects} custom select(s)</strong>` : '',
+      counts.requiredUnknown ? `<strong style="color:var(--c-accent)">${counts.requiredUnknown} required-unknown field(s)</strong>` : '',
+    ].filter(Boolean).join(' · ');
+
+    const fieldsHtml = `
+      <div class="tm__paste-fields">
+        <div class="row head"><span class="lbl">Label</span><span class="key">Classified as</span><span class="conf">Confidence</span><span class="req">Req</span></div>
+        ${out.fields.slice(0, 60).map(f => `<div class="row">
+          <span class="lbl" title="${esc(f.label)}">${esc(f.label.slice(0, 80))}</span>
+          <span class="key">${esc(f.key || '(unmapped)')}</span>
+          <span class="conf is-${esc(f.confidence)}">${esc(f.confidence)}</span>
+          <span class="req">${f.required ? 'req' : ''}</span>
+        </div>`).join('')}
+      </div>
+    `;
+    target.innerHTML = `
+      <div class="tm__paste-summary">
+        <div style="margin-bottom: 6px;">${pills}</div>
+        ${flags ? `<div style="margin-bottom: 6px;">${flags}</div>` : ''}
+        <div>Buttons seen: ${out.buttons.length ? out.buttons.map(b => `<code>${esc(b)}</code>`).join(' · ') : '<em class="muted">none</em>'}</div>
+      </div>
+      ${fieldsHtml}
+    `;
+  }
+
+  $('#tm-paste-run')?.addEventListener('click', () => {
+    const html = (document.getElementById('tm-paste-input') as HTMLTextAreaElement).value.trim();
+    if (!html) return;
+    renderPasteResult(html);
+  });
+  $('#tm-paste-clear')?.addEventListener('click', () => {
+    (document.getElementById('tm-paste-input') as HTMLTextAreaElement).value = '';
+    $('#tm-paste-result')!.innerHTML = '';
+  });
+
+  // Boot: run once on load so users see expected/actual.
+  setTimeout(() => $('#tm-run-all')?.click(), 200);
+</script>

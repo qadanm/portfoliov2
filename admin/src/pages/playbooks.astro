@@ -1,0 +1,100 @@
+---
+import Admin from '@/layouts/Admin.astro';
+import { PLAYBOOKS } from '@/lib/ats/playbooks';
+
+const playbookList = Object.values(PLAYBOOKS).sort((a, b) => a.friction - b.friction);
+---
+
+<Admin
+  title="ATS playbooks"
+  intro="What to expect, what to prepare, what's safe to autofill, and what must stay manual — per ATS."
+>
+  <section class="playbooks">
+    {playbookList.map(p => (
+      <article class="pb">
+        <header class="pb__head">
+          <div>
+            <h2 class="pb__name">{p.label}</h2>
+            <div class="pb__chips">
+              <span class="chip">Friction {p.friction}/100</span>
+              <span class="chip">~{p.estimatedMinutes} min</span>
+              <span class={`chip chip--strategy chip--${p.strategy}`}>{p.strategy.replace(/-/g, ' ')}</span>
+            </div>
+          </div>
+        </header>
+
+        <div class="pb__grid">
+          <section>
+            <h3>Prepare</h3>
+            <ul>{p.prepare.map(x => <li>{x}</li>)}</ul>
+          </section>
+          <section>
+            <h3>Safe autofill</h3>
+            <ul>{p.safeAutofill.map(x => <li>{x}</li>)}</ul>
+          </section>
+          <section>
+            <h3>Must be manual</h3>
+            <ul class="pb__must-manual">{p.mustBeManual.map(x => <li>{x}</li>)}</ul>
+          </section>
+          <section>
+            <h3>Common questions</h3>
+            <ul>{p.commonQuestions.map(x => <li>{x}</li>)}</ul>
+          </section>
+          <section style="grid-column: 1 / -1;">
+            <h3>Workflow</h3>
+            <ol>{p.workflow.map(x => <li>{x}</li>)}</ol>
+          </section>
+          <section style="grid-column: 1 / -1;">
+            <h3>Tips</h3>
+            <ul class="pb__tips">{p.tips.map(x => <li>{x}</li>)}</ul>
+          </section>
+        </div>
+      </article>
+    ))}
+  </section>
+</Admin>
+
+<style>
+  .playbooks { display: flex; flex-direction: column; gap: 16px; }
+  .pb {
+    background: var(--c-bg-elev);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    padding: 18px 22px;
+  }
+  .pb__head { margin-bottom: 14px; }
+  .pb__name {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+  .pb__chips { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .chip--strategy.chip--fast-apply { color: var(--c-success); border-color: rgba(16, 185, 129, 0.4); }
+  .chip--strategy.chip--tailor-required { color: var(--c-accent); border-color: rgba(245, 158, 11, 0.4); }
+  .chip--strategy.chip--skip-if-low-fit { color: #FCA5A5; border-color: rgba(248, 113, 113, 0.4); }
+
+  .pb__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  @media (max-width: 720px) { .pb__grid { grid-template-columns: 1fr; } }
+
+  .pb__grid section h3 {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--c-text-subtle);
+    margin-bottom: 8px;
+  }
+  .pb__grid ul, .pb__grid ol {
+    padding-left: 18px;
+    color: var(--c-text-muted);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .pb__must-manual { color: #FCA5A5; }
+  .pb__tips { color: var(--c-text); }
+</style>

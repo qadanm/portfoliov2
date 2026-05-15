@@ -1,0 +1,527 @@
+---
+import Admin from '@/layouts/Admin.astro';
+---
+
+<Admin title="Apply Session">
+  <section class="apply">
+    <!-- Sticky head -->
+    <header class="apply__head" id="apply-head">
+      <div class="apply__progress">
+        <strong id="apply-progress">— / —</strong>
+        <span class="apply__progress-bar" aria-hidden="true"><span id="apply-progress-fill"></span></span>
+      </div>
+      <div class="apply__job">
+        <strong id="apply-company">—</strong>
+        <span class="muted" id="apply-role">—</span>
+        <div class="apply__chips">
+          <span class="chip" id="apply-ats">ATS: —</span>
+          <span class="chip" id="apply-fit">Fit —</span>
+          <span class="chip" id="apply-auth">Auth —</span>
+          <span class="chip" id="apply-friction">Friction —</span>
+          <span class="chip" id="apply-ghost">Ghost: low</span>
+        </div>
+      </div>
+      <div class="apply__actions">
+        <a class="btn" id="apply-listing-btn" target="_blank">Open listing</a>
+        <a class="btn" id="apply-edit-btn">Edit packet</a>
+        <button class="btn" id="apply-skip">Skip / Later</button>
+        <button class="btn" id="apply-pass">Pass on this</button>
+        <button class="btn btn--primary" id="apply-mark">Mark applied</button>
+      </div>
+    </header>
+
+    <!-- Keyboard hints -->
+    <div class="apply__hints">
+      <kbd>j</kbd>/<kbd>k</kbd> prev/next
+      <span class="apply__hint-sep">·</span>
+      <kbd>o</kbd> open
+      <span class="apply__hint-sep">·</span>
+      <kbd>e</kbd> edit
+      <span class="apply__hint-sep">·</span>
+      <kbd>r</kbd> resume
+      <span class="apply__hint-sep">·</span>
+      <kbd>c</kbd> cover
+      <span class="apply__hint-sep">·</span>
+      <kbd>a</kbd> mark applied
+      <span class="apply__hint-sep">·</span>
+      <kbd>s</kbd> skip
+      <span class="apply__hint-sep">·</span>
+      <kbd>x</kbd> pass
+    </div>
+
+    <!-- Warnings strip -->
+    <div class="apply__warnings" id="apply-warnings"></div>
+
+    <div class="apply__split">
+      <!-- Checklist -->
+      <aside class="apply__checklist">
+        <h3 class="apply__pane-h">Checklist</h3>
+        <ul id="apply-checklist"></ul>
+      </aside>
+
+      <!-- Panels -->
+      <main class="apply__panels">
+        <details class="block" open><summary><h3>Resume (tailored)</h3></summary>
+          <div class="block__body">
+            <pre id="apply-resume" class="resume-pre"></pre>
+            <div class="block__actions">
+              <button class="btn micro-btn" data-copy="resume">Copy resume text</button>
+              <a class="btn micro-btn" id="apply-resume-pdf" target="_blank">Open PDF view</a>
+            </div>
+          </div>
+        </details>
+        <details class="block" open><summary><h3>Cover letter</h3></summary>
+          <div class="block__body">
+            <textarea id="apply-cover" rows="10" readonly></textarea>
+            <div class="block__actions"><button class="btn micro-btn" data-copy="cover">Copy</button></div>
+          </div>
+        </details>
+        <details class="block" open><summary><h3>Short answers</h3></summary>
+          <div class="block__body">
+            <label class="micro">Why this role</label>
+            <textarea id="apply-why-role" rows="3" readonly></textarea>
+            <div class="block__actions"><button class="btn micro-btn" data-copy="why-role">Copy</button></div>
+            <label class="micro">Why this company</label>
+            <textarea id="apply-why-co" rows="3" readonly></textarea>
+            <div class="block__actions"><button class="btn micro-btn" data-copy="why-co">Copy</button></div>
+            <label class="micro">Salary</label>
+            <textarea id="apply-salary" rows="2" readonly></textarea>
+            <div class="block__actions"><button class="btn micro-btn" data-copy="salary">Copy</button></div>
+            <label class="micro">Tell me about yourself</label>
+            <textarea id="apply-tmay" rows="3" readonly></textarea>
+            <div class="block__actions"><button class="btn micro-btn" data-copy="tmay">Copy</button></div>
+          </div>
+        </details>
+        <details class="block"><summary><h3>Recruiter DM</h3></summary>
+          <div class="block__body">
+            <textarea id="apply-dm" rows="4" readonly></textarea>
+            <div class="block__actions"><button class="btn micro-btn" data-copy="dm">Copy</button></div>
+          </div>
+        </details>
+      </main>
+    </div>
+
+    <div id="apply-toast" class="apply__toast"></div>
+  </section>
+
+  <!-- Confirmed submit modal (M3 — disabled by default) -->
+  <div id="confirm-submit" class="confirm-modal" hidden role="dialog" aria-modal="true">
+    <div class="confirm-modal__body">
+      <h3>Confirm submit?</h3>
+      <p class="muted">M3 Confirmed-Submit Assist is OFF. This modal is only shown when you've explicitly enabled it in Vault settings.</p>
+      <p>Type <strong>SUBMIT</strong> below to confirm.</p>
+      <input id="confirm-text" type="text" autocomplete="off" />
+      <div class="confirm-modal__actions">
+        <button class="btn" id="confirm-cancel">Cancel</button>
+        <button class="btn btn--primary" id="confirm-go" disabled>Submit</button>
+      </div>
+    </div>
+  </div>
+</Admin>
+
+<style>
+  .apply { display: flex; flex-direction: column; gap: 12px; }
+
+  .apply__head {
+    position: sticky; top: 0; z-index: 10;
+    display: grid;
+    grid-template-columns: 180px 1fr auto;
+    gap: 16px;
+    align-items: center;
+    padding: 12px 16px;
+    background: var(--c-bg-elev);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+  }
+  .apply__progress { display: flex; flex-direction: column; gap: 6px; min-width: 130px; }
+  .apply__progress strong { font-family: var(--font-display); font-size: 18px; }
+  .apply__progress-bar {
+    display: block; height: 4px;
+    background: var(--c-bg-muted);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .apply__progress-bar > span {
+    display: block; height: 100%; width: 0%;
+    background: var(--c-accent);
+    transition: width 200ms;
+  }
+  .apply__job strong { font-family: var(--font-display); font-size: 22px; font-weight: 400; }
+  .apply__job .muted { margin-left: 8px; }
+  .apply__chips { display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
+  .apply__actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .apply__hints {
+    font-family: var(--font-mono); font-size: 11px; color: var(--c-text-subtle);
+    padding: 4px 14px;
+  }
+  .apply__hints kbd {
+    font-family: var(--font-mono); font-size: 10px;
+    padding: 1px 5px; border-radius: 3px;
+    border: 1px solid var(--c-border); background: var(--c-bg);
+    color: var(--c-text);
+  }
+  .apply__hint-sep { opacity: 0.4; margin: 0 4px; }
+
+  .apply__warnings { display: flex; flex-direction: column; gap: 6px; }
+  .warn { padding: 8px 12px; border-radius: var(--r-md); font-size: 12px;
+    background: var(--c-bg-elev); border: 1px solid var(--c-border-subtle); }
+  .warn--red { border-color: rgba(248, 113, 113, 0.4); color: #FCA5A5; }
+  .warn--yellow { border-color: rgba(245, 158, 11, 0.4); color: var(--c-accent); }
+
+  .apply__split {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 14px;
+  }
+  @media (max-width: 900px) {
+    .apply__split { grid-template-columns: 1fr; }
+    .apply__head { grid-template-columns: 1fr; }
+  }
+  .apply__pane-h {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 400;
+    margin-bottom: 10px;
+  }
+  .apply__checklist {
+    background: var(--c-bg-elev);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    padding: 14px 16px;
+    position: sticky;
+    top: 110px;
+    align-self: flex-start;
+  }
+  .apply__checklist ul {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .apply__checklist li {
+    display: flex; align-items: flex-start; gap: 8px;
+    padding: 8px 10px;
+    background: var(--c-bg);
+    border: 1px solid var(--c-border-subtle);
+    border-radius: var(--r-sm);
+    font-size: 12px;
+  }
+  .apply__checklist li.is-done { opacity: 0.55; }
+  .apply__checklist input[type=checkbox] { margin-top: 2px; }
+  .apply__checklist .check-copy {
+    margin-left: auto;
+    font-family: var(--font-mono); font-size: 10px;
+    color: var(--c-accent); cursor: pointer; background: transparent; border: 0;
+  }
+  .apply__panels { display: flex; flex-direction: column; gap: 10px; }
+
+  .block { background: var(--c-bg-elev); border: 1px solid var(--c-border); border-radius: var(--r-md); padding: 12px 16px; }
+  .block summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+  .block summary::-webkit-details-marker { display: none; }
+  .block summary h3 { font-family: var(--font-display); font-size: 18px; font-weight: 400; }
+  .block summary::after { content: '▾'; font-size: 10px; color: var(--c-text-subtle); }
+  .block:not([open]) summary::after { content: '▸'; }
+  .block__body { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+  .block__actions { display: flex; gap: 8px; }
+  .micro-btn { padding: 4px 10px; font-size: 11px; }
+  .micro { font-family: var(--font-mono); font-size: 11px; color: var(--c-text-subtle); }
+  .resume-pre {
+    font-family: var(--font-mono); font-size: 11px;
+    background: var(--c-bg); border: 1px solid var(--c-border-subtle);
+    border-radius: var(--r-md); padding: 12px;
+    max-height: 380px; overflow-y: auto;
+    white-space: pre-wrap; line-height: 1.5;
+    color: var(--c-text-muted);
+  }
+  .muted { color: var(--c-text-subtle); }
+
+  .apply__toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    padding: 8px 14px;
+    background: var(--c-text); color: var(--c-bg);
+    border-radius: var(--r-full); font-size: 12px;
+    opacity: 0; transition: opacity 200ms; pointer-events: none; z-index: 100;
+  }
+  .apply__toast.is-visible { opacity: 1; }
+
+  .confirm-modal {
+    position: fixed; inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 200;
+  }
+  .confirm-modal__body {
+    background: var(--c-bg-elev);
+    border: 1px solid var(--c-accent);
+    border-radius: var(--r-md);
+    padding: 22px;
+    max-width: 420px;
+  }
+  .confirm-modal__actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; }
+</style>
+
+<script>
+  import {
+    jobsStore,
+    packetsStore,
+    applySettingsStore,
+    ensureSchema,
+    type ApplicationPacket,
+    type Job,
+    type PacketChecklistItem,
+  } from '@/lib/storage';
+  import { getOrBuildPacket, persistPacket } from '@/lib/packet/builder';
+  import { atsLabel } from '@/lib/ats/detect';
+  import { markApplied } from '@/lib/insights/outcomes';
+  import { buildResume, resumeToText } from '@/lib/engine';
+  import { checklistProgress } from '@/lib/ats/checklists';
+
+  ensureSchema();
+
+  const url = new URL(window.location.href);
+  const idsParam = url.searchParams.get('ids');
+  const singleJobId = url.searchParams.get('jobId');
+
+  // Resolve queue: explicit ids, or single job, or default to today's saved + applying
+  let queueJobIds: string[] = [];
+  if (idsParam) queueJobIds = idsParam.split(',').filter(Boolean);
+  else if (singleJobId) queueJobIds = [singleJobId];
+  else {
+    queueJobIds = jobsStore.list()
+      .filter(j => j.status === 'Saved' || j.status === 'Applying')
+      .sort((a, b) => (a.priority ?? 3) - (b.priority ?? 3) || (b.fitScore ?? 0) - (a.fitScore ?? 0))
+      .map(j => j.id);
+  }
+
+  if (queueJobIds.length === 0) {
+    document.body.innerHTML = '<div style="padding:40px;color:var(--c-text-muted);font-family:var(--font-mono)">No queued jobs. Add jobs to Today first.</div>';
+    throw new Error('empty queue');
+  }
+
+  let cursor = 0;
+  let packet: ApplicationPacket | null = null;
+  let job: Job | undefined;
+
+  const settings = applySettingsStore.get();
+
+  function $(sel: string): HTMLElement | null { return document.querySelector(sel); }
+  function $$<T extends Element>(sel: string): T[] { return Array.from(document.querySelectorAll(sel)) as T[]; }
+  function esc(s: string): string {
+    return s.replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]!));
+  }
+  function toast(msg: string) {
+    const el = document.getElementById('apply-toast')!;
+    el.textContent = msg;
+    el.classList.add('is-visible');
+    setTimeout(() => el.classList.remove('is-visible'), 1500);
+  }
+
+  function loadCursor() {
+    const jobId = queueJobIds[cursor];
+    if (!jobId) return;
+    job = jobsStore.get(jobId);
+    packet = job ? getOrBuildPacket(job.id) : null;
+    if (!job || !packet) {
+      toast('Could not load packet for this job');
+    }
+  }
+
+  function renderHead() {
+    if (!job || !packet) return;
+    ($('#apply-progress') as HTMLElement).textContent = `${cursor + 1} / ${queueJobIds.length}`;
+    const pct = ((cursor + 1) / queueJobIds.length) * 100;
+    ($('#apply-progress-fill') as HTMLElement).style.width = `${pct}%`;
+    ($('#apply-company') as HTMLElement).textContent = job.company ?? '—';
+    ($('#apply-role') as HTMLElement).textContent = job.role ?? '—';
+    ($('#apply-ats') as HTMLElement).textContent = `ATS: ${atsLabel(packet.atsType)}`;
+    ($('#apply-fit') as HTMLElement).textContent = `Fit ${packet.scores.fit}`;
+    ($('#apply-auth') as HTMLElement).textContent = `Auth ${packet.scores.authenticity}`;
+    ($('#apply-friction') as HTMLElement).textContent = `Friction ${packet.atsFrictionScore}`;
+    const ghostEl = $('#apply-ghost') as HTMLElement;
+    ghostEl.textContent = `Ghost: ${packet.ghostRisk}`;
+    ghostEl.style.color = packet.ghostRisk === 'high' ? '#F87171' : packet.ghostRisk === 'medium' ? 'var(--c-accent)' : '';
+
+    const listingBtn = $('#apply-listing-btn') as HTMLAnchorElement;
+    if (job.url) { listingBtn.href = job.url; listingBtn.style.opacity = '1'; listingBtn.style.pointerEvents = 'auto'; }
+    else { listingBtn.removeAttribute('href'); listingBtn.style.opacity = '0.4'; listingBtn.style.pointerEvents = 'none'; }
+
+    ($('#apply-edit-btn') as HTMLAnchorElement).setAttribute('href', `/packet?jobId=${job.id}`);
+    ($('#apply-resume-pdf') as HTMLAnchorElement).href = `/resume/${packet.resumeAngleId}`;
+  }
+
+  function renderWarnings() {
+    if (!packet) return;
+    const list = $('#apply-warnings')!;
+    list.innerHTML = '';
+    const w = packet.warnings;
+    if (packet.ghostRisk === 'high') {
+      list.insertAdjacentHTML('beforeend', `<div class="warn warn--red">⚠ High ghost-job risk · ${esc(w.ghostFlags.slice(0,3).join(' · '))}</div>`);
+    }
+    if (w.redFlags.length > 0) {
+      list.insertAdjacentHTML('beforeend', `<div class="warn warn--yellow">AI tells in copy: ${esc(w.redFlags.slice(0,4).join(', '))}</div>`);
+    }
+    if (w.authenticityConcerns.length > 0) {
+      list.insertAdjacentHTML('beforeend', `<div class="warn warn--red">Unsupported claims: ${esc(w.authenticityConcerns.slice(0,4).join(', '))}</div>`);
+    }
+    if (w.salaryConflicts.length > 0) {
+      list.insertAdjacentHTML('beforeend', `<div class="warn warn--yellow">${esc(w.salaryConflicts.join(' · '))}</div>`);
+    }
+    if (w.workArrangementConflicts.length > 0) {
+      list.insertAdjacentHTML('beforeend', `<div class="warn warn--yellow">${esc(w.workArrangementConflicts.join(' · '))}</div>`);
+    }
+  }
+
+  function renderPanels() {
+    if (!packet) return;
+    ($('#apply-cover') as HTMLTextAreaElement).value = packet.coverLetter ?? '';
+    ($('#apply-why-role') as HTMLTextAreaElement).value = packet.whyRoleAnswer ?? '';
+    ($('#apply-why-co') as HTMLTextAreaElement).value = packet.whyCompanyAnswer ?? '';
+    ($('#apply-salary') as HTMLTextAreaElement).value = packet.salaryGuidance ?? '';
+    ($('#apply-tmay') as HTMLTextAreaElement).value = packet.tellMeAboutYourself ?? '';
+    ($('#apply-dm') as HTMLTextAreaElement).value = packet.recruiterDm ?? '';
+
+    const resume = buildResume(packet.resumeAngleId);
+    const text = resume ? resumeToText(resume) : '(no resume)';
+    const prefix = packet.summaryKicker ? `${packet.summaryKicker}\n\n` : '';
+    ($('#apply-resume') as HTMLElement).textContent = prefix + text;
+  }
+
+  function renderChecklist() {
+    if (!packet) return;
+    const ul = $('#apply-checklist')!;
+    ul.innerHTML = '';
+    packet.checklist.forEach((item, idx) => {
+      const li = document.createElement('li');
+      if (item.done) li.classList.add('is-done');
+      li.innerHTML = `<label>
+        <input type="checkbox" ${item.done ? 'checked' : ''} data-cidx="${idx}" />
+      </label>
+      <span>${esc(item.label)}</span>
+      ${item.copyTarget ? `<button class="check-copy" data-copy="${esc(item.copyTarget)}">copy</button>` : ''}`;
+      ul.appendChild(li);
+    });
+
+    ul.querySelectorAll<HTMLInputElement>('input[type=checkbox]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        if (!packet) return;
+        const idx = Number(cb.dataset.cidx);
+        const it = packet.checklist[idx];
+        if (!it) return;
+        it.done = cb.checked;
+        it.doneAt = cb.checked ? Date.now() : undefined;
+        packet = persistPacket(packet);
+        renderChecklist();
+        renderHead();
+      });
+    });
+    ul.querySelectorAll<HTMLButtonElement>('button.check-copy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.copy!;
+        copyByKey(key);
+      });
+    });
+  }
+
+  function copyByKey(key: string) {
+    if (!packet) return;
+    const map: Record<string, string> = {
+      'resume': ($('#apply-resume') as HTMLElement).textContent ?? '',
+      'cover': ($('#apply-cover') as HTMLTextAreaElement).value,
+      'why-role': ($('#apply-why-role') as HTMLTextAreaElement).value,
+      'why-co': ($('#apply-why-co') as HTMLTextAreaElement).value,
+      'why-company': ($('#apply-why-co') as HTMLTextAreaElement).value,
+      'cover-letter': ($('#apply-cover') as HTMLTextAreaElement).value,
+      'salary': ($('#apply-salary') as HTMLTextAreaElement).value,
+      'tmay': ($('#apply-tmay') as HTMLTextAreaElement).value,
+      'tell-me-about-yourself': ($('#apply-tmay') as HTMLTextAreaElement).value,
+      'recruiter-dm': ($('#apply-dm') as HTMLTextAreaElement).value,
+      'dm': ($('#apply-dm') as HTMLTextAreaElement).value,
+      'jd-summary': packet.jdSummary,
+    };
+    const text = map[key] ?? '';
+    if (!text) { toast('Nothing to copy'); return; }
+    navigator.clipboard.writeText(text).then(() => toast(`Copied · ${key}`)).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); ta.remove();
+      toast('Copied');
+    });
+  }
+
+  function bindCopyButtons() {
+    $$<HTMLButtonElement>('[data-copy]').forEach(btn => {
+      btn.addEventListener('click', () => copyByKey(btn.dataset.copy!));
+    });
+  }
+
+  function next() { if (cursor < queueJobIds.length - 1) cursor++; renderAll(); }
+  function prev() { if (cursor > 0) cursor--; renderAll(); }
+
+  function doMarkApplied() {
+    if (!job || !packet) return;
+    if (packet.scores.authenticity < settings.authenticityThreshold) {
+      if (!confirm(`Authenticity (${packet.scores.authenticity}) below threshold (${settings.authenticityThreshold}). Mark applied anyway?`)) return;
+    }
+    markApplied(job, packet);
+    packet.status = 'submitted';
+    packet.submittedAt = Date.now();
+    packet = persistPacket(packet);
+    toast(`Applied · ${job.company}`);
+    next();
+  }
+
+  function doSkip() {
+    if (!job) return;
+    const updated: Job = { ...job, deferredAt: Date.now(), updatedAt: Date.now() };
+    jobsStore.upsert(updated);
+    toast('Deferred to later');
+    next();
+  }
+
+  function doPass() {
+    if (!job) return;
+    if (!confirm('Move this job to Archived and remove from queue?')) return;
+    const updated: Job = { ...job, status: 'Archived', updatedAt: Date.now() };
+    jobsStore.upsert(updated);
+    toast('Passed');
+    next();
+  }
+
+  function bindActions() {
+    $('#apply-mark')!.addEventListener('click', doMarkApplied);
+    $('#apply-skip')!.addEventListener('click', doSkip);
+    $('#apply-pass')!.addEventListener('click', doPass);
+  }
+
+  function bindKeys() {
+    document.addEventListener('keydown', e => {
+      // Ignore when focused in a text field
+      const tag = (e.target as HTMLElement).tagName;
+      if (tag === 'TEXTAREA' || tag === 'INPUT' || tag === 'SELECT') return;
+      switch (e.key) {
+        case 'j': next(); break;
+        case 'k': prev(); break;
+        case 'o': ($('#apply-listing-btn') as HTMLAnchorElement).click(); break;
+        case 'e': window.location.href = ($('#apply-edit-btn') as HTMLAnchorElement).getAttribute('href') ?? '/'; break;
+        case 'r': copyByKey('resume'); break;
+        case 'c': copyByKey('cover'); break;
+        case 'a': doMarkApplied(); break;
+        case 's': doSkip(); break;
+        case 'x': doPass(); break;
+      }
+    });
+  }
+
+  function renderAll() {
+    loadCursor();
+    renderHead();
+    renderWarnings();
+    renderPanels();
+    renderChecklist();
+  }
+
+  // Boot
+  renderAll();
+  bindCopyButtons();
+  bindActions();
+  bindKeys();
+</script>

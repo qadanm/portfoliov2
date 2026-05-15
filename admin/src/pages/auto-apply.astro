@@ -1,0 +1,899 @@
+---
+import Admin from '@/layouts/Admin.astro';
+---
+
+<Admin
+  title="Auto Apply"
+  intro="Autonomous agent. Pick jobs, choose autonomy, watch it work. Pauses for anything uncertain. Auto-submit gated by safety checks and is off by default."
+>
+  <section class="aa">
+    <!-- Active session state row -->
+    <div class="aa__active" id="aa-active" hidden>
+      <div class="aa__active-head">
+        <span class="aa__active-dot" data-status></span>
+        <span data-active-summary>—</span>
+        <div class="aa__active-counters">
+          <span class="counter"><strong data-c-submitted>0</strong> submitted</span>
+          <span class="counter"><strong data-c-review>0</strong> review</span>
+          <span class="counter"><strong data-c-blocked>0</strong> blocked</span>
+          <span class="counter"><strong data-c-failed>0</strong> failed</span>
+          <span class="counter"><strong data-c-skipped>0</strong> skipped</span>
+          <span class="counter"><strong data-c-time>0m</strong> saved</span>
+        </div>
+        <div class="aa__active-actions">
+          <button class="btn" data-action="pause">Pause</button>
+          <button class="btn" data-action="resume" hidden>Resume</button>
+          <button class="btn" data-action="stop">Stop</button>
+        </div>
+      </div>
+      <div class="aa__current" id="aa-current">
+        <span class="aa__current-label">Current job</span>
+        <span data-current-job>—</span>
+        <div class="aa__current-actions">
+          <a class="btn" id="aa-open-current" target="_blank" rel="noopener">Open</a>
+          <a class="btn" id="aa-edit-packet">Edit packet</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Session setup -->
+    <section class="card" id="aa-setup">
+      <h2 class="aa__h2">New session</h2>
+      <p class="muted">Pick jobs from your saved queue, choose autonomy. The extension takes over from there.</p>
+
+      <div class="aa__setup-grid">
+        <!-- Autonomy picker -->
+        <div>
+          <label class="aa__label">Autonomy level</label>
+          <div class="aa__autonomy" id="aa-autonomy">
+            <label class="aa__opt"><input type="radio" name="autonomy" value="1" /> <strong>L1</strong> · Fill safe fields. You submit.</label>
+            <label class="aa__opt"><input type="radio" name="autonomy" value="2" checked /> <strong>L2</strong> · Fill + auto-advance pages. Pause before submit. (Recommended)</label>
+            <label class="aa__opt"><input type="radio" name="autonomy" value="3" /> <strong>L3</strong> · Confirmed Auto-Submit. Submits one job at a time if all gates pass.</label>
+            <label class="aa__opt"><input type="radio" name="autonomy" value="4" /> <strong>L4</strong> · Batch Auto-Apply. Processes whole queue and submits eligible jobs. <em>Disabled defaults — read tradeoffs.</em></label>
+          </div>
+        </div>
+
+        <!-- Safety gates -->
+        <div>
+          <label class="aa__label">Safety gates (auto-submit thresholds)</label>
+          <div class="aa__gates">
+            <label>Fit ≥ <input type="number" min="0" max="100" data-setting="fitThreshold" value="60" /></label>
+            <label>Authenticity ≥ <input type="number" min="0" max="100" data-setting="authenticityThreshold" value="70" /></label>
+            <label>Quality ≥ <input type="number" min="0" max="100" data-setting="qualityThreshold" value="60" /></label>
+            <label>Daily cap <input type="number" min="1" max="200" data-setting="dailySubmitCap" value="20" /></label>
+            <label>Per-source cap <input type="number" min="1" max="50" data-setting="perSourceCap" value="8" /></label>
+          </div>
+
+          <label class="aa__label" style="margin-top: 12px;">ATS tiers allowed for auto-submit</label>
+          <div class="aa__tiers">
+            <label><input type="checkbox" data-setting="allowAutoSubmitTier1" checked /> Tier 1 (Ashby, Greenhouse, Lever)</label>
+            <label><input type="checkbox" data-setting="allowAutoSubmitTier2" /> Tier 2 (SmartRecruiters, LinkedIn Easy Apply)</label>
+            <label><input type="checkbox" data-setting="allowAutoSubmitTier3" /> Tier 3 (Workday, Generic) — <em>not recommended</em></label>
+          </div>
+
+          <label class="aa__label" style="margin-top: 12px;">
+            <input type="checkbox" data-setting="useDeepSeekForQuestions" checked />
+            Allow DeepSeek to interpret unknown form questions (server-side proxy, audit-logged)
+          </label>
+
+          <label class="aa__label aa__dry-run" style="margin-top: 10px;">
+            <input type="checkbox" data-setting="dryRun" checked />
+            <strong>Dry run</strong> — fill + advance + reach submit page, but <em>do not click submit</em>. Recommended for testing.
+          </label>
+        </div>
+      </div>
+
+      <!-- Job picker -->
+      <h3 class="aa__h3">Pick jobs <span class="muted" id="aa-job-meta"></span></h3>
+      <div class="aa__job-controls">
+        <button class="btn" id="aa-select-all">Select all Saved</button>
+        <button class="btn" id="aa-select-tier1">Select Tier 1 only</button>
+        <button class="btn" id="aa-clear">Clear</button>
+        <span class="muted" id="aa-summary"></span>
+      </div>
+      <div id="aa-job-list" class="aa__job-list"></div>
+
+      <div class="aa__setup-actions">
+        <button class="btn btn--primary" id="aa-start">Start session →</button>
+      </div>
+    </section>
+
+    <!-- Live attempts -->
+    <section class="card" id="aa-attempts-card" hidden>
+      <h2 class="aa__h2">Attempts <span class="muted" id="aa-attempts-count">0</span></h2>
+      <div id="aa-attempts" class="aa__attempts"></div>
+    </section>
+
+    <!-- Run log -->
+    <section class="card" id="aa-log-card" hidden>
+      <h2 class="aa__h2">Run log
+        <button class="btn micro-btn" id="aa-log-clear" style="float:right">Clear log</button>
+      </h2>
+      <div id="aa-log" class="aa__log"></div>
+    </section>
+
+    <!-- Autopilot health -->
+    <section class="card aa__health-card">
+      <h2 class="aa__h2">Autopilot health</h2>
+      <div class="aa__health-grid">
+        <div class="hcell" id="hc-ext"><span class="hdot"></span><span class="hlabel">Extension</span><span class="hval">checking…</span></div>
+        <div class="hcell" id="hc-vault"><span class="hdot"></span><span class="hlabel">Vault</span><span class="hval">—</span></div>
+        <div class="hcell" id="hc-resume"><span class="hdot"></span><span class="hlabel">Staged resume</span><span class="hval">—</span></div>
+        <div class="hcell" id="hc-llm"><span class="hdot"></span><span class="hlabel">DeepSeek proxy</span><span class="hval">—</span></div>
+        <div class="hcell" id="hc-autonomy"><span class="hdot"></span><span class="hlabel">Autonomy</span><span class="hval">—</span></div>
+        <div class="hcell" id="hc-last-fill"><span class="hdot"></span><span class="hlabel">Last fill</span><span class="hval">—</span></div>
+        <div class="hcell" id="hc-last-block"><span class="hdot"></span><span class="hlabel">Last blocker</span><span class="hval">—</span></div>
+        <div class="hcell" id="hc-review"><span class="hdot"></span><span class="hlabel">In review</span><span class="hval">—</span></div>
+      </div>
+    </section>
+
+    <!-- Reliability per ATS -->
+    <section class="card aa__reliability-card">
+      <h2 class="aa__h2">ATS reliability <span class="muted" style="font-size:11px;">(last 30 days)</span></h2>
+      <div id="aa-reliability" class="aa__reliability-grid"></div>
+    </section>
+
+    <!-- Extension status -->
+    <section class="card aa__ext-card" id="aa-ext-card">
+      <h2 class="aa__h2">Extension status</h2>
+      <p class="muted">
+        The agent needs the <a href="/extension">Qadan Apply Assist</a> extension installed and your vault imported.
+        Status below reflects whether the extension is currently talking to this page.
+      </p>
+      <div class="aa__ext-status">
+        <span class="aa__ext-dot" id="ext-dot"></span>
+        <span id="ext-text">Checking…</span>
+      </div>
+      <p class="muted aa__ext-help" id="ext-help" hidden>
+        Open the extension popup and check that your vault is imported. The agent will run on Ashby/Greenhouse/Lever
+        job pages automatically once a session is started.
+      </p>
+    </section>
+  </section>
+</Admin>
+
+<style>
+  .aa { display: flex; flex-direction: column; gap: 14px; }
+  .aa__h2 { font-family: var(--font-display); font-size: 22px; font-weight: 400; margin-bottom: 10px; }
+  .aa__h3 { font-family: var(--font-display); font-size: 18px; font-weight: 400; margin-top: 18px; margin-bottom: 8px; }
+  .muted { color: var(--c-text-subtle); font-size: 12px; }
+
+  .aa__active {
+    position: sticky; top: 0; z-index: 10;
+    background: var(--c-bg-elev);
+    border: 1px solid var(--c-accent);
+    border-radius: var(--r-md);
+    padding: 12px 16px;
+  }
+  .aa__active-head {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .aa__active-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--c-success);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  }
+  .aa__active-dot[data-status="paused"] { background: var(--c-accent); box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2); }
+  .aa__active-dot[data-status="stopped"], .aa__active-dot[data-status="finished"] { background: var(--c-text-subtle); box-shadow: none; }
+  .aa__active-counters {
+    display: flex; gap: 14px;
+    margin-left: auto;
+    flex-wrap: wrap;
+  }
+  .counter {
+    font-family: var(--font-mono); font-size: 11px; color: var(--c-text-muted);
+  }
+  .counter strong {
+    font-family: var(--font-display); font-size: 20px; line-height: 1;
+    color: var(--c-text); margin-right: 4px;
+  }
+  .aa__active-actions { display: flex; gap: 8px; }
+  .aa__current {
+    display: flex; align-items: center; gap: 10px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--c-border-subtle);
+    flex-wrap: wrap;
+  }
+  .aa__current-label {
+    font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--c-text-subtle);
+  }
+  .aa__current-actions { margin-left: auto; display: flex; gap: 8px; }
+
+  .aa__setup-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 10px;
+  }
+  @media (max-width: 720px) { .aa__setup-grid { grid-template-columns: 1fr; } }
+  .aa__label {
+    display: block;
+    font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--c-text-subtle);
+    margin-bottom: 6px;
+  }
+  .aa__autonomy { display: flex; flex-direction: column; gap: 6px; }
+  .aa__opt {
+    display: flex; align-items: flex-start; gap: 8px;
+    padding: 8px 12px;
+    background: var(--c-bg);
+    border: 1px solid var(--c-border-subtle);
+    border-radius: var(--r-md);
+    font-size: 12.5px;
+    line-height: 1.5;
+    cursor: pointer;
+  }
+  .aa__opt:has(input:checked) {
+    border-color: var(--c-accent);
+    background: var(--c-accent-dim);
+  }
+  .aa__opt input { margin-top: 3px; }
+  .aa__opt strong { color: var(--c-accent); margin-right: 4px; }
+  .aa__opt em { color: var(--c-text-subtle); font-style: normal; }
+
+  .aa__gates { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .aa__gates label {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--c-text-muted);
+    font-family: var(--font-mono);
+  }
+  .aa__gates input[type=number] { width: 64px; }
+  .aa__tiers { display: flex; flex-direction: column; gap: 4px; }
+  .aa__tiers label, .aa__label:has(input[type=checkbox]) {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--c-text-muted);
+    font-family: inherit;
+    text-transform: none; letter-spacing: 0;
+  }
+  .aa__tiers label em, .aa__label em { color: var(--c-text-subtle); font-style: normal; }
+
+  .aa__job-controls {
+    display: flex; gap: 8px; align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .aa__job-list {
+    max-height: 320px;
+    overflow-y: auto;
+    border: 1px solid var(--c-border-subtle);
+    border-radius: var(--r-md);
+  }
+  .aa__job-row {
+    display: grid;
+    grid-template-columns: 26px 1fr 90px 60px 50px;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--c-border-subtle);
+    font-size: 12px;
+    font-family: var(--font-mono);
+  }
+  .aa__job-row:last-child { border-bottom: none; }
+  .aa__job-row label { display: flex; align-items: center; }
+  .aa__job-row .role { color: var(--c-text-muted); font-size: 11px; }
+  .aa__job-row .company { color: var(--c-text); font-size: 13px; }
+  .aa__job-row .ats { color: var(--c-text-muted); }
+  .aa__job-row .ats-tier1 { color: var(--c-success); }
+  .aa__job-row .ats-tier2 { color: var(--c-accent); }
+  .aa__job-row .ats-tier3 { color: #FCA5A5; }
+
+  .aa__setup-actions { margin-top: 14px; display: flex; gap: 8px; }
+
+  .aa__attempts { display: flex; flex-direction: column; gap: 6px; }
+  .aa__attempt {
+    display: grid;
+    grid-template-columns: 1fr 80px 80px 90px 24px;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 12px;
+    background: var(--c-bg);
+    border: 1px solid var(--c-border-subtle);
+    border-radius: var(--r-sm);
+    font-family: var(--font-mono); font-size: 11px;
+  }
+  .aa__attempt.is-submitted { border-color: rgba(16, 185, 129, 0.4); }
+  .aa__attempt.is-running { border-color: var(--c-accent); }
+  .aa__attempt.is-needs-review { border-color: rgba(245, 158, 11, 0.5); }
+  .aa__attempt.is-blocked, .aa__attempt.is-failed, .aa__attempt.is-unsupported { border-color: rgba(248, 113, 113, 0.4); }
+  .aa__attempt .summary { color: var(--c-text); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .aa__attempt .status { color: var(--c-text-muted); }
+  .aa__attempt .ats { color: var(--c-text-subtle); }
+  .aa__attempt .reason { color: var(--c-accent); font-size: 10px; }
+
+  .aa__log {
+    max-height: 360px; overflow-y: auto;
+    font-family: var(--font-mono); font-size: 11px;
+    display: flex; flex-direction: column-reverse;
+    gap: 2px;
+  }
+  .log-row {
+    display: grid;
+    grid-template-columns: 80px 160px 1fr;
+    gap: 8px;
+    padding: 4px 8px;
+    border-bottom: 1px solid var(--c-border-subtle);
+  }
+  .log-row .time { color: var(--c-text-subtle); }
+  .log-row .kind { color: var(--c-accent); }
+  .log-row .msg { color: var(--c-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .aa__health-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 8px;
+  }
+  .hcell {
+    display: grid;
+    grid-template-columns: 12px 90px 1fr;
+    gap: 6px;
+    align-items: center;
+    padding: 8px 10px;
+    background: var(--c-bg);
+    border: 1px solid var(--c-border-subtle);
+    border-radius: var(--r-sm);
+    font-family: var(--font-mono); font-size: 11px;
+  }
+  .hcell .hdot { width: 8px; height: 8px; border-radius: 50%; background: var(--c-text-subtle); }
+  .hcell.is-ok .hdot { background: var(--c-success); }
+  .hcell.is-warn .hdot { background: var(--c-accent); }
+  .hcell.is-bad .hdot { background: #F87171; }
+  .hcell .hlabel { color: var(--c-text-subtle); letter-spacing: 0.04em; text-transform: uppercase; font-size: 9.5px; }
+  .hcell .hval { color: var(--c-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .aa__reliability-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 8px;
+  }
+  .rl-cell {
+    padding: 10px 12px;
+    background: var(--c-bg);
+    border: 1px solid var(--c-border-subtle);
+    border-radius: var(--r-md);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .rl-cell.is-reliable { border-color: rgba(16, 185, 129, 0.4); }
+  .rl-cell.is-needs-attention { border-color: rgba(245, 158, 11, 0.4); }
+  .rl-cell.is-unstable { border-color: rgba(248, 113, 113, 0.4); }
+  .rl-cell.is-no-data { opacity: 0.5; }
+  .rl-cell .rl-head { display: flex; align-items: baseline; justify-content: space-between; }
+  .rl-cell .rl-name { font-family: var(--font-display); font-size: 16px; }
+  .rl-cell .rl-tier { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .rl-cell .rl-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 12px;
+    font-family: var(--font-mono); font-size: 10.5px;
+    color: var(--c-text-muted);
+  }
+  .rl-cell .rl-stats strong { color: var(--c-text); }
+
+  .aa__dry-run input { margin-right: 6px; vertical-align: -2px; }
+  .aa__dry-run strong { color: var(--c-accent); }
+
+  .aa__ext-status { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--c-bg); border-radius: var(--r-md); }
+  .aa__ext-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c-text-subtle); }
+  .aa__ext-dot.is-connected { background: var(--c-success); box-shadow: 0 0 0 3px rgba(16,185,129,0.2); }
+  .aa__ext-dot.is-disconnected { background: var(--c-text-subtle); }
+  .aa__ext-help { margin-top: 8px; padding: 8px 12px; background: var(--c-bg); border-radius: var(--r-md); }
+
+  .micro-btn { padding: 3px 10px; font-size: 11px; }
+</style>
+
+<script>
+  import {
+    jobsStore,
+    packetsStore,
+    applySettingsStore,
+    sessionsStore,
+    attemptsStore,
+    agentLogStore,
+    ATS_TIER,
+    type Job,
+    type ApplySession,
+    type ApplyAttempt,
+    type AgentLogEntry,
+    type AutonomyLevel,
+    type ApplySessionSettings,
+    type AtsType,
+    ensureSchema,
+  } from '@/lib/storage';
+  import { detectAts, atsLabel } from '@/lib/ats/detect';
+  import { createSession, startSession, pauseSession, resumeSession, stopSession, timeSavedEstimate } from '@/lib/agent/session';
+  import { onDataChanged } from '@/lib/sync';
+
+  ensureSchema();
+
+  function $(sel: string): HTMLElement | null { return document.querySelector(sel); }
+  function $$<T extends Element>(sel: string): T[] { return Array.from(document.querySelectorAll(sel)) as T[]; }
+  function esc(s: string): string {
+    return s.replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]!));
+  }
+
+  let selectedJobIds = new Set<string>();
+  let activeSessionId: string | null = null;
+  let extConnected = false;
+
+  // ── Render: extension status ─────────────────────────────────────
+  function pingExtension() {
+    // Dispatch a custom event the extension's admin-bridge listens for.
+    // If the bridge isn't installed nothing happens (timeout via state).
+    window.postMessage({ source: 'qa-admin', kind: 'ping' }, '*');
+    setTimeout(() => {
+      // If we haven't received a pong within 600ms, assume disconnected.
+      if (!extConnected) renderExtState(false);
+    }, 700);
+  }
+  function renderExtState(connected: boolean) {
+    extConnected = connected;
+    const dot = document.getElementById('ext-dot')!;
+    const text = document.getElementById('ext-text')!;
+    const help = document.getElementById('ext-help')!;
+    dot.className = 'aa__ext-dot ' + (connected ? 'is-connected' : 'is-disconnected');
+    text.textContent = connected ? 'Extension connected.' : 'Extension not detected on this page.';
+    (help as HTMLElement).hidden = connected;
+  }
+  window.addEventListener('message', async (e) => {
+    if (e.source !== window) return;
+    const d = e.data as { source?: string; kind?: string; sessionId?: string; attemptUpdate?: any; entry?: any };
+    if (d?.source !== 'qa-ext') return;
+    if (d.kind === 'pong' || d.kind === 'bridge-ready') {
+      renderExtState(true);
+      return;
+    }
+    // Extension asked for snapshot of session + attempts + vault + packets
+    if (d.kind === 'agent.bridge.request-snapshot') {
+      const session = sessionsStore.get(d.sessionId!);
+      if (!session) return;
+      const attempts = attemptsStore.bySession(session.id);
+      const packets = attempts
+        .map(a => a.packetId ? packetsStore.get(a.packetId) : packetsStore.byJobId(a.jobId))
+        .filter(Boolean);
+      const { vaultStore } = await import('@/lib/storage');
+      const vault = vaultStore.get();
+      // Push snapshot back via the bridge (admin-bridge content script
+      // forwards messages with source qa-admin to the SW).
+      window.postMessage({
+        source: 'qa-admin',
+        kind: 'agent.session.snapshot.push',
+        session, attempts, packets, vault,
+      }, '*');
+      // Also tell SW directly via chrome.runtime if available — the bridge
+      // intercepts qa-admin messages we send, but a dedicated SW-bound
+      // snapshot avoids any race.
+      return;
+    }
+    // Live state updates from extension agent
+    if (d.kind === 'agent.bridge.state-update' && d.attemptUpdate) {
+      const a = attemptsStore.get(d.attemptUpdate.id);
+      if (a) {
+        Object.assign(a, d.attemptUpdate);
+        // If status flipped to submitted, also record outcome + bump job
+        if (d.attemptUpdate.status === 'submitted') {
+          const { recordOutcome } = await import('@/lib/insights/outcomes');
+          const job = jobsStore.get(a.jobId);
+          if (job && !job.dateApplied) {
+            const updated = { ...job, status: 'Applied' as const, dateApplied: Date.now(), followUpDate: job.followUpDate ?? Date.now() + 7 * 86400_000, updatedAt: Date.now() };
+            jobsStore.upsert(updated);
+            recordOutcome(job.id, 'applied', { packetId: a.packetId });
+          }
+        }
+        attemptsStore.upsert(a);
+      }
+      renderAttempts();
+      return;
+    }
+    if (d.kind === 'agent.bridge.log' && d.entry) {
+      agentLogStore.append(d.entry);
+      renderLog();
+      renderActive();
+      return;
+    }
+    if (d.kind === 'agent.bridge.interpret-question') {
+      // Agent runner asked us to interpret a question. Run the interpreter
+      // and post back via the bridge.
+      try {
+        const attempt = attemptsStore.get(d['attemptId']);
+        if (!attempt) {
+          window.postMessage({ source: 'qa-admin', kind: 'agent.bridge.question-result', requestId: d['requestId'], ok: false }, '*');
+          return;
+        }
+        const job = jobsStore.get(attempt.jobId);
+        const packet = attempt.packetId ? packetsStore.get(attempt.packetId) : packetsStore.byJobId(attempt.jobId);
+        if (!job || !packet) {
+          window.postMessage({ source: 'qa-admin', kind: 'agent.bridge.question-result', requestId: d['requestId'], ok: false }, '*');
+          return;
+        }
+        const { interpretQuestion } = await import('@/lib/agent/question-interpreter');
+        const { vaultStore } = await import('@/lib/storage');
+        const v = vaultStore.get();
+        const session = sessionsStore.get(attempt.sessionId);
+        const useLlm = session?.settings?.useDeepSeekForQuestions !== false;
+        const interpretation = await interpretQuestion(d['questionText'] as string, packet, job, v, { useLlm });
+        // Persist the question + draft to the attempt for review queue visibility
+        if (interpretation.needsHuman) {
+          attempt.unknownQuestions = [...new Set([...(attempt.unknownQuestions ?? []), d['questionText'] as string])];
+          attemptsStore.upsert(attempt);
+        }
+        window.postMessage({
+          source: 'qa-admin',
+          kind: 'agent.bridge.question-result',
+          requestId: d['requestId'],
+          ok: true,
+          interpretation,
+        }, '*');
+      } catch (err) {
+        window.postMessage({
+          source: 'qa-admin',
+          kind: 'agent.bridge.question-result',
+          requestId: d['requestId'],
+          ok: false,
+        }, '*');
+      }
+      return;
+    }
+  });
+
+  // ── Render: job picker ───────────────────────────────────────────
+  function renderJobList() {
+    const jobs = jobsStore.list().filter(j => j.status === 'Saved' || j.status === 'Applying');
+    const list = document.getElementById('aa-job-list')!;
+    const meta = document.getElementById('aa-job-meta')!;
+    meta.textContent = `(${jobs.length} saved · ${selectedJobIds.size} selected)`;
+    if (jobs.length === 0) {
+      list.innerHTML = '<div style="padding:16px;color:var(--c-text-subtle);font-size:13px;">No saved jobs. Add jobs from /jobs/new or /discovery.</div>';
+      renderSummary();
+      return;
+    }
+    list.innerHTML = jobs.map(j => {
+      const checked = selectedJobIds.has(j.id) ? 'checked' : '';
+      const packet = packetsStore.byJobId(j.id);
+      const ats = packet?.atsType ?? detectAts(j.url, j.jdText);
+      const tier = ATS_TIER[ats];
+      const fit = packet?.scores.fit ?? j.fitScore ?? 0;
+      const status = packet?.status ?? '—';
+      return `<div class="aa__job-row">
+        <label><input type="checkbox" data-jid="${esc(j.id)}" ${checked} /></label>
+        <div>
+          <div class="company">${esc(j.company ?? '')}</div>
+          <div class="role">${esc(j.role ?? '')}</div>
+        </div>
+        <span class="ats ats-tier${tier}">${esc(atsLabel(ats))}</span>
+        <span class="fit">fit ${fit}</span>
+        <span class="status">${esc(status)}</span>
+      </div>`;
+    }).join('');
+
+    list.querySelectorAll<HTMLInputElement>('input[type=checkbox]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const id = cb.dataset.jid!;
+        if (cb.checked) selectedJobIds.add(id); else selectedJobIds.delete(id);
+        renderSummary();
+        meta.textContent = `(${jobs.length} saved · ${selectedJobIds.size} selected)`;
+      });
+    });
+    renderSummary();
+  }
+
+  function renderSummary() {
+    const el = document.getElementById('aa-summary')!;
+    if (selectedJobIds.size === 0) {
+      el.textContent = '0 selected';
+      return;
+    }
+    const counts = { 1: 0, 2: 0, 3: 0 };
+    for (const id of selectedJobIds) {
+      const j = jobsStore.get(id);
+      if (!j) continue;
+      const packet = packetsStore.byJobId(id);
+      const ats = packet?.atsType ?? detectAts(j.url, j.jdText);
+      counts[ATS_TIER[ats] as 1 | 2 | 3] += 1;
+    }
+    el.textContent = `${selectedJobIds.size} selected — Tier 1: ${counts[1]}, Tier 2: ${counts[2]}, Tier 3: ${counts[3]}`;
+  }
+
+  document.getElementById('aa-select-all')?.addEventListener('click', () => {
+    for (const j of jobsStore.list()) {
+      if (j.status === 'Saved' || j.status === 'Applying') selectedJobIds.add(j.id);
+    }
+    renderJobList();
+  });
+  document.getElementById('aa-select-tier1')?.addEventListener('click', () => {
+    selectedJobIds.clear();
+    for (const j of jobsStore.list()) {
+      if (j.status !== 'Saved' && j.status !== 'Applying') continue;
+      const packet = packetsStore.byJobId(j.id);
+      const ats = packet?.atsType ?? detectAts(j.url, j.jdText);
+      if (ATS_TIER[ats] === 1) selectedJobIds.add(j.id);
+    }
+    renderJobList();
+  });
+  document.getElementById('aa-clear')?.addEventListener('click', () => {
+    selectedJobIds.clear();
+    renderJobList();
+  });
+
+  // ── Start session ────────────────────────────────────────────────
+  document.getElementById('aa-start')?.addEventListener('click', () => {
+    if (selectedJobIds.size === 0) {
+      alert('Pick at least one job.');
+      return;
+    }
+    const autonomy = Number((document.querySelector('input[name=autonomy]:checked') as HTMLInputElement)?.value ?? '2') as AutonomyLevel;
+    const settings: Partial<ApplySessionSettings> = { autonomyLevel: autonomy };
+    $$<HTMLInputElement>('[data-setting]').forEach(input => {
+      const key = input.dataset.setting!;
+      let val: any;
+      if (input.type === 'checkbox') val = input.checked;
+      else if (input.type === 'number') val = Number(input.value);
+      else val = input.value;
+      (settings as any)[key] = val;
+    });
+
+    if (autonomy >= 4) {
+      const ok = confirm(
+        'Level 4: Batch Auto-Apply will process the entire queue and AUTO-SUBMIT jobs that pass all safety gates. ' +
+        'No per-job confirmation. Continue?'
+      );
+      if (!ok) return;
+    } else if (autonomy >= 3) {
+      const ok = confirm(
+        'Level 3: Confirmed Auto-Submit will submit jobs one at a time, ONLY when all safety gates pass. ' +
+        'You can stop the session any time. Continue?'
+      );
+      if (!ok) return;
+    }
+
+    const session = createSession({ jobIds: [...selectedJobIds], settingsOverride: settings });
+    startSession(session.id);
+    activeSessionId = session.id;
+    selectedJobIds.clear();
+    renderJobList();
+    renderActive();
+    renderAttempts();
+    renderLog();
+    // Notify extension to begin
+    window.postMessage({ source: 'qa-admin', kind: 'session-start', sessionId: session.id }, '*');
+  });
+
+  // ── Render: active session ───────────────────────────────────────
+  function renderActive() {
+    const active = sessionsStore.active() ?? (activeSessionId ? sessionsStore.get(activeSessionId) ?? undefined : undefined);
+    const bar = document.getElementById('aa-active') as HTMLDivElement;
+    const setup = document.getElementById('aa-setup') as HTMLDivElement;
+    const attemptsCard = document.getElementById('aa-attempts-card') as HTMLDivElement;
+    const logCard = document.getElementById('aa-log-card') as HTMLDivElement;
+    if (!active || active.status === 'finished' || active.status === 'stopped') {
+      bar.hidden = true;
+      setup.hidden = false;
+      attemptsCard.hidden = !activeSessionId;  // Keep attempts visible after finish
+      logCard.hidden = !activeSessionId;
+      activeSessionId = active?.id ?? null;
+      return;
+    }
+    activeSessionId = active.id;
+    bar.hidden = false;
+    setup.hidden = true;
+    attemptsCard.hidden = false;
+    logCard.hidden = false;
+
+    const dot = bar.querySelector('[data-status]') as HTMLElement;
+    dot.dataset.status = active.status;
+    const summary = bar.querySelector('[data-active-summary]') as HTMLElement;
+    summary.textContent = `Session ${active.id.slice(0, 8)} · ${active.status} · ${active.jobIds.length} jobs · L${active.settings.autonomyLevel}`;
+    (bar.querySelector('[data-c-submitted]') as HTMLElement).textContent = String(active.submittedCount);
+    (bar.querySelector('[data-c-review]') as HTMLElement).textContent = String(active.reviewCount);
+    (bar.querySelector('[data-c-blocked]') as HTMLElement).textContent = String(active.blockedCount);
+    (bar.querySelector('[data-c-failed]') as HTMLElement).textContent = String(active.failedCount);
+    (bar.querySelector('[data-c-skipped]') as HTMLElement).textContent = String(active.skippedCount);
+    const saved = timeSavedEstimate(active);
+    (bar.querySelector('[data-c-time]') as HTMLElement).textContent = saved.minutes < 60 ? `${saved.minutes}m` : `${saved.hours}h`;
+
+    // Current job
+    const currentJob = active.currentJobId ? jobsStore.get(active.currentJobId) : undefined;
+    (bar.querySelector('[data-current-job]') as HTMLElement).textContent =
+      currentJob ? `${currentJob.company} · ${currentJob.role}` : 'idle — waiting for extension';
+    const openA = document.getElementById('aa-open-current') as HTMLAnchorElement;
+    const editA = document.getElementById('aa-edit-packet') as HTMLAnchorElement;
+    if (currentJob) {
+      if (currentJob.url) { openA.href = currentJob.url; openA.style.opacity = '1'; openA.style.pointerEvents = 'auto'; }
+      else { openA.removeAttribute('href'); openA.style.opacity = '0.5'; openA.style.pointerEvents = 'none'; }
+      editA.href = `/packet?jobId=${encodeURIComponent(currentJob.id)}`;
+      editA.style.opacity = '1';
+      editA.style.pointerEvents = 'auto';
+    } else {
+      openA.removeAttribute('href');
+      openA.style.opacity = '0.5'; openA.style.pointerEvents = 'none';
+      editA.removeAttribute('href');
+      editA.style.opacity = '0.5'; editA.style.pointerEvents = 'none';
+    }
+
+    (bar.querySelector('[data-action="pause"]') as HTMLButtonElement).hidden = active.status !== 'running';
+    (bar.querySelector('[data-action="resume"]') as HTMLButtonElement).hidden = active.status !== 'paused';
+  }
+
+  document.querySelector('[data-action="pause"]')?.addEventListener('click', () => {
+    if (!activeSessionId) return;
+    pauseSession(activeSessionId);
+    renderActive();
+    window.postMessage({ source: 'qa-admin', kind: 'session-pause', sessionId: activeSessionId }, '*');
+  });
+  document.querySelector('[data-action="resume"]')?.addEventListener('click', () => {
+    if (!activeSessionId) return;
+    resumeSession(activeSessionId);
+    renderActive();
+    window.postMessage({ source: 'qa-admin', kind: 'session-resume', sessionId: activeSessionId }, '*');
+  });
+  document.querySelector('[data-action="stop"]')?.addEventListener('click', () => {
+    if (!activeSessionId) return;
+    if (!confirm('Stop this session? Any in-flight attempts will be marked skipped.')) return;
+    stopSession(activeSessionId);
+    renderActive();
+    window.postMessage({ source: 'qa-admin', kind: 'session-stop', sessionId: activeSessionId }, '*');
+  });
+
+  // ── Attempts list ────────────────────────────────────────────────
+  function renderAttempts() {
+    if (!activeSessionId) return;
+    const attempts = attemptsStore.bySession(activeSessionId).sort((a, b) => a.startedAt - b.startedAt);
+    const el = document.getElementById('aa-attempts')!;
+    const count = document.getElementById('aa-attempts-count')!;
+    count.textContent = `(${attempts.length})`;
+    if (attempts.length === 0) {
+      el.innerHTML = '<div class="muted" style="padding:10px;">No attempts yet.</div>';
+      return;
+    }
+    el.innerHTML = attempts.map(renderAttempt).join('');
+  }
+  function renderAttempt(a: ApplyAttempt): string {
+    const job = jobsStore.get(a.jobId);
+    const cls = `aa__attempt is-${a.status}`;
+    const summary = job ? `${esc(job.company ?? '')} · ${esc(job.role ?? '')}` : '(unknown job)';
+    const reason = a.blockReason ? esc(a.blockReason) : '';
+    return `<div class="${cls}" data-aid="${esc(a.id)}">
+      <span class="summary">${summary}</span>
+      <span class="ats">${esc(atsLabel(a.atsType))}</span>
+      <span class="status">${esc(a.status)}</span>
+      <span class="reason">${reason}</span>
+      <a href="/packet?jobId=${esc(a.jobId)}" title="Open packet">→</a>
+    </div>`;
+  }
+
+  // ── Run log ──────────────────────────────────────────────────────
+  function renderLog() {
+    if (!activeSessionId) return;
+    const log = agentLogStore.forSession(activeSessionId).slice(-100);
+    const el = document.getElementById('aa-log')!;
+    if (log.length === 0) {
+      el.innerHTML = '<div class="muted" style="padding:10px;">No events yet.</div>';
+      return;
+    }
+    el.innerHTML = log.map(entryRow).join('');
+  }
+  function entryRow(e: AgentLogEntry): string {
+    const time = new Date(e.at).toLocaleTimeString();
+    return `<div class="log-row">
+      <span class="time">${esc(time)}</span>
+      <span class="kind">${esc(e.kind)}</span>
+      <span class="msg" title="${esc(e.message)}">${esc(e.message)}</span>
+    </div>`;
+  }
+  window.addEventListener('qa-agent-log', () => { renderAttempts(); renderLog(); renderActive(); });
+  document.getElementById('aa-log-clear')?.addEventListener('click', () => {
+    if (!confirm('Clear the run log?')) return;
+    agentLogStore.clear();
+    renderLog();
+  });
+
+  // Cross-tab sync refresh
+  onDataChanged(() => {
+    renderActive();
+    renderAttempts();
+    renderLog();
+    renderHealth();
+    renderReliability();
+  });
+
+  // ── Autopilot health ────────────────────────────────────────────
+  async function renderHealth() {
+    const { vaultStore, attemptsStore, applySettingsStore } = await import('@/lib/storage');
+    const vault = vaultStore.get();
+    const settings = applySettingsStore.get();
+    const session = sessionsStore.active() ?? (activeSessionId ? sessionsStore.get(activeSessionId) : undefined);
+
+    const setHc = (id: string, tier: 'ok' | 'warn' | 'bad' | 'none', val: string) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.remove('is-ok', 'is-warn', 'is-bad');
+      if (tier === 'ok') el.classList.add('is-ok');
+      else if (tier === 'warn') el.classList.add('is-warn');
+      else if (tier === 'bad') el.classList.add('is-bad');
+      const v = el.querySelector('.hval') as HTMLElement | null;
+      if (v) v.textContent = val;
+    };
+
+    setHc('hc-ext', extConnected ? 'ok' : 'bad', extConnected ? 'connected' : 'not detected');
+
+    const vaultRequired = ['displayName', 'email', 'city'];
+    const vaultMissing = vaultRequired.filter(k => !(vault as any)[k]?.trim?.());
+    setHc('hc-vault', vaultMissing.length ? 'warn' : 'ok',
+      vaultMissing.length ? `missing: ${vaultMissing.join(', ')}` : 'complete');
+
+    // Resume staged — ask SW via the bridge ping pattern. Best-effort.
+    let resumeStaged: string | null = null;
+    try {
+      // No direct page→storage access; admin can't ask without the bridge.
+      // Surface a hint: we know it's staged if a recent log entry mentioned it.
+      const last = agentLogStore.list().slice(-50).reverse().find(e => /Resume uploaded|Staged/i.test(e.message || ''));
+      if (last) resumeStaged = last.message;
+    } catch { /* ignore */ }
+    setHc('hc-resume', resumeStaged ? 'ok' : 'warn',
+      resumeStaged ? 'staged' : 'pick PDF in extension popup');
+
+    // DeepSeek health
+    let llmOk = false;
+    try {
+      const res = await fetch('/api/draft', { method: 'GET' });
+      if (res.ok) {
+        const body = await res.json() as { configured?: boolean };
+        llmOk = !!body?.configured;
+      }
+    } catch { llmOk = false; }
+    setHc('hc-llm', llmOk ? 'ok' : 'warn', llmOk ? 'live (DeepSeek)' : 'disabled — heuristic only');
+
+    setHc('hc-autonomy', 'ok', session ? `L${session.settings.autonomyLevel}${session.settings.dryRun ? ' · dry-run' : ''}` : 'no session');
+
+    // Last fill
+    const lastFill = [...agentLogStore.list()].reverse().find(e => e.kind === 'attempt-fields-filled');
+    setHc('hc-last-fill', lastFill ? 'ok' : 'none', lastFill ? lastFill.message : 'never');
+
+    // Last blocker
+    const lastBlock = [...agentLogStore.list()].reverse().find(e => e.kind === 'attempt-paused' || e.kind === 'attempt-blocked' || e.kind === 'attempt-failed');
+    setHc('hc-last-block', lastBlock ? 'warn' : 'ok', lastBlock ? lastBlock.message.slice(0, 60) : 'none');
+
+    // In review
+    const review = attemptsStore.needsReview().length;
+    setHc('hc-review', review > 0 ? 'warn' : 'ok', `${review} attempts`);
+  }
+
+  async function renderReliability() {
+    const { reliabilityAll } = await import('@/lib/agent/reliability');
+    const rows = reliabilityAll();
+    const el = document.getElementById('aa-reliability');
+    if (!el) return;
+    el.innerHTML = rows.map(r => `<div class="rl-cell is-${r.tier}">
+      <div class="rl-head">
+        <span class="rl-name">${r.label}</span>
+        <span class="rl-tier">${r.tier === 'no-data' ? 'no data' : r.tier}</span>
+      </div>
+      <div class="rl-stats">
+        <span>Attempts <strong>${r.total}</strong></span>
+        <span>Submit-ready <strong>${r.submitReadyRate}%</strong></span>
+        <span>Fill rate <strong>${r.fillSuccessRate}%</strong></span>
+        <span>Upload <strong>${r.uploadSuccessRate}%</strong></span>
+        <span>Textarea <strong>${r.textareaSuccessRate}%</strong></span>
+        <span>Unknown <strong>${r.unknownFieldRate}%</strong></span>
+      </div>
+    </div>`).join('');
+  }
+
+  // Boot
+  const initial = sessionsStore.active();
+  if (initial) activeSessionId = initial.id;
+  renderJobList();
+  renderActive();
+  renderAttempts();
+  renderLog();
+  renderHealth();
+  renderReliability();
+  pingExtension();
+</script>

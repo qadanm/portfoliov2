@@ -1,0 +1,66 @@
+{
+  "manifest_version": 3,
+  "name": "Qadan Apply Assist",
+  "short_name": "Apply Assist",
+  "version": "0.2.0",
+  "description": "Autonomous job-application agent for the Qadan admin cockpit. Fills, auto-advances, and (with explicit confirmation) auto-submits on supported ATS platforms. Never bypasses CAPTCHA or login. Never autofills demographics.",
+  "permissions": ["storage", "activeTab", "scripting", "tabs", "webNavigation"],
+  "minimum_chrome_version": "102",
+  "host_permissions": [
+    "http://localhost:4322/*",
+    "http://127.0.0.1:4322/*",
+    "https://admin.qadan.co/*",
+    "*://boards.greenhouse.io/*",
+    "*://job-boards.greenhouse.io/*",
+    "*://*.greenhouse.io/*",
+    "*://jobs.lever.co/*",
+    "*://hire.lever.co/*",
+    "*://*.ashbyhq.com/*",
+    "*://*.myworkdayjobs.com/*",
+    "*://*.smartrecruiters.com/*",
+    "*://www.linkedin.com/jobs/*"
+  ],
+  "background": { "service_worker": "background.js" },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://localhost:4322/*",
+        "http://127.0.0.1:4322/*",
+        "https://admin.qadan.co/*"
+      ],
+      "js": ["admin-bridge.js"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "*://boards.greenhouse.io/*",
+        "*://job-boards.greenhouse.io/*",
+        "*://*.greenhouse.io/*",
+        "*://jobs.lever.co/*",
+        "*://hire.lever.co/*",
+        "*://*.ashbyhq.com/*",
+        "*://*.myworkdayjobs.com/*",
+        "*://*.smartrecruiters.com/*",
+        "*://www.linkedin.com/jobs/*"
+      ],
+      "js": ["red-flags.js", "ats-adapters.js", "agent-runner.js", "content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Qadan Apply Assist"
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "externally_connectable": {
+    "matches": [
+      "http://localhost:4322/*",
+      "http://127.0.0.1:4322/*",
+      "https://admin.qadan.co/*"
+    ]
+  }
+}

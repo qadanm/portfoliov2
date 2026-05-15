@@ -27,6 +27,30 @@ import Admin from '@/layouts/Admin.astro';
   </section>
 
   <section style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px;">
+    <a class="card link-card link-card--accent" href="/auto-apply">
+      <h3>⚡ Auto Apply (agent)</h3>
+      <p>Autonomous agent. Pick jobs, choose L1–L4 autonomy, watch the extension fill + advance + submit (when gates pass). Pauses for CAPTCHA / login / unknown questions.</p>
+    </a>
+    <a class="card link-card" href="/packet/session">
+      <h3>▶ Apply Session (manual)</h3>
+      <p>Guided keyboard-driven copy/paste over today's queue. Use when you want full manual control of every submit.</p>
+    </a>
+    <a class="card link-card link-card--accent" href="/vault">
+      <h3>◆ Profile Vault</h3>
+      <p>Reusable identity, links, work-auth answers, salary target, bios. Powers the packet builder and the browser extension. Lives locally; syncs through cloud.</p>
+    </a>
+    <a class="card link-card" href="/playbooks">
+      <h3>⊞ ATS playbooks</h3>
+      <p>Greenhouse, Lever, Ashby, Workday, SmartRecruiters, LinkedIn Easy Apply. Friction, prep, safe autofill, what stays manual.</p>
+    </a>
+    <a class="card link-card" href="/insights">
+      <h3>↗ Insights</h3>
+      <p>Conversion by angle, source, ATS. Funnel. Companies that ghosted. Anti-spam check.</p>
+    </a>
+    <a class="card link-card" href="/extension">
+      <h3>⊕ Browser extension</h3>
+      <p>Manifest V3 Chrome extension. Fills name/email/phone/links on Greenhouse, Lever, Ashby forms after you click Fill. Never auto-submits.</p>
+    </a>
     <a class="card link-card" href="/jobs">
       <h3>Job tracker</h3>
       <p>Kanban + table views, search, filters, full schema.</p>
@@ -111,6 +135,8 @@ import Admin from '@/layouts/Admin.astro';
   .link-card:hover { border-color: var(--c-accent); }
   .link-card h3 { font-family: var(--font-display); font-weight: 400; font-size: 20px; margin-bottom: 6px; letter-spacing: -0.01em; }
   .link-card p { font-size: 13px; color: var(--c-text-muted); line-height: 1.5; }
+  .link-card--accent { border-color: var(--c-accent); background: var(--c-accent-dim); }
+  .link-card--accent h3 { color: var(--c-accent); }
   .funnel { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
   .funnel-step {
     display: inline-flex; align-items: center; gap: 6px;

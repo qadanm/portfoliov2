@@ -1,0 +1,189 @@
+---
+import Admin from '@/layouts/Admin.astro';
+---
+
+<Admin
+  title="Needs Review"
+  intro="Attempts the agent could not finish autonomously. Open the page, resolve the issue, then retry or mark applied."
+>
+  <section class="review">
+    <div class="review__filters" id="review-filters">
+      <button class="btn" data-filter="all">All</button>
+      <button class="btn" data-filter="needs-review">Needs review</button>
+      <button class="btn" data-filter="paused">Paused</button>
+      <button class="btn" data-filter="blocked">Blocked</button>
+    </div>
+    <div id="review-list" class="review__list"></div>
+  </section>
+</Admin>
+
+<style>
+  .review { display: flex; flex-direction: column; gap: 14px; }
+  .review__filters { display: flex; gap: 6px; flex-wrap: wrap; }
+  .review__list { display: flex; flex-direction: column; gap: 10px; }
+  .review__item {
+    background: var(--c-bg-elev);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    padding: 14px 18px;
+  }
+  .review__item.is-paused { border-color: rgba(245, 158, 11, 0.4); }
+  .review__item.is-blocked { border-color: rgba(248, 113, 113, 0.4); }
+  .review__head {
+    display: flex; align-items: baseline; gap: 10px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .review__co { font-family: var(--font-display); font-size: 18px; font-weight: 400; }
+  .review__role { font-family: var(--font-mono); font-size: 11px; color: var(--c-text-muted); }
+  .review__chips { display: flex; gap: 4px; flex-wrap: wrap; margin-left: auto; }
+  .chip {
+    display: inline-flex; align-items: center;
+    font-family: var(--font-mono); font-size: 10px;
+    padding: 2px 8px; border-radius: var(--r-full);
+    background: var(--c-bg-muted); color: var(--c-text-muted);
+    border: 1px solid var(--c-border-subtle);
+  }
+  .review__body { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px; }
+  @media (max-width: 720px) { .review__body { grid-template-columns: 1fr; } }
+  .review__why {
+    padding: 10px 12px;
+    background: var(--c-bg);
+    border-radius: var(--r-md);
+    font-size: 13px;
+    color: var(--c-text-muted);
+  }
+  .review__why strong { color: var(--c-accent); }
+  .review__actions {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .review__last-step {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--c-text-subtle);
+    margin-top: 6px;
+  }
+  .review__empty { padding: 40px; text-align: center; color: var(--c-text-subtle); font-size: 13px; }
+</style>
+
+<script>
+  import {
+    attemptsStore,
+    jobsStore,
+    packetsStore,
+    sessionsStore,
+    type ApplyAttempt,
+    ensureSchema,
+  } from '@/lib/storage';
+  import { atsLabel } from '@/lib/ats/detect';
+  import { explainBlock } from '@/lib/agent/gates';
+  import { updateAttemptStatus } from '@/lib/agent/session';
+  import { markApplied } from '@/lib/insights/outcomes';
+  import { onDataChanged } from '@/lib/sync';
+
+  ensureSchema();
+
+  let filter: 'all' | 'needs-review' | 'paused' | 'blocked' = 'all';
+  function $(sel: string): HTMLElement | null { return document.querySelector(sel); }
+  function esc(s: string): string {
+    return s.replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]!));
+  }
+
+  function attemptsInScope(): ApplyAttempt[] {
+    const all = attemptsStore.list();
+    const inScope = all.filter(a =>
+      a.status === 'needs-review' || a.status === 'paused' || a.status === 'blocked'
+    );
+    if (filter === 'all') return inScope;
+    return inScope.filter(a => a.status === filter);
+  }
+
+  function render() {
+    const list = $('#review-list')!;
+    const items = attemptsInScope().sort((a, b) => b.updatedAt - a.updatedAt);
+    if (items.length === 0) {
+      list.innerHTML = `<div class="review__empty">No attempts need review. Run a session at <a href="/auto-apply" style="color:var(--c-accent);text-decoration:underline;text-decoration-color:var(--c-border);">/auto-apply</a>.</div>`;
+      return;
+    }
+    list.innerHTML = items.map(renderItem).join('');
+    list.querySelectorAll<HTMLElement>('[data-act]').forEach(el => {
+      el.addEventListener('click', () => onAction(el));
+    });
+  }
+
+  function renderItem(a: ApplyAttempt): string {
+    const job = jobsStore.get(a.jobId);
+    const packet = a.packetId ? packetsStore.get(a.packetId) : packetsStore.byJobId(a.jobId);
+    const session = sessionsStore.get(a.sessionId);
+    const lastStep = a.steps[a.steps.length - 1];
+    return `<article class="review__item is-${esc(a.status)}" data-aid="${esc(a.id)}">
+      <div class="review__head">
+        <span class="review__co">${esc(job?.company ?? 'unknown')}</span>
+        <span class="review__role">${esc(job?.role ?? '')}</span>
+        <div class="review__chips">
+          <span class="chip">${esc(atsLabel(a.atsType))}</span>
+          <span class="chip">tier ${a.atsTier}</span>
+          <span class="chip">L${a.autonomyLevel}</span>
+          <span class="chip">${esc(a.status)}</span>
+        </div>
+      </div>
+      <div class="review__body">
+        <div class="review__why">
+          <strong>${esc(a.blockReason ?? 'unknown')}</strong> · ${esc(explainBlock(a.blockReason))}
+          ${a.blockNote ? `<div style="margin-top:4px;">${esc(a.blockNote)}</div>` : ''}
+          ${packet ? `<div style="margin-top:8px;font-family:var(--font-mono);font-size:11px;">scores: fit ${packet.scores.fit} · auth ${packet.scores.authenticity} · qual ${packet.scores.quality}</div>` : ''}
+        </div>
+        <div>
+          ${a.unknownQuestions.length > 0 ? `<div style="margin-bottom:6px;"><strong>Unknown questions:</strong><ul style="padding-left:18px;font-size:12px;color:var(--c-text-muted);">${a.unknownQuestions.slice(0,4).map(q => `<li>${esc(q)}</li>`).join('')}</ul></div>` : ''}
+          ${a.reviewFields.length > 0 ? `<div style="margin-bottom:6px;"><strong>Fields needing review:</strong> <span style="font-family:var(--font-mono);font-size:11px;color:var(--c-text-muted);">${esc(a.reviewFields.slice(0,8).join(', '))}</span></div>` : ''}
+          ${a.currentUrl ? `<div style="font-family:var(--font-mono);font-size:11px;color:var(--c-text-subtle);">at ${esc(a.currentUrl)}</div>` : ''}
+        </div>
+      </div>
+      <div class="review__last-step">${lastStep ? `last: ${esc(lastStep.kind)} · ${esc(lastStep.message)}` : ''}</div>
+      <div class="review__actions">
+        ${job?.url ? `<a class="btn" href="${esc(job.url)}" target="_blank" rel="noopener">Open listing</a>` : ''}
+        <a class="btn" href="/packet?jobId=${esc(a.jobId)}">Open packet</a>
+        <button class="btn" data-act="retry">Retry</button>
+        <button class="btn" data-act="markApplied">Mark applied (manual)</button>
+        <button class="btn" data-act="skip">Skip</button>
+      </div>
+    </article>`;
+  }
+
+  function onAction(el: HTMLElement) {
+    const card = el.closest('.review__item') as HTMLElement | null;
+    if (!card) return;
+    const aid = card.dataset.aid!;
+    const act = el.dataset.act!;
+    const a = attemptsStore.get(aid);
+    if (!a) return;
+    if (act === 'retry') {
+      updateAttemptStatus(aid, 'queued', { blockReason: undefined, blockNote: undefined });
+      // Notify extension to re-pick this attempt
+      window.postMessage({ source: 'qa-admin', kind: 'attempt-retry', sessionId: a.sessionId, attemptId: aid }, '*');
+      render();
+    } else if (act === 'markApplied') {
+      const job = jobsStore.get(a.jobId);
+      if (!job) return;
+      const packet = a.packetId ? packetsStore.get(a.packetId) : packetsStore.byJobId(a.jobId);
+      markApplied(job, packet);
+      updateAttemptStatus(aid, 'submitted', {});
+      render();
+    } else if (act === 'skip') {
+      updateAttemptStatus(aid, 'skipped', {});
+      render();
+    }
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('[data-filter]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      filter = btn.dataset.filter as typeof filter;
+      document.querySelectorAll<HTMLButtonElement>('[data-filter]').forEach(b => b.classList.toggle('btn--primary', b === btn));
+      render();
+    });
+  });
+  document.querySelector<HTMLButtonElement>('[data-filter="all"]')?.classList.add('btn--primary');
+
+  onDataChanged(render);
+  render();
+</script>

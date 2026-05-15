@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=380, initial-scale=1" />
+  <title>Qadan Apply Assist</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header class="bar">
+    <div class="brand">Qadan<span>.</span> Apply Assist</div>
+    <button id="tab-vault" class="tab is-active">Fill</button>
+    <button id="tab-agent" class="tab">Agent</button>
+    <button id="tab-import" class="tab">Vault</button>
+  </header>
+
+  <!-- FILL TAB -->
+  <section id="pane-fill" class="pane">
+    <div class="status" id="page-status">
+      <span id="ats-label">Detecting…</span>
+      <span class="muted" id="url-host"></span>
+    </div>
+
+    <button class="btn btn--primary" id="detect-btn">Detect fields on this page</button>
+
+    <div id="detect-summary" class="summary" hidden></div>
+    <div id="field-list" class="fields"></div>
+
+    <div class="actions" id="fill-actions" hidden>
+      <button class="btn" id="fill-btn">Fill safe fields</button>
+      <label class="checkbox">
+        <input type="checkbox" id="allow-sensitive" />
+        Include sensitive (work auth, salary)
+      </label>
+    </div>
+
+    <p class="footnote">
+      Never autofills demographic, EEOC, or "Never autofill" fields.
+      Submit is always manual — even if M3 is enabled, the extension never clicks Submit without per-request confirmation.
+    </p>
+  </section>
+
+  <!-- AGENT TAB -->
+  <section id="pane-agent" class="pane" hidden>
+    <h3>Agent status</h3>
+    <div class="status">
+      <span id="agent-status-line">No active session.</span>
+    </div>
+    <div id="agent-attempt-box" hidden style="margin-top:8px;">
+      <div class="summary">
+        <div class="is-high"><strong id="agent-filled">0</strong><span class="lbl">Filled</span></div>
+        <div class="is-medium"><strong id="agent-review">0</strong><span class="lbl">Review</span></div>
+        <div class="is-low"><strong id="agent-unk">0</strong><span class="lbl">Unknown</span></div>
+        <div class="is-never"><strong id="agent-never">0</strong><span class="lbl">Never</span></div>
+      </div>
+      <div class="actions" style="margin-top:8px;">
+        <button class="btn" id="agent-run-now">Run agent on this page</button>
+      </div>
+    </div>
+
+    <hr style="margin: 14px 0; border: 0; border-top: 1px solid var(--border-subtle);" />
+    <h3>Session resume (PDF)</h3>
+    <p class="muted">Pick a PDF once. The agent uploads it to resume slots on supported ATS forms.
+      Cleared when you close Chrome.</p>
+    <div class="actions">
+      <label class="btn">
+        <input id="resume-file" type="file" accept="application/pdf" style="display:none" />
+        Pick resume PDF
+      </label>
+      <button class="btn" id="clear-resume">Clear</button>
+    </div>
+    <div id="resume-status" class="status muted" style="margin-top:8px;">No resume staged.</div>
+
+    <p class="footnote">
+      The agent only runs when a session has assigned this tab to an attempt. From the admin,
+      open <code>/auto-apply</code>, start a session, then open the listing in a new tab.
+    </p>
+  </section>
+
+  <!-- VAULT TAB -->
+  <section id="pane-import" class="pane" hidden>
+    <h3>Import vault</h3>
+    <p class="muted">Paste the JSON blob from <code>/vault → Export for extension</code>.</p>
+    <textarea id="import-text" rows="8" placeholder='{"version":1,"vault":{...}}'></textarea>
+    <div class="actions">
+      <button class="btn btn--primary" id="import-btn">Save vault</button>
+      <button class="btn" id="clear-vault">Clear stored vault</button>
+    </div>
+    <div id="vault-status" class="status muted" style="margin-top: 8px;"></div>
+  </section>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+---
+import Admin from '@/layouts/Admin.astro';
+---
+
+<Admin
+  title="Browser extension"
+  intro="Qadan Apply Assist — a Manifest V3 Chrome extension that fills standard fields on ATS forms after you click Fill. Never auto-submits unless M3 Confirmed-Submit Assist is explicitly enabled."
+>
+  <section class="ext">
+    <article class="card">
+      <h2>What it does</h2>
+      <ul>
+        <li>Detects fields on Greenhouse, Lever, Ashby, Workday, SmartRecruiters, and LinkedIn Easy Apply forms</li>
+        <li>Shows a preview of which fields it can autofill (high / medium / never confidence)</li>
+        <li>Fills only after you click <strong>Fill safe fields</strong></li>
+        <li><strong>Never</strong> fills demographic, EEOC, work-auth-by-default, or salary fields</li>
+        <li><strong>Never</strong> clicks submit unless M3 is enabled in Vault and you type <code>SUBMIT</code> per-application</li>
+      </ul>
+    </article>
+
+    <article class="card">
+      <h2>Install (developer mode)</h2>
+      <ol>
+        <li>Clone or download the <code>portfoliov2/extension</code> directory</li>
+        <li>Open <code>chrome://extensions</code> in Chrome</li>
+        <li>Toggle <strong>Developer mode</strong> (top right)</li>
+        <li>Click <strong>Load unpacked</strong> and pick the <code>extension</code> directory</li>
+        <li>Pin the extension to your toolbar</li>
+      </ol>
+    </article>
+
+    <article class="card">
+      <h2>Connect your vault</h2>
+      <ol>
+        <li>Visit <a href="/vault">/vault</a> and fill the Profile Vault sections</li>
+        <li>Click <strong>Export for extension</strong> and copy the JSON blob</li>
+        <li>Click the extension icon → <strong>Import vault</strong> → paste the blob</li>
+        <li>The extension now has your standard fields stored locally in <code>chrome.storage.local</code></li>
+      </ol>
+      <p class="muted">The extension never reads admin pages automatically. The export/import is an explicit handoff so you control exactly what crosses the boundary.</p>
+    </article>
+
+    <article class="card">
+      <h2>Daily use</h2>
+      <ol>
+        <li>From <a href="/today">/today</a>, click <strong>Start Apply Session</strong></li>
+        <li>The session opens the listing in a new tab; you click the extension icon there</li>
+        <li>Click <strong>Detect fields</strong> → review the preview</li>
+        <li>Click <strong>Fill safe fields</strong> → all <code>high</code>-confidence fields populate; filled cells get a yellow outline so you can see what changed</li>
+        <li>Manually fill the rest (open prompts, cover letter, demographics if you choose)</li>
+        <li>Click <strong>Submit</strong> in the ATS — the extension does NOT submit for you</li>
+        <li>Back in /packet/session, click <strong>Mark applied</strong></li>
+      </ol>
+    </article>
+
+    <article class="card warning-card">
+      <h2>What it will not do</h2>
+      <ul>
+        <li>Auto-submit any application (unless M3 is enabled AND you confirm per-job by typing SUBMIT)</li>
+        <li>Fill race, gender, ethnicity, disability, veteran, age, dateOfBirth, SSN, pronouns, religion fields — ever</li>
+        <li>Auto-answer work authorization or sponsorship questions unless you explicitly enabled "Allow extension to autofill work-auth answers" in Vault</li>
+        <li>Read the admin pages (no auto-scraping)</li>
+        <li>Solve CAPTCHAs</li>
+        <li>Create accounts on your behalf</li>
+        <li>Bypass any anti-bot protection</li>
+      </ul>
+    </article>
+  </section>
+</Admin>
+
+<style>
+  .ext { display: flex; flex-direction: column; gap: 14px; }
+  .ext h2 { font-family: var(--font-display); font-size: 22px; font-weight: 400; margin-bottom: 10px; }
+  .ext ol, .ext ul { padding-left: 22px; color: var(--c-text-muted); font-size: 13px; line-height: 1.7; }
+  .ext code {
+    font-family: var(--font-mono); font-size: 11px;
+    background: var(--c-bg); padding: 1px 5px; border-radius: 3px;
+  }
+  .ext a {
+    color: var(--c-accent);
+    border-bottom: 1px solid var(--c-border);
+  }
+  .muted { color: var(--c-text-subtle); font-size: 12px; margin-top: 8px; }
+  .warning-card { border-color: rgba(248, 113, 113, 0.4); }
+  .warning-card h2 { color: #FCA5A5; }
+</style>

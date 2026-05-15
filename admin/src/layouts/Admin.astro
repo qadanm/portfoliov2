@@ -36,6 +36,18 @@ function isActive(href: string) {
       <nav id="admin-nav" class="admin__nav" aria-label="Admin navigation" data-nav>
         <a href="/" class:list={{ 'is-active': isActive('/') }}>Dashboard</a>
         <a href="/today" class:list={['admin__nav-primary', { 'is-active': isActive('/today') }]}>→ Today</a>
+        <a href="/auto-apply" class:list={['admin__nav-primary', { 'is-active': isActive('/auto-apply') }]}>⚡ Auto Apply (agent)</a>
+        <a href="/packet/session" class:list={['admin__nav-primary', { 'is-active': isActive('/packet/session') }]}>▶ Apply Session (manual)</a>
+
+        <h4>Agent</h4>
+        <a href="/review" class:list={{ 'is-active': isActive('/review') }}>⚠ Needs review</a>
+        <a href="/test-matrix" class:list={{ 'is-active': isActive('/test-matrix') }}>✕ Test matrix</a>
+
+        <h4>Application cockpit</h4>
+        <a href="/vault" class:list={{ 'is-active': isActive('/vault') }}>◆ Profile Vault</a>
+        <a href="/playbooks" class:list={{ 'is-active': isActive('/playbooks') }}>⊞ ATS playbooks</a>
+        <a href="/insights" class:list={{ 'is-active': isActive('/insights') }}>↗ Insights</a>
+        <a href="/extension" class:list={{ 'is-active': isActive('/extension') }}>⊕ Browser extension</a>
 
         <h4>Workflow</h4>
         <a href="/discovery" class:list={{ 'is-active': isActive('/discovery') }}>⌕ Discovery</a>

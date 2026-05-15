@@ -13,14 +13,19 @@ import Admin from '@/layouts/Admin.astro';
         <strong id="today-queue-count">0</strong>
         <span class="today__count-label">in queue</span>
       </div>
+      <div class="today__queue-stat">
+        <strong id="today-avg-auth">—</strong>
+        <span class="today__count-label">avg authenticity</span>
+      </div>
+      <a class="btn btn--primary" id="today-session-btn" href="/packet/session">Start Apply Session →</a>
       <div class="today__hints" aria-label="keyboard shortcuts">
         <kbd>j</kbd><kbd>k</kbd> navigate
         <span class="today__hint-sep">·</span>
+        <kbd>p</kbd> packet
+        <span class="today__hint-sep">·</span>
+        <kbd>S</kbd> session
+        <span class="today__hint-sep">·</span>
         <kbd>r</kbd> resume PDF
-        <span class="today__hint-sep">·</span>
-        <kbd>l</kbd> letter PDF
-        <span class="today__hint-sep">·</span>
-        <kbd>b</kbd> both PDFs
         <span class="today__hint-sep">·</span>
         <kbd>space</kbd> open
         <span class="today__hint-sep">·</span>
@@ -31,6 +36,9 @@ import Admin from '@/layouts/Admin.astro';
         <kbd>d</kbd> defer
       </div>
     </header>
+
+    <!-- Daily guardrail banner (only shows when triggered) -->
+    <div id="today-guardrail" class="today__guardrail" hidden></div>
 
     <div class="today__split">
       <ol class="today__queue" id="today-queue" aria-label="application queue"></ol>
@@ -62,6 +70,19 @@ import Admin from '@/layouts/Admin.astro';
     border-radius: var(--r-md);
     background: var(--c-bg-elev);
     flex-wrap: wrap;
+  }
+  .today__guardrail {
+    padding: 10px 14px;
+    border: 1px solid rgba(248, 113, 113, 0.4);
+    border-radius: var(--r-md);
+    background: var(--c-bg-elev);
+    font-size: 12px;
+    color: #FCA5A5;
+    line-height: 1.5;
+  }
+  .today__guardrail.is-warn {
+    border-color: rgba(245, 158, 11, 0.4);
+    color: var(--c-accent);
   }
   .today__count, .today__queue-stat {
     display: inline-flex;
@@ -188,6 +209,20 @@ import Admin from '@/layouts/Admin.astro';
     white-space: nowrap;
   }
   .today__queue :global(.today__pill--p1) { color: var(--c-accent); border-color: var(--c-accent); }
+  .today__queue :global(.today__dot) {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--c-text-subtle);
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+  .today__queue :global(.today__dot--none) { background: var(--c-border); }
+  .today__queue :global(.today__dot--draft) { background: var(--c-accent); }
+  .today__queue :global(.today__dot--ready) { background: var(--c-success); }
+  .today__queue :global(.today__dot--submitted) { background: var(--c-success); opacity: 0.5; }
+  .today__queue :global(.today__dot--ghost-medium) { background: var(--c-accent); margin-left: 2px; }
+  .today__queue :global(.today__dot--ghost-high) { background: #F87171; margin-left: 2px; }
   .today__queue :global(.today__score) {
     font-family: var(--font-display);
     font-size: 18px;
@@ -429,9 +464,17 @@ import Admin from '@/layouts/Admin.astro';
 </style>
 
 <script>
-  import { jobsStore, type Job, type JobStatus } from '@/lib/storage';
+  import { jobsStore, packetsStore, applySettingsStore, type Job, type JobStatus } from '@/lib/storage';
   import { angleById } from '@/data/angles';
   import { openForPrint, openBothForPrint } from '@/lib/pdf-download';
+  import { detectGhostRisk } from '@/lib/packet/ghost-detect';
+  import { appliedToday as appliedTodayCount, avgAuthenticityToday } from '@/lib/insights/correlator';
+
+  function packetStatusLabel(jobId: string): string {
+    const p = packetsStore.byJobId(jobId);
+    if (!p) return 'Build packet';
+    return `Packet · ${p.status}`;
+  }
 
   // ── State ────────────────────────────────────────────────────────────
   type State = {
@@ -493,8 +536,38 @@ import Admin from '@/layouts/Admin.astro';
 
   // ── Render ───────────────────────────────────────────────────────────
   function renderHeader() {
-    appliedEl.textContent = String(appliedToday());
+    appliedEl.textContent = String(appliedTodayCount());
     queueCountEl.textContent = String(state.queue.length);
+
+    const authEl = document.getElementById('today-avg-auth');
+    if (authEl) {
+      const a = avgAuthenticityToday();
+      authEl.textContent = a > 0 ? String(a) : '—';
+    }
+
+    // Daily guardrail banner
+    const settings = applySettingsStore.get();
+    const today = appliedTodayCount();
+    const auth = avgAuthenticityToday();
+    const guardEl = document.getElementById('today-guardrail') as HTMLDivElement;
+    if (guardEl) {
+      let msg = '';
+      let mood: 'warn' | 'danger' = 'warn';
+      if (today >= settings.dailyVolumeWarnAt && auth > 0 && auth < settings.authenticityThreshold) {
+        msg = `⚠ ${today} applied today with avg authenticity ${auth}/${settings.authenticityThreshold}. Pause and review packets before continuing.`;
+        mood = 'danger';
+      } else if (today >= settings.dailyVolumeWarnAt) {
+        msg = `Volume today: ${today}. Tailor each remaining application before sending.`;
+        mood = 'warn';
+      }
+      if (msg) {
+        guardEl.textContent = msg;
+        guardEl.hidden = false;
+        guardEl.classList.toggle('is-warn', mood === 'warn');
+      } else {
+        guardEl.hidden = true;
+      }
+    }
   }
 
   function escape(s: string): string {
@@ -513,11 +586,20 @@ import Admin from '@/layouts/Admin.astro';
       const pri = j.priority ? `<span class="today__pill ${j.priority === 1 ? 'today__pill--p1' : ''}">P${j.priority}</span>` : '';
       const role = j.role ?? '';
       const co = j.company ?? '(no company)';
+      // Packet status indicator + ghost dot
+      const packet = packetsStore.byJobId(j.id);
+      const packetDot = packet
+        ? `<span class="today__dot today__dot--${packet.status}" title="Packet: ${packet.status}"></span>`
+        : `<span class="today__dot today__dot--none" title="No packet built"></span>`;
+      const ghost = detectGhostRisk(j, state.queue);
+      const ghostDot = ghost.risk !== 'low'
+        ? `<span class="today__dot today__dot--ghost-${ghost.risk}" title="Ghost risk: ${ghost.risk}"></span>`
+        : '';
       return `
         <li class="today__row ${sel} ${def}" data-idx="${i}">
           <span class="today__rank">${i + 1}</span>
           <div class="today__row-main">
-            <span class="today__row-co">${escape(co)}</span>
+            <span class="today__row-co">${escape(co)} ${packetDot}${ghostDot}</span>
             <span class="today__row-role">${escape(role)}</span>
           </div>
           ${pri}
@@ -636,6 +718,8 @@ import Admin from '@/layouts/Admin.astro';
       ${editHtml}
 
       <div class="detail__actions">
+        <a class="detail__action" href="/packet?jobId=${escape(job.id)}"><span>${packetStatusLabel(job.id)}</span><kbd>p</kbd></a>
+        <a class="detail__action detail__action--primary" href="/packet/session?jobId=${escape(job.id)}"><span>Start guided apply →</span><kbd>S</kbd></a>
         <button class="detail__action" data-act="resume-pdf" type="button"><span>Resume PDF <span class="hint">↓</span></span><kbd>r</kbd></button>
         <button class="detail__action" data-act="letter-pdf" type="button"><span>Cover letter PDF <span class="hint">↓</span></span><kbd>l</kbd></button>
         <button class="detail__action detail__action--wide" data-act="both-pdf" type="button"><span>Download both PDFs <span class="hint">↓↓</span></span><kbd>b</kbd></button>
@@ -790,13 +874,30 @@ import Admin from '@/layouts/Admin.astro';
   function moveToStatus(status: JobStatus) {
     const job = state.queue[state.selectedIdx];
     if (!job) return;
+    const followUp = job.followUpDate ?? (status === 'Applied' ? Date.now() + 7 * 86400_000 : undefined);
     const updated: Job = {
       ...job,
       status,
-      ...(status === 'Applied' ? { dateApplied: Date.now() } : {}),
+      ...(status === 'Applied' ? { dateApplied: Date.now(), followUpDate: followUp } : {}),
       updatedAt: Date.now(),
     };
     jobsStore.upsert(updated);
+
+    // Record outcome when transitioning to Applied (deduped: only if no
+    // existing 'applied' outcome for this job).
+    if (status === 'Applied') {
+      // Defer-import outcomes helper to avoid SSR issues
+      import('@/lib/insights/outcomes').then(({ recordOutcome }) => {
+        import('@/lib/storage').then(({ outcomesStore, packetsStore }) => {
+          const already = outcomesStore.byJobId(job.id).some(o => o.kind === 'applied');
+          if (!already) {
+            const packet = packetsStore.byJobId(job.id);
+            recordOutcome(job.id, 'applied', { packetId: packet?.id });
+          }
+        });
+      });
+    }
+
     const prevIdx = state.selectedIdx;
     loadQueue();
     state.selectedIdx = Math.min(prevIdx, state.queue.length - 1);
@@ -917,6 +1018,16 @@ import Admin from '@/layouts/Admin.astro';
         e.preventDefault(); toggleDefer(); break;
       case 'e':
         e.preventDefault(); startEdit(); break;
+      case 'p': {
+        const job = state.queue[state.selectedIdx];
+        if (job) window.location.href = `/packet?jobId=${encodeURIComponent(job.id)}`;
+        break;
+      }
+      case 'S': {
+        const job = state.queue[state.selectedIdx];
+        if (job) window.location.href = `/packet/session?jobId=${encodeURIComponent(job.id)}`;
+        break;
+      }
     }
   });
 

@@ -1,0 +1,439 @@
+---
+import Admin from '@/layouts/Admin.astro';
+---
+
+<Admin
+  title="Profile Vault"
+  intro="Reusable answers + identity for the application form-fill assistant and packet drafts. Lives in your browser, syncs via the cloud, never sent to the LLM proxy unless you click Refine."
+>
+  <section class="vault">
+    <!-- Status row -->
+    <div class="vault__status" id="vault-status">
+      <span data-status-dot></span>
+      <span data-status-text>Loading vault…</span>
+      <button type="button" class="btn" id="vault-export-btn" disabled>Export for extension</button>
+    </div>
+
+    <!-- Section: Identity -->
+    <details class="vault__section" open>
+      <summary><h2>Identity</h2></summary>
+      <div class="vault__grid">
+        <label>Display name<input type="text" data-vault="displayName" placeholder="Moe Qadan" /></label>
+        <label>Preferred name<input type="text" data-vault="preferredName" placeholder="Moe" /></label>
+        <label>Pronouns (optional)<input type="text" data-vault="pronouns" placeholder="he/him" /></label>
+        <label>Legal first name (optional)<input type="text" data-vault="legalFirstName" /></label>
+        <label>Legal last name (optional)<input type="text" data-vault="legalLastName" /></label>
+        <label>Email<input type="email" data-vault="email" placeholder="moe@qadan.co" /></label>
+        <label>Phone<input type="tel" data-vault="phone" placeholder="(555) 123-4567" /></label>
+        <label>City<input type="text" data-vault="city" /></label>
+        <label>State<input type="text" data-vault="state" /></label>
+        <label>Country<input type="text" data-vault="country" /></label>
+      </div>
+    </details>
+
+    <!-- Section: Work arrangement -->
+    <details class="vault__section" open>
+      <summary><h2>Work arrangement</h2></summary>
+      <div class="vault__grid">
+        <label class="checkbox">
+          <input type="checkbox" data-vault="remoteOnly" />
+          <span>Remote only</span>
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" data-vault="willingToRelocate" />
+          <span>Willing to relocate</span>
+        </label>
+        <label>Current title<input type="text" data-vault="currentTitle" /></label>
+        <label>Current employer<input type="text" data-vault="currentEmployer" /></label>
+        <label>Years of experience<input type="number" min="0" max="50" data-vault="yearsExperience" /></label>
+      </div>
+    </details>
+
+    <!-- Section: Links -->
+    <details class="vault__section" open>
+      <summary><h2>Links</h2></summary>
+      <div class="vault__grid">
+        <label>Portfolio<input type="url" data-vault="portfolio" /></label>
+        <label>LinkedIn<input type="url" data-vault="linkedin" /></label>
+        <label>GitHub<input type="url" data-vault="github" /></label>
+        <label>Personal site (optional)<input type="url" data-vault="personalSite" /></label>
+      </div>
+    </details>
+
+    <!-- Section: Work auth (sensitive) -->
+    <details class="vault__section">
+      <summary><h2>Work authorization</h2></summary>
+      <p class="muted">These answers are stored locally so you can copy them. Autofill is OFF by default — flip the toggle only if your answer is constant across applications.</p>
+      <div class="vault__grid">
+        <label>Work auth answer<textarea rows="2" data-vault="workAuthAnswer" placeholder="e.g., Yes, I'm a US citizen and authorized to work without sponsorship."></textarea></label>
+        <label>Sponsorship answer<textarea rows="2" data-vault="sponsorshipAnswer" placeholder="e.g., I do not require sponsorship now or in the future."></textarea></label>
+        <label class="checkbox">
+          <input type="checkbox" data-vault="workAuthAutofillAllowed" />
+          <span>Allow extension to autofill work-auth answers (medium confidence)</span>
+        </label>
+      </div>
+    </details>
+
+    <!-- Section: Salary -->
+    <details class="vault__section">
+      <summary><h2>Salary target</h2></summary>
+      <div class="vault__grid">
+        <label>Min ($)<input type="number" min="0" max="2000000" step="1000" data-vault="salaryMin" placeholder="110000" /></label>
+        <label>Max ($)<input type="number" min="0" max="2000000" step="1000" data-vault="salaryMax" placeholder="160000" /></label>
+        <label>Currency<input type="text" data-vault="currency" placeholder="USD" /></label>
+        <label class="checkbox">
+          <input type="checkbox" data-vault="salaryNegotiable" />
+          <span>Negotiable based on scope/package</span>
+        </label>
+      </div>
+    </details>
+
+    <!-- Section: Reusable text -->
+    <details class="vault__section">
+      <summary><h2>Reusable text</h2></summary>
+      <p class="muted">Used by the packet builder. Drafts fall back to a generic template when these are empty.</p>
+      <div class="vault__stack">
+        <label>Short bio (1-2 sentences)<textarea rows="2" data-vault="shortBio"></textarea></label>
+        <label>Long bio (~150 words)<textarea rows="5" data-vault="longBio"></textarea></label>
+        <label>"Tell me about yourself" (90-140 words)<textarea rows="5" data-vault="tellMeAboutYourself"></textarea></label>
+        <label>"Why are you looking?"<textarea rows="3" data-vault="whyLooking"></textarea></label>
+        <label>"Why this role" template (use <code>{'{role}'}</code>, <code>{'{company}'}</code>, <code>{'{themes}'}</code>)<textarea rows="3" data-vault="whyThisRoleTemplate"></textarea></label>
+        <label>"Why this company" template (use <code>{'{company}'}</code>)<textarea rows="3" data-vault="whyThisCompanyTemplate"></textarea></label>
+        <label>AI workflow explanation<textarea rows="3" data-vault="aiWorkflowExplanation"></textarea></label>
+        <label>Design workflow explanation<textarea rows="3" data-vault="designWorkflowExplanation"></textarea></label>
+      </div>
+    </details>
+
+    <!-- Section: Apply settings -->
+    <details class="vault__section">
+      <summary><h2>Apply settings</h2></summary>
+      <div class="vault__grid">
+        <label class="checkbox">
+          <input type="checkbox" data-settings="defaultLlmRefinementEnabled" />
+          <span>Use AI refinement by default when building packets</span>
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" data-settings="confirmedSubmitAssistEnabled" />
+          <span><strong>M3 — Confirmed Submit Assist</strong> (extension may click submit only with per-job confirmation)</span>
+        </label>
+        <label>Daily volume warning threshold<input type="number" min="5" max="200" step="1" data-settings="dailyVolumeWarnAt" /></label>
+        <label>Authenticity threshold (0-100)<input type="number" min="0" max="100" step="1" data-settings="authenticityThreshold" /></label>
+      </div>
+    </details>
+
+    <!-- LLM audit log peek -->
+    <details class="vault__section">
+      <summary><h2>LLM audit log <span class="muted" id="audit-count"></span></h2></summary>
+      <p class="muted">Every call to the DeepSeek proxy is recorded here. Click an entry to see exactly which fields were sent.</p>
+      <div id="audit-log" class="audit-log"></div>
+      <button class="btn" id="clear-audit">Clear audit log</button>
+    </details>
+
+    <!-- Export panel for extension -->
+    <div class="vault__export-card" id="export-card" hidden>
+      <h3>Export blob for browser extension</h3>
+      <p class="muted">Copy this JSON into the Qadan Apply Assist extension's "Import vault" field. The extension stores it locally and uses it to fill standard fields on application forms.</p>
+      <textarea readonly rows="8" id="export-blob"></textarea>
+      <div class="vault__export-actions">
+        <button class="btn" id="copy-blob">Copy to clipboard</button>
+        <button class="btn" id="close-export">Close</button>
+      </div>
+    </div>
+
+    <div id="toast" class="vault__toast" aria-live="polite"></div>
+  </section>
+</Admin>
+
+<style>
+  .vault { display: flex; flex-direction: column; gap: 14px; max-width: 880px; }
+  .vault__status {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    background: var(--c-bg-elev);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--c-text-muted);
+  }
+  .vault__status [data-status-dot] {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--c-text-subtle);
+  }
+  .vault__status [data-status-dot].is-set { background: var(--c-success); }
+  .vault__status [data-status-dot].is-empty { background: var(--c-accent); }
+  .vault__status button { margin-left: auto; }
+
+  .vault__section {
+    background: var(--c-bg-elev);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    padding: 14px 18px;
+  }
+  .vault__section summary { cursor: pointer; list-style: none; }
+  .vault__section summary::-webkit-details-marker { display: none; }
+  .vault__section summary h2 {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+  .vault__section summary::after {
+    content: ' ▾';
+    color: var(--c-text-subtle);
+    font-size: 11px;
+    margin-left: 6px;
+  }
+  .vault__section:not([open]) summary::after { content: ' ▸'; }
+
+  .vault__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  @media (max-width: 720px) {
+    .vault__grid { grid-template-columns: 1fr; }
+  }
+  .vault__stack { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+
+  .vault label {
+    display: flex; flex-direction: column; gap: 4px;
+    font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    color: var(--c-text-subtle);
+  }
+  .vault label.checkbox {
+    flex-direction: row; align-items: center; gap: 8px;
+    text-transform: none; letter-spacing: 0;
+    font-family: var(--font-body); font-size: 13px;
+    color: var(--c-text);
+  }
+  .vault label.checkbox input { width: 16px; height: 16px; }
+  .vault label code {
+    font-family: var(--font-mono); font-size: 10px;
+    background: var(--c-bg); padding: 1px 4px; border-radius: 3px;
+  }
+
+  .muted { color: var(--c-text-subtle); font-size: 12px; margin: 6px 0; }
+
+  .audit-log {
+    display: flex; flex-direction: column; gap: 4px;
+    margin-top: 10px;
+    max-height: 280px; overflow-y: auto;
+    font-family: var(--font-mono); font-size: 11px;
+  }
+  .audit-row {
+    padding: 6px 10px;
+    background: var(--c-bg);
+    border: 1px solid var(--c-border-subtle);
+    border-radius: var(--r-sm);
+    display: grid;
+    grid-template-columns: 80px 1fr 80px 90px;
+    gap: 8px;
+    align-items: center;
+  }
+  .audit-row span:nth-child(1) { color: var(--c-text-subtle); }
+  .audit-row span:nth-child(3) { color: var(--c-accent); }
+  .audit-row.is-disabled span:nth-child(3) { color: var(--c-text-subtle); }
+  .audit-row.is-error span:nth-child(3) { color: #F87171; }
+
+  .vault__export-card {
+    margin-top: 12px;
+    padding: 16px;
+    background: var(--c-bg-elev);
+    border: 1px dashed var(--c-accent);
+    border-radius: var(--r-md);
+  }
+  .vault__export-card textarea {
+    font-family: var(--font-mono); font-size: 11px;
+    margin-top: 10px;
+  }
+  .vault__export-actions { display: flex; gap: 8px; margin-top: 10px; }
+
+  .vault__toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 14px;
+    background: var(--c-text);
+    color: var(--c-bg);
+    border-radius: var(--r-full);
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 200ms;
+    pointer-events: none;
+    z-index: 100;
+  }
+  .vault__toast.is-visible { opacity: 1; }
+</style>
+
+<script>
+  import {
+    vaultStore,
+    applySettingsStore,
+    llmAuditStore,
+    ensureSchema,
+    type ProfileVault,
+    type ApplySettings,
+    type LlmAuditEntry,
+  } from '@/lib/storage';
+
+  ensureSchema();
+  let vault: ProfileVault = vaultStore.get();
+  let settings: ApplySettings = applySettingsStore.get();
+
+  function $(sel: string): Element | null { return document.querySelector(sel); }
+  function $$<T extends Element>(sel: string): T[] { return Array.from(document.querySelectorAll(sel)) as T[]; }
+
+  function toast(msg: string) {
+    const el = document.getElementById('toast')!;
+    el.textContent = msg;
+    el.classList.add('is-visible');
+    setTimeout(() => el.classList.remove('is-visible'), 1800);
+  }
+
+  // Load → form
+  function applyVaultToForm() {
+    $$<HTMLInputElement | HTMLTextAreaElement>('[data-vault]').forEach(el => {
+      const key = (el as HTMLElement).dataset.vault!;
+      const val = (vault as any)[key];
+      if (val == null) {
+        if ((el as HTMLInputElement).type === 'checkbox') (el as HTMLInputElement).checked = false;
+        else el.value = '';
+        return;
+      }
+      if ((el as HTMLInputElement).type === 'checkbox') {
+        (el as HTMLInputElement).checked = Boolean(val);
+      } else {
+        el.value = String(val);
+      }
+    });
+    $$<HTMLInputElement>('[data-settings]').forEach(el => {
+      const key = el.dataset.settings!;
+      const val = (settings as any)[key];
+      if (val == null) return;
+      if (el.type === 'checkbox') el.checked = Boolean(val);
+      else el.value = String(val);
+    });
+  }
+
+  // Form → state on change
+  function bindVaultInputs() {
+    $$<HTMLInputElement | HTMLTextAreaElement>('[data-vault]').forEach(el => {
+      el.addEventListener('change', () => {
+        const key = (el as HTMLElement).dataset.vault!;
+        let val: any;
+        const input = el as HTMLInputElement;
+        if (input.type === 'checkbox') val = input.checked;
+        else if (input.type === 'number') val = el.value === '' ? undefined : Number(el.value);
+        else val = el.value;
+        (vault as any)[key] = val;
+        vaultStore.save(vault);
+        renderStatus();
+      });
+    });
+    $$<HTMLInputElement>('[data-settings]').forEach(el => {
+      el.addEventListener('change', () => {
+        const key = el.dataset.settings!;
+        let val: any;
+        if (el.type === 'checkbox') val = el.checked;
+        else if (el.type === 'number') val = el.value === '' ? undefined : Number(el.value);
+        else val = el.value;
+        (settings as any)[key] = val;
+        applySettingsStore.save(settings);
+      });
+    });
+  }
+
+  // Status row
+  function renderStatus() {
+    const dot = $('[data-status-dot]')!;
+    const text = $('[data-status-text]')!;
+    const btn = document.getElementById('vault-export-btn') as HTMLButtonElement;
+    const required = ['displayName', 'email', 'city'];
+    const missing = required.filter(k => !(vault as any)[k] || String((vault as any)[k]).trim() === '');
+    if (missing.length > 0) {
+      dot.className = 'is-empty';
+      text.textContent = `Missing: ${missing.join(', ')}`;
+      btn.disabled = true;
+    } else {
+      dot.className = 'is-set';
+      const last = vault.updatedAt ? new Date(vault.updatedAt).toLocaleString() : 'never saved';
+      text.textContent = `Saved ${last}`;
+      btn.disabled = false;
+    }
+  }
+
+  // Export blob
+  function renderExportCard() {
+    const card = document.getElementById('export-card') as HTMLDivElement;
+    const blob = document.getElementById('export-blob') as HTMLTextAreaElement;
+    const payload = {
+      version: 1,
+      exportedAt: Date.now(),
+      vault: { ...vault },
+      // Don't include audit log or settings — extension only needs vault.
+    };
+    blob.value = JSON.stringify(payload, null, 2);
+    card.hidden = false;
+  }
+  document.getElementById('vault-export-btn')?.addEventListener('click', renderExportCard);
+  document.getElementById('close-export')?.addEventListener('click', () => {
+    document.getElementById('export-card')!.hidden = true;
+  });
+  document.getElementById('copy-blob')?.addEventListener('click', async () => {
+    const blob = document.getElementById('export-blob') as HTMLTextAreaElement;
+    try {
+      await navigator.clipboard.writeText(blob.value);
+      toast('Copied — paste into extension');
+    } catch {
+      blob.select();
+      document.execCommand('copy');
+      toast('Copied');
+    }
+  });
+
+  // Audit log
+  function renderAuditLog() {
+    const log = llmAuditStore.list();
+    const container = document.getElementById('audit-log')!;
+    const count = document.getElementById('audit-count')!;
+    count.textContent = log.length ? `(${log.length} entries)` : '(empty)';
+    if (log.length === 0) {
+      container.innerHTML = '<p class="muted">No LLM calls recorded yet. Build a packet to see entries here.</p>';
+      return;
+    }
+    container.innerHTML = log.slice(-50).reverse().map(esc).join('');
+
+    function esc(e: LlmAuditEntry): string {
+      const date = new Date(e.at).toLocaleTimeString();
+      const sent = e.dataSentFields.join(',');
+      const stat = e.status;
+      const cls = stat === 'disabled' ? 'is-disabled' : stat === 'error' ? 'is-error' : '';
+      return `<div class="audit-row ${cls}" title="Sent fields: ${escapeHtml(sent)}">
+        <span>${escapeHtml(date)}</span>
+        <span>${escapeHtml(e.task)} · ${e.contextChars}ch</span>
+        <span>${escapeHtml(stat)}</span>
+        <span>${e.modelUsed ? escapeHtml(e.modelUsed.slice(0, 14)) : '—'}</span>
+      </div>`;
+    }
+  }
+  function escapeHtml(s: string): string {
+    return s.replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]!));
+  }
+  document.getElementById('clear-audit')?.addEventListener('click', () => {
+    if (!confirm('Clear all LLM audit entries?')) return;
+    llmAuditStore.clear();
+    renderAuditLog();
+    toast('Audit log cleared');
+  });
+
+  // Boot
+  applyVaultToForm();
+  bindVaultInputs();
+  renderStatus();
+  renderAuditLog();
+</script>

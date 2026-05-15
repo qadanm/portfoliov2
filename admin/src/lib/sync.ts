@@ -19,16 +19,32 @@ import {
   jobsStore,
   recruitersStore,
   lettersStore,
+  packetsStore,
+  outcomesStore,
+  vaultStore,
+  applySettingsStore,
+  sessionsStore,
+  attemptsStore,
+  agentLogStore,
   STORAGE_KEYS,
   SCHEMA_VERSION,
+  VAULT_DEFAULTS,
+  APPLY_SETTINGS_DEFAULTS,
   type Job,
   type Recruiter,
   type SavedLetter,
+  type ApplicationPacket,
+  type JobOutcome,
+  type ProfileVault,
+  type ApplySettings,
+  type ApplySession,
+  type ApplyAttempt,
+  type AgentLogEntry,
 } from './storage';
 
 // ── Types ────────────────────────────────────────────────────────────
 
-export type RecordType = 'job' | 'recruiter' | 'letter';
+export type RecordType = 'job' | 'recruiter' | 'letter' | 'packet' | 'outcome';
 export interface Tombstone {
   type: RecordType;
   id: string;
@@ -40,6 +56,13 @@ export interface SyncState {
   jobs: Job[];
   recruiters: Recruiter[];
   letters: SavedLetter[];
+  packets: ApplicationPacket[];
+  outcomes: JobOutcome[];
+  sessions: ApplySession[];
+  attempts: ApplyAttempt[];
+  agentLog: AgentLogEntry[];
+  vault: ProfileVault;
+  applySettings: ApplySettings;
   tombstones: Tombstone[];
   // The wall-clock timestamp this device produced the snapshot. Used for
   // tie-breaking when neither side has a newer per-record timestamp.
@@ -105,6 +128,13 @@ export function buildLocalSnapshot(): SyncState {
     jobs: jobsStore.list(),
     recruiters: recruitersStore.list(),
     letters: lettersStore.list(),
+    packets: packetsStore.list(),
+    outcomes: outcomesStore.list(),
+    sessions: sessionsStore.list(),
+    attempts: attemptsStore.list(),
+    agentLog: agentLogStore.list(),
+    vault: vaultStore.get(),
+    applySettings: applySettingsStore.get(),
     tombstones: listTombstones(),
     exportedAt: Date.now(),
   };
@@ -117,6 +147,13 @@ function applySnapshot(snap: SyncState): void {
   localStorage.setItem(STORAGE_KEYS.jobs, JSON.stringify(snap.jobs));
   localStorage.setItem(STORAGE_KEYS.recruiters, JSON.stringify(snap.recruiters));
   localStorage.setItem(STORAGE_KEYS.letters, JSON.stringify(snap.letters));
+  localStorage.setItem(STORAGE_KEYS.packets, JSON.stringify(snap.packets));
+  localStorage.setItem(STORAGE_KEYS.outcomes, JSON.stringify(snap.outcomes));
+  localStorage.setItem(STORAGE_KEYS.sessions, JSON.stringify(snap.sessions ?? []));
+  localStorage.setItem(STORAGE_KEYS.attempts, JSON.stringify(snap.attempts ?? []));
+  localStorage.setItem(STORAGE_KEYS.agentLog, JSON.stringify(snap.agentLog ?? []));
+  localStorage.setItem(STORAGE_KEYS.vault, JSON.stringify(snap.vault));
+  localStorage.setItem(STORAGE_KEYS.applySettings, JSON.stringify(snap.applySettings));
   saveTombstones(snap.tombstones);
 }
 
@@ -176,11 +213,26 @@ export function mergeSnapshots(local: SyncState, remote: SyncState): SyncState {
   const tMap = new Map<string, Tombstone>();
   for (const t of tombstones) tMap.set(tombstoneKey(t), t);
 
+  // Vault and applySettings are singletons: pick the newer by updatedAt.
+  const vault = (remote.vault?.updatedAt ?? 0) > (local.vault?.updatedAt ?? 0)
+    ? remote.vault
+    : local.vault;
+  const applySettings = (remote.applySettings?.updatedAt ?? 0) > (local.applySettings?.updatedAt ?? 0)
+    ? remote.applySettings
+    : local.applySettings;
+
   return {
     schemaVersion: Math.max(local.schemaVersion, remote.schemaVersion),
     jobs: mergeRecords('job', local.jobs, remote.jobs, tMap),
     recruiters: mergeRecords('recruiter', local.recruiters, remote.recruiters, tMap),
     letters: mergeRecords('letter', local.letters, remote.letters, tMap),
+    packets: mergeRecords('packet', local.packets ?? [], remote.packets ?? [], tMap),
+    outcomes: mergeRecords('outcome', local.outcomes ?? [], remote.outcomes ?? [], tMap),
+    sessions: mergeRecords('session' as any, local.sessions ?? [], remote.sessions ?? [], tMap),
+    attempts: mergeRecords('attempt' as any, local.attempts ?? [], remote.attempts ?? [], tMap),
+    agentLog: mergeRecords('agentLog' as any, local.agentLog ?? [], remote.agentLog ?? [], tMap),
+    vault: vault ?? local.vault ?? { ...VAULT_DEFAULTS },
+    applySettings: applySettings ?? local.applySettings ?? { ...APPLY_SETTINGS_DEFAULTS },
     tombstones,
     exportedAt: Math.max(local.exportedAt, remote.exportedAt),
   };
@@ -194,6 +246,10 @@ export function snapshotsEqual(a: SyncState, b: SyncState): boolean {
     JSON.stringify(a.jobs) === JSON.stringify(b.jobs) &&
     JSON.stringify(a.recruiters) === JSON.stringify(b.recruiters) &&
     JSON.stringify(a.letters) === JSON.stringify(b.letters) &&
+    JSON.stringify(a.packets ?? []) === JSON.stringify(b.packets ?? []) &&
+    JSON.stringify(a.outcomes ?? []) === JSON.stringify(b.outcomes ?? []) &&
+    JSON.stringify(a.vault ?? {}) === JSON.stringify(b.vault ?? {}) &&
+    JSON.stringify(a.applySettings ?? {}) === JSON.stringify(b.applySettings ?? {}) &&
     JSON.stringify(a.tombstones) === JSON.stringify(b.tombstones)
   );
 }
@@ -279,6 +335,15 @@ function normalizeState(raw: any): SyncState {
     jobs: Array.isArray(raw?.jobs) ? raw.jobs : [],
     recruiters: Array.isArray(raw?.recruiters) ? raw.recruiters : [],
     letters: Array.isArray(raw?.letters) ? raw.letters : [],
+    packets: Array.isArray(raw?.packets) ? raw.packets : [],
+    outcomes: Array.isArray(raw?.outcomes) ? raw.outcomes : [],
+    sessions: Array.isArray(raw?.sessions) ? raw.sessions : [],
+    attempts: Array.isArray(raw?.attempts) ? raw.attempts : [],
+    agentLog: Array.isArray(raw?.agentLog) ? raw.agentLog : [],
+    vault: (raw?.vault && typeof raw.vault === 'object') ? raw.vault : { ...VAULT_DEFAULTS },
+    applySettings: (raw?.applySettings && typeof raw.applySettings === 'object')
+      ? raw.applySettings
+      : { ...APPLY_SETTINGS_DEFAULTS },
     tombstones: Array.isArray(raw?.tombstones) ? raw.tombstones : [],
     exportedAt: Number(raw?.exportedAt ?? 0),
   };

@@ -4,7 +4,7 @@
 // SECURITY: this is browser-local. Clearing site data deletes everything.
 // Use the Export Center to back up.
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 export const STORAGE_KEYS = {
   schemaVersion: 'qa_schema_version',
@@ -12,6 +12,15 @@ export const STORAGE_KEYS = {
   recruiters: 'qa_recruiters',
   letters: 'qa_letters',
   notes: 'qa_notes',
+  vault: 'qa_vault',
+  packets: 'qa_packets',
+  outcomes: 'qa_outcomes',
+  llmAuditLog: 'qa_llm_audit_log',
+  applySettings: 'qa_apply_settings',
+  sessions: 'qa_sessions',
+  attempts: 'qa_attempts',
+  agentLog: 'qa_agent_log',
+  applicationMemory: 'qa_application_memory',
 } as const;
 
 // ── Types ──────────────────────────────────────────────────────────────
@@ -113,6 +122,245 @@ export interface SavedLetter {
   updatedAt: number;
 }
 
+// ── Profile Vault ───────────────────────────────────────────────────────
+// Reusable personal answers for application form-fill + standard questions.
+// Single record; lives in localStorage + KV sync.
+
+export interface ProfileVault {
+  // Identity
+  displayName: string;
+  legalFirstName?: string;
+  legalLastName?: string;
+  preferredName?: string;
+  pronouns?: string;
+  email: string;
+  phone: string;
+  city: string;
+  state: string;
+  country: string;
+
+  // Work arrangement
+  remoteOnly: boolean;
+  willingToRelocate: boolean;
+  currentTitle?: string;
+  currentEmployer?: string;
+  yearsExperience?: number;
+
+  // Links
+  portfolio: string;
+  linkedin: string;
+  github: string;
+  personalSite?: string;
+
+  // Work auth — answers stored, autofill defaults off
+  workAuthAnswer?: string;
+  sponsorshipAnswer?: string;
+  workAuthAutofillAllowed: boolean;
+
+  // Salary target
+  salaryMin?: number;
+  salaryMax?: number;
+  currency: string;
+  salaryNegotiable: boolean;
+
+  // Reusable text
+  shortBio: string;
+  longBio: string;
+  tellMeAboutYourself: string;
+  whyLooking: string;
+  whyThisRoleTemplate: string;
+  whyThisCompanyTemplate: string;
+  aiWorkflowExplanation: string;
+  designWorkflowExplanation: string;
+
+  updatedAt: number;
+}
+
+// ── Application Packet ────────────────────────────────────────────────
+
+export type AtsType =
+  | 'greenhouse'
+  | 'lever'
+  | 'ashby'
+  | 'workday'
+  | 'smartrecruiters'
+  | 'linkedin-easy'
+  | 'generic';
+
+export type ApplyMode = 'manual' | 'guided' | 'autofill';
+export type PacketStatus = 'draft' | 'ready' | 'in-progress' | 'submitted' | 'archived';
+export type GhostRisk = 'low' | 'medium' | 'high';
+export type CallbackStrength = 'weak' | 'moderate' | 'strong';
+export type FieldConfidence = 'high' | 'medium' | 'low' | 'never';
+
+export interface PacketSelection {
+  projectIds: string[];
+  bulletIdsByProject: Record<string, string[]>;
+  skillGroupOrder: string[];
+}
+
+export interface PacketScores {
+  fit: number;
+  quality: number;
+  authenticity: number;
+  effort: number;
+  callback: CallbackStrength;
+}
+
+export interface PacketWarnings {
+  missingKeywords: string[];
+  redFlags: string[];
+  authenticityConcerns: string[];
+  ghostFlags: string[];
+  salaryConflicts: string[];
+  workArrangementConflicts: string[];
+}
+
+export interface FieldMapEntry {
+  fieldKey: string;
+  value: string;
+  confidence: FieldConfidence;
+  source: 'vault' | 'packet' | 'job';
+  note?: string;
+}
+
+export interface PacketChecklistItem {
+  id: string;
+  label: string;
+  done: boolean;
+  doneAt?: number;
+  copyTarget?: 'resume' | 'cover-letter' | 'why-role' | 'why-company' | 'salary' | 'recruiter-dm' | 'tell-me-about-yourself' | 'jd-summary';
+  hint?: string;
+}
+
+export interface ApplicationPacket {
+  id: string;
+  jobId: string;
+
+  resumeAngleId: string;
+  recommendedAngleReason: string;
+  resumeSelection: PacketSelection;
+  summaryKicker: string;
+
+  coverLetter: string;
+  whyRoleAnswer: string;
+  whyCompanyAnswer: string;
+  tellMeAboutYourself: string;
+  salaryGuidance: string;
+  portfolioMentions: string[];
+  recruiterDm: string;
+  followUpMessage: string;
+  jdSummary: string;
+
+  scores: PacketScores;
+  warnings: PacketWarnings;
+  ghostRisk: GhostRisk;
+  ghostReasons: string[];
+
+  fieldMap: FieldMapEntry[];
+
+  status: PacketStatus;
+  applyMode: ApplyMode;
+  atsType: AtsType;
+  atsFrictionScore: number;
+  estimatedMinutes: number;
+  checklist: PacketChecklistItem[];
+
+  llmUsed: { task: string; at: number }[];
+  // Per-packet override of the global "use AI refinement" setting. Defaults to global.
+  llmRefinementEnabled?: boolean;
+
+  // Snapshot of generated baseline drafts for "effort" diffing. Never shown
+  // to user; only diff distance.
+  baseline?: {
+    coverLetter: string;
+    whyRoleAnswer: string;
+    whyCompanyAnswer: string;
+    summaryKicker: string;
+  };
+
+  createdAt: number;
+  updatedAt: number;
+  submittedAt?: number;
+}
+
+// ── Outcomes ──────────────────────────────────────────────────────────
+
+export type OutcomeKind =
+  | 'applied'
+  | 'recruiter-reply'
+  | 'screening-invite'
+  | 'screen-completed'
+  | 'take-home'
+  | 'onsite-loop'
+  | 'offer'
+  | 'rejection'
+  | 'ghosted'
+  | 'withdrew';
+
+export const OUTCOME_KINDS: OutcomeKind[] = [
+  'applied', 'recruiter-reply', 'screening-invite', 'screen-completed',
+  'take-home', 'onsite-loop', 'offer', 'rejection', 'ghosted', 'withdrew',
+];
+
+export const OUTCOME_LABELS: Record<OutcomeKind, string> = {
+  'applied': 'Applied',
+  'recruiter-reply': 'Recruiter replied',
+  'screening-invite': 'Screen invited',
+  'screen-completed': 'Screen completed',
+  'take-home': 'Take-home',
+  'onsite-loop': 'Onsite/loop',
+  'offer': 'Offer',
+  'rejection': 'Rejection',
+  'ghosted': 'Ghosted',
+  'withdrew': 'Withdrew',
+};
+
+export interface JobOutcome {
+  id: string;
+  jobId: string;
+  packetId?: string;
+  kind: OutcomeKind;
+  at: number;
+  note?: string;
+  recruiterId?: string;
+  // updatedAt required for the sync layer.
+  updatedAt: number;
+}
+
+// ── LLM audit log ─────────────────────────────────────────────────────
+
+export interface LlmAuditEntry {
+  id: string;
+  at: number;
+  task: string;
+  jobId?: string;
+  packetId?: string;
+  status: 'ok' | 'disabled' | 'error' | 'rejected-by-scrubber';
+  modelUsed?: string;
+  dataSentFields: string[];
+  contextChars: number;
+  draftChars?: number;
+  errorMessage?: string;
+}
+
+// ── Apply Session settings (global app prefs) ─────────────────────────
+
+export interface ApplySettings {
+  // M3 confirmed-submit assist. Default OFF; even when ON, each submit
+  // requires user typing "SUBMIT" in a per-job confirmation modal.
+  confirmedSubmitAssistEnabled: boolean;
+  // Default for the packet builder's "Use AI refinement" toggle.
+  defaultLlmRefinementEnabled: boolean;
+  // Per-day cap for Apply Session warnings.
+  dailyVolumeWarnAt: number;
+  // Authenticity threshold below which "Mark ready" requires override.
+  authenticityThreshold: number;
+  // Cover letter similarity threshold for "too generic" banner.
+  similarityThreshold: number;
+  updatedAt: number;
+}
+
 // ── Generic accessors ──────────────────────────────────────────────────
 
 function safeParse<T>(raw: string | null, fallback: T): T {
@@ -159,7 +407,7 @@ function write<T>(key: string, value: T): void {
 // Fire a "record was deleted" event so the sync layer can record a
 // tombstone. Without tombstones, a deleted record would resurrect itself
 // the next time the other device pushed.
-function notifyDeleted(type: 'job' | 'recruiter' | 'letter', id: string): void {
+function notifyDeleted(type: 'job' | 'recruiter' | 'letter' | 'packet' | 'outcome', id: string): void {
   if (typeof window === 'undefined') return;
   try {
     window.dispatchEvent(new CustomEvent('qa-record-deleted', { detail: { type, id } }));
@@ -253,6 +501,457 @@ export const lettersStore = {
   },
 };
 
+// ── Profile Vault store (singleton record) ────────────────────────────
+
+export const VAULT_DEFAULTS: ProfileVault = {
+  displayName: 'Moe Qadan',
+  email: 'moe@qadan.co',
+  phone: '',
+  city: 'Los Angeles',
+  state: 'CA',
+  country: 'United States',
+  remoteOnly: false,
+  willingToRelocate: false,
+  portfolio: 'https://qadan.co',
+  linkedin: 'https://linkedin.com/in/mqadan',
+  github: 'https://github.com/qadanm',
+  workAuthAutofillAllowed: false,
+  currency: 'USD',
+  salaryNegotiable: true,
+  shortBio: '',
+  longBio: '',
+  tellMeAboutYourself: '',
+  whyLooking: '',
+  whyThisRoleTemplate: '',
+  whyThisCompanyTemplate: '',
+  aiWorkflowExplanation: '',
+  designWorkflowExplanation: '',
+  updatedAt: 0,
+};
+
+export const vaultStore = {
+  get(): ProfileVault {
+    const v = read<ProfileVault | null>(STORAGE_KEYS.vault, null);
+    if (!v) return { ...VAULT_DEFAULTS };
+    // Forward-fill any missing fields from defaults so older payloads
+    // don't crash callers expecting newer fields.
+    return { ...VAULT_DEFAULTS, ...v };
+  },
+  save(v: ProfileVault): void {
+    v.updatedAt = Date.now();
+    write(STORAGE_KEYS.vault, v);
+  },
+};
+
+// ── Packets store ─────────────────────────────────────────────────────
+
+export const packetsStore = {
+  list(): ApplicationPacket[] { return read<ApplicationPacket[]>(STORAGE_KEYS.packets, []); },
+  save(ps: ApplicationPacket[]): void { write(STORAGE_KEYS.packets, ps); },
+  upsert(p: ApplicationPacket): void {
+    const all = this.list();
+    const idx = all.findIndex(x => x.id === p.id);
+    p.updatedAt = Date.now();
+    if (idx >= 0) all[idx] = p; else all.push(p);
+    this.save(all);
+  },
+  remove(id: string): void {
+    this.save(this.list().filter(p => p.id !== id));
+    notifyDeleted('packet', id);
+  },
+  get(id: string): ApplicationPacket | undefined { return this.list().find(p => p.id === id); },
+  byJobId(jobId: string): ApplicationPacket | undefined {
+    // Latest packet for a given job. If multiple, return the most recent.
+    const matches = this.list().filter(p => p.jobId === jobId);
+    if (matches.length === 0) return undefined;
+    return matches.sort((a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0))[0];
+  },
+};
+
+// ── Outcomes store ────────────────────────────────────────────────────
+
+export const outcomesStore = {
+  list(): JobOutcome[] { return read<JobOutcome[]>(STORAGE_KEYS.outcomes, []); },
+  save(os: JobOutcome[]): void { write(STORAGE_KEYS.outcomes, os); },
+  upsert(o: JobOutcome): void {
+    const all = this.list();
+    const idx = all.findIndex(x => x.id === o.id);
+    o.updatedAt = Date.now();
+    if (idx >= 0) all[idx] = o; else all.push(o);
+    this.save(all);
+  },
+  remove(id: string): void {
+    this.save(this.list().filter(o => o.id !== id));
+    notifyDeleted('outcome', id);
+  },
+  byJobId(jobId: string): JobOutcome[] {
+    return this.list()
+      .filter(o => o.jobId === jobId)
+      .sort((a, b) => a.at - b.at);
+  },
+};
+
+// ── Apply Sessions + Attempts (autonomous agent) ─────────────────────
+
+export type AutonomyLevel = 0 | 1 | 2 | 3 | 4;
+
+export const AUTONOMY_LABELS: Record<AutonomyLevel, string> = {
+  0: 'Manual (copy/paste only)',
+  1: 'Fill Assist (extension fills safe fields)',
+  2: 'Step Assist (fill + auto-advance, pause before submit)',
+  3: 'Confirmed Auto-Submit (single-job submit after gates pass)',
+  4: 'Batch Auto-Apply (process queue, submit eligible jobs)',
+};
+
+export type AtsTier = 1 | 2 | 3;
+export const ATS_TIER: Record<AtsType, AtsTier> = {
+  ashby: 1,
+  greenhouse: 1,
+  lever: 1,
+  smartrecruiters: 2,
+  'linkedin-easy': 2,
+  workday: 3,
+  generic: 3,
+};
+
+export type AttemptStatus =
+  | 'queued'         // not yet started
+  | 'running'        // agent currently working
+  | 'paused'         // waiting on user action (CAPTCHA, login, unknown field)
+  | 'needs-review'   // unfinishable without manual intervention
+  | 'submitted'      // applied successfully
+  | 'blocked'        // hard block (unsupported ATS, dupe, etc.)
+  | 'failed'         // error during run
+  | 'skipped'        // user moved past
+  | 'unsupported';   // ATS or page shape not supported
+
+export type AttemptBlockReason =
+  | 'captcha'
+  | 'login-required'
+  | 'unknown-required-field'
+  | 'demographic-required'
+  | 'legal-required'
+  | 'salary-unresolved'
+  | 'work-auth-ambiguity'
+  | 'upload-failed'
+  | 'unsupported-ats'
+  | 'page-error'
+  | 'packet-not-ready'
+  | 'low-authenticity'
+  | 'low-fit'
+  | 'duplicate'
+  | 'gates-failed'
+  | 'page-changed'
+  | 'user-paused'
+  | 'over-cap'
+  | 'unknown';
+
+export type AgentEventKind =
+  | 'session-started'
+  | 'session-paused'
+  | 'session-resumed'
+  | 'session-stopped'
+  | 'session-finished'
+  | 'attempt-queued'
+  | 'attempt-started'
+  | 'attempt-page-loaded'
+  | 'attempt-ats-detected'
+  | 'attempt-fields-detected'
+  | 'attempt-fields-filled'
+  | 'attempt-advance'
+  | 'attempt-paused'
+  | 'attempt-question-detected'
+  | 'attempt-question-answered'
+  | 'attempt-submit-attempted'
+  | 'attempt-submitted'
+  | 'attempt-blocked'
+  | 'attempt-failed'
+  | 'attempt-needs-review'
+  | 'extension-disconnected';
+
+export interface AgentLogEntry {
+  id: string;
+  sessionId: string;
+  attemptId?: string;
+  at: number;
+  kind: AgentEventKind;
+  message: string;
+  meta?: Record<string, unknown>;
+  // Required for the sync layer to merge entries deterministically.
+  updatedAt: number;
+}
+
+export interface AttemptStep {
+  at: number;
+  kind: AgentEventKind;
+  message: string;
+}
+
+export interface ApplyAttempt {
+  id: string;
+  sessionId: string;
+  jobId: string;
+  packetId?: string;
+  atsType: AtsType;
+  atsTier: AtsTier;
+  autonomyLevel: AutonomyLevel;
+  status: AttemptStatus;
+  blockReason?: AttemptBlockReason;
+  blockNote?: string;
+  startedAt: number;
+  endedAt?: number;
+  submittedAt?: number;
+  // Step log — first 100 step events stored inline for quick UI render.
+  // Full log lives in agentLogStore.
+  steps: AttemptStep[];
+  filledFields: string[];
+  reviewFields: string[];
+  neverFields: string[];
+  unknownQuestions: string[];
+  errors: string[];
+  // The tab id in chrome where the attempt is running. Set by extension.
+  tabId?: number;
+  // URL of the application page (resolved after open).
+  currentUrl?: string;
+  // Required for the sync layer.
+  updatedAt: number;
+}
+
+export interface ApplySessionSettings {
+  autonomyLevel: AutonomyLevel;
+  fitThreshold: number;           // minimum fit to auto-submit
+  authenticityThreshold: number;  // minimum authenticity to auto-submit
+  qualityThreshold: number;       // minimum quality to auto-submit
+  dailySubmitCap: number;         // hard daily cap on auto-submitted apps
+  perSourceCap: number;           // per-source cap (e.g., max 10 from LinkedIn/day)
+  // Per-ATS tier: which tiers are allowed to auto-submit
+  allowAutoSubmitTier1: boolean;
+  allowAutoSubmitTier2: boolean;
+  allowAutoSubmitTier3: boolean;
+  // Per-job opt-out for auto-submit. Job IDs in this set will NEVER auto-submit.
+  autoSubmitDenylist: string[];
+  // Whether DeepSeek custom-question interpretation may run.
+  useDeepSeekForQuestions: boolean;
+  // Dry-run mode: the runner fills + advances but NEVER clicks the final
+  // submit button, even when all gates pass. Designed for testing.
+  dryRun: boolean;
+}
+
+export type SessionStatus = 'idle' | 'running' | 'paused' | 'stopped' | 'finished';
+
+export interface ApplySession {
+  id: string;
+  startedAt: number;
+  endedAt?: number;
+  status: SessionStatus;
+  settings: ApplySessionSettings;
+  jobIds: string[];
+  currentJobId?: string;
+  // Counters for fast UI
+  submittedCount: number;
+  reviewCount: number;
+  blockedCount: number;
+  failedCount: number;
+  skippedCount: number;
+  // Required for the sync layer.
+  updatedAt: number;
+}
+
+const LLM_AUDIT_CAP = 500;
+
+export const llmAuditStore = {
+  list(): LlmAuditEntry[] { return read<LlmAuditEntry[]>(STORAGE_KEYS.llmAuditLog, []); },
+  append(entry: LlmAuditEntry): void {
+    const all = this.list();
+    all.push(entry);
+    // Keep most-recent N
+    const trimmed = all.length > LLM_AUDIT_CAP ? all.slice(-LLM_AUDIT_CAP) : all;
+    write(STORAGE_KEYS.llmAuditLog, trimmed);
+  },
+  clear(): void { write(STORAGE_KEYS.llmAuditLog, []); },
+};
+
+// ── Apply settings (global prefs) ────────────────────────────────────
+
+export const APPLY_SETTINGS_DEFAULTS: ApplySettings = {
+  confirmedSubmitAssistEnabled: false,
+  defaultLlmRefinementEnabled: true,
+  dailyVolumeWarnAt: 20,
+  authenticityThreshold: 70,
+  similarityThreshold: 0.8,
+  updatedAt: 0,
+};
+
+export const applySettingsStore = {
+  get(): ApplySettings {
+    const s = read<ApplySettings | null>(STORAGE_KEYS.applySettings, null);
+    if (!s) return { ...APPLY_SETTINGS_DEFAULTS };
+    return { ...APPLY_SETTINGS_DEFAULTS, ...s };
+  },
+  save(s: ApplySettings): void {
+    s.updatedAt = Date.now();
+    write(STORAGE_KEYS.applySettings, s);
+  },
+};
+
+// ── Application memory: per-ATS / per-domain learned signals ──────────
+// Records what selectors worked / failed on real pages, which upload
+// method took, what unknown questions came up, and the recent reliability.
+// The agent reads this on next visit to the same domain so it can prefer
+// what's known to work and pause faster on known-bad selectors.
+
+export interface AppMemoryEntry {
+  id: string;            // hash of `${atsType}::${hostname}`
+  atsType: AtsType;
+  hostname: string;
+  lastSeenAt: number;
+  visits: number;
+  // Selectors that filled successfully at least once
+  selectorsThatWorked: string[];
+  // Selectors that failed (e.g., the input was disabled / detached / stale)
+  selectorsThatFailed: string[];
+  // Upload method last seen: 'native-file' | 'dropzone-with-input' | 'dropzone-unbound' | 'none'
+  uploadMethod?: string;
+  // Whether textareas accepted typed values (some React UIs reset on type)
+  textareaTypingWorks?: boolean;
+  // Unknown required questions we've seen at this domain (helps Moe
+  // configure vault templates proactively).
+  knownUnknownQuestions: string[];
+  // Last seen blockers
+  lastBlockerReasons: string[];
+  // Rolling reliability — submit-ready %, last 10 visits
+  rollingSubmitReady: number;
+  // Notes the user can add (e.g., "always click 'Continue' twice")
+  notes: string;
+  updatedAt: number;
+}
+
+export const appMemoryStore = {
+  list(): AppMemoryEntry[] { return read<AppMemoryEntry[]>(STORAGE_KEYS.applicationMemory, []); },
+  save(es: AppMemoryEntry[]): void { write(STORAGE_KEYS.applicationMemory, es); },
+  getOrCreate(atsType: AtsType, hostname: string): AppMemoryEntry {
+    const id = `${atsType}::${hostname}`;
+    const all = this.list();
+    const existing = all.find(e => e.id === id);
+    if (existing) return existing;
+    const fresh: AppMemoryEntry = {
+      id, atsType, hostname,
+      lastSeenAt: Date.now(),
+      visits: 0,
+      selectorsThatWorked: [],
+      selectorsThatFailed: [],
+      knownUnknownQuestions: [],
+      lastBlockerReasons: [],
+      rollingSubmitReady: 0,
+      notes: '',
+      updatedAt: Date.now(),
+    };
+    return fresh;
+  },
+  upsert(e: AppMemoryEntry): void {
+    e.updatedAt = Date.now();
+    const all = this.list();
+    const idx = all.findIndex(x => x.id === e.id);
+    if (idx >= 0) all[idx] = e; else all.push(e);
+    this.save(all);
+  },
+  remove(id: string): void {
+    this.save(this.list().filter(e => e.id !== id));
+  },
+};
+
+// ── Agent: Sessions, Attempts, Logs ───────────────────────────────────
+
+export const SESSION_SETTINGS_DEFAULTS: ApplySessionSettings = {
+  autonomyLevel: 2,
+  fitThreshold: 60,
+  authenticityThreshold: 70,
+  qualityThreshold: 60,
+  dailySubmitCap: 20,
+  perSourceCap: 8,
+  allowAutoSubmitTier1: true,
+  allowAutoSubmitTier2: false,
+  allowAutoSubmitTier3: false,
+  autoSubmitDenylist: [],
+  useDeepSeekForQuestions: true,
+  dryRun: true, // SAFE DEFAULT — must be turned off explicitly to enable real submits
+};
+
+export const sessionsStore = {
+  list(): ApplySession[] { return read<ApplySession[]>(STORAGE_KEYS.sessions, []); },
+  save(s: ApplySession[]): void { write(STORAGE_KEYS.sessions, s); },
+  upsert(s: ApplySession): void {
+    const all = this.list();
+    const idx = all.findIndex(x => x.id === s.id);
+    s.updatedAt = Date.now();
+    if (idx >= 0) all[idx] = s; else all.push(s);
+    this.save(all);
+  },
+  get(id: string): ApplySession | undefined { return this.list().find(s => s.id === id); },
+  active(): ApplySession | undefined {
+    return this.list().find(s => s.status === 'running' || s.status === 'paused');
+  },
+  remove(id: string): void {
+    this.save(this.list().filter(s => s.id !== id));
+    notifyDeleted('session' as any, id);
+  },
+};
+
+export const attemptsStore = {
+  list(): ApplyAttempt[] { return read<ApplyAttempt[]>(STORAGE_KEYS.attempts, []); },
+  save(a: ApplyAttempt[]): void { write(STORAGE_KEYS.attempts, a); },
+  upsert(a: ApplyAttempt): void {
+    const all = this.list();
+    const idx = all.findIndex(x => x.id === a.id);
+    a.updatedAt = Date.now();
+    if (idx >= 0) all[idx] = a; else all.push(a);
+    this.save(all);
+  },
+  get(id: string): ApplyAttempt | undefined { return this.list().find(a => a.id === id); },
+  bySession(sessionId: string): ApplyAttempt[] {
+    return this.list().filter(a => a.sessionId === sessionId);
+  },
+  byJob(jobId: string): ApplyAttempt[] {
+    return this.list().filter(a => a.jobId === jobId);
+  },
+  needsReview(): ApplyAttempt[] {
+    return this.list().filter(a => a.status === 'needs-review' || a.status === 'paused' || a.status === 'blocked');
+  },
+  remove(id: string): void {
+    this.save(this.list().filter(a => a.id !== id));
+  },
+};
+
+const AGENT_LOG_CAP = 2000; // per-page rolling cap; survives sync
+
+export const agentLogStore = {
+  list(): AgentLogEntry[] { return read<AgentLogEntry[]>(STORAGE_KEYS.agentLog, []); },
+  save(l: AgentLogEntry[]): void { write(STORAGE_KEYS.agentLog, l); },
+  append(entry: AgentLogEntry): void {
+    const all = this.list();
+    entry.updatedAt = Date.now();
+    all.push(entry);
+    const trimmed = all.length > AGENT_LOG_CAP ? all.slice(-AGENT_LOG_CAP) : all;
+    this.save(trimmed);
+  },
+  appendMany(entries: AgentLogEntry[]): void {
+    if (entries.length === 0) return;
+    const all = this.list();
+    const now = Date.now();
+    for (const e of entries) e.updatedAt = e.updatedAt || now;
+    const merged = [...all, ...entries];
+    const trimmed = merged.length > AGENT_LOG_CAP ? merged.slice(-AGENT_LOG_CAP) : merged;
+    this.save(trimmed);
+  },
+  forSession(sessionId: string): AgentLogEntry[] {
+    return this.list().filter(e => e.sessionId === sessionId).sort((a, b) => a.at - b.at);
+  },
+  forAttempt(attemptId: string): AgentLogEntry[] {
+    return this.list().filter(e => e.attemptId === attemptId).sort((a, b) => a.at - b.at);
+  },
+  clear(): void { write(STORAGE_KEYS.agentLog, []); },
+};
+
 // ── Backup / restore ───────────────────────────────────────────────────
 
 export interface Backup {
@@ -267,6 +966,14 @@ export interface Backup {
   discoverySources?: unknown[];
   watchedCompanies?: unknown[];
   discoveryPrefs?: unknown;
+  // Apply-cockpit payload — optional for backward-compat.
+  vault?: ProfileVault;
+  packets?: ApplicationPacket[];
+  outcomes?: JobOutcome[];
+  applySettings?: ApplySettings;
+  sessions?: ApplySession[];
+  attempts?: ApplyAttempt[];
+  agentLog?: AgentLogEntry[];
 }
 
 // Read raw discovery keys directly from localStorage so storage.ts has no
@@ -302,6 +1009,10 @@ export function exportAll(): Backup {
     discoverySources: readRaw<unknown[]>(DISCOVERY_KEYS.sources, []),
     watchedCompanies: readRaw<unknown[]>(DISCOVERY_KEYS.watched, []),
     discoveryPrefs: readRaw<unknown>(DISCOVERY_KEYS.prefs, null),
+    vault: vaultStore.get(),
+    packets: packetsStore.list(),
+    outcomes: outcomesStore.list(),
+    applySettings: applySettingsStore.get(),
   };
 }
 
@@ -314,6 +1025,13 @@ export function importAll(backup: Backup, mode: 'replace' | 'merge'): void {
     if (backup.discoverySources) writeRaw(DISCOVERY_KEYS.sources, backup.discoverySources);
     if (backup.watchedCompanies) writeRaw(DISCOVERY_KEYS.watched, backup.watchedCompanies);
     if (backup.discoveryPrefs != null) writeRaw(DISCOVERY_KEYS.prefs, backup.discoveryPrefs);
+    if (backup.vault) vaultStore.save(backup.vault);
+    if (Array.isArray(backup.packets)) packetsStore.save(backup.packets);
+    if (Array.isArray(backup.outcomes)) outcomesStore.save(backup.outcomes);
+    if (backup.applySettings) applySettingsStore.save(backup.applySettings);
+    if (Array.isArray(backup.sessions)) sessionsStore.save(backup.sessions);
+    if (Array.isArray(backup.attempts)) attemptsStore.save(backup.attempts);
+    if (Array.isArray(backup.agentLog)) agentLogStore.save(backup.agentLog);
     return;
   }
   // merge by id (incoming wins)
@@ -325,6 +1043,28 @@ export function importAll(backup: Backup, mode: 'replace' | 'merge'): void {
   jobsStore.save(mergeBy(jobsStore.list(), backup.jobs ?? []));
   recruitersStore.save(mergeBy(recruitersStore.list(), backup.recruiters ?? []));
   lettersStore.save(mergeBy(lettersStore.list(), backup.letters ?? []));
+  if (Array.isArray(backup.packets)) {
+    packetsStore.save(mergeBy(packetsStore.list(), backup.packets));
+  }
+  if (Array.isArray(backup.outcomes)) {
+    outcomesStore.save(mergeBy(outcomesStore.list(), backup.outcomes));
+  }
+  if (Array.isArray(backup.sessions)) {
+    sessionsStore.save(mergeBy(sessionsStore.list(), backup.sessions));
+  }
+  if (Array.isArray(backup.attempts)) {
+    attemptsStore.save(mergeBy(attemptsStore.list(), backup.attempts));
+  }
+  if (Array.isArray(backup.agentLog)) {
+    agentLogStore.save(mergeBy(agentLogStore.list(), backup.agentLog));
+  }
+  // Vault and settings: incoming wins if newer.
+  if (backup.vault && (backup.vault.updatedAt ?? 0) > (vaultStore.get().updatedAt ?? 0)) {
+    vaultStore.save(backup.vault);
+  }
+  if (backup.applySettings && (backup.applySettings.updatedAt ?? 0) > (applySettingsStore.get().updatedAt ?? 0)) {
+    applySettingsStore.save(backup.applySettings);
+  }
   // Discovery merge: union by id for arrays of objects with `id`. Sources
   // and watched companies have ids; discoveredJobs do too.
   if (Array.isArray(backup.discoveredJobs)) {
@@ -350,10 +1090,13 @@ export function clearAll(): void {
   jobsStore.save([]);
   recruitersStore.save([]);
   lettersStore.save([]);
+  packetsStore.save([]);
+  outcomesStore.save([]);
+  llmAuditStore.clear();
   writeRaw(DISCOVERY_KEYS.discoveredJobs, []);
   writeRaw(DISCOVERY_KEYS.sources, []);
   writeRaw(DISCOVERY_KEYS.watched, []);
-  // Don't wipe prefs — those are user settings, restored separately.
+  // Don't wipe vault, apply settings, or prefs — those are user settings.
 }
 
 // ── CSV helpers ────────────────────────────────────────────────────────

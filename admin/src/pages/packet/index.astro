@@ -1,0 +1,767 @@
+---
+import Admin from '@/layouts/Admin.astro';
+---
+
+<Admin title="Application packet">
+  <section class="packet">
+    <!-- Top bar -->
+    <header class="packet__bar" id="packet-bar">
+      <div class="packet__where">
+        <div class="packet__where-line">
+          <strong id="packet-company">—</strong>
+          <span class="muted" id="packet-role">—</span>
+        </div>
+        <div class="packet__where-meta">
+          <span class="chip" id="packet-ats">ATS: —</span>
+          <span class="chip" id="packet-friction">Friction —</span>
+          <span class="chip" id="packet-mins">— min</span>
+          <span class="chip" id="packet-ghost">Ghost: low</span>
+          <span class="chip" id="packet-status">draft</span>
+        </div>
+      </div>
+      <div class="packet__actions">
+        <a class="btn" id="packet-open-listing" target="_blank" rel="noopener">Open listing</a>
+        <button class="btn" id="packet-refine" disabled title="Will refine drafts using DeepSeek if the proxy is configured">Refine with AI</button>
+        <a class="btn btn--primary" id="packet-start-session">Start guided apply →</a>
+      </div>
+    </header>
+
+    <!-- Score scoreboard -->
+    <section class="packet__scoreboard" id="packet-scoreboard"></section>
+
+    <!-- Warnings -->
+    <section class="packet__warnings" id="packet-warnings"></section>
+
+    <div class="packet__split">
+      <!-- LEFT: editable drafts -->
+      <div class="packet__pane">
+        <details class="block" open>
+          <summary><h3>Resume angle</h3></summary>
+          <div class="block__body">
+            <label class="micro">Angle
+              <select id="angle-select"></select>
+            </label>
+            <p class="muted" id="angle-reason">—</p>
+            <div class="alt-angles" id="alt-angles"></div>
+            <p class="micro micro--note">Bullets are sourced from <code>projects.ts</code> and cannot be rewritten — only reordered or omitted via angle change. <a href="/resume" id="resume-link">Open resume →</a></p>
+          </div>
+        </details>
+
+        <details class="block" open>
+          <summary><h3>Summary kicker</h3></summary>
+          <div class="block__body">
+            <textarea id="kicker" rows="2"></textarea>
+            <p class="micro muted">One-line JD-aware lead-in for the summary section. Editable.</p>
+          </div>
+        </details>
+
+        <details class="block" open>
+          <summary><h3>Cover letter</h3></summary>
+          <div class="block__body">
+            <textarea id="cover-letter" rows="14"></textarea>
+            <div class="block__actions">
+              <button class="btn micro-btn" data-copy="cover-letter">Copy</button>
+              <span class="micro muted" id="cover-letter-meta"></span>
+            </div>
+          </div>
+        </details>
+
+        <details class="block" open>
+          <summary><h3>Why this role</h3></summary>
+          <div class="block__body">
+            <textarea id="why-role" rows="5"></textarea>
+            <div class="block__actions">
+              <button class="btn micro-btn" data-copy="why-role">Copy</button>
+            </div>
+          </div>
+        </details>
+
+        <details class="block" open>
+          <summary><h3>Why this company</h3></summary>
+          <div class="block__body">
+            <textarea id="why-company" rows="5"></textarea>
+            <div class="block__actions">
+              <button class="btn micro-btn" data-copy="why-company">Copy</button>
+            </div>
+          </div>
+        </details>
+
+        <details class="block">
+          <summary><h3>Tell me about yourself</h3></summary>
+          <div class="block__body">
+            <textarea id="tell-me" rows="6"></textarea>
+            <div class="block__actions">
+              <button class="btn micro-btn" data-copy="tell-me">Copy</button>
+            </div>
+          </div>
+        </details>
+
+        <details class="block">
+          <summary><h3>Salary guidance</h3></summary>
+          <div class="block__body">
+            <textarea id="salary" rows="3"></textarea>
+            <div class="block__actions">
+              <button class="btn micro-btn" data-copy="salary">Copy</button>
+            </div>
+          </div>
+        </details>
+
+        <details class="block">
+          <summary><h3>Recruiter DM</h3></summary>
+          <div class="block__body">
+            <textarea id="recruiter-dm" rows="6"></textarea>
+            <div class="block__actions">
+              <button class="btn micro-btn" data-copy="recruiter-dm">Copy</button>
+            </div>
+          </div>
+        </details>
+
+        <details class="block">
+          <summary><h3>Follow-up message (+7d)</h3></summary>
+          <div class="block__body">
+            <textarea id="follow-up" rows="6"></textarea>
+            <div class="block__actions">
+              <button class="btn micro-btn" data-copy="follow-up">Copy</button>
+            </div>
+          </div>
+        </details>
+
+        <details class="block">
+          <summary><h3>JD summary</h3></summary>
+          <div class="block__body">
+            <textarea id="jd-summary" rows="6"></textarea>
+            <div class="block__actions">
+              <button class="btn micro-btn" data-copy="jd-summary">Copy</button>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <!-- RIGHT: resume preview + field map -->
+      <div class="packet__pane packet__pane--sticky">
+        <details class="block" open>
+          <summary><h3>Resume (tailored preview)</h3></summary>
+          <div class="block__body">
+            <pre id="resume-preview" class="resume-pre"></pre>
+            <div class="block__actions">
+              <button class="btn micro-btn" data-copy="resume">Copy resume text</button>
+              <a class="btn micro-btn" id="resume-pdf-link" target="_blank">Open PDF view</a>
+            </div>
+          </div>
+        </details>
+
+        <details class="block" open>
+          <summary><h3>Field map for autofill</h3></summary>
+          <div class="block__body">
+            <p class="micro muted">Used by the Chrome extension. <strong>high</strong> = autofills automatically. <strong>medium</strong> = autofills when extension setting allows. <strong>low</strong> = autofills only after preview. <strong>never</strong> = will not autofill.</p>
+            <div id="field-map" class="field-map"></div>
+          </div>
+        </details>
+
+        <details class="block">
+          <summary><h3>Portfolio mentions</h3></summary>
+          <div class="block__body">
+            <div id="portfolio-mentions" class="micro"></div>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <!-- Bottom action bar -->
+    <footer class="packet__footer">
+      <button class="btn" id="packet-mark-ready">Mark ready</button>
+      <button class="btn" id="packet-rebuild">Regenerate drafts</button>
+      <button class="btn" id="packet-delete">Delete packet</button>
+      <span class="packet__footer-meta micro muted" id="packet-saved">—</span>
+    </footer>
+
+    <div id="toast" class="packet__toast" aria-live="polite"></div>
+  </section>
+</Admin>
+
+<style>
+  .packet { display: flex; flex-direction: column; gap: 14px; }
+
+  .packet__bar {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    padding: 12px 16px;
+    background: var(--c-bg-elev);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .packet__where { flex: 1; min-width: 220px; }
+  .packet__where-line { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  .packet__where-line strong {
+    font-family: var(--font-display); font-size: 22px; font-weight: 400; letter-spacing: -0.01em;
+  }
+  .packet__where-meta { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+  .packet__actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .packet__scoreboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+  }
+  .score-card {
+    padding: 10px 14px;
+    background: var(--c-bg-elev);
+    border: 1px solid var(--c-border-subtle);
+    border-radius: var(--r-md);
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .score-card__label {
+    font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--c-text-subtle);
+  }
+  .score-card__value {
+    font-family: var(--font-display); font-size: 32px; line-height: 1;
+    color: var(--c-text);
+  }
+  .score-card__value.is-low { color: #F87171; }
+  .score-card__value.is-mid { color: var(--c-accent); }
+  .score-card__value.is-high { color: var(--c-success); }
+  .score-card__bar {
+    height: 4px;
+    background: var(--c-bg-muted);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .score-card__bar > span {
+    display: block;
+    height: 100%;
+    background: var(--c-accent);
+    transition: width 200ms;
+  }
+
+  .packet__warnings { display: flex; flex-direction: column; gap: 6px; }
+  .warn {
+    padding: 8px 12px;
+    border-radius: var(--r-md);
+    font-size: 12px;
+    background: var(--c-bg-elev);
+    border: 1px solid var(--c-border-subtle);
+  }
+  .warn--red { border-color: rgba(248, 113, 113, 0.4); color: #FCA5A5; }
+  .warn--yellow { border-color: rgba(245, 158, 11, 0.4); color: var(--c-accent); }
+  .warn--blue { border-color: rgba(96, 165, 250, 0.4); color: #93C5FD; }
+
+  .packet__split {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 14px;
+  }
+  @media (max-width: 980px) {
+    .packet__split { grid-template-columns: 1fr; }
+  }
+  .packet__pane { display: flex; flex-direction: column; gap: 10px; }
+  .packet__pane--sticky { position: sticky; top: 84px; align-self: flex-start; }
+  @media (max-width: 980px) {
+    .packet__pane--sticky { position: static; }
+  }
+
+  .block {
+    background: var(--c-bg-elev);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    padding: 12px 16px;
+  }
+  .block summary {
+    list-style: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .block summary::-webkit-details-marker { display: none; }
+  .block summary h3 {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+  .block summary::after {
+    content: '▾';
+    font-size: 10px; color: var(--c-text-subtle);
+  }
+  .block:not([open]) summary::after { content: '▸'; }
+  .block__body { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+  .block__actions { display: flex; align-items: center; gap: 8px; }
+  .micro-btn { padding: 4px 10px; font-size: 11px; }
+  .micro {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--c-text-muted);
+  }
+  .micro code { background: var(--c-bg); padding: 1px 4px; border-radius: 3px; }
+  .micro--note {
+    border-top: 1px dashed var(--c-border-subtle);
+    padding-top: 8px;
+  }
+  .muted { color: var(--c-text-subtle); }
+
+  .alt-angles { display: flex; flex-wrap: wrap; gap: 6px; }
+  .alt-angle {
+    padding: 3px 8px;
+    font-family: var(--font-mono); font-size: 10px;
+    border: 1px solid var(--c-border-subtle);
+    border-radius: var(--r-full);
+    background: var(--c-bg);
+    cursor: pointer;
+    color: var(--c-text-muted);
+  }
+  .alt-angle:hover { color: var(--c-accent); border-color: var(--c-accent); }
+
+  .resume-pre {
+    font-family: var(--font-mono); font-size: 11px;
+    background: var(--c-bg);
+    border: 1px solid var(--c-border-subtle);
+    border-radius: var(--r-md);
+    padding: 12px;
+    max-height: 480px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    line-height: 1.5;
+    color: var(--c-text-muted);
+  }
+
+  .field-map {
+    display: flex; flex-direction: column; gap: 4px;
+    max-height: 400px; overflow-y: auto;
+  }
+  .field-row {
+    display: grid;
+    grid-template-columns: 130px 1fr 60px;
+    gap: 8px;
+    padding: 6px 10px;
+    background: var(--c-bg);
+    border: 1px solid var(--c-border-subtle);
+    border-radius: var(--r-sm);
+    font-family: var(--font-mono); font-size: 11px;
+    align-items: center;
+  }
+  .field-row__key { color: var(--c-text-muted); }
+  .field-row__value {
+    color: var(--c-text);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .field-row__conf {
+    text-align: right;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .field-row__conf.is-high { color: var(--c-success); }
+  .field-row__conf.is-medium { color: var(--c-accent); }
+  .field-row__conf.is-low { color: var(--c-text-muted); }
+  .field-row__conf.is-never { color: #F87171; }
+
+  .packet__footer {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 14px;
+    background: var(--c-bg-elev);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+  }
+  .packet__footer-meta { margin-left: auto; }
+
+  .packet__toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    padding: 8px 14px;
+    background: var(--c-text); color: var(--c-bg);
+    border-radius: var(--r-full); font-size: 12px;
+    opacity: 0; transition: opacity 200ms; pointer-events: none; z-index: 100;
+  }
+  .packet__toast.is-visible { opacity: 1; }
+</style>
+
+<script>
+  import {
+    jobsStore,
+    packetsStore,
+    vaultStore,
+    applySettingsStore,
+    ensureSchema,
+    type ApplicationPacket,
+    type Job,
+    type FieldMapEntry,
+  } from '@/lib/storage';
+  import { getOrBuildPacket, persistPacket, rebuildPacketDrafts } from '@/lib/packet/builder';
+  import { selectionToText } from '@/lib/packet/resume-tailor';
+  import { angles, angleById } from '@/data/angles';
+  import { atsLabel } from '@/lib/ats/detect';
+  import { playbookFor } from '@/lib/ats/playbooks';
+  import { refinePacketDrafts } from '@/lib/packet/llm';
+  import { resumeToText } from '@/lib/engine';
+  import { buildResume } from '@/lib/engine';
+  import { fieldLabel } from '@/lib/packet/field-map';
+
+  ensureSchema();
+
+  const url = new URL(window.location.href);
+  const jobId = url.searchParams.get('jobId');
+  if (!jobId) {
+    document.body.innerHTML = '<div style="padding:40px;color:#F87171;font-family:var(--font-mono)">Missing ?jobId param. Open a packet from /today or /jobs.</div>';
+    throw new Error('jobId required');
+  }
+
+  let job: Job | undefined = jobsStore.get(jobId);
+  if (!job) {
+    document.body.innerHTML = `<div style="padding:40px;color:#F87171;font-family:var(--font-mono)">No job with id ${jobId}. Was it deleted?</div>`;
+    throw new Error('job missing');
+  }
+
+  let packet: ApplicationPacket | null = getOrBuildPacket(jobId);
+  if (!packet) {
+    document.body.innerHTML = '<div style="padding:40px;color:#F87171;font-family:var(--font-mono)">Could not build packet (no angles match).</div>';
+    throw new Error('packet null');
+  }
+
+  const settings = applySettingsStore.get();
+
+  function $(sel: string): HTMLElement | null { return document.querySelector(sel); }
+  function $$<T extends Element>(sel: string): T[] { return Array.from(document.querySelectorAll(sel)) as T[]; }
+
+  function toast(msg: string) {
+    const el = document.getElementById('toast')!;
+    el.textContent = msg;
+    el.classList.add('is-visible');
+    setTimeout(() => el.classList.remove('is-visible'), 1800);
+  }
+
+  function escapeHtml(s: string): string {
+    return s.replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]!));
+  }
+
+  function classifyScore(n: number): string {
+    if (n >= 75) return 'is-high';
+    if (n >= 50) return 'is-mid';
+    return 'is-low';
+  }
+
+  // ── Render bar ───────────────────────────────────────────────────
+  function renderBar() {
+    if (!packet || !job) return;
+    ($('#packet-company') as HTMLElement).textContent = job.company ?? '—';
+    ($('#packet-role') as HTMLElement).textContent = job.role ?? '—';
+    const a = $('#packet-open-listing') as HTMLAnchorElement;
+    if (job.url) {
+      a.href = job.url;
+      a.removeAttribute('aria-disabled');
+    } else {
+      a.removeAttribute('href');
+      a.setAttribute('aria-disabled', 'true');
+      a.style.opacity = '0.4';
+      a.style.pointerEvents = 'none';
+    }
+    ($('#packet-ats') as HTMLElement).textContent = `ATS: ${atsLabel(packet.atsType)}`;
+    ($('#packet-friction') as HTMLElement).textContent = `Friction ${packet.atsFrictionScore}`;
+    ($('#packet-mins') as HTMLElement).textContent = `~${packet.estimatedMinutes} min`;
+    const ghostEl = $('#packet-ghost') as HTMLElement;
+    ghostEl.textContent = `Ghost: ${packet.ghostRisk}`;
+    ghostEl.classList.toggle('chip--active', packet.ghostRisk === 'high');
+    ghostEl.style.color = packet.ghostRisk === 'high' ? '#F87171' : packet.ghostRisk === 'medium' ? 'var(--c-accent)' : '';
+    ($('#packet-status') as HTMLElement).textContent = packet.status;
+
+    ($('#packet-start-session') as HTMLAnchorElement).href = `/packet/session?jobId=${packet.jobId}`;
+    ($('#resume-link') as HTMLAnchorElement).href = `/resume/${packet.resumeAngleId}`;
+    ($('#resume-pdf-link') as HTMLAnchorElement).href = `/resume/${packet.resumeAngleId}`;
+    ($('#packet-saved') as HTMLElement).textContent = `Updated ${new Date(packet.updatedAt).toLocaleTimeString()}`;
+  }
+
+  // ── Scoreboard ───────────────────────────────────────────────────
+  function renderScoreboard() {
+    if (!packet) return;
+    const s = packet.scores;
+    const board = $('#packet-scoreboard')!;
+    const cards: [string, number, string][] = [
+      ['Fit', s.fit, 'against JD analyzer'],
+      ['Quality', s.quality, 'completeness × depth'],
+      ['Authenticity', s.authenticity, 'no AI tells'],
+      ['Effort', s.effort, 'edits made'],
+    ];
+    board.innerHTML = cards.map(([label, n, sub]) => `
+      <div class="score-card">
+        <span class="score-card__label">${escapeHtml(label)}</span>
+        <span class="score-card__value ${classifyScore(n)}">${n}</span>
+        <div class="score-card__bar"><span style="width:${n}%"></span></div>
+        <span class="micro muted">${escapeHtml(sub)}</span>
+      </div>
+    `).join('') + `
+      <div class="score-card">
+        <span class="score-card__label">Callback strength</span>
+        <span class="score-card__value">${escapeHtml(s.callback)}</span>
+        <span class="micro muted">composite signal</span>
+      </div>
+    `;
+  }
+
+  // ── Warnings ─────────────────────────────────────────────────────
+  function renderWarnings() {
+    if (!packet) return;
+    const list = $('#packet-warnings')!;
+    list.innerHTML = '';
+    const w = packet.warnings;
+    if (packet.ghostRisk === 'high') {
+      list.insertAdjacentHTML('beforeend', `<div class="warn warn--red">⚠ High ghost-job risk · ${escapeHtml(w.ghostFlags.slice(0,4).join(' · '))}</div>`);
+    } else if (packet.ghostRisk === 'medium') {
+      list.insertAdjacentHTML('beforeend', `<div class="warn warn--yellow">Medium ghost-job risk · ${escapeHtml(w.ghostFlags.slice(0,3).join(' · '))}</div>`);
+    }
+    if (w.redFlags.length > 0) {
+      list.insertAdjacentHTML('beforeend', `<div class="warn warn--yellow">AI red-flag phrases: ${escapeHtml(w.redFlags.slice(0,5).join(', '))}</div>`);
+    }
+    if (w.authenticityConcerns.length > 0) {
+      list.insertAdjacentHTML('beforeend', `<div class="warn warn--red">Unsupported claims: ${escapeHtml(w.authenticityConcerns.slice(0,5).join(', '))}</div>`);
+    }
+    if (w.missingKeywords.length > 0) {
+      list.insertAdjacentHTML('beforeend', `<div class="warn warn--blue">Missing JD keywords: ${escapeHtml(w.missingKeywords.slice(0,6).join(', '))}</div>`);
+    }
+    if (w.salaryConflicts.length > 0) {
+      list.insertAdjacentHTML('beforeend', `<div class="warn warn--yellow">${escapeHtml(w.salaryConflicts.join(' · '))}</div>`);
+    }
+    if (w.workArrangementConflicts.length > 0) {
+      list.insertAdjacentHTML('beforeend', `<div class="warn warn--yellow">${escapeHtml(w.workArrangementConflicts.join(' · '))}</div>`);
+    }
+  }
+
+  // ── Angle selector ───────────────────────────────────────────────
+  function renderAngle() {
+    if (!packet) return;
+    const sel = $('#angle-select') as HTMLSelectElement;
+    sel.innerHTML = angles.map(a => `<option value="${a.id}" ${a.id === packet!.resumeAngleId ? 'selected' : ''}>${escapeHtml(a.label)}</option>`).join('');
+    sel.onchange = () => {
+      if (!packet) return;
+      const fresh = rebuildPacketDrafts(packet.id, { angleId: sel.value });
+      if (fresh) {
+        packet = fresh;
+        renderAll();
+        toast('Drafts regenerated for new angle');
+      }
+    };
+    ($('#angle-reason') as HTMLElement).textContent = packet.recommendedAngleReason;
+  }
+
+  // ── Field map ────────────────────────────────────────────────────
+  function renderFieldMap() {
+    if (!packet) return;
+    const fm = $('#field-map')!;
+    fm.innerHTML = packet.fieldMap
+      .filter(e => e.fieldKey !== 'coverLetterText') // skip the giant text fields
+      .map(e => fieldRowHtml(e)).join('');
+  }
+  function fieldRowHtml(e: FieldMapEntry): string {
+    const safeVal = (e.value || '—').slice(0, 60);
+    return `<div class="field-row" title="${escapeHtml(e.note ?? '')}">
+      <span class="field-row__key">${escapeHtml(fieldLabel(e.fieldKey))}</span>
+      <span class="field-row__value">${escapeHtml(safeVal)}</span>
+      <span class="field-row__conf is-${e.confidence}">${e.confidence}</span>
+    </div>`;
+  }
+
+  // ── Portfolio mentions ───────────────────────────────────────────
+  function renderPortfolio() {
+    if (!packet) return;
+    const el = $('#portfolio-mentions')!;
+    const ids = packet.portfolioMentions ?? [];
+    if (ids.length === 0) {
+      el.innerHTML = '<span class="muted">No portfolio mentions queued.</span>';
+      return;
+    }
+    el.innerHTML = ids.map(id => `<div>• ${escapeHtml(id)}</div>`).join('');
+  }
+
+  // ── Resume preview ───────────────────────────────────────────────
+  function renderResumePreview() {
+    if (!packet) return;
+    const el = $('#resume-preview')!;
+    // Show the existing engine's resumeToText for the chosen angle, prefixed
+    // by the kicker. Since tailoring only re-orders bullets within a project
+    // and selectProjects() in engine.ts is angle-driven, the tailored output
+    // is essentially the engine's output for the angle.
+    const resume = buildResume(packet.resumeAngleId);
+    if (!resume) { el.textContent = '(no resume for this angle)'; return; }
+    const text = resumeToText(resume);
+    const prefix = packet.summaryKicker ? `${packet.summaryKicker}\n\n` : '';
+    el.textContent = prefix + text;
+  }
+
+  // ── Bind text fields ─────────────────────────────────────────────
+  function bindFields() {
+    if (!packet) return;
+    const mapping: Array<[string, keyof ApplicationPacket]> = [
+      ['kicker', 'summaryKicker'],
+      ['cover-letter', 'coverLetter'],
+      ['why-role', 'whyRoleAnswer'],
+      ['why-company', 'whyCompanyAnswer'],
+      ['tell-me', 'tellMeAboutYourself'],
+      ['salary', 'salaryGuidance'],
+      ['recruiter-dm', 'recruiterDm'],
+      ['follow-up', 'followUpMessage'],
+      ['jd-summary', 'jdSummary'],
+    ];
+    for (const [id, field] of mapping) {
+      const el = document.getElementById(id) as HTMLTextAreaElement;
+      el.value = String((packet as any)[field] ?? '');
+      el.addEventListener('input', () => {
+        if (!packet) return;
+        (packet as any)[field] = el.value;
+        packet = persistPacket(packet);
+        renderScoreboard();
+        renderWarnings();
+        ($('#packet-saved') as HTMLElement).textContent = `Updated ${new Date(packet.updatedAt).toLocaleTimeString()}`;
+      });
+    }
+  }
+
+  // ── Copy buttons ─────────────────────────────────────────────────
+  function bindCopyButtons() {
+    const map: Record<string, () => string> = {
+      'cover-letter': () => (document.getElementById('cover-letter') as HTMLTextAreaElement).value,
+      'why-role': () => (document.getElementById('why-role') as HTMLTextAreaElement).value,
+      'why-company': () => (document.getElementById('why-company') as HTMLTextAreaElement).value,
+      'tell-me': () => (document.getElementById('tell-me') as HTMLTextAreaElement).value,
+      'salary': () => (document.getElementById('salary') as HTMLTextAreaElement).value,
+      'recruiter-dm': () => (document.getElementById('recruiter-dm') as HTMLTextAreaElement).value,
+      'follow-up': () => (document.getElementById('follow-up') as HTMLTextAreaElement).value,
+      'jd-summary': () => (document.getElementById('jd-summary') as HTMLTextAreaElement).value,
+      'resume': () => (document.getElementById('resume-preview') as HTMLElement).textContent ?? '',
+    };
+    $$<HTMLButtonElement>('[data-copy]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const key = btn.dataset.copy!;
+        const text = map[key]?.();
+        if (!text) return;
+        try {
+          await navigator.clipboard.writeText(text);
+          toast(`Copied · ${key}`);
+        } catch {
+          // Fallback
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          ta.remove();
+          toast('Copied (fallback)');
+        }
+      });
+    });
+  }
+
+  // ── Refine with AI ───────────────────────────────────────────────
+  async function checkProxyHealth() {
+    try {
+      const res = await fetch('/api/draft', { method: 'GET' });
+      if (!res.ok) return false;
+      const body = await res.json() as { configured?: boolean };
+      return Boolean(body?.configured);
+    } catch { return false; }
+  }
+  async function setupRefineButton() {
+    const btn = $('#packet-refine') as HTMLButtonElement;
+    const enabled = await checkProxyHealth();
+    btn.disabled = !enabled;
+    if (!enabled) {
+      btn.title = 'LLM proxy not configured. Set DEEPSEEK_API_KEY in Cloudflare Pages → Settings → Environment variables.';
+    } else {
+      btn.title = 'Refine drafts using DeepSeek. Heuristic baselines remain as fallback.';
+    }
+    btn.addEventListener('click', async () => {
+      if (!packet || !job) return;
+      btn.disabled = true;
+      btn.textContent = 'Refining…';
+      const resume = buildResume(packet.resumeAngleId);
+      const resumeContext = resume ? resumeToText(resume) : '';
+      const whitelist = [job.company ?? '', job.role ?? ''].filter(Boolean);
+      try {
+        const refined = await refinePacketDrafts(packet, resumeContext, job.jdText ?? '', whitelist, (task, status, resp) => {
+          btn.textContent = `Refining… ${task} ${status}`;
+          if (status === 'done' && resp?.rejectedByScrubber) {
+            toast(`Scrubber rejected ${task}; kept baseline`);
+          }
+        });
+        packet = persistPacket(refined);
+        renderAll();
+        toast('Refinement complete');
+      } catch (err) {
+        toast(`Refine failed: ${(err as Error).message}`);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Refine with AI';
+      }
+    });
+  }
+
+  // ── Footer actions ───────────────────────────────────────────────
+  function bindFooter() {
+    $('#packet-mark-ready')!.addEventListener('click', () => {
+      if (!packet) return;
+      const auth = packet.scores.authenticity;
+      const fit = packet.scores.fit;
+      if (auth < settings.authenticityThreshold) {
+        if (!confirm(`Authenticity score (${auth}) below threshold (${settings.authenticityThreshold}). Mark ready anyway?`)) return;
+      }
+      if (fit < 50) {
+        if (!confirm(`Fit score is weak (${fit}). Mark ready anyway?`)) return;
+      }
+      packet.status = 'ready';
+      packet = persistPacket(packet);
+      renderBar();
+      toast('Marked ready');
+    });
+    $('#packet-rebuild')!.addEventListener('click', () => {
+      if (!packet) return;
+      if (!confirm('Regenerate all drafts from heuristic baselines? Your edits will be lost.')) return;
+      const fresh = rebuildPacketDrafts(packet.id);
+      if (fresh) {
+        packet = fresh;
+        renderAll();
+        toast('Drafts regenerated');
+      }
+    });
+    $('#packet-delete')!.addEventListener('click', () => {
+      if (!packet) return;
+      if (!confirm('Delete this packet permanently?')) return;
+      packetsStore.remove(packet.id);
+      window.location.href = `/today`;
+    });
+  }
+
+  function renderAll() {
+    renderBar();
+    renderScoreboard();
+    renderWarnings();
+    renderAngle();
+    renderFieldMap();
+    renderPortfolio();
+    renderResumePreview();
+    // Update text areas to reflect current packet
+    const mapping: Array<[string, keyof ApplicationPacket]> = [
+      ['kicker', 'summaryKicker'],
+      ['cover-letter', 'coverLetter'],
+      ['why-role', 'whyRoleAnswer'],
+      ['why-company', 'whyCompanyAnswer'],
+      ['tell-me', 'tellMeAboutYourself'],
+      ['salary', 'salaryGuidance'],
+      ['recruiter-dm', 'recruiterDm'],
+      ['follow-up', 'followUpMessage'],
+      ['jd-summary', 'jdSummary'],
+    ];
+    for (const [id, field] of mapping) {
+      const el = document.getElementById(id) as HTMLTextAreaElement | null;
+      if (el && packet) el.value = String((packet as any)[field] ?? '');
+    }
+  }
+
+  // Boot
+  renderAll();
+  bindFields();
+  bindCopyButtons();
+  bindFooter();
+  setupRefineButton();
+</script>
