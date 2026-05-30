@@ -1,6 +1,7 @@
 ---
 import Placeholder from './Placeholder.astro';
 import VerdictArtifact from './artifacts/VerdictArtifact.astro';
+import VinlyArtifact from './artifacts/VinlyArtifact.astro';
 import PlatformArtifact from './artifacts/PlatformArtifact.astro';
 import SawaArtifact from './artifacts/SawaArtifact.astro';
 import AdvisorArtifact from './artifacts/AdvisorArtifact.astro';
@@ -20,6 +21,7 @@ const { data, slug } = project;
 // placeholder if a project hasn't been hand-illustrated yet.
 const artifactMap: Record<string, any> = {
   'chatobd2': VerdictArtifact,
+  'vinly': VinlyArtifact,
   'magtek-platform': PlatformArtifact,
   'sawa': SawaArtifact,
   'financial-platforms': AdvisorArtifact,
@@ -265,6 +267,7 @@ const categoryKey = data.category.toLowerCase();
 
   /* Allow the artifact components to fill the media area */
   .pcard__media :global(.vart),
+  .pcard__media :global(.vinart),
   .pcard__media :global(.part),
   .pcard__media :global(.sart),
   .pcard__media :global(.aart),
@@ -276,6 +279,7 @@ const categoryKey = data.category.toLowerCase();
   }
 
   .pcard:hover .pcard__media :global(.vart),
+  .pcard:hover .pcard__media :global(.vinart),
   .pcard:hover .pcard__media :global(.part),
   .pcard:hover .pcard__media :global(.sart),
   .pcard:hover .pcard__media :global(.aart) {

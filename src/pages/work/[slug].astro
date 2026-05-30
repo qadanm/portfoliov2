@@ -2,6 +2,7 @@
 import BaseLayout from '@/components/layout/BaseLayout.astro';
 import Placeholder from '@/components/Placeholder.astro';
 import VerdictArtifact from '@/components/artifacts/VerdictArtifact.astro';
+import VinlyArtifact from '@/components/artifacts/VinlyArtifact.astro';
 import PlatformArtifact from '@/components/artifacts/PlatformArtifact.astro';
 import SawaArtifact from '@/components/artifacts/SawaArtifact.astro';
 import AdvisorArtifact from '@/components/artifacts/AdvisorArtifact.astro';
@@ -43,6 +44,7 @@ const ogAlt = `${data.title} — case study by Moe Qadan.`;
 // Map slugs to bespoke artifact components for the hero preview frame.
 const artifactMap: Record<string, any> = {
   'chatobd2': VerdictArtifact,
+  'vinly': VinlyArtifact,
   'magtek-platform': PlatformArtifact,
   'sawa': SawaArtifact,
   'financial-platforms': AdvisorArtifact,
@@ -338,6 +340,180 @@ const categoryKey = data.category.toLowerCase();
               </figcaption>
             </figure>
           </div>
+        </section>
+      </>
+    )}
+
+    {project.slug === 'vinly' && (
+      <>
+        <section class="container-narrow cs__pull">
+          <p class="cs__pull-text">
+            The model explains the number. It never picks it.
+          </p>
+          <span class="cs__pull-caption">Where the trust comes from</span>
+        </section>
+
+        <section class="container-site cs__post">
+          <header class="cs__post-head">
+            <div class="cs__post-sxn">
+              <span class="cs__post-num">04</span>
+              <span class="cs__post-eyebrow">The report</span>
+              <span class="cs__post-rule" aria-hidden="true"></span>
+            </div>
+            <h2 class="cs__post-title">From a screenshot to a verdict.</h2>
+            <p class="cs__post-sub">
+              Up to a dozen listing screenshots in. About a hundred
+              seconds later, a buyer's report the shopper reads top to
+              bottom — verdict first, the reasoning under it, the
+              evidence attached.
+            </p>
+          </header>
+          <div class="cs__shot-grid cs__shot-grid--phones">
+            <figure class="cs__shot">
+              <img
+                src="/images/vinly/ocr-loader.webp"
+                alt="VINly upload screen: a modal reads 'Picking out year, make, model — looking for vehicle details across every photo,' over a grid of listing screenshots. An optional listing-link field notes 'We never log in to Facebook.'"
+                width="1080"
+                height="2341"
+                loading="lazy"
+              />
+              <figcaption>
+                You hand it screenshots, not a VIN. The first pass reads
+                every photo to pull year, make, and model — ten to twenty
+                seconds, and it never logs into Facebook. The listing link
+                is optional context.
+              </figcaption>
+            </figure>
+            <figure class="cs__shot">
+              <img
+                src="/images/vinly/report-hero.webp"
+                alt="VINly buyer report for a 2010 Lexus RX 350: an INSPECT verdict, a $5,850 opening offer marked −$1,650 versus asking, and a WALK $5,400 to ASKING $7,500 range slider."
+                width="1080"
+                height="2341"
+                loading="lazy"
+              />
+              <figcaption>
+                The answer comes first. INSPECT, an opening offer of
+                $5,850, and the distance to a $7,500 asking price — with
+                the walk-away floor pinned at $5,400 before a line of
+                reasoning.
+              </figcaption>
+            </figure>
+            <figure class="cs__shot">
+              <img
+                src="/images/vinly/verdict.webp"
+                alt="VINly report, scrolled: the $5,850 offer over YEAR 1 COST $4.2k–8.5k and ASKING $7,500 tiles, with Send message, Negotiate, and Inspect action buttons."
+                width="1080"
+                height="2341"
+                loading="lazy"
+              />
+              <figcaption>
+                Every report resolves to a next move — message the seller,
+                negotiate, or mark it to inspect. The cost and asking
+                figures sit right under the offer so the gap is never
+                abstract.
+              </figcaption>
+            </figure>
+            <figure class="cs__shot">
+              <img
+                src="/images/vinly/report-overview.webp"
+                alt="VINly report receipt: Identity normalized, Model knowledge with failure modes loaded, 7 sources cited, 'Generated in 100s · Anthropic Sonnet · NHTSA + web grounding,' above an index of listing details, red flags, service timeline, and known issues, each with a count."
+                width="1080"
+                height="2341"
+                loading="lazy"
+              />
+              <figcaption>
+                A receipt sits at the top: identity normalized, failure
+                modes loaded, seven sources cited, generated in 100 seconds
+                on Anthropic Sonnet over NHTSA and the web. Below it, an
+                index of everything flagged, each line with a count.
+              </figcaption>
+            </figure>
+          </div>
+        </section>
+
+        <section class="container-site cs__post cs__post--alt">
+          <header class="cs__post-head">
+            <div class="cs__post-sxn">
+              <span class="cs__post-num">05</span>
+              <span class="cs__post-eyebrow">The takeaways</span>
+              <span class="cs__post-rule" aria-hidden="true"></span>
+            </div>
+            <h2 class="cs__post-title">The work it hands you — and what it costs.</h2>
+            <p class="cs__post-sub">
+              Three things a buyer can act on the same afternoon — a cost
+              forecast, an inspection checklist for the shop, and a
+              negotiation message — plus a price that matches how people
+              actually shop for a car.
+            </p>
+          </header>
+          <div class="cs__shot-grid cs__shot-grid--phones">
+            <figure class="cs__shot">
+              <img
+                src="/images/vinly/cost-forecast.webp"
+                alt="VINly Year 1 cost forecast: $4,200–$8,500 per year, split into fuel $2.6k, insurance $1.6k, maintenance $475, with line-item assumptions for a 205k-mile Lexus RX 350 in Long Beach."
+                width="1080"
+                height="2341"
+                loading="lazy"
+              />
+              <figcaption>
+                Year-one cost, itemized. Fuel modeled from real annual
+                mileage and local gas prices, insurance from the car's
+                class and city, and a repair budget sized to a 205k-mile
+                example — a range, never a falsely precise number.
+              </figcaption>
+            </figure>
+            <figure class="cs__shot">
+              <img
+                src="/images/vinly/inspection-checklist.webp"
+                alt="VINly inspection checklist for a 2010 Lexus RX 350: scan for OBD-II codes P0010–P0020 and P0135/P0155, check valve cover gaskets, pressure-test the cooling system, listen for VVT-i rattle — printable for the shop."
+                width="1080"
+                height="2341"
+                loading="lazy"
+              />
+              <figcaption>
+                The inspection list is specific to this engine, down to
+                the OBD-II codes to scan for and the gaskets and actuators
+                known to fail. It prints, so it goes to the shop with the
+                buyer.
+              </figcaption>
+            </figure>
+            <figure class="cs__shot">
+              <img
+                src="/images/vinly/negotiation-script.webp"
+                alt="VINly negotiation script: a copyable message opening at $5,850 for a 205,000-mile 2010 RX 350, holding a $5,400 floor, citing overdue water pump, valve cover gaskets, and transmission service."
+                width="1080"
+                height="2341"
+                loading="lazy"
+              />
+              <figcaption>
+                A copyable opening message, anchored to the same math:
+                open at $5,850, hold at $5,400, walk below it. The computed
+                offer, turned into words a buyer can actually send.
+              </figcaption>
+            </figure>
+            <figure class="cs__shot">
+              <img
+                src="/images/vinly/paywall.webp"
+                alt="VINly pricing: a single report for $3.99 with free updates when the seller replies, or a $12.99 Shopping Pass of 10 reports over 30 days, no subscription. NHTSA recalls and complaints are free."
+                width="1080"
+                height="2341"
+                loading="lazy"
+              />
+              <figcaption>
+                $3.99 for a report, or $12.99 for ten — sized for someone
+                weighing several cars over a couple of weeks. No
+                subscription, credits expire, and NHTSA recalls come free
+                on every report.
+              </figcaption>
+            </figure>
+          </div>
+          <p class="cs__post-closing">
+            The price reflects what a report costs to produce, not what a
+            subscription funnel can extract. A used-car shopper is in the
+            market for a few weeks, not forever — so the product is built
+            to be picked up, used hard, and put back down.
+          </p>
         </section>
       </>
     )}
@@ -1186,6 +1362,7 @@ const categoryKey = data.category.toLowerCase();
   }
 
   .cs__cover-artifact :global(.vart),
+  .cs__cover-artifact :global(.vinart),
   .cs__cover-artifact :global(.part),
   .cs__cover-artifact :global(.sart),
   .cs__cover-artifact :global(.aart) {
@@ -1408,6 +1585,22 @@ const categoryKey = data.category.toLowerCase();
     .cs__shot-grid--3 {
       grid-template-columns: repeat(3, 1fr);
       gap: var(--space-6);
+    }
+  }
+
+  /* Portrait phone screenshots — App Store-style row. Used for VINly. */
+  .cs__shot-grid--phones {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-5);
+    max-width: 880px;
+    margin-inline: auto;
+  }
+
+  @media (min-width: 900px) {
+    .cs__shot-grid--phones {
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-6);
+      max-width: none;
     }
   }
 

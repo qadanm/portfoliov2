@@ -1,0 +1,440 @@
+---
+// VINly thumbnail. Recreates the buyer-report verdict hero: the screen a
+// shopper sees after VINly reads a Facebook Marketplace listing — an
+// INSPECT verdict, an opening-offer number, and the walk/ask range.
+// Theme-aware: warm dark atmosphere in dark mode, cream in light mode,
+// both carrying VINly's red-orange accent so the project reads at a glance.
+---
+
+<div class="vinart" aria-hidden="true">
+  <div class="vinart__bg"></div>
+  <div class="vinart__grid"></div>
+  <div class="vinart__halo"></div>
+
+  <div class="vinart__plate">
+    <div class="vinart__head">
+      <div class="vinart__brand">
+        <span class="vinart__brand-mark">✦</span>
+        <span class="vinart__brand-name">VINly</span>
+      </div>
+      <span class="vinart__head-mono">Buyer report</span>
+    </div>
+
+    <div class="vinart__body">
+      <div class="vinart__vehicle">
+        <span class="vinart__vehicle-name">2010 Lexus RX 350</span>
+        <span class="vinart__vehicle-meta">$7,500 · 205k mi · Long Beach</span>
+      </div>
+
+      <div class="vinart__verdict">
+        <span class="vinart__verdict-tag">
+          <span class="vinart__verdict-dot"></span>
+          Inspect
+        </span>
+        <span class="vinart__verdict-note">High mileage, inspect hard</span>
+      </div>
+
+      <div class="vinart__offer">
+        <span class="vinart__offer-value">$5,850</span>
+        <span class="vinart__offer-sub">Opening offer · −$1,650 vs asking</span>
+      </div>
+
+      <div class="vinart__range">
+        <div class="vinart__range-track">
+          <span class="vinart__range-fill"></span>
+          <span class="vinart__range-dot vinart__range-dot--walk"></span>
+          <span class="vinart__range-marker"></span>
+          <span class="vinart__range-dot vinart__range-dot--ask"></span>
+        </div>
+        <div class="vinart__range-labels">
+          <span class="vinart__range-end">
+            <span class="vinart__range-tag">Walk</span>
+            <span class="vinart__range-num">$5,400</span>
+          </span>
+          <span class="vinart__range-end vinart__range-end--right">
+            <span class="vinart__range-tag">Asking</span>
+            <span class="vinart__range-num">$7,500</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="vinart__caption">
+    <span class="vinart__caption-line"></span>
+    <span>Buyer report · VINly</span>
+  </div>
+</div>
+
+<style>
+  /* Theme-aware tokens. Default = dark; light overrides via global theme. */
+  .vinart {
+    --vin-atmos:
+      radial-gradient(ellipse 80% 80% at 28% 18%, rgba(234, 88, 12, 0.13), transparent 60%),
+      radial-gradient(ellipse 60% 60% at 82% 92%, rgba(249, 115, 22, 0.06), transparent 60%),
+      linear-gradient(155deg, #120E0B 0%, #1C140E 60%, #0D0A08 100%);
+    --vin-text: #FAF7F5;
+    --vin-text-muted: rgba(255, 248, 244, 0.56);
+    --vin-text-subtle: rgba(255, 248, 244, 0.44);
+    --vin-grid: rgba(255, 255, 255, 0.022);
+    --vin-dot-1: rgba(234, 88, 12, 0.05);
+    --vin-dot-2: rgba(255, 255, 255, 0.03);
+    --vin-halo: radial-gradient(circle, rgba(234, 88, 12, 0.20), transparent 65%);
+    --vin-plate-bg: linear-gradient(180deg, rgba(34, 25, 18, 0.92), rgba(22, 16, 11, 0.94));
+    --vin-plate-border: rgba(255, 255, 255, 0.08);
+    --vin-plate-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 16px 32px rgba(0, 0, 0, 0.42),
+      0 4px 12px rgba(0, 0, 0, 0.32);
+    --vin-divider: rgba(255, 255, 255, 0.07);
+    --vin-track: rgba(255, 255, 255, 0.10);
+    --vin-ask-ring: rgba(255, 248, 244, 0.35);
+    --vin-caption: rgba(255, 248, 244, 0.44);
+    --vin-caption-rule: rgba(255, 248, 244, 0.3);
+  }
+
+  :global([data-theme="light"]) .vinart {
+    --vin-atmos:
+      radial-gradient(ellipse 80% 80% at 28% 18%, rgba(234, 88, 12, 0.12), transparent 60%),
+      radial-gradient(ellipse 60% 60% at 82% 92%, rgba(249, 115, 22, 0.07), transparent 60%),
+      linear-gradient(155deg, #FFFBF5 0%, #FFF1E0 60%, #FFFCF7 100%);
+    --vin-text: #1C1207;
+    --vin-text-muted: rgba(28, 18, 7, 0.62);
+    --vin-text-subtle: rgba(28, 18, 7, 0.5);
+    --vin-grid: rgba(28, 18, 7, 0.04);
+    --vin-dot-1: rgba(234, 88, 12, 0.08);
+    --vin-dot-2: rgba(28, 18, 7, 0.04);
+    --vin-halo: radial-gradient(circle, rgba(234, 88, 12, 0.20), transparent 65%);
+    --vin-plate-bg: linear-gradient(180deg, rgba(255, 252, 246, 0.97), rgba(255, 244, 230, 0.95));
+    --vin-plate-border: rgba(28, 18, 7, 0.08);
+    --vin-plate-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.7),
+      0 1px 2px rgba(28, 18, 7, 0.04),
+      0 16px 32px rgba(28, 18, 7, 0.08),
+      0 4px 12px rgba(28, 18, 7, 0.04);
+    --vin-divider: rgba(28, 18, 7, 0.07);
+    --vin-track: rgba(28, 18, 7, 0.12);
+    --vin-ask-ring: rgba(28, 18, 7, 0.32);
+    --vin-caption: rgba(28, 18, 7, 0.5);
+    --vin-caption-rule: rgba(28, 18, 7, 0.25);
+  }
+
+  .vinart {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: var(--vin-atmos);
+    color: var(--vin-text);
+    container-type: inline-size;
+  }
+
+  .vinart__bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(var(--vin-dot-1) 1px, transparent 1px),
+      radial-gradient(var(--vin-dot-2) 1px, transparent 1px);
+    background-size: 14px 14px, 32px 32px;
+    background-position: 0 0, 7px 7px;
+  }
+
+  .vinart__grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, var(--vin-grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--vin-grid) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: linear-gradient(180deg, transparent 0%, #000 50%);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 50%);
+  }
+
+  .vinart__halo {
+    position: absolute;
+    top: -12%;
+    right: -18%;
+    width: 58%;
+    height: 58%;
+    border-radius: 50%;
+    background: var(--vin-halo);
+    filter: blur(22px);
+    pointer-events: none;
+  }
+
+  .vinart__plate {
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 1px solid var(--vin-plate-border);
+    border-radius: 12px;
+    background: var(--vin-plate-bg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: var(--vin-plate-shadow);
+    padding: 12px 14px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  @container (min-width: 360px) {
+    .vinart__plate {
+      padding: 16px 18px 18px;
+      gap: 13px;
+    }
+  }
+
+  .vinart__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--vin-divider);
+  }
+
+  .vinart__brand {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .vinart__brand-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 5px;
+    background: linear-gradient(180deg, #FB923C, #EA580C);
+    color: #FFF7ED;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .vinart__brand-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--vin-text);
+    letter-spacing: 0.02em;
+    opacity: 0.9;
+  }
+
+  .vinart__head-mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--vin-text-subtle);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .vinart__body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  @container (min-width: 360px) {
+    .vinart__body { gap: 12px; }
+  }
+
+  .vinart__vehicle {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .vinart__vehicle-name {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: 16px;
+    line-height: 1.1;
+    letter-spacing: -0.005em;
+    color: var(--vin-text);
+  }
+
+  @container (min-width: 360px) {
+    .vinart__vehicle-name { font-size: 20px; }
+  }
+
+  .vinart__vehicle-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--vin-text-subtle);
+    letter-spacing: 0.02em;
+  }
+
+  .vinart__verdict {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .vinart__verdict-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 9px;
+    border-radius: 9999px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: #FFF7ED;
+    background: linear-gradient(180deg, #F97316, #EA580C);
+    border: 1px solid rgba(234, 88, 12, 0.5);
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .vinart__verdict-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: #FFF7ED;
+    box-shadow: 0 0 5px rgba(255, 247, 237, 0.8);
+  }
+
+  .vinart__verdict-note {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--vin-text-muted);
+    letter-spacing: 0.01em;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .vinart__offer {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .vinart__offer-value {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: 34px;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    color: var(--vin-text);
+  }
+
+  @container (min-width: 360px) {
+    .vinart__offer-value { font-size: 44px; }
+  }
+
+  .vinart__offer-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--vin-text-muted);
+    letter-spacing: 0.01em;
+  }
+
+  .vinart__range {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-top: 2px;
+  }
+
+  .vinart__range-track {
+    position: relative;
+    height: 4px;
+    border-radius: 9999px;
+    background-color: var(--vin-track);
+  }
+
+  .vinart__range-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 21%;
+    border-radius: inherit;
+    background: linear-gradient(to right, #EA580C, #F97316);
+  }
+
+  .vinart__range-dot {
+    position: absolute;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .vinart__range-dot--walk {
+    left: 0;
+    background-color: #EA580C;
+  }
+
+  .vinart__range-dot--ask {
+    left: 100%;
+    background-color: transparent;
+    border: 1.5px solid var(--vin-ask-ring);
+  }
+
+  .vinart__range-marker {
+    position: absolute;
+    top: 50%;
+    left: 21%;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #F97316;
+    border: 2px solid var(--vin-plate-bg);
+    box-shadow: 0 0 0 1px rgba(234, 88, 12, 0.5), 0 2px 4px rgba(234, 88, 12, 0.4);
+  }
+
+  .vinart__range-labels {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .vinart__range-end {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .vinart__range-end--right { align-items: flex-end; }
+
+  .vinart__range-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--vin-text-subtle);
+  }
+
+  .vinart__range-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--vin-text);
+  }
+
+  .vinart__caption {
+    position: absolute;
+    bottom: 12px;
+    left: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--vin-caption);
+    letter-spacing: 0.06em;
+  }
+
+  .vinart__caption-line {
+    width: 14px;
+    height: 1px;
+    background-color: var(--vin-caption-rule);
+  }
+</style>
