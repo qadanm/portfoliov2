@@ -5,6 +5,14 @@ import AIFlow from '@/components/diagrams/AIFlow.astro';
 
 const projects = [
   {
+    slug: 'vinly',
+    title: 'VINly',
+    note: "A used-car listing in, a priced buyer's report out. Designed and engineered solo for iOS.",
+    src: '/images/vinly/site-hero.webp',
+    alt: 'VINly marketing hero, "Read the listing like a mechanic," beside a sample buyer report card.',
+    category: 'flagship',
+  },
+  {
     slug: 'chatobd2',
     title: 'ChatOBD2',
     note: 'AI-native diagnostics, designed and engineered solo.',
@@ -135,17 +143,28 @@ const projects = [
         </div>
 
         <p class="apr__para">
-          <strong>In the products.</strong> ChatOBD2 is the worked
-          example. Vehicle data flows through six deterministic
-          reasoning layers before any model call. The system prompt
-          isn't a string; it's a module that assembles fragments by
-          priority inside a 38,000-token budget, keyed by verdict
-          tier and code context. The fragments are typed, versioned,
-          and reviewed in pull requests like any other source. A copy
-          change is a one-file edit. The analytics taxonomy stays
-          coherent because every fragment is tagged. Outputs are
-          schema-bound, which means the rendering layer doesn't
-          apologize for the model.
+          <strong>In the products.</strong> VINly is the shipped
+          example. The numbers that cost a buyer money — the opening
+          offer, the walk-away floor, the car's real annual mileage —
+          are computed by plain deterministic functions before any
+          model runs, then passed into the pipeline as fixed
+          constraints. The model explains an offer it is never allowed
+          to invent. A second model reads the draft back as a critic
+          and flags claims the evidence doesn't support. The money math
+          carries 133 tests.
+        </p>
+
+        <p class="apr__para">
+          <strong>The same discipline, scaled up in ChatOBD2.</strong>
+          Vehicle data flows through six deterministic reasoning layers
+          before any model call. The system prompt isn't a string; it's
+          a module that assembles fragments by priority inside a
+          38,000-token budget, keyed by verdict tier and code context.
+          The fragments are typed, versioned, and reviewed in pull
+          requests like any other source. A copy change is a one-file
+          edit. The analytics taxonomy stays coherent because every
+          fragment is tagged. Outputs are schema-bound, which means the
+          rendering layer doesn't apologize for the model.
         </p>
 
         <p class="apr__para">
@@ -192,7 +211,7 @@ const projects = [
           <li><strong>Modernizing a platform that can't be rewritten.</strong> Long-running stacks have opinions. I read those first, plan around them, and ship in increments that don't require a flag day.</li>
           <li><strong>Building systems engineers actually use.</strong> Typed components. Tokens. Layout primitives. Real consumers from day one. No big-bang library that ships into a vacuum.</li>
           <li><strong>Sitting between design and engineering and unblocking both.</strong> I read intent, not just specs. Most production breakage lives in the gap a handoff doesn't see.</li>
-          <li><strong>Building AI features as engineering.</strong> Prompt modules in source. Schema-bound outputs. Structured pipelines that hold up under traffic. ChatOBD2 is the worked example: six deterministic layers in front of every model call, prompts assembled per scan from a 38,000-token budget.</li>
+          <li><strong>Building AI features as engineering.</strong> Prompt modules in source. Schema-bound outputs. Deterministic logic in front of the model, not behind it. In VINly the offer price is computed before any model runs; in ChatOBD2 six reasoning layers and a 38,000-token prompt budget sit in front of every call.</li>
         </ul>
       </section>
 

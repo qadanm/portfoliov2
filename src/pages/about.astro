@@ -26,31 +26,62 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
 
     <header class="about__hero">
       <div class="container-site">
-        <div class="about__sxn">
-          <span class="about__sxn-num">01</span>
-          <span class="about__sxn-label">Profile</span>
-          <span class="about__sxn-rule" aria-hidden="true"></span>
-          <span class="about__sxn-meta">Independent senior generalist</span>
-        </div>
+        <div class="about__hero-grid">
+          <div class="about__hero-copy">
+            <div class="about__sxn">
+              <span class="about__sxn-num">01</span>
+              <span class="about__sxn-label">Profile</span>
+              <span class="about__sxn-rule" aria-hidden="true"></span>
+              <span class="about__sxn-meta">Independent senior generalist</span>
+            </div>
 
-        <h1 class="about__title">Moe Qadan.</h1>
-        <p class="about__hero-sub">
-          Senior UX and frontend practitioner based in Los Angeles. I
-          do the parts of web work that usually get split across a
-          team. Most days that's the seam where Figma, the codebase,
-          the content model, the SEO graph, and the performance budget
-          all have to agree.
-        </p>
+            <h1 class="about__title">Moe Qadan.</h1>
+            <p class="about__hero-sub">
+              Senior UX and frontend practitioner based in Los Angeles. I
+              do the parts of web work that usually get split across a
+              team. Most days that's the seam where Figma, the codebase,
+              the content model, the SEO graph, and the performance budget
+              all have to agree.
+            </p>
 
-        <div class="about__id-strip">
-          <a href="/contact" class="about__id-status" aria-label="Send a message">
-            <span class="about__id-status-dot" aria-hidden="true"></span>
-            Send a message
-          </a>
-          <span class="about__id-sep" aria-hidden="true">/</span>
-          <span class="about__id-loc">Los Angeles, CA</span>
-          <span class="about__id-sep" aria-hidden="true">/</span>
-          <a href="mailto:moe@qadan.co" class="about__id-mail">moe@qadan.co</a>
+            <div class="about__id-strip">
+              <a href="/contact" class="about__id-status" aria-label="Send a message">
+                <span class="about__id-status-dot" aria-hidden="true"></span>
+                Send a message
+              </a>
+              <span class="about__id-sep" aria-hidden="true">/</span>
+              <span class="about__id-loc">Los Angeles, CA</span>
+              <span class="about__id-sep" aria-hidden="true">/</span>
+              <a href="mailto:moe@qadan.co" class="about__id-mail">moe@qadan.co</a>
+            </div>
+          </div>
+
+          <aside class="about__hero-portrait">
+            <div class="about__portrait-frame">
+              {/* Stage layers behind the figure: backlight + grounding plinth.
+                  These keep the all-black wardrobe from sinking into the dark
+                  background. */}
+              <div class="about__portrait-stage" aria-hidden="true">
+                <span class="about__portrait-glow"></span>
+                <span class="about__portrait-plinth"></span>
+              </div>
+
+              <img
+                src="/images/portrait/qadan-portrait.webp"
+                alt="Portrait of Moe Qadan"
+                width="1122"
+                height="1402"
+                fetchpriority="high"
+                decoding="async"
+                class="about__portrait-img"
+              />
+
+              <span class="about__portrait-corner about__portrait-corner--tl" aria-hidden="true"></span>
+              <span class="about__portrait-corner about__portrait-corner--tr" aria-hidden="true"></span>
+              <span class="about__portrait-corner about__portrait-corner--bl" aria-hidden="true"></span>
+              <span class="about__portrait-corner about__portrait-corner--br" aria-hidden="true"></span>
+            </div>
+          </aside>
         </div>
       </div>
     </header>
@@ -70,7 +101,7 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
             <li><strong>Modernizing platforms that can't be rewritten.</strong> Long-running systems with traffic on them, opinions baked in, integrations the business depends on. The win is incremental, sequenced, and invisible when it lands.</li>
             <li><strong>Building component systems engineers actually use.</strong> Typed, documented, scoped, migrated to without flag days. Right now it's a 100+ component Razor partial library at MagTek; previously it was per-tenant CSS systems on InvestCloud's framework across more than 50 institutions.</li>
             <li><strong>Translating design intent into code at fidelity.</strong> Reading what the file is asking for, not just what it specifies, and closing the gaps a handoff doesn't see. Most production breakage lives in those gaps.</li>
-            <li><strong>Shipping AI-assisted features without the buzzword tax.</strong> Prompts as system rather than scattered components. Schema-bound outputs. The model held as one stage in a pipeline. ChatOBD2 is the worked example.</li>
+            <li><strong>Shipping AI-assisted features without the buzzword tax.</strong> Prompts as system rather than scattered components. Schema-bound outputs. The model held as one stage in a pipeline. VINly is the shipped example: its offer price is computed by deterministic functions the model never overrides, and ChatOBD2 holds the same line in diagnostics.</li>
           </ul>
         </section>
 
@@ -95,6 +126,35 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
                   <span class="about__career-status-dot"></span>
                   Current
                 </span>
+                <h3 class="about__career-title">VINly</h3>
+                <span class="about__career-period">2026</span>
+              </header>
+              <p class="about__career-desc">
+                Founder, sole designer and engineer. An iOS app that turns
+                a used-car listing into a priced buyer's report: a verdict,
+                an opening offer, a walk-away floor. The hard part was
+                trust. The numbers that cost money are computed by
+                deterministic functions and pinned by tests, so the model
+                explains an offer it is never allowed to invent. Submitted
+                to the App Store and in review.
+              </p>
+              <p class="about__career-stack">
+                Expo / React Native · TypeScript · Supabase Edge (Deno) ·
+                Anthropic Sonnet + DeepSeek · RevenueCat · Astro
+              </p>
+            </li>
+
+            <li class="about__career-item about__career-item--current about__career-item--flagship">
+              <span class="about__career-corner about__career-corner--tl" aria-hidden="true"></span>
+              <span class="about__career-corner about__career-corner--tr" aria-hidden="true"></span>
+              <span class="about__career-corner about__career-corner--bl" aria-hidden="true"></span>
+              <span class="about__career-corner about__career-corner--br" aria-hidden="true"></span>
+
+              <header class="about__career-head">
+                <span class="about__career-status">
+                  <span class="about__career-status-dot"></span>
+                  Current
+                </span>
                 <h3 class="about__career-title">ChatOBD2</h3>
                 <span class="about__career-period">2025 to present</span>
               </header>
@@ -104,7 +164,8 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
                 marketing site, developer portal, prompt pipeline. The
                 design problem was translation. Vehicle data is messy and
                 technical; the verdict has to be a single sentence the
-                driver can act on.
+                driver can act on. Now in QA and field testing ahead of
+                release.
               </p>
               <p class="about__career-stack">
                 React Native (Expo) · TypeScript · Supabase · BLE ·
@@ -227,6 +288,10 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
             <li>
               <span class="about__card-key">Building</span>
               <span class="about__card-val about__card-val--building">
+                <a href="/work/vinly" class="about__card-pill about__card-pill--flagship">
+                  <span class="about__card-pill-dot"></span>
+                  VINly
+                </a>
                 <a href="/work/chatobd2" class="about__card-pill about__card-pill--flagship">
                   <span class="about__card-pill-dot"></span>
                   ChatOBD2
@@ -474,6 +539,188 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     color: var(--color-accent);
     text-decoration-color: var(--color-accent);
   }
+
+  /* Hero two-column: copy beside the portrait */
+  .about__hero-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+
+  .about__hero-copy {
+    min-width: 0;
+  }
+
+  @media (min-width: 880px) {
+    .about__hero-grid {
+      grid-template-columns: 1fr minmax(260px, 360px);
+      gap: clamp(var(--space-8), 5vw, var(--space-16));
+      align-items: center;
+    }
+  }
+
+  /* Portrait — same designed-object fingerprint as the project cards:
+     bordered frame, accent backlight, grounding plinth, corner crosshairs.
+     The backlight + plinth + stacked drop-shadows are what stop the
+     all-black wardrobe from disappearing into the dark background. */
+  .about__hero-portrait {
+    position: relative;
+    width: 100%;
+    max-width: 320px;
+    margin-inline: auto;
+  }
+
+  @media (min-width: 880px) {
+    .about__hero-portrait {
+      max-width: 360px;
+      margin-inline: 0;
+      justify-self: end;
+    }
+  }
+
+  .about__portrait-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1122 / 1402;
+    border-radius: var(--radius-2xl);
+    border: 1px solid var(--color-border);
+    overflow: hidden;
+    isolation: isolate;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.04) inset,
+      0 30px 60px -20px rgba(0, 0, 0, 0.45);
+    background:
+      linear-gradient(180deg,
+        color-mix(in srgb, var(--color-bg-elevated) 85%, transparent) 0%,
+        color-mix(in srgb, var(--color-bg-muted) 95%, transparent) 60%,
+        color-mix(in srgb, var(--color-bg-deep) 95%, transparent) 100%
+      );
+    transition: border-color 320ms var(--ease-out), box-shadow 320ms var(--ease-out);
+  }
+
+  :global([data-theme="light"]) .about__portrait-frame {
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.6) inset,
+      0 1px 2px rgba(15, 15, 20, 0.04),
+      0 24px 48px -16px rgba(15, 15, 20, 0.10);
+  }
+
+  .about__portrait-frame:hover {
+    border-color: var(--color-accent-muted);
+  }
+
+  .about__portrait-stage {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Ambient backlight that catches the upper torso. */
+  .about__portrait-glow {
+    position: absolute;
+    top: 12%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 110%;
+    height: 75%;
+    background:
+      radial-gradient(ellipse 50% 60% at 50% 40%,
+        color-mix(in srgb, var(--color-accent) 18%, transparent) 0%,
+        color-mix(in srgb, var(--color-accent) 6%, transparent) 35%,
+        transparent 70%
+      );
+    filter: blur(28px);
+    opacity: 0.85;
+  }
+
+  :global([data-theme="light"]) .about__portrait-glow {
+    background:
+      radial-gradient(ellipse 50% 60% at 50% 40%,
+        color-mix(in srgb, var(--color-accent) 12%, transparent) 0%,
+        color-mix(in srgb, var(--color-accent) 4%, transparent) 35%,
+        transparent 70%
+      );
+    opacity: 0.7;
+  }
+
+  /* Tonal panel the lower torso lands on. */
+  .about__portrait-plinth {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 32%;
+    background:
+      linear-gradient(180deg,
+        transparent 0%,
+        color-mix(in srgb, var(--color-bg-deep) 40%, transparent) 35%,
+        color-mix(in srgb, var(--color-bg-deep) 80%, transparent) 100%
+      );
+  }
+
+  :global([data-theme="light"]) .about__portrait-plinth {
+    background:
+      linear-gradient(180deg,
+        transparent 0%,
+        color-mix(in srgb, #1F1408 5%, transparent) 35%,
+        color-mix(in srgb, #1F1408 9%, transparent) 100%
+      );
+  }
+
+  .about__portrait-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+    z-index: 2;
+    filter:
+      contrast(1.03)
+      saturate(1.05)
+      drop-shadow(0 0 0.4px rgba(0, 0, 0, 0.95))
+      drop-shadow(0 0 0.8px rgba(0, 0, 0, 0.75))
+      drop-shadow(0 0 1.4px rgba(0, 0, 0, 0.45))
+      drop-shadow(0 14px 30px rgba(0, 0, 0, 0.4));
+    transition: transform 720ms var(--ease-out);
+  }
+
+  :global([data-theme="light"]) .about__portrait-img {
+    filter:
+      contrast(0.97)
+      saturate(0.96)
+      brightness(1.02)
+      drop-shadow(0 0 0.4px rgba(40, 30, 20, 0.55))
+      drop-shadow(0 0 0.9px rgba(40, 30, 20, 0.35))
+      drop-shadow(0 12px 24px rgba(15, 15, 20, 0.18));
+  }
+
+  .about__portrait-frame:hover .about__portrait-img {
+    transform: scale(1.015);
+  }
+
+  .about__portrait-corner {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border: 1px solid var(--color-text-subtle);
+    pointer-events: none;
+    z-index: 3;
+    opacity: 0.55;
+    transition: opacity 240ms, border-color 240ms;
+  }
+
+  .about__portrait-frame:hover .about__portrait-corner {
+    opacity: 1;
+    border-color: var(--color-accent);
+  }
+
+  .about__portrait-corner--tl { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+  .about__portrait-corner--tr { top: 10px; right: 10px; border-left: none; border-bottom: none; }
+  .about__portrait-corner--bl { bottom: 10px; left: 10px; border-right: none; border-top: none; }
+  .about__portrait-corner--br { bottom: 10px; right: 10px; border-left: none; border-top: none; }
 
   /* Body grid */
   .about__body {

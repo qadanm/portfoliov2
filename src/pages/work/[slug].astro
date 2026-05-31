@@ -144,7 +144,7 @@ const categoryKey = data.category.toLowerCase();
           {data.status && (
             <div>
               <dt>Status</dt>
-              <dd><span class="cs__meta-text cs__meta-text--status"><span class="cs__status-dot" aria-hidden="true"></span>{data.status}</span></dd>
+              <dd><span class:list={['cs__meta-text', 'cs__meta-text--status', { 'cs__meta-text--coming': data.comingSoon }]}><span class:list={['cs__status-dot', { 'cs__status-dot--coming': data.comingSoon }]} aria-hidden="true"></span>{data.status}</span></dd>
             </div>
           )}
           <div>
@@ -368,6 +368,24 @@ const categoryKey = data.category.toLowerCase();
               evidence attached.
             </p>
           </header>
+          <div class="cs__shot-grid">
+            <figure class="cs__shot">
+              <img
+                src="/images/vinly/listing-vs-report.webp"
+                alt="Side by side: a raw Facebook Marketplace listing for a 2017 Lexus GX 460 — $24,500, 155k miles, posted by a private seller and flagged with 4 red flags — next to the VINly report that reads it. The report returns an INSPECT verdict, a $20,825 opening offer marked −$3,675 versus asking, a WALK $20.3k to ASK $24.6k range, a 'Worth seeing, inspect hard' note about timing-cover and valley-plate leaks on the 1UR-FE engine, tiles for 4 known issues, $6.8–14k year-one cost, and 0 open recalls, and an index of what the full report contains."
+                width="1920"
+                height="1166"
+                loading="lazy"
+              />
+              <figcaption>
+                The whole product in one frame: a wall-of-optimism listing
+                on the left, the buyer's report it becomes on the right.
+                Same car, generated in about a hundred seconds — verdict,
+                opening offer, the distance to walk, and a receipt under
+                every claim.
+              </figcaption>
+            </figure>
+          </div>
           <div class="cs__shot-grid cs__shot-grid--phones">
             <figure class="cs__shot">
               <img
@@ -514,6 +532,73 @@ const categoryKey = data.category.toLowerCase();
             market for a few weeks, not forever — so the product is built
             to be picked up, used hard, and put back down.
           </p>
+        </section>
+
+        <section class="container-site cs__post">
+          <header class="cs__post-head">
+            <div class="cs__post-sxn">
+              <span class="cs__post-num">06</span>
+              <span class="cs__post-eyebrow">The full spectrum</span>
+              <span class="cs__post-rule" aria-hidden="true"></span>
+            </div>
+            <h2 class="cs__post-title">Three listings. Three verdicts. The same $3.99.</h2>
+            <p class="cs__post-sub">
+              VINly isn't a funnel that always says buy. A clean Civic gets
+              a green light, a high-mileage GX gets an inspect-hard, and a
+              salvage-title Mustang gets walked — and the price is identical,
+              because the verdict a buyer needs isn't for sale.
+            </p>
+          </header>
+          <div class="cs__shot-grid">
+            <figure class="cs__shot">
+              <img
+                src="/images/vinly/three-verdicts.webp"
+                alt="VINly's full-spectrum view: three side-by-side verdict cards at the same $3.99. WORTH SEEING in green — a 2014 Honda Civic LX in Oakland, $8,400, about $500 under asking, a clean 78k-mile car priced near the comp median. INSPECT in orange — a 2017 Lexus GX 460 Premium in Anaheim, $20,825, high-mileage with timing-cover and valley-plate work due-or-done. WALK AWAY in red — a 2018 Ford Mustang GT in Sacramento asking $14,000, salvage title, cash-only, no test drives, skip the drive."
+                width="1920"
+                height="956"
+                loading="lazy"
+              />
+              <figcaption>
+                Three real listings, three different answers. The verdict
+                most reports land on is inspect, not buy — and some are a
+                flat walk. A tool that always says buy is one you can't
+                trust the one time it matters.
+              </figcaption>
+            </figure>
+          </div>
+        </section>
+
+        <section class="container-site cs__post cs__post--alt">
+          <header class="cs__post-head">
+            <div class="cs__post-sxn">
+              <span class="cs__post-num">07</span>
+              <span class="cs__post-eyebrow">The surface</span>
+              <span class="cs__post-rule" aria-hidden="true"></span>
+            </div>
+            <h2 class="cs__post-title">And the site that frames it.</h2>
+            <p class="cs__post-sub">
+              The marketing site, the copy, the pricing, the live sample
+              report — same hand, same week. "Read the listing like a
+              mechanic" is the whole pitch in five words, shipping the same
+              buyer-report card the app returns.
+            </p>
+          </header>
+          <div class="cs__shot-grid">
+            <figure class="cs__shot">
+              <img
+                src="/images/vinly/site-hero.webp"
+                alt="The VINly marketing site: a bold headline 'Read the listing like a mechanic.' over a subhead about turning a Marketplace screenshot into a buyer's report in ninety seconds for four dollars, an App Store download button and a 'See a sample report' link, and a live sample buyer-report card for a 2017 Lexus GX 460 Premium in Anaheim showing an INSPECT verdict, a $20,825 opening offer, a WALK-to-ASKING range, and a $6.8k–14.5k year-one cost."
+                width="1920"
+                height="1125"
+                loading="lazy"
+              />
+              <figcaption>
+                Landing page, copy, pricing, and the sample report — also
+                one person's work. The same listing-to-verdict logic that
+                runs the app frames the pitch on the web.
+              </figcaption>
+            </figure>
+          </div>
         </section>
       </>
     )}
@@ -1148,6 +1233,17 @@ const categoryKey = data.category.toLowerCase();
   @keyframes cs-status-pulse {
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.6; transform: scale(0.85); }
+  }
+
+  /* Coming-soon status — muted, not the live green, and no pulse. */
+  .cs__meta-text--coming {
+    color: var(--color-text-muted);
+  }
+
+  .cs__status-dot--coming {
+    background-color: var(--color-text-subtle);
+    box-shadow: none;
+    animation: none;
   }
 
   @media (prefers-reduced-motion: reduce) {

@@ -16,6 +16,7 @@ const build = defineCollection({
       labelTone: z.enum(['light', 'dark']).default('light'),
     }),
     featured: z.boolean().default(false),
+    comingSoon: z.boolean().default(false),
     order: z.number().default(99),
     draft: z.boolean().default(false),
     engagement: z.enum(['independent', 'work']).default('independent'),

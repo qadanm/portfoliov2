@@ -71,7 +71,12 @@ const categoryKey = data.category.toLowerCase();
       {number && (
         <span class="pcard__seq">{number}</span>
       )}
-      {data.category === 'Flagship' && (
+      {data.comingSoon ? (
+        <span class="pcard__pill pcard__pill--soon">
+          <span class="pcard__pill-dot" aria-hidden="true"></span>
+          Coming soon
+        </span>
+      ) : data.category === 'Flagship' && (
         <span class="pcard__pill">
           <span class="pcard__pill-dot" aria-hidden="true"></span>
           Flagship
@@ -341,6 +346,19 @@ const categoryKey = data.category.toLowerCase();
     border-radius: 50%;
     background-color: #FBBF24;
     box-shadow: 0 0 6px #F59E0B;
+  }
+
+  /* Coming-soon variant — neutral slate over a dark scrim, deliberately
+     not the live amber/green. Legible over any artifact in either theme. */
+  .pcard__pill--soon {
+    background-color: rgba(15, 23, 42, 0.55);
+    color: #E2E8F0;
+    border-color: rgba(226, 232, 240, 0.18);
+  }
+
+  .pcard__pill--soon .pcard__pill-dot {
+    background-color: #E2E8F0;
+    box-shadow: none;
   }
 
   .pcard__body {
