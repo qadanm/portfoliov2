@@ -3,8 +3,8 @@ import Placeholder from './Placeholder.astro';
 import VerdictArtifact from './artifacts/VerdictArtifact.astro';
 import VinlyArtifact from './artifacts/VinlyArtifact.astro';
 import PlatformArtifact from './artifacts/PlatformArtifact.astro';
-import SawaArtifact from './artifacts/SawaArtifact.astro';
 import AdvisorArtifact from './artifacts/AdvisorArtifact.astro';
+import CarSpotterArtifact from './artifacts/CarSpotterArtifact.astro';
 import type { CollectionEntry } from 'astro:content';
 
 interface Props {
@@ -22,8 +22,8 @@ const { data, slug } = project;
 const artifactMap: Record<string, any> = {
   'chatobd2': VerdictArtifact,
   'vinly': VinlyArtifact,
+  'car-spotter': CarSpotterArtifact,
   'magtek-platform': PlatformArtifact,
-  'sawa': SawaArtifact,
   'financial-platforms': AdvisorArtifact,
 };
 
@@ -274,7 +274,7 @@ const categoryKey = data.category.toLowerCase();
   .pcard__media :global(.vart),
   .pcard__media :global(.vinart),
   .pcard__media :global(.part),
-  .pcard__media :global(.sart),
+  .pcard__media :global(.csart),
   .pcard__media :global(.aart),
   .pcard__media :global(.placeholder) {
     position: absolute;
@@ -286,7 +286,7 @@ const categoryKey = data.category.toLowerCase();
   .pcard:hover .pcard__media :global(.vart),
   .pcard:hover .pcard__media :global(.vinart),
   .pcard:hover .pcard__media :global(.part),
-  .pcard:hover .pcard__media :global(.sart),
+  .pcard:hover .pcard__media :global(.csart),
   .pcard:hover .pcard__media :global(.aart) {
     transform: scale(1.025);
   }

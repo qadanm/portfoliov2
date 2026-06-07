@@ -123,11 +123,11 @@ gen_card "${OUT_DIR}/magtek-platform.jpg" \
   "Case study" \
   "qadan.co · 2026"
 
-gen_card "${OUT_DIR}/sawa.jpg" \
-  "Sawa." \
-  "Marketing site for an iMessage-native group dining app." \
-  "PRODUCT" \
-  "A78BFA" \
+gen_card "${OUT_DIR}/car-spotter.jpg" \
+  "CarSpotter." \
+  "A daily car-spotting game for enthusiasts. Designed and engineered solo for iOS." \
+  "FLAGSHIP" \
+  "C8FF00" \
   "Case study" \
   "qadan.co · 2026"
 

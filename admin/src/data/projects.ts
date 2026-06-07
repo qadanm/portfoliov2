@@ -186,46 +186,6 @@ export const projects: Project[] = [
       },
     ],
   },
-  {
-    id: 'sawa',
-    title: 'Sawa Marketing Site',
-    role: 'Designer & Frontend Engineer',
-    period: '2024',
-    location: 'Independent',
-    role_priority: {
-      'product-designer': 'support',
-      'senior-product-designer': 'mention',
-      'ux-engineer': 'mention',
-      'frontend-ux-engineer': 'mention',
-      'design-engineer': 'support',
-      'web-experience-manager': 'support',
-      'design-systems-engineer': 'mention',
-      'ai-product-designer': 'support',
-      'ux-product-lead': 'mention',
-    },
-    bullets: [
-      {
-        text: 'Designed and built the marketing site for Sawa, a group-decision dining app. Scope was the marketing surface, not the app itself.',
-        serves: ['design', 'product'],
-        weight: 4,
-      },
-      {
-        text: 'Two surfaces did the convincing: a live matches feed (real squads, real restaurants, real time) and a curated City Food Guides section sourced from Reddit threads with attribution kept intact. Content as proof, not promises.',
-        serves: ['design', 'product'],
-        weight: 4,
-      },
-      {
-        text: 'Tone alignment as the brief: carry the app’s calm, low-friction feel into the marketing surface that introduces it. The install path is one number long — SMS in, app link out, no account creation before the user has seen the value.',
-        serves: ['product', 'design'],
-        weight: 4,
-      },
-      {
-        text: 'Stack: Next.js, Tailwind, content-driven city guides, hand-built layouts.',
-        serves: ['engineering'],
-        weight: 2,
-      },
-    ],
-  },
 ];
 
 export const projectById = (id: string): Project | undefined =>
