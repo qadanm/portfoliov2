@@ -1,0 +1,556 @@
+---
+// The Garage — the car-enthusiast showcase for the three mobile apps.
+// CarSpotter is the hero (largest, lime arcade, the best-designed card);
+// VINly + ChatOBD2 sit below as a brand-accented 2-up. Energetic, warm/dark,
+// automotive — deliberately "these are mine," the opposite of the corporate
+// Experience wall that follows it.
+const apps = {
+  carspotter: {
+    href: '/work/car-spotter',
+    poster: '/images/car-spotter/poster.webp',
+    alt: 'CarSpotter portfolio poster — tilted iPhone screenshots of the daily car-detail guessing game on a dark garage backdrop.',
+  },
+  vinly: {
+    href: '/work/vinly',
+    poster: '/images/vinly/poster.webp',
+    alt: 'VINly portfolio poster — a warm, cream layout fanning five iPhone screenshots of the AI used-car buyer report.',
+  },
+  chatobd2: {
+    href: '/work/chatobd2',
+    poster: '/images/chatobd2/poster.webp',
+    alt: 'ChatOBD2 portfolio poster — a light blue tech layout with the AI car-diagnostics app and an OBD-II adapter.',
+  },
+};
+---
+
+<section class="garage" id="garage" aria-labelledby="garage-title">
+  <span class="garage__atmos" aria-hidden="true"></span>
+  <span class="garage__scan" aria-hidden="true"></span>
+
+  <div class="container-site garage__inner">
+    <header class="garage__head" data-reveal>
+      <div class="garage__sxn">
+        <span class="garage__sxn-num">02</span>
+        <span class="garage__sxn-label">The Garage</span>
+        <span class="garage__sxn-rule" aria-hidden="true"></span>
+        <span class="garage__sxn-meta">Built by a car enthusiast</span>
+      </div>
+      <h2 class="garage__title" id="garage-title">Built for the love of cars.</h2>
+      <p class="garage__lede">
+        I'm a car guy who ships car apps — three of them, designed and
+        engineered solo. A daily spotting game, an AI buyer's report, and an
+        AI mechanic in your pocket.
+      </p>
+    </header>
+
+    {/* ── Hero: CarSpotter ─────────────────────────────────────────── */}
+    <a
+      href={apps.carspotter.href}
+      class="garage__hero"
+      data-reveal
+      data-reveal-delay="2"
+      data-track="cta_click"
+      data-track-cta="garage-hero"
+      data-track-project="car-spotter"
+    >
+      <span class="garage__hero-corner garage__hero-corner--tl" aria-hidden="true"></span>
+      <span class="garage__hero-corner garage__hero-corner--tr" aria-hidden="true"></span>
+      <span class="garage__hero-corner garage__hero-corner--bl" aria-hidden="true"></span>
+      <span class="garage__hero-corner garage__hero-corner--br" aria-hidden="true"></span>
+
+      <div class="garage__hero-media">
+        <img src={apps.carspotter.poster} alt={apps.carspotter.alt} width="2560" height="1600" loading="lazy" decoding="async" />
+        <span class="garage__hero-redline" aria-hidden="true"></span>
+      </div>
+
+      <div class="garage__hero-body">
+        <div class="garage__hero-tags">
+          <span class="garage__chip garage__chip--flag">Flagship</span>
+          <span class="garage__hero-kind">iOS · daily game</span>
+        </div>
+        <h3 class="garage__hero-name">CarSpotter</h3>
+        <p class="garage__hero-desc">
+          The daily car-spotting game. Five cropped details, four answers,
+          ten seconds — for the people who can name a chassis code from a
+          single headlight.
+        </p>
+        <ul class="garage__spec">
+          <li><span>Daily 5</span></li>
+          <li><span>12 detail types</span></li>
+          <li><span>Spoiler-free share</span></li>
+        </ul>
+        <span class="garage__cta">
+          Open the case study
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M3 13L13 3M13 3H5M13 3v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </div>
+    </a>
+
+    {/* ── 2-up: VINly + ChatOBD2 ───────────────────────────────────── */}
+    <div class="garage__pair">
+      <a
+        href={apps.vinly.href}
+        class="garage__app garage__app--vinly"
+        data-reveal
+        data-reveal-delay="3"
+        data-track="cta_click"
+        data-track-cta="garage-app"
+        data-track-project="vinly"
+      >
+        <div class="garage__app-media">
+          <img src={apps.vinly.poster} alt={apps.vinly.alt} width="2560" height="1600" loading="lazy" decoding="async" />
+        </div>
+        <div class="garage__app-body">
+          <div class="garage__app-tags">
+            <span class="garage__chip garage__chip--flag">Flagship</span>
+            <span class="garage__app-kind">iOS · AI report</span>
+          </div>
+          <h3 class="garage__app-name">VINly</h3>
+          <p class="garage__app-desc">
+            A used-car listing in, a priced buyer's report out — verdict,
+            opening offer, walk-away floor. In review on the App Store.
+          </p>
+          <span class="garage__app-link">
+            Case study
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M3 13L13 3M13 3H5M13 3v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </div>
+      </a>
+
+      <a
+        href={apps.chatobd2.href}
+        class="garage__app garage__app--chatobd"
+        data-reveal
+        data-reveal-delay="4"
+        data-track="cta_click"
+        data-track-cta="garage-app"
+        data-track-project="chatobd2"
+      >
+        <div class="garage__app-media">
+          <img src={apps.chatobd2.poster} alt={apps.chatobd2.alt} width="2560" height="1600" loading="lazy" decoding="async" />
+        </div>
+        <div class="garage__app-body">
+          <div class="garage__app-tags">
+            <span class="garage__chip garage__chip--soon">Coming soon</span>
+            <span class="garage__app-kind">iOS · AI diagnostics</span>
+          </div>
+          <h3 class="garage__app-name">ChatOBD2</h3>
+          <p class="garage__app-desc">
+            Your AI car mechanic. Plug in an OBD-II adapter, ask your car
+            anything, and get a real diagnosis in plain English.
+          </p>
+          <span class="garage__app-link">
+            Case study
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M3 13L13 3M13 3H5M13 3v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ─── Section frame: warm/dark automotive band ──────────────────── */
+  .garage {
+    position: relative;
+    overflow: hidden;
+    padding-top: var(--space-16);
+    padding-bottom: var(--space-16);
+    border-top: 1px solid var(--color-border-subtle);
+    --lime: #C8FF00;
+    --lime-rgb: 200, 255, 0;
+  }
+
+  @media (min-width: 768px) {
+    .garage {
+      padding-top: var(--space-24);
+      padding-bottom: var(--space-24);
+    }
+  }
+
+  /* A deeper, warmer wash than the page — the "garage" atmosphere. */
+  .garage__atmos {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 60% 50% at 82% 8%, rgba(var(--lime-rgb), 0.10), transparent 60%),
+      radial-gradient(ellipse 70% 60% at 8% 100%, rgba(234, 88, 12, 0.06), transparent 62%);
+  }
+  :global([data-theme="light"]) .garage__atmos {
+    background:
+      radial-gradient(ellipse 60% 50% at 82% 8%, rgba(146, 184, 0, 0.10), transparent 60%),
+      radial-gradient(ellipse 70% 60% at 8% 100%, rgba(234, 88, 12, 0.05), transparent 62%);
+  }
+
+  .garage__scan {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.5;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 3px,
+      rgba(255, 255, 255, 0.014) 3px,
+      rgba(255, 255, 255, 0.014) 4px
+    );
+    mask-image: radial-gradient(ellipse 90% 70% at 70% 30%, #000, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 90% 70% at 70% 30%, #000, transparent 75%);
+  }
+  :global([data-theme="light"]) .garage__scan { display: none; }
+
+  .garage__inner { position: relative; z-index: 1; }
+
+  /* ─── Section head ──────────────────────────────────────────────── */
+  .garage__sxn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: var(--space-5);
+  }
+  .garage__sxn-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 22px;
+    padding: 0 7px;
+    border-radius: 4px;
+    border: 1px solid rgba(var(--lime-rgb), 0.4);
+    background-color: rgba(var(--lime-rgb), 0.08);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1;
+  }
+  .garage__sxn-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-text);
+  }
+  .garage__sxn-rule {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, rgba(var(--lime-rgb), 0.5), transparent);
+    min-width: 24px;
+    max-width: 520px;
+  }
+  .garage__sxn-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-text-subtle);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .garage__head {
+    max-width: 760px;
+    margin-bottom: var(--space-10);
+  }
+  @media (min-width: 768px) {
+    .garage__head { margin-bottom: var(--space-12); }
+  }
+  .garage__title {
+    font-family: var(--font-display);
+    font-size: clamp(34px, 5.4vw, 60px);
+    font-weight: 400;
+    letter-spacing: -0.022em;
+    line-height: 1.04;
+    color: var(--color-text);
+    margin-bottom: var(--space-5);
+  }
+  .garage__lede {
+    font-size: clamp(15px, 1.5vw, 17px);
+    line-height: 1.65;
+    color: var(--color-text-muted);
+    max-width: 56ch;
+  }
+
+  /* ─── Shared chips ──────────────────────────────────────────────── */
+  .garage__chip {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 9px;
+    border-radius: 9999px;
+    line-height: 1;
+  }
+  .garage__chip--flag {
+    color: #0B0C0E;
+    background: var(--lime);
+    box-shadow: 0 0 14px rgba(var(--lime-rgb), 0.35);
+  }
+  .garage__chip--soon {
+    color: var(--color-text);
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border-strong);
+  }
+
+  /* ─── Hero card: CarSpotter ─────────────────────────────────────── */
+  .garage__hero {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
+    background: linear-gradient(180deg, var(--color-bg-elevated), var(--color-bg-muted));
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    margin-bottom: var(--space-5);
+    transition: border-color 360ms var(--ease-out), box-shadow 360ms var(--ease-out), transform 360ms var(--ease-out);
+    will-change: transform;
+  }
+  @media (min-width: 880px) {
+    .garage__hero { grid-template-columns: 1.32fr 1fr; }
+  }
+
+  .garage__hero:hover {
+    transform: translateY(-4px);
+    border-color: rgba(var(--lime-rgb), 0.5);
+    box-shadow: var(--shadow-card-hover), 0 0 0 1px rgba(var(--lime-rgb), 0.25), 0 24px 60px rgba(var(--lime-rgb), 0.10);
+  }
+
+  .garage__hero-media {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+    background: #0B0C0E;
+    border-bottom: 1px solid var(--color-border);
+  }
+  @media (min-width: 880px) {
+    .garage__hero-media { border-bottom: none; border-right: 1px solid var(--color-border); aspect-ratio: auto; }
+  }
+  .garage__hero-media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: transform 700ms var(--ease-out);
+    will-change: transform;
+  }
+  .garage__hero:hover .garage__hero-media img { transform: scale(1.035); }
+
+  /* redline sweep that flares on hover */
+  .garage__hero-redline {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 3px;
+    background: linear-gradient(to right, transparent, var(--lime), transparent);
+    opacity: 0;
+    transform: scaleX(0.4);
+    transition: opacity 360ms var(--ease-out), transform 520ms var(--ease-out);
+  }
+  .garage__hero:hover .garage__hero-redline { opacity: 0.9; transform: scaleX(1); }
+
+  .garage__hero-corner {
+    position: absolute;
+    width: 12px; height: 12px;
+    border: 1.5px solid rgba(var(--lime-rgb), 0.0);
+    z-index: 3;
+    transition: border-color 280ms var(--ease-out);
+  }
+  .garage__hero:hover .garage__hero-corner { border-color: var(--lime); }
+  .garage__hero-corner--tl { top: 12px; left: 12px; border-right: none; border-bottom: none; }
+  .garage__hero-corner--tr { top: 12px; right: 12px; border-left: none; border-bottom: none; }
+  .garage__hero-corner--bl { bottom: 12px; left: 12px; border-right: none; border-top: none; }
+  .garage__hero-corner--br { bottom: 12px; right: 12px; border-left: none; border-top: none; }
+
+  .garage__hero-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-7) var(--space-6);
+  }
+  @media (min-width: 880px) {
+    .garage__hero-body { padding: var(--space-10) var(--space-8); justify-content: center; }
+  }
+
+  .garage__hero-tags { display: flex; align-items: center; gap: 10px; }
+  .garage__hero-kind {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--color-text-subtle);
+    text-transform: uppercase;
+  }
+  .garage__hero-name {
+    font-family: var(--font-display);
+    font-size: clamp(40px, 6vw, 64px);
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    line-height: 0.98;
+    color: var(--color-text);
+  }
+  .garage__hero-desc {
+    font-size: clamp(15px, 1.6vw, 17px);
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    max-width: 46ch;
+  }
+  .garage__spec {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    list-style: none;
+    padding: var(--space-4) 0 0;
+    margin: 0;
+    border-top: 1px solid var(--color-border-subtle);
+  }
+  .garage__spec li {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--color-text-subtle);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .garage__spec li::before {
+    content: '';
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--lime);
+    box-shadow: 0 0 6px rgba(var(--lime-rgb), 0.6);
+  }
+  .garage__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: var(--space-2);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+  .garage__cta svg { transition: transform 240ms var(--ease-out); }
+  .garage__hero:hover .garage__cta { color: var(--lime); }
+  :global([data-theme="light"]) .garage__hero:hover .garage__cta { color: #5b7300; }
+  .garage__hero:hover .garage__cta svg { transform: translate(3px, -3px); }
+
+  /* ─── 2-up: VINly + ChatOBD2 ────────────────────────────────────── */
+  .garage__pair {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+  @media (min-width: 720px) {
+    .garage__pair { grid-template-columns: 1fr 1fr; }
+  }
+
+  .garage__app {
+    --g-accent: var(--color-accent);
+    --g-rgb: 245, 158, 11;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    background: linear-gradient(180deg, var(--color-bg-elevated), var(--color-bg-muted));
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    transition: border-color 360ms var(--ease-out), box-shadow 360ms var(--ease-out), transform 360ms var(--ease-out);
+    will-change: transform;
+  }
+  .garage__app--vinly { --g-accent: #EA580C; --g-rgb: 234, 88, 12; }
+  .garage__app--chatobd { --g-accent: #3B82F6; --g-rgb: 59, 130, 246; }
+
+  .garage__app:hover {
+    transform: translateY(-4px);
+    border-color: rgba(var(--g-rgb), 0.5);
+    box-shadow: var(--shadow-card-hover), 0 0 0 1px rgba(var(--g-rgb), 0.2);
+  }
+
+  .garage__app-media {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+    background: var(--color-bg-deep);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .garage__app-media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 700ms var(--ease-out);
+    will-change: transform;
+  }
+  .garage__app:hover .garage__app-media img { transform: scale(1.04); }
+
+  .garage__app-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-5) var(--space-5) var(--space-6);
+    flex: 1;
+  }
+  .garage__app-tags { display: flex; align-items: center; gap: 9px; }
+  .garage__app-kind {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+  }
+  .garage__app--vinly .garage__app-tags .garage__chip--flag { background: #EA580C; color: #FFF7ED; box-shadow: 0 0 14px rgba(234, 88, 12, 0.35); }
+  .garage__app-name {
+    font-family: var(--font-display);
+    font-size: clamp(26px, 3.4vw, 34px);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    color: var(--color-text);
+  }
+  .garage__app-desc {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    flex: 1;
+  }
+  .garage__app-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: var(--space-1);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+    transition: color 240ms var(--ease-out);
+  }
+  .garage__app-link svg { transition: transform 240ms var(--ease-out); }
+  .garage__app:hover .garage__app-link { color: var(--g-accent); }
+  .garage__app:hover .garage__app-link svg { transform: translate(2px, -2px); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .garage__hero, .garage__app, .garage__hero-media img, .garage__app-media img,
+    .garage__hero-redline, .garage__cta svg, .garage__app-link svg {
+      transition: none !important;
+    }
+    .garage__hero:hover, .garage__app:hover { transform: none; }
+    .garage__hero:hover .garage__hero-media img, .garage__app:hover .garage__app-media img { transform: none; }
+  }
+</style>

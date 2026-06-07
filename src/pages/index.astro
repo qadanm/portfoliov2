@@ -1,16 +1,13 @@
 ---
 import BaseLayout from '@/components/layout/BaseLayout.astro';
 import Hero from '@/components/home/Hero.astro';
-import ProjectGrid from '@/components/ProjectGrid.astro';
-import { getCollection } from 'astro:content';
-
-const projects = (await getCollection('build', ({ data }) => !data.draft))
-  .sort((a, b) => a.data.order - b.data.order);
+import GarageShowcase from '@/components/home/GarageShowcase.astro';
+import ExperienceWall from '@/components/home/ExperienceWall.astro';
 ---
 
 <BaseLayout
   title="Moe Qadan, UX Engineer & Frontend Systems"
-  description="Portfolio of Moe Qadan, a senior UX and frontend practitioner in Los Angeles. UX engineering, frontend systems, design systems, content architecture, SEO, accessibility, and AI-assisted product work. Selected projects include VINly, an AI buyer's report for used-car shoppers; ChatOBD2; MagTek's multi-site platform; and advisor portals deployed across more than 50 wealth and banking institutions."
+  description="Portfolio of Moe Qadan, a senior UX and frontend practitioner in Los Angeles. UX engineering, frontend systems, design systems, content architecture, SEO, accessibility, and AI-assisted product work. Selected projects include CarSpotter, a daily car-spotting game for iOS; VINly, an AI buyer's report for used-car shoppers; ChatOBD2; MagTek's multi-site platform; and advisor portals deployed across more than 50 wealth and banking institutions."
   keywords={[
     'Moe Qadan',
     'Muhammed Qadan',
@@ -27,31 +24,11 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
 >
   <Hero />
 
-  {/* Selected work. Numbered editorial head, then the cards do the rest. */}
-  <section class="home-work" id="work">
-    <div class="container-site">
-      <div class="home-work__head" data-reveal>
-        <div class="home-work__sxn">
-          <span class="home-work__sxn-num">02</span>
-          <span class="home-work__sxn-label">Selected work</span>
-          <span class="home-work__sxn-rule" aria-hidden="true"></span>
-          <span class="home-work__sxn-meta">2026 / case studies</span>
-        </div>
-        <h2 class="home-work__title">
-          Recent work, in two passes.
-        </h2>
-        <p class="home-work__lede">
-          Independent projects below, then the companies I've worked at.
-          Each one is a different surface, a different platform, a
-          different posture.
-        </p>
-      </div>
+  {/* The Garage — the three car apps (CarSpotter hero + VINly / ChatOBD2). */}
+  <GarageShowcase />
 
-      <div data-reveal data-reveal-delay="2">
-        <ProjectGrid projects={projects} />
-      </div>
-    </div>
-  </section>
+  {/* Experience — the deliberately corporate jobs (MagTek, InvestCloud). */}
+  <ExperienceWall />
 
   {/* Approach module. A 3-card process strip. The text from the previous
       version is preserved across the lead and the third card. */}
@@ -59,7 +36,7 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
     <div class="container-site">
       <div class="home-approach__head" data-reveal>
         <div class="home-approach__sxn">
-          <span class="home-approach__sxn-num">03</span>
+          <span class="home-approach__sxn-num">04</span>
           <span class="home-approach__sxn-label">How I work</span>
           <span class="home-approach__sxn-rule" aria-hidden="true"></span>
           <span class="home-approach__sxn-meta">A method, not a manifesto</span>
@@ -150,7 +127,7 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
         <div class="home-contact__card-text">
           <div class="home-contact__sxn">
             <span class="home-contact__sxn-dot"></span>
-            <span class="home-contact__sxn-num">04</span>
+            <span class="home-contact__sxn-num">05</span>
             <span class="home-contact__sxn-label">Contact</span>
           </div>
           <h2 class="home-contact__title">
@@ -194,8 +171,7 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
 </BaseLayout>
 
 <style>
-  /* Shared section-head pattern — used in work, approach, contact. */
-  .home-work__sxn,
+  /* Section-head pattern for the "How I work" strip. */
   .home-approach__sxn {
     display: flex;
     align-items: center;
@@ -203,7 +179,6 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
     margin-bottom: var(--space-5);
   }
 
-  .home-work__sxn-num,
   .home-approach__sxn-num {
     display: inline-flex;
     align-items: center;
@@ -221,7 +196,6 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
     line-height: 1;
   }
 
-  .home-work__sxn-label,
   .home-approach__sxn-label {
     font-family: var(--font-mono);
     font-size: 11px;
@@ -231,7 +205,6 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
     color: var(--color-text);
   }
 
-  .home-work__sxn-rule,
   .home-approach__sxn-rule {
     flex: 1;
     height: 1px;
@@ -240,55 +213,12 @@ const projects = (await getCollection('build', ({ data }) => !data.draft))
     max-width: 480px;
   }
 
-  .home-work__sxn-meta,
   .home-approach__sxn-meta {
     font-family: var(--font-mono);
     font-size: 11px;
     color: var(--color-text-subtle);
     letter-spacing: 0.04em;
     white-space: nowrap;
-  }
-
-  /* ─── Work section ───────────────────────────────────────────────── */
-  .home-work {
-    padding-top: var(--space-12);
-    padding-bottom: var(--space-16);
-    border-top: 1px solid var(--color-border-subtle);
-  }
-
-  @media (min-width: 768px) {
-    .home-work {
-      padding-top: var(--space-24);
-      padding-bottom: var(--space-24);
-    }
-  }
-
-  .home-work__head {
-    margin-bottom: var(--space-10);
-    max-width: 760px;
-  }
-
-  @media (min-width: 768px) {
-    .home-work__head {
-      margin-bottom: var(--space-12);
-    }
-  }
-
-  .home-work__title {
-    font-family: var(--font-display);
-    font-size: clamp(34px, 5.4vw, 60px);
-    font-weight: 400;
-    letter-spacing: -0.022em;
-    line-height: 1.05;
-    color: var(--color-text);
-    margin-bottom: var(--space-5);
-  }
-
-  .home-work__lede {
-    font-size: clamp(15px, 1.5vw, 17px);
-    line-height: 1.65;
-    color: var(--color-text-muted);
-    max-width: 60ch;
   }
 
   /* ─── Approach process strip ─────────────────────────────────────── */

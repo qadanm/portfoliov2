@@ -1,0 +1,353 @@
+---
+// Experience — the corporate counterpart to The Garage. Deliberately
+// restrained: a hard "wall" break, a recessed cool panel, an even 2-up of the
+// two jobs (MagTek, current; InvestCloud, earlier) carrying role / period /
+// metrics / named clients. Understated motion. Intentionally NOT the Garage.
+const jobs = [
+  {
+    href: '/work/magtek-platform',
+    poster: '/images/magtek/poster.webp',
+    alt: 'MagTek experience poster — a clean light corporate layout with the MagTek.com homepage in a browser frame and a metric band.',
+    company: 'MagTek',
+    status: 'Current',
+    role: 'UX Engineering & Frontend Systems',
+    period: '2023 — present',
+    metrics: ['$11B processed', '99.9% uptime', '11 sites', '100+ components'],
+    clients: null,
+    project: 'magtek-platform',
+  },
+  {
+    href: '/work/financial-platforms',
+    poster: '/images/financial-platforms/poster.webp',
+    alt: 'InvestCloud experience poster — a navy financial layout with two advisor-portal browser windows and a client roster.',
+    company: 'InvestCloud',
+    status: 'Earlier',
+    role: 'Frontend Implementation & Design Translation',
+    period: 'Earlier',
+    metrics: ['50+ institutions', '0 → production', 'Hand-written CSS'],
+    clients: 'Chase · Cetera · Northwestern Mutual · Voya · SVB · East West',
+    project: 'financial-platforms',
+  },
+];
+---
+
+<section class="xp" id="experience" aria-labelledby="xp-title">
+  <div class="container-site">
+    <header class="xp__head" data-reveal>
+      <div class="xp__sxn">
+        <span class="xp__sxn-num">03</span>
+        <span class="xp__sxn-label">Experience</span>
+        <span class="xp__sxn-rule" aria-hidden="true"></span>
+        <span class="xp__sxn-meta">Inside a team</span>
+      </div>
+      <h2 class="xp__title" id="xp-title">And the work I've shipped inside a team.</h2>
+      <p class="xp__lede">
+        Two companies, two postures. A long-running multi-site platform where I
+        own most of the frontend, and advisor portals deployed across more than
+        fifty wealth and banking institutions.
+      </p>
+    </header>
+
+    <div class="xp__grid" data-reveal data-reveal-delay="2">
+      {jobs.map((job) => (
+        <a
+          href={job.href}
+          class="xp__card"
+          data-track="cta_click"
+          data-track-cta="experience-card"
+          data-track-project={job.project}
+        >
+          <div class="xp__card-media">
+            <img src={job.poster} alt={job.alt} width="2560" height="1600" loading="lazy" decoding="async" />
+          </div>
+          <div class="xp__card-body">
+            <div class="xp__card-row">
+              <span class="xp__company">{job.company}</span>
+              <span class:list={['xp__status', { 'xp__status--current': job.status === 'Current' }]}>
+                <span class="xp__status-dot" aria-hidden="true"></span>
+                {job.status}
+              </span>
+            </div>
+            <p class="xp__role">{job.role}</p>
+            <span class="xp__period">{job.period}</span>
+
+            <ul class="xp__metrics">
+              {job.metrics.map((m) => <li>{m}</li>)}
+            </ul>
+
+            {job.clients && (
+              <p class="xp__clients">
+                <span class="xp__clients-label">Deployed for</span>
+                {job.clients}
+              </p>
+            )}
+
+            <span class="xp__link">
+              Case study
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M3 13L13 3M13 3H5M13 3v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ─── A recessed, cool, corporate panel — the deliberate "wall" ──── */
+  .xp {
+    position: relative;
+    padding-top: var(--space-16);
+    padding-bottom: var(--space-16);
+    background-color: var(--color-bg-deep);
+    border-top: 1px solid var(--color-border-strong);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+    --steel: var(--project-platform-rgb);
+  }
+  /* the hard break: a thin ruled band sitting on the top border */
+  .xp::before {
+    content: '';
+    position: absolute;
+    top: -1px; left: 0; right: 0;
+    height: 3px;
+    background: repeating-linear-gradient(
+      to right,
+      var(--color-border-strong) 0, var(--color-border-strong) 24px,
+      transparent 24px, transparent 40px
+    );
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  @media (min-width: 768px) {
+    .xp { padding-top: var(--space-24); padding-bottom: var(--space-24); }
+  }
+
+  /* ─── Section head — neutral, no accent glow ────────────────────── */
+  .xp__sxn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: var(--space-5);
+  }
+  .xp__sxn-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 22px;
+    padding: 0 7px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border-strong);
+    background-color: var(--color-bg-elevated);
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1;
+  }
+  .xp__sxn-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+  .xp__sxn-rule {
+    flex: 1;
+    height: 1px;
+    background: var(--color-border);
+    min-width: 24px;
+    max-width: 520px;
+  }
+  .xp__sxn-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-text-subtle);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .xp__head {
+    max-width: 720px;
+    margin-bottom: var(--space-10);
+  }
+  @media (min-width: 768px) {
+    .xp__head { margin-bottom: var(--space-12); }
+  }
+  .xp__title {
+    font-family: var(--font-display);
+    font-size: clamp(30px, 4.6vw, 50px);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.06;
+    color: var(--color-text);
+    margin-bottom: var(--space-4);
+  }
+  .xp__lede {
+    font-size: clamp(15px, 1.5vw, 16px);
+    line-height: 1.65;
+    color: var(--color-text-muted);
+    max-width: 58ch;
+  }
+
+  /* ─── Even 2-up corporate grid ──────────────────────────────────── */
+  .xp__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+  @media (min-width: 800px) {
+    .xp__grid { grid-template-columns: 1fr 1fr; gap: var(--space-6); }
+  }
+
+  .xp__card {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-bg-elevated);
+    overflow: hidden;
+    transition: border-color 320ms var(--ease-out), box-shadow 320ms var(--ease-out), transform 320ms var(--ease-out);
+  }
+  .xp__card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(var(--steel), 0.5);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.10);
+  }
+
+  .xp__card-media {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-bg-muted);
+  }
+  .xp__card-media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .xp__card-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-6);
+    flex: 1;
+  }
+
+  .xp__card-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+  .xp__company {
+    font-size: 21px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+  }
+  .xp__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+  }
+  .xp__status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--color-text-subtle);
+  }
+  .xp__status--current { color: var(--color-success); }
+  .xp__status--current .xp__status-dot {
+    background: var(--color-success);
+    box-shadow: 0 0 6px var(--color-success);
+  }
+
+  .xp__role {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+  }
+  .xp__period {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--color-text-subtle);
+  }
+
+  .xp__metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 0;
+    list-style: none;
+    margin: var(--space-2) 0 0;
+    padding: var(--space-4) 0 0;
+    border-top: 1px solid var(--color-border-subtle);
+  }
+  .xp__metrics li {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--color-text);
+    padding: 0 12px;
+    border-right: 1px solid var(--color-border);
+    line-height: 1.1;
+  }
+  .xp__metrics li:first-child { padding-left: 0; }
+  .xp__metrics li:last-child { border-right: none; }
+
+  .xp__clients {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+    margin-top: var(--space-1);
+  }
+  .xp__clients-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+    margin-bottom: 4px;
+  }
+
+  .xp__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: auto;
+    padding-top: var(--space-4);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+    transition: color 240ms var(--ease-out);
+  }
+  .xp__link svg { transition: transform 240ms var(--ease-out); }
+  .xp__card:hover .xp__link { color: rgb(var(--steel)); }
+  .xp__card:hover .xp__link svg { transform: translate(2px, -2px); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .xp__card, .xp__link svg { transition: none !important; }
+    .xp__card:hover { transform: none; }
+  }
+</style>

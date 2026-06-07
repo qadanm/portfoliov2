@@ -1,0 +1,364 @@
+---
+// CarSpotter thumbnail. Recreates the Daily 5 round: a cropped car detail in
+// a lime viewfinder with a draining timer, over a 2×2 arcade answer grid with
+// the correct chassis locked in. The plate is the app's "midnight arcade"
+// screen, so it stays dark in both themes (a screen is a screen); only the
+// surrounding atmosphere + caption follow the page theme. Lime #C8FF00 accent.
+---
+
+<div class="csart" aria-hidden="true">
+  <div class="csart__bg"></div>
+  <div class="csart__grid"></div>
+  <div class="csart__halo"></div>
+
+  <div class="csart__plate">
+    <div class="csart__head">
+      <div class="csart__brand">
+        <span class="csart__brand-mark"></span>
+        <span class="csart__brand-name">CarSpotter</span>
+      </div>
+      <span class="csart__head-mono">Daily&nbsp;5 · 01/05</span>
+    </div>
+
+    <div class="csart__crop">
+      <span class="csart__bracket csart__bracket--tl"></span>
+      <span class="csart__bracket csart__bracket--tr"></span>
+      <span class="csart__bracket csart__bracket--bl"></span>
+      <span class="csart__bracket csart__bracket--br"></span>
+      <span class="csart__detail"></span>
+      <span class="csart__scanline"></span>
+      <span class="csart__timer">0:07</span>
+    </div>
+
+    <div class="csart__answers">
+      <span class="csart__ans csart__ans--correct">
+        <span class="csart__ans-name">Honda S2000</span>
+        <span class="csart__ans-check">✓</span>
+      </span>
+      <span class="csart__ans"><span class="csart__ans-name">Toyota Supra</span></span>
+      <span class="csart__ans"><span class="csart__ans-name">Mazda MX-5</span></span>
+      <span class="csart__ans"><span class="csart__ans-name">Toyota MR2</span></span>
+    </div>
+  </div>
+
+  <div class="csart__caption">
+    <span class="csart__caption-line"></span>
+    <span>Daily 5 · CarSpotter</span>
+  </div>
+</div>
+
+<style>
+  /* Theme-aware ONLY for the atmosphere behind the plate. Default = dark. */
+  .csart {
+    --cs-atmos:
+      radial-gradient(ellipse 70% 70% at 78% 16%, rgba(200, 255, 0, 0.10), transparent 60%),
+      radial-gradient(ellipse 80% 70% at 20% 92%, rgba(200, 255, 0, 0.04), transparent 60%),
+      linear-gradient(160deg, #111316 0%, #0B0C0E 60%, #08090B 100%);
+    --cs-grid: rgba(255, 255, 255, 0.022);
+    --cs-dot-1: rgba(200, 255, 0, 0.05);
+    --cs-dot-2: rgba(255, 255, 255, 0.03);
+    --cs-halo: radial-gradient(circle, rgba(200, 255, 0, 0.22), transparent 65%);
+    --cs-caption: rgba(231, 233, 236, 0.46);
+    --cs-caption-rule: rgba(231, 233, 236, 0.3);
+  }
+
+  :global([data-theme="light"]) .csart {
+    --cs-atmos:
+      radial-gradient(ellipse 70% 70% at 78% 16%, rgba(146, 184, 0, 0.16), transparent 60%),
+      radial-gradient(ellipse 80% 70% at 20% 92%, rgba(146, 184, 0, 0.08), transparent 60%),
+      linear-gradient(160deg, #EEF1F4 0%, #E4E8EC 60%, #EFF2F5 100%);
+    --cs-grid: rgba(14, 15, 17, 0.04);
+    --cs-dot-1: rgba(110, 140, 0, 0.07);
+    --cs-dot-2: rgba(14, 15, 17, 0.04);
+    --cs-halo: radial-gradient(circle, rgba(146, 184, 0, 0.22), transparent 65%);
+    --cs-caption: rgba(14, 15, 17, 0.5);
+    --cs-caption-rule: rgba(14, 15, 17, 0.25);
+  }
+
+  .csart {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: var(--cs-atmos);
+    color: #E7E9EC;
+    container-type: inline-size;
+  }
+
+  .csart__bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(var(--cs-dot-1) 1px, transparent 1px),
+      radial-gradient(var(--cs-dot-2) 1px, transparent 1px);
+    background-size: 14px 14px, 32px 32px;
+    background-position: 0 0, 7px 7px;
+  }
+
+  .csart__grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, var(--cs-grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--cs-grid) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: linear-gradient(180deg, transparent 0%, #000 50%);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 50%);
+  }
+
+  .csart__halo {
+    position: absolute;
+    top: -14%;
+    right: -16%;
+    width: 56%;
+    height: 56%;
+    border-radius: 50%;
+    background: var(--cs-halo);
+    filter: blur(22px);
+    pointer-events: none;
+  }
+
+  /* The plate = the app's dark arcade screen. Stays dark in both themes. */
+  .csart__plate {
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 14px;
+    background: linear-gradient(180deg, #191B1F 0%, #121316 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 18px 36px rgba(0, 0, 0, 0.5),
+      0 4px 12px rgba(0, 0, 0, 0.36);
+    padding: 11px 12px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  @container (min-width: 360px) {
+    .csart__plate { padding: 15px 16px 16px; gap: 13px; }
+  }
+
+  .csart__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .csart__brand {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  /* Speedometer-style brandmark: a lime ring with a needle. */
+  .csart__brand-mark {
+    position: relative;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1.5px solid #C8FF00;
+    box-shadow: 0 0 8px rgba(200, 255, 0, 0.5);
+    flex-shrink: 0;
+  }
+  .csart__brand-mark::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 6px;
+    height: 1.5px;
+    background: #C8FF00;
+    border-radius: 1px;
+    transform-origin: left center;
+    transform: translate(0, -50%) rotate(-38deg);
+  }
+
+  .csart__brand-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: #E7E9EC;
+  }
+
+  .csart__head-mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: rgba(231, 233, 236, 0.5);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* Viewfinder crop — a stylized headlight detail under lime brackets. */
+  .csart__crop {
+    position: relative;
+    height: 78px;
+    border-radius: 8px;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse 60% 80% at 42% 34%, rgba(200, 255, 0, 0.10), transparent 62%),
+      linear-gradient(150deg, #23262B 0%, #14161A 55%, #0C0D10 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  @container (min-width: 360px) {
+    .csart__crop { height: 104px; }
+  }
+
+  /* The headlight: a skewed housing with two bright lime LED bars. */
+  .csart__detail {
+    position: absolute;
+    left: 14%;
+    top: 30%;
+    width: 56%;
+    height: 40%;
+    border-radius: 5px 16px 6px 14px;
+    background: linear-gradient(135deg, #2A2E34 0%, #16181C 70%);
+    transform: skewX(-15deg);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+  .csart__detail::before {
+    content: '';
+    position: absolute;
+    left: 12%;
+    top: 26%;
+    width: 70%;
+    height: 12%;
+    background: #C8FF00;
+    border-radius: 2px;
+    box-shadow: 0 0 8px rgba(200, 255, 0, 0.7);
+  }
+  .csart__detail::after {
+    content: '';
+    position: absolute;
+    left: 16%;
+    top: 56%;
+    width: 54%;
+    height: 9%;
+    background: rgba(200, 255, 0, 0.55);
+    border-radius: 2px;
+  }
+
+  .csart__scanline {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 38%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(200, 255, 0, 0.5), transparent);
+  }
+
+  .csart__bracket {
+    position: absolute;
+    width: 13px;
+    height: 13px;
+    border: 1.5px solid #C8FF00;
+    z-index: 2;
+  }
+  .csart__bracket--tl { top: 7px; left: 7px; border-right: none; border-bottom: none; }
+  .csart__bracket--tr { top: 7px; right: 7px; border-left: none; border-bottom: none; }
+  .csart__bracket--bl { bottom: 7px; left: 7px; border-right: none; border-top: none; }
+  .csart__bracket--br { bottom: 7px; right: 7px; border-left: none; border-top: none; }
+
+  .csart__timer {
+    position: absolute;
+    right: 8px;
+    bottom: 7px;
+    z-index: 3;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #C8FF00;
+    padding: 2px 6px;
+    border-radius: 5px;
+    background: rgba(8, 9, 11, 0.72);
+    border: 1px solid rgba(200, 255, 0, 0.35);
+  }
+
+  .csart__answers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  @container (min-width: 360px) {
+    .csart__answers { gap: 8px; }
+  }
+
+  .csart__ans {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    padding: 7px 9px;
+    border-radius: 7px;
+    background: linear-gradient(180deg, #202327, #181A1E);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  .csart__ans-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: rgba(231, 233, 236, 0.82);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  @container (min-width: 360px) {
+    .csart__ans-name { font-size: 11px; }
+  }
+
+  .csart__ans--correct {
+    background: linear-gradient(180deg, #C8FF00, #A6D400);
+    border-color: rgba(200, 255, 0, 0.7);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.3),
+      0 0 14px rgba(200, 255, 0, 0.3);
+  }
+
+  .csart__ans--correct .csart__ans-name {
+    color: #0B0C0E;
+    font-weight: 700;
+  }
+
+  .csart__ans-check {
+    font-size: 9px;
+    font-weight: 800;
+    color: #0B0C0E;
+    flex-shrink: 0;
+  }
+
+  @container (min-width: 360px) {
+    .csart__ans-check { font-size: 11px; }
+  }
+
+  .csart__caption {
+    position: absolute;
+    bottom: 12px;
+    left: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--cs-caption);
+    letter-spacing: 0.06em;
+    z-index: 4;
+  }
+
+  .csart__caption-line {
+    width: 14px;
+    height: 1px;
+    background-color: var(--cs-caption-rule);
+  }
+</style>

@@ -4,8 +4,8 @@ import Placeholder from '@/components/Placeholder.astro';
 import VerdictArtifact from '@/components/artifacts/VerdictArtifact.astro';
 import VinlyArtifact from '@/components/artifacts/VinlyArtifact.astro';
 import PlatformArtifact from '@/components/artifacts/PlatformArtifact.astro';
-import SawaArtifact from '@/components/artifacts/SawaArtifact.astro';
 import AdvisorArtifact from '@/components/artifacts/AdvisorArtifact.astro';
+import CarSpotterArtifact from '@/components/artifacts/CarSpotterArtifact.astro';
 import ChatOBDFlow from '@/components/diagrams/ChatOBDFlow.astro';
 import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
 import AdvisorVisual from '@/components/diagrams/AdvisorVisual.astro';
@@ -45,8 +45,8 @@ const ogAlt = `${data.title} — case study by Moe Qadan.`;
 const artifactMap: Record<string, any> = {
   'chatobd2': VerdictArtifact,
   'vinly': VinlyArtifact,
+  'car-spotter': CarSpotterArtifact,
   'magtek-platform': PlatformArtifact,
-  'sawa': SawaArtifact,
   'financial-platforms': AdvisorArtifact,
 };
 const Artifact = artifactMap[project.slug] ?? null;
@@ -603,6 +603,199 @@ const categoryKey = data.category.toLowerCase();
       </>
     )}
 
+    {project.slug === 'car-spotter' && (
+      <>
+        <section class="container-narrow cs__pull">
+          <p class="cs__pull-text">
+            One detail. Ten seconds. Then the whole car.
+          </p>
+          <span class="cs__pull-caption">The moment that hooks you</span>
+        </section>
+
+        <section class="container-site cs__post">
+          <header class="cs__post-head">
+            <div class="cs__post-sxn">
+              <span class="cs__post-num">04</span>
+              <span class="cs__post-eyebrow">The Daily 5</span>
+              <span class="cs__post-rule" aria-hidden="true"></span>
+            </div>
+            <h2 class="cs__post-title">A clue, a clock, and four ways to be wrong.</h2>
+            <p class="cs__post-sub">
+              The loop is built to be felt in under a minute. A cropped detail
+              locks into a lime viewfinder, the tachometer drains ten seconds,
+              and four arcade buttons wait in the thumb zone. Pick, and the crop
+              blooms out to the whole car — same five for everyone, every day.
+            </p>
+          </header>
+          <div class="cs__shot-grid cs__shot-grid--phones">
+            <figure class="cs__shot">
+              <img
+                src="/images/car-spotter/clue.webp"
+                alt="CarSpotter clue screen: a tightly cropped car detail inside a lime viewfinder, a draining ten-second tachometer, and four answer buttons — Honda S2000, Toyota Supra, Mazda MX-5, Toyota MR2."
+                width="1290"
+                height="2796"
+                loading="lazy"
+              />
+              <figcaption>
+                The clue: one cropped detail, a ten-second clock, four chassis
+                to choose from. Tap before the tach hits zero.
+              </figcaption>
+            </figure>
+            <figure class="cs__shot">
+              <img
+                src="/images/car-spotter/reveal.webp"
+                alt="CarSpotter reveal screen: the cropped detail has zoomed out to the full car, with the model named and a one-line fact beneath it."
+                width="1290"
+                height="2796"
+                loading="lazy"
+              />
+              <figcaption>
+                The reveal. The crop zooms out to the whole car and the fact
+                lands — the one second the entire app is built around.
+              </figcaption>
+            </figure>
+            <figure class="cs__shot">
+              <img
+                src="/images/car-spotter/daily.webp"
+                alt="CarSpotter home: today's Daily 5 with the five clue slots and a streak counter."
+                width="1290"
+                height="2796"
+                loading="lazy"
+              />
+              <figcaption>
+                A fresh Daily 5 every morning. Five clues, the same five for
+                everyone, and a streak to keep alive.
+              </figcaption>
+            </figure>
+            <figure class="cs__shot">
+              <img
+                src="/images/car-spotter/combo.webp"
+                alt="CarSpotter result screen: a run score with a combo multiplier and a rank."
+                width="1290"
+                height="2796"
+                loading="lazy"
+              />
+              <figcaption>
+                Consecutive hits stack a combo. The run resolves to a score, a
+                tier, and a rank you actually earned.
+              </figcaption>
+            </figure>
+          </div>
+        </section>
+
+        <section class="container-site cs__post cs__post--alt">
+          <header class="cs__post-head">
+            <div class="cs__post-sxn">
+              <span class="cs__post-num">05</span>
+              <span class="cs__post-eyebrow">The flex, and the teach</span>
+              <span class="cs__post-rule" aria-hidden="true"></span>
+            </div>
+            <h2 class="cs__post-title">Brag without spoiling. Miss without losing.</h2>
+            <p class="cs__post-sub">
+              Sharing is the growth loop, so it's spoiler-free by construction —
+              colored squares and a clock, never a car name. And every miss
+              teaches the tell, so the detail you blow today is the one you nail
+              on sight tomorrow.
+            </p>
+          </header>
+          <div class="cs__shot-grid cs__shot-grid--phones">
+            <figure class="cs__shot">
+              <img
+                src="/images/car-spotter/share.webp"
+                alt="CarSpotter share card: a grid of colored squares and a clock, with no car names — safe to drop in a group chat."
+                width="1290"
+                height="2796"
+                loading="lazy"
+              />
+              <figcaption>
+                The share card mirrors the in-app result exactly — squares,
+                letters, a clock, a tier — but never a car name. The flex is
+                honest and the round stays unspoiled.
+              </figcaption>
+            </figure>
+            <figure class="cs__shot">
+              <img
+                src="/images/car-spotter/learn.webp"
+                alt="CarSpotter miss state: the car you didn't get, with the detail to look for next time."
+                width="1290"
+                height="2796"
+                loading="lazy"
+              />
+              <figcaption>
+                Miss one and it shows you the tell. The game is quietly building
+                detail literacy under the arcade.
+              </figcaption>
+            </figure>
+            <figure class="cs__shot">
+              <img
+                src="/images/car-spotter/clue2.webp"
+                alt="CarSpotter clue: a different cropped detail — a wheel — framed under the viewfinder with four answers."
+                width="1290"
+                height="2796"
+                loading="lazy"
+              />
+              <figcaption>
+                Twelve detail categories — headlight, taillight, grille, wheel,
+                badge, and more. The crop is the whole puzzle.
+              </figcaption>
+            </figure>
+            <figure class="cs__shot">
+              <img
+                src="/images/car-spotter/reveal2.webp"
+                alt="CarSpotter reveal: a second full-car reveal with the model named and a fact."
+                width="1290"
+                height="2796"
+                loading="lazy"
+              />
+              <figcaption>
+                Real cars, real chassis codes, real facts. No trick questions,
+                no AI mush, no filler.
+              </figcaption>
+            </figure>
+          </div>
+          <p class="cs__post-closing">
+            The clue stays secret, the reveal is the payoff, and the share card
+            protects both. Every surface is designed around one rule: never spoil
+            the round you want someone else to play.
+          </p>
+        </section>
+
+        <section class="container-site cs__post">
+          <header class="cs__post-head">
+            <div class="cs__post-sxn">
+              <span class="cs__post-num">06</span>
+              <span class="cs__post-eyebrow">The brand surface</span>
+              <span class="cs__post-rule" aria-hidden="true"></span>
+            </div>
+            <h2 class="cs__post-title">One brand, generated end to end.</h2>
+            <p class="cs__post-sub">
+              The marketing poster, the App Store screenshots, and the game all
+              speak the same midnight-arcade language. The design tokens are a
+              shared package the app and the website both compile from — and the
+              promo art comes out of a scripted ImageMagick pipeline, versioned
+              next to the code.
+            </p>
+          </header>
+          <div class="cs__shot-grid">
+            <figure class="cs__shot">
+              <img
+                src="/images/car-spotter/poster.webp"
+                alt="CarSpotter portfolio poster: a fan of tilted iPhone screenshots on a dark garage backdrop with lime accents and the line 'Guess the car from the detail.'"
+                width="2560"
+                height="1600"
+                loading="lazy"
+              />
+              <figcaption>
+                The poster, the screenshots, and the brand are scripted artifacts
+                — reproducible, on-brand, and impossible to drift from the app
+                they sell.
+              </figcaption>
+            </figure>
+          </div>
+        </section>
+      </>
+    )}
+
     {project.slug === 'magtek-platform' && (
       <>
         <section class="container-site cs__post">
@@ -731,106 +924,6 @@ const categoryKey = data.category.toLowerCase();
           </p>
         </section>
 
-      </>
-    )}
-
-    {project.slug === 'sawa' && (
-      <>
-        <section class="container-site cs__post">
-          <header class="cs__post-head">
-            <div class="cs__post-sxn">
-              <span class="cs__post-num">04</span>
-              <span class="cs__post-eyebrow">Earning trust through content</span>
-              <span class="cs__post-rule" aria-hidden="true"></span>
-            </div>
-            <h2 class="cs__post-title">Two surfaces that do the convincing.</h2>
-            <p class="cs__post-sub">
-              A group-decision product has to feel low-friction before
-              anyone installs it. The marketing site does that with two
-              content surfaces. A live matches feed that shows the
-              product in motion. A curated guide section sourced from
-              Reddit threads.
-            </p>
-          </header>
-          <div class="cs__shot-grid cs__shot-grid--2">
-            <figure class="cs__shot">
-              <img
-                src="/images/sawa/live-matches.webp"
-                alt="Sawa marketing site: Matches Happening Now. A live grid of group dining matches with location, headline, swipe count, and time stamps."
-                width="1440"
-                height="900"
-                loading="lazy"
-              />
-              <figcaption>
-                A live matches feed. Real squads, real restaurants, real
-                time. Lets the product make its own case without
-                saying "trust us."
-              </figcaption>
-            </figure>
-            <figure class="cs__shot">
-              <img
-                src="/images/sawa/city-guides.webp"
-                alt="Sawa City Food Guides: real recommendations from real locals, powered by Reddit. Filter pills for All Cities, NYC, Los Angeles, Honolulu, Seattle."
-                width="1440"
-                height="900"
-                loading="lazy"
-              />
-              <figcaption>
-                City Food Guides, sourced from Reddit threads with
-                attribution kept intact. Curation as proof that the
-                app is built around real places, not just a swipe
-                mechanic.
-              </figcaption>
-            </figure>
-          </div>
-        </section>
-
-        <section class="container-site cs__post cs__post--alt">
-          <header class="cs__post-head">
-            <div class="cs__post-sxn">
-              <span class="cs__post-num">05</span>
-              <span class="cs__post-eyebrow">Long-form content and conversion</span>
-              <span class="cs__post-rule" aria-hidden="true"></span>
-            </div>
-            <h2 class="cs__post-title">Restaurant pieces double as the install path.</h2>
-            <p class="cs__post-sub">
-              Each city piece is its own page with its own URL. They
-              earn organic traffic, hold the SEO surface for the
-              brand, and lead the same reader into the same install
-              prompt at the bottom.
-            </p>
-          </header>
-          <div class="cs__shot-grid cs__shot-grid--2">
-            <figure class="cs__shot">
-              <img
-                src="/images/sawa/article.webp"
-                alt="Sawa article page: The Apple Pan, Los Angeles, CA (Since 1947). Restaurant feature with hero photography, tags, date, and editorial body."
-                width="1440"
-                height="900"
-                loading="lazy"
-              />
-              <figcaption>
-                Article pages live inside the same Sawa shell.
-                Hero image, tags, read-time, then long-form. SEO
-                surface and brand surface in one.
-              </figcaption>
-            </figure>
-            <figure class="cs__shot">
-              <img
-                src="/images/sawa/download-cta.webp"
-                alt="Sawa final CTA section: Ready to End the Food Fight? With an SMS download form."
-                width="1440"
-                height="900"
-                loading="lazy"
-              />
-              <figcaption>
-                One-number install path. SMS in, app link out. No
-                account creation, no profile setup before the user
-                has seen the value.
-              </figcaption>
-            </figure>
-          </div>
-        </section>
       </>
     )}
 
@@ -1460,7 +1553,7 @@ const categoryKey = data.category.toLowerCase();
   .cs__cover-artifact :global(.vart),
   .cs__cover-artifact :global(.vinart),
   .cs__cover-artifact :global(.part),
-  .cs__cover-artifact :global(.sart),
+  .cs__cover-artifact :global(.csart),
   .cs__cover-artifact :global(.aart) {
     position: absolute;
     inset: 0;

@@ -1,0 +1,83 @@
+---
+title: CarSpotter
+short: A daily car-spotting game — five cropped details, four answers, ten seconds. Designed, engineered, and shipped solo for iOS.
+category: Flagship
+keyFocus:
+  - Daily game loop
+  - Content-addressed media pipeline
+  - End-to-end solo build
+role: Sole designer, engineer & founder
+period: '2026'
+status: iOS · preparing App Store submission
+scope: iOS game, durable content pipeline, shared design system, marketing site
+outcomes:
+  - label: Cars a day
+    value: Daily 5
+  - label: Detail categories
+    value: '12'
+  - label: Tests on the engine
+    value: '234'
+  - label: Designed and built by
+    value: One person
+stack:
+  - Expo / React Native
+  - TypeScript
+  - Zustand
+  - MMKV
+  - Turborepo monorepo
+  - Astro
+  - ImageMagick pipeline
+placeholder:
+  from: '#0B0C0E'
+  to: '#C8FF00'
+  label: CarSpotter
+  sublabel: Daily Car Game
+  angle: 135
+  labelTone: light
+coverImage: /images/car-spotter/poster.webp
+coverAlt: CarSpotter portfolio poster — tilted iPhone screenshots of the daily car-detail guessing game on a dark garage backdrop, lime accents, the line "Guess the car from the detail."
+featured: true
+order: 1
+---
+
+## The premise
+
+Every enthusiast has done it. A single headlight in traffic, a quarter of a grille, the shape of a wheel arch — and you already know the car. CarSpotter is that instinct turned into a daily game.
+
+Each day is a Daily 5: five cropped details of real cars, four answers each, ten seconds a clue. Same five for everyone. Score, rank up, hold a streak, and brag without spoiling it. It's a Wordle-shaped daily for the people who can name a chassis code from a single taillight.
+
+## The Daily 5
+
+The whole loop is built to be felt in under a minute. A detail locks into a lime viewfinder, a tachometer drains the ten seconds, four arcade buttons wait in the thumb zone. You pick, the crop blooms out to the whole car, and a one-line fact lands. Five times, then you're done until tomorrow.
+
+The constraints are the design. Everyone gets the same five, so bragging rights are earned, not bought. Practice is XP-capped, so the leaderboard can't be farmed. The answers are real model names and real chassis codes — no trick questions, no AI mush, no filler.
+
+## Brag without spoiling
+
+Sharing is the growth loop, so it had to be spoiler-free by construction. One tap turns a run into a card of colored squares and a clock — no car names, no photos, nothing that ruins the round for the group chat. It mirrors the in-app result exactly, down to the per-clue letters and the run tier, so the flex is honest.
+
+## The reveal — and the bug that almost shipped
+
+The best second in the app is the reveal: the cropped detail zooms out to the whole car. Preparing the first App Store build, I found that second was broken for every authored day — the clue played, then the reveal bloomed to nothing.
+
+The cause was quiet and dangerous. The studio I author puzzles in had stored each reveal photo as an absolute `file://…/Application/<container-UUID>/…` path. iOS regenerates that container UUID on every reinstall, so every stored path silently dangled. The crops had survived only by accident — the shipping export happened to inline them as base64 — while the reveal originals, stored the exact same way, were never captured anywhere. A whole schedule shipped with working clues and empty reveals.
+
+It was a data-loss *class* of bug, not a one-off. So I rebuilt the pipeline to make it impossible to repeat.
+
+## A content pipeline that can't lose your work
+
+The rule now: never persist an absolute path. Media is content-addressed — every photo lives under the SHA-256 of its own bytes, the manifest holds stable keys, and the real URI is rebased against the document directory at runtime. The presence of a hash file *is* the integrity proof. Writes are atomic: download to a temp file, verify size and hash, then move into place.
+
+Around that sits a recovery pipeline and a set of gates:
+
+- **Recovery that runs on any machine.** Every reveal can be re-derived by priority — a committed in-repo bake first, then a local raw cache, then the original source fetched by ID and re-verified against its dimensions and hash. Run against the full schedule, it recovered 374 of 375 reveals.
+- **A bundler that fails loud.** The launch bundler used to silently skip any puzzle whose reveal wouldn't resolve. Now it ships complete crop-and-reveal pairs only, asserts every scheduled day is a full five, and exits non-zero on anything missing.
+- **Referential integrity gates.** A pure checker runs over the authored content for dangling photo references, half-built reveal pairs, and orphans — and the same gate guards the studio, the export, and the build.
+
+Exports are self-contained now: every crop and every reveal travels as bytes, so reinstalling a phone or moving to a new laptop can't orphan a thing. The engine carries 234 tests, and the parts that lose data when they're wrong carry the most of them.
+
+## One person, end to end
+
+The design, the iOS app, the game engine, the content pipeline, and the marketing site are one person's work, in a Turborepo monorepo. The rules of the game live in a pure-TypeScript `game-core` package with no React anywhere near them, which makes them trivial to test. The design tokens are a shared package the app and the website both compile from, so the brand can't drift between the two. Even the App Store screenshots and the poster on this page come out of a scripted ImageMagick pipeline, versioned next to the code.
+
+A small game, built on a serious spine — so the fun part never breaks.
