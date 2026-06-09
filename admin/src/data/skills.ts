@@ -25,6 +25,7 @@ export const skills: Skill[] = [
   { name: 'Tailwind', category: 'frontend', serves: ['engineering', 'design'], weight: 4 },
   { name: 'Hand-authored CSS systems', category: 'frontend', serves: ['engineering', 'design'], weight: 5 },
   { name: 'Accessibility (WCAG)', category: 'frontend', serves: ['engineering', 'design'], weight: 4 },
+  { name: 'Monorepo architecture (Turborepo)', category: 'frontend', serves: ['engineering'], weight: 3 },
 
   // Platform
   { name: 'ASP.NET MVC + Razor', category: 'platform', serves: ['engineering'], weight: 4 },
@@ -33,6 +34,8 @@ export const skills: Skill[] = [
   { name: 'Multi-tenant frontends', category: 'platform', serves: ['engineering', 'leadership'], weight: 4 },
   { name: 'Long-running platform UX', category: 'platform', serves: ['engineering', 'product', 'leadership'], weight: 5 },
   { name: 'Supabase', category: 'platform', serves: ['engineering'], weight: 3 },
+  { name: 'Supabase Edge Functions (Deno)', category: 'platform', serves: ['engineering'], weight: 3 },
+  { name: 'Content-addressed media & data-integrity engineering', category: 'platform', serves: ['engineering'], weight: 4 },
 
   // AI — described as concrete capabilities, not jargon
   { name: 'Prompt engineering (versioned, scoped, budgeted)', category: 'ai', serves: ['ai', 'engineering'], weight: 5 },
@@ -41,6 +44,8 @@ export const skills: Skill[] = [
   { name: 'Requirement discovery via model interrogation', category: 'ai', serves: ['ai', 'product'], weight: 4 },
   { name: 'AI-assisted code workflows (Claude, Cursor)', category: 'ai', serves: ['ai', 'engineering'], weight: 5 },
   { name: 'Visual exploration with Claude Design', category: 'ai', serves: ['ai', 'design'], weight: 4 },
+  { name: 'Multi-model AI orchestration (synthesis + critic)', category: 'ai', serves: ['ai', 'engineering'], weight: 5 },
+  { name: 'Deterministic guards around model outputs', category: 'ai', serves: ['ai', 'engineering'], weight: 4 },
 
   // Tools
   { name: 'Figma', category: 'tools', serves: ['design'], weight: 4 },

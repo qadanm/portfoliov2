@@ -25,31 +25,31 @@ export const headlines: Record<string, string> = {
 
 export const summaries: Record<string, string> = {
   'product-designer':
-    'Product designer with deep frontend literacy. Built ChatOBD2, an AI-native diagnostics product, end to end. Lead UX and frontend systems across MagTek’s multi-site platform. Comfortable making decisions where design and engineering meet.',
+    'Product designer with deep frontend literacy. Designed and built a string of independent iOS products end to end, including ChatOBD2, an AI-native diagnostics app, and VINly, an AI used-car buyer report. Lead UX and frontend systems across MagTek’s multi-site platform. Comfortable making decisions where design and engineering meet.',
 
   'senior-product-designer':
-    'Senior product designer with end-to-end ownership across product, marketing surfaces, and developer-facing experiences. Founded ChatOBD2, an AI-native diagnostics product. Lead the UX and frontend systems for MagTek’s multi-site platform. Make calls where design, engineering, and platform constraints overlap.',
+    'Senior product designer with end-to-end ownership across product, marketing surfaces, and developer-facing experiences. Founded and shipped a string of independent iOS products, including ChatOBD2, an AI-native diagnostics app, and VINly, an AI used-car buyer report. Lead the UX and frontend systems for MagTek’s multi-site platform. Make calls where design, engineering, and platform constraints overlap.',
 
   'ux-engineer':
-    'UX engineer who works in the seam between design and frontend. Built ChatOBD2 end to end. Operate the UX layer across MagTek’s ASP.NET MVC platform. Earlier: built advisor portals at InvestCloud across major wealth institutions, implementing Figma handoffs at production fidelity.',
+    'UX engineer who works in the seam between design and frontend. Designed and built independent iOS products end to end, including ChatOBD2 and CarSpotter. Operate the UX layer across MagTek’s ASP.NET MVC platform. Earlier: built advisor portals at InvestCloud across major wealth institutions, implementing Figma handoffs at production fidelity.',
 
   'frontend-ux-engineer':
-    'Frontend UX engineer with platform depth. Comfortable across React, TypeScript, React Native, Astro, ASP.NET MVC + Razor, and hand-authored CSS systems. Built and maintain frontend systems for ChatOBD2 (AI-native product) and MagTek (multi-site enterprise platform).',
+    'Frontend UX engineer with platform depth. Comfortable across React, TypeScript, React Native, Astro, ASP.NET MVC + Razor, and hand-authored CSS systems. Built and shipped React Native apps end to end (ChatOBD2 and VINly, including their Supabase backends) and maintain frontend systems across MagTek’s multi-site enterprise platform.',
 
   'design-engineer':
-    'Design engineer working in the overlap. Built ChatOBD2 end to end — chat surface, verdict-first scan results, marketing site, developer portal. Maintain a Razor component library and token-driven CSS substrate across MagTek’s multi-site platform. Author CSS and components by hand against tokens that ship across many surfaces.',
+    'Design engineer working in the overlap. Built ChatOBD2 end to end: chat surface, verdict-first scan results, marketing site, developer portal. Shipped CarSpotter solo on a shared design-tokens package the app and marketing site both compile from. Maintain a Razor component library and token-driven CSS substrate across MagTek’s multi-site platform. Author CSS and components by hand against tokens that ship across many surfaces.',
 
   'web-experience-manager':
     'Web experience leader across MagTek’s multi-site enterprise platform. Own UX, content structure, and frontend systems across MagTek.com, Magensa, and related properties. Earlier: built advisor portals at InvestCloud across major wealth institutions.',
 
   'design-systems-engineer':
-    'Design systems engineer. Built and maintain a 100+ component Razor partial library plus token-driven CSS substrate across MagTek’s multi-site platform. Built ChatOBD2’s React Native design system from the ground up. Comfortable with platform constraints, incremental adoption, and zero-downtime migration.',
+    'Design systems engineer. Built and maintain a 100+ component Razor partial library plus token-driven CSS substrate across MagTek’s multi-site platform. Built ChatOBD2’s React Native design system from the ground up, and shipped CarSpotter on a shared design-tokens package that both the app and its marketing site compile from. Comfortable with platform constraints, incremental adoption, and zero-downtime migration.',
 
   'ai-product-designer':
-    'Product designer for AI-native systems. Founded ChatOBD2, where the model is one constrained stage inside a six-layer structured pipeline, prompts are versioned and budgeted at the system level, and outputs are schema-bound. Designed and built the product, the marketing site, and the developer portal that keeps it maintainable.',
+    'Product designer for AI-native systems. Founded ChatOBD2, where the model is one constrained stage inside a six-layer structured pipeline, prompts are versioned and budgeted at the system level, and outputs are schema-bound. Shipped VINly, an AI buyer report where deterministic math sets the price the model is never allowed to pick and a second model audits the first. Across both, I designed and built the product, the marketing site, and the backend that keeps it honest.',
 
   'ux-product-lead':
-    'Product and UX lead. End-to-end ownership across an AI-native product (ChatOBD2) and a multi-site enterprise platform (MagTek). Comfortable making the call, building the surface, and living with the consequences.',
+    'Product and UX lead. End-to-end ownership across a portfolio of independent AI-native iOS products (ChatOBD2, VINly) and a multi-site enterprise platform (MagTek). Comfortable making the call, building the surface, and living with the consequences.',
 };
 
 // Optional kicker line under headline, kept very short.

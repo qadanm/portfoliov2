@@ -62,6 +62,24 @@ const stories: Story[] = [
       'I shipped it because the alternative — hiding scan quality — would have made the verdict mean less.',
     ],
   },
+  {
+    theme: 'Engineering rigor under pressure',
+    prompt: 'Tell me about a bug that taught you something.',
+    beat_bullets: [
+      'CarSpotter: preparing the first App Store build, every authored reveal was broken — iOS regenerates its container UUID on reinstall, so stored file:// paths silently dangled.',
+      'It was a data-loss class of bug, not a one-off. Rebuilt the media layer content-addressed (every file under the SHA-256 of its bytes), added recovery that re-derived 374 of 375 reveals, and gated the studio, export, and build against dangling references.',
+      'The fix was making the failure impossible to repeat, not patching the instance. The engine carries 234 tests, weighted toward the parts that lose data when they’re wrong.',
+    ],
+  },
+  {
+    theme: 'Knowing when not to use the model',
+    prompt: 'Tell me about a time you deliberately limited what AI could do.',
+    beat_bullets: [
+      'VINly prices a used car. The model never picks the number — deterministic functions compute the opening offer and walk-away floor before any model runs.',
+      'A model that hallucinates a price is worse than no app at all. Arithmetic that’s wrong the same way every time can be pinned down by tests; the money math carries 133 of them.',
+      'A second model reads the first one’s report back as a critic and forces a re-run on unsupported claims. The model explains the number, it doesn’t invent it.',
+    ],
+  },
 ];
 
 const cheatsheet = [
