@@ -4,7 +4,7 @@ import Admin from '@/layouts/Admin.astro';
 
 <Admin
   title="Browser extension"
-  intro="Qadan Apply Assist — a Manifest V3 Chrome extension that fills standard fields on ATS forms after you click Fill. Never auto-submits unless M3 Confirmed-Submit Assist is explicitly enabled."
+  intro="Qadan Apply Assist — a Manifest V3 Chrome extension that runs the apply agent on ATS forms. What it's allowed to do is set per session by autonomy level (L1 fill-only → L4 batch auto-apply); submits only happen at L3+ with dry-run off and every safety gate passing."
 >
   <section class="ext">
     <article class="card">
@@ -12,9 +12,11 @@ import Admin from '@/layouts/Admin.astro';
       <ul>
         <li>Detects fields on Greenhouse, Lever, Ashby, Workday, SmartRecruiters, and LinkedIn Easy Apply forms</li>
         <li>Shows a preview of which fields it can autofill (high / medium / never confidence)</li>
-        <li>Fills only after you click <strong>Fill safe fields</strong></li>
+        <li>Runs at the autonomy level you pick per session on <a href="/auto-apply">/auto-apply</a>:
+          <strong>L1</strong> fill safe fields only · <strong>L2</strong> fill + auto-advance, pause before submit ·
+          <strong>L3</strong> confirmed auto-submit when ALL gates pass · <strong>L4</strong> batch: processes the queue and submits eligible jobs</li>
+        <li>Auto-submit (L3/L4) is gated: fit/authenticity/quality thresholds, daily + per-source caps, duplicate check, no CAPTCHA/login/legal/demographic blockers — and dry-run is ON by default</li>
         <li><strong>Never</strong> fills demographic, EEOC, work-auth-by-default, or salary fields</li>
-        <li><strong>Never</strong> clicks submit unless M3 is enabled in Vault and you type <code>SUBMIT</code> per-application</li>
       </ul>
     </article>
 
@@ -37,29 +39,27 @@ import Admin from '@/layouts/Admin.astro';
         <li>Click the extension icon → <strong>Import vault</strong> → paste the blob</li>
         <li>The extension now has your standard fields stored locally in <code>chrome.storage.local</code></li>
       </ol>
-      <p class="muted">The extension never reads admin pages automatically. The export/import is an explicit handoff so you control exactly what crosses the boundary.</p>
+      <p class="muted">The extension never scrapes admin pages. Starting an agent session on /auto-apply pushes the vault to the extension as part of the session snapshot; the paste-import above is the manual fallback for popup-only use.</p>
     </article>
 
     <article class="card">
       <h2>Daily use</h2>
       <ol>
-        <li>From <a href="/today">/today</a>, click <strong>Start Apply Session</strong></li>
-        <li>The session opens the listing in a new tab; you click the extension icon there</li>
-        <li>Click <strong>Detect fields</strong> → review the preview</li>
-        <li>Click <strong>Fill safe fields</strong> → all <code>high</code>-confidence fields populate; filled cells get a yellow outline so you can see what changed</li>
-        <li>Manually fill the rest (open prompts, cover letter, demographics if you choose)</li>
-        <li>Click <strong>Submit</strong> in the ATS — the extension does NOT submit for you</li>
-        <li>Back in /packet/session, click <strong>Mark applied</strong></li>
+        <li>From <a href="/auto-apply">/auto-apply</a>, pick jobs, pick an autonomy level, and start a session (L2 with dry-run on is the recommended default)</li>
+        <li>The agent opens each listing, fills safe + packet fields, and auto-advances pages (L2+); filled cells get a yellow outline so you can see what changed</li>
+        <li>At L1/L2 it pauses at the submit page and you click <strong>Submit</strong> yourself; at L3/L4 it submits only when every safety gate passes and dry-run is off</li>
+        <li>Anything uncertain (CAPTCHA, login, unknown required fields, uploads it can't do) lands in <a href="/review">/review</a> with a reason — resolve and hit Retry</li>
+        <li>Submitted attempts mark the job Applied automatically; manual one-off fills are still available from the extension popup</li>
       </ol>
     </article>
 
     <article class="card warning-card">
       <h2>What it will not do</h2>
       <ul>
-        <li>Auto-submit any application (unless M3 is enabled AND you confirm per-job by typing SUBMIT)</li>
+        <li>Submit below L3, in dry-run mode, or past any failing gate (caps, duplicates, thresholds, legal/demographic blockers) — L4 only widens batching, never the gates</li>
         <li>Fill race, gender, ethnicity, disability, veteran, age, dateOfBirth, SSN, pronouns, religion fields — ever</li>
         <li>Auto-answer work authorization or sponsorship questions unless you explicitly enabled "Allow extension to autofill work-auth answers" in Vault</li>
-        <li>Read the admin pages (no auto-scraping)</li>
+        <li>Paste LLM-drafted answers without review below L3</li>
         <li>Solve CAPTCHAs</li>
         <li>Create accounts on your behalf</li>
         <li>Bypass any anti-bot protection</li>

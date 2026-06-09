@@ -84,6 +84,15 @@ import Admin from '@/layouts/Admin.astro';
     download(todayName('recruiters', 'csv'), recruitersToCSV(recruitersStore.list()), 'text/csv');
   });
 
+  // A wrong file restored with "replace" wipes everything — sanity-check
+  // the shape before letting it anywhere near importAll.
+  function looksLikeBackup(b: unknown): b is Backup {
+    if (typeof b !== 'object' || b === null) return false;
+    const o = b as Record<string, unknown>;
+    if (typeof o.schemaVersion !== 'number') return false;
+    return Array.isArray(o.jobs) || Array.isArray(o.recruiters) || Array.isArray(o.letters);
+  }
+
   async function readBackup(): Promise<Backup | null> {
     const input = document.getElementById('restore-file') as HTMLInputElement;
     const file = input.files?.[0];
@@ -91,8 +100,14 @@ import Admin from '@/layouts/Admin.astro';
     let text: string;
     try { text = await file.text(); }
     catch (err) { alert(`Could not read file: ${(err as Error).message}`); return null; }
-    try { return JSON.parse(text) as Backup; }
+    let parsed: unknown;
+    try { parsed = JSON.parse(text); }
     catch (err) { alert(`Could not parse JSON: ${(err as Error).message.slice(0, 120)}`); return null; }
+    if (!looksLikeBackup(parsed)) {
+      alert('This file does not look like a Qadan admin backup (expected a numeric schemaVersion and at least one of jobs/recruiters/letters as arrays). Restore cancelled.');
+      return null;
+    }
+    return parsed;
   }
 
   document.getElementById('restore-merge')?.addEventListener('click', async () => {
@@ -114,8 +129,11 @@ import Admin from '@/layouts/Admin.astro';
     if (!confirm('Replace will overwrite all local data — including discovered jobs, watched companies, and source configs. Continue?')) return;
     const b = await readBackup();
     if (!b) return;
+    // Safety net: snapshot the current data BEFORE it is overwritten, so a
+    // wrong-file replace is recoverable.
+    download(todayName('qadan-admin-pre-restore-backup', 'json'), JSON.stringify(exportAll(), null, 2));
     importAll(b, 'replace');
-    alert('Restored. Reload to see updated counts.');
+    alert('Restored. (A pre-restore backup of the previous data was downloaded automatically.) Reload to see updated counts.');
   });
 
   document.getElementById('wipe')?.addEventListener('click', () => {

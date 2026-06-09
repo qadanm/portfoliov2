@@ -177,7 +177,10 @@ Another…"></textarea>
 
 <style>
   .lbl { font-size: 12px; color: var(--c-text-subtle); display: block; margin-bottom: 4px; }
-  .hint { color: var(--c-text-subtle); font-size: 12px; }
+  /* .hint is both static (labels) and injected via innerHTML (breakdown
+     fallback note, strengths empty state) — injected copies need :global
+     through their static containers. */
+  .hint, .bd :global(.hint), .pill-list :global(.hint) { color: var(--c-text-subtle); font-size: 12px; }
   .err { color: #F87171; font-size: 12px; margin-top: 8px; line-height: 1.5; }
   .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .row > label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--c-text-subtle); }
@@ -256,6 +259,8 @@ Another…"></textarea>
   #bulk-results :global(.bulk-fix input), #bulk-results :global(.bulk-fix textarea) { font-family: inherit; font-size: 12.5px; }
   #bulk-results :global(.bulk-fix textarea) { font-family: var(--font-mono); font-size: 11.5px; min-height: 100px; }
   #bulk-results :global(.bulk-fix .actions) { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
+  #bulk-results :global(.bulk-banner) { padding: 10px 14px; border: 1px solid rgba(239,68,68,0.4); background: rgba(239,68,68,0.06); color: var(--c-text); border-radius: var(--r-md); margin-bottom: 12px; font-size: 12.5px; line-height: 1.5; }
+  #bulk-results :global(.bulk-banner code) { font-family: var(--font-mono); font-size: 11.5px; }
   #bulk-results :global(.bulk-summary) { display: flex; gap: 14px; padding: 10px 14px; background: var(--c-bg-muted); border: 1px solid var(--c-border); border-radius: var(--r-md); margin-bottom: 12px; font-size: 13px; align-items: center; flex-wrap: wrap; }
   #bulk-results :global(.bulk-summary strong) { color: var(--c-text); font-family: var(--font-display); font-size: 18px; line-height: 1; margin-right: 4px; }
   #bulk-results :global(.bulk-summary .label) { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-text-subtle); }
@@ -267,7 +272,7 @@ Another…"></textarea>
 
 <script>
   import { runIntake, runIntakeAsync, tryFetchJD, fetchJobViaProxy, type IntakeResult, type IntakeAsyncOutcome } from '@/lib/job-intake';
-  import { parseJobUrl } from '@/lib/job-url-parser';
+  import { parseJobUrl, cleanJobUrl } from '@/lib/job-url-parser';
   import { jobsStore, ensureSchema, type Job, type JobStatus } from '@/lib/storage';
 
   ensureSchema();
@@ -369,7 +374,19 @@ Another…"></textarea>
 
   $('analyze-btn').addEventListener('click', runAnalysis);
 
+  // Never clobber text the user typed: if the JD box already has content,
+  // append the fetched text below a separator instead of replacing it.
+  function applyFetchedJdText(fetched: string) {
+    const ta = $<HTMLTextAreaElement>('jd-text');
+    const existing = ta.value.trim();
+    ta.value = existing
+      ? `${existing}\n\n----- fetched from URL -----\n\n${fetched}`
+      : fetched;
+  }
+
   $('try-fetch-btn').addEventListener('click', async () => {
+    const fetchBtn = $<HTMLButtonElement>('try-fetch-btn');
+    if (fetchBtn.disabled) return;
     const urlText = ($<HTMLInputElement>('jd-url')).value.trim();
     const status = $('fetch-status');
     if (!urlText) {
@@ -379,36 +396,40 @@ Another…"></textarea>
     showInputError('');
     status.style.display = 'block';
     status.textContent = 'Fetching via the edge proxy…';
-
-    // 1. Try the server-side proxy (works for LinkedIn + most boards).
-    const proxy = await fetchJobViaProxy(urlText);
-    if (proxy.kind === 'ok') {
-      const d = proxy.data;
-      const merged: string[] = [];
-      if (d.title) merged.push(`Title: ${d.title}`);
-      if (d.company) merged.push(`Company: ${d.company}`);
-      if (d.location) merged.push(`Location: ${d.location}`);
-      if (d.description) merged.push('', d.description);
-      ($<HTMLTextAreaElement>('jd-text')).value = merged.join('\n').trim();
-      status.textContent = `Fetched from ${d.source} (${d.via}). Review the text above and hit Analyze.`;
-      return;
-    }
-
-    // 2. Proxy unavailable (dev mode without wrangler) — try client-side fetch.
-    if (proxy.kind === 'unavailable') {
-      status.textContent = 'Proxy not running, trying client-side fetch…';
-      const text = await tryFetchJD(urlText);
-      if (text) {
-        ($<HTMLTextAreaElement>('jd-text')).value = text;
-        status.textContent = 'Fetched directly. Review the text above and hit Analyze.';
+    fetchBtn.disabled = true;
+    try {
+      // 1. Try the server-side proxy (works for LinkedIn + most boards).
+      const proxy = await fetchJobViaProxy(urlText);
+      if (proxy.kind === 'ok') {
+        const d = proxy.data;
+        const merged: string[] = [];
+        if (d.title) merged.push(`Title: ${d.title}`);
+        if (d.company) merged.push(`Company: ${d.company}`);
+        if (d.location) merged.push(`Location: ${d.location}`);
+        if (d.description) merged.push('', d.description);
+        applyFetchedJdText(merged.join('\n').trim());
+        status.textContent = `Fetched from ${d.source} (${d.via}). Review the text above and hit Analyze.`;
         return;
       }
-      status.textContent = `${proxy.message} Open the URL in a tab and paste the JD into the box.`;
-      return;
-    }
 
-    // 3. Proxy ran but the upstream failed — give a specific reason.
-    status.textContent = `${proxy.message}${proxy.hint ? ' ' + proxy.hint : ''}`;
+      // 2. Proxy unavailable (dev mode without wrangler) — try client-side fetch.
+      if (proxy.kind === 'unavailable') {
+        status.textContent = 'Proxy not running, trying client-side fetch…';
+        const text = await tryFetchJD(urlText);
+        if (text) {
+          applyFetchedJdText(text);
+          status.textContent = 'Fetched directly. Review the text above and hit Analyze.';
+          return;
+        }
+        status.textContent = `${proxy.message} Open the URL in a tab and paste the JD into the box.`;
+        return;
+      }
+
+      // 3. Proxy ran but the upstream failed — give a specific reason.
+      status.textContent = `${proxy.message}${proxy.hint ? ' ' + proxy.hint : ''}`;
+    } finally {
+      fetchBtn.disabled = false;
+    }
   });
 
   $('reset-btn').addEventListener('click', () => {
@@ -425,41 +446,61 @@ Another…"></textarea>
   });
 
   $('save-btn').addEventListener('click', () => {
+    const saveBtn = $<HTMLButtonElement>('save-btn');
+    if (saveBtn.disabled) return;
     const company = ($<HTMLInputElement>('f-company')).value.trim();
     const role = ($<HTMLInputElement>('f-role')).value.trim();
     if (!company || !role) {
       showSaveError('Company and role are required.');
       return;
     }
+    // Duplicate check (same matcher the bulk path uses: URL first, then
+    // company + role). The user can edit fields and retry if it's truly a
+    // different posting.
+    const urlVal = ($<HTMLInputElement>('f-url')).value.trim();
+    const dup = findDuplicate(
+      jobsStore.list(),
+      { id: '', source: urlVal, kind: urlVal ? 'url' : 'jd' },
+      { draft: { company, role } },
+    );
+    if (dup) {
+      showSaveError(`Already in tracker: ${dup.company} — ${dup.role}. Change the fields if this is a different posting, then save again.`);
+      return;
+    }
     showSaveError('');
-    const job: Job = {
-      id: crypto.randomUUID(),
-      company,
-      role,
-      url: ($<HTMLInputElement>('f-url')).value.trim() || undefined,
-      source: ($<HTMLInputElement>('f-source')).value.trim() || undefined,
-      location: ($<HTMLInputElement>('f-location')).value.trim() || undefined,
-      salaryMin: Number(($<HTMLInputElement>('f-salaryMin')).value) || undefined,
-      salaryMax: Number(($<HTMLInputElement>('f-salaryMax')).value) || undefined,
-      status: (($<HTMLSelectElement>('f-status')).value as JobStatus) || 'Saved',
-      resumeAngle: ($<HTMLSelectElement>('f-angle')).value || undefined,
-      priority: (Number(($<HTMLSelectElement>('f-priority')).value) as 1|2|3) || undefined,
-      fitScore: lastResult?.score?.total,
-      jdText: lastResult?.draft.jdText,
-      nextStep: ($<HTMLInputElement>('f-nextStep')).value.trim() || undefined,
-      dateFound: lastResult?.draft.dateFound ?? Date.now(),
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    };
-    jobsStore.upsert(job);
+    saveBtn.disabled = true;
+    try {
+      const job: Job = {
+        id: crypto.randomUUID(),
+        company,
+        role,
+        url: urlVal || undefined,
+        source: ($<HTMLInputElement>('f-source')).value.trim() || undefined,
+        location: ($<HTMLInputElement>('f-location')).value.trim() || undefined,
+        salaryMin: Number(($<HTMLInputElement>('f-salaryMin')).value) || undefined,
+        salaryMax: Number(($<HTMLInputElement>('f-salaryMax')).value) || undefined,
+        status: (($<HTMLSelectElement>('f-status')).value as JobStatus) || 'Saved',
+        resumeAngle: ($<HTMLSelectElement>('f-angle')).value || undefined,
+        priority: (Number(($<HTMLSelectElement>('f-priority')).value) as 1|2|3) || undefined,
+        fitScore: lastResult?.score?.total,
+        jdText: lastResult?.draft.jdText,
+        nextStep: ($<HTMLInputElement>('f-nextStep')).value.trim() || undefined,
+        dateFound: lastResult?.draft.dateFound ?? Date.now(),
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      };
+      jobsStore.upsert(job);
 
-    // Saved view
-    $('saved-summary').textContent = `${company} — ${role}${lastResult?.score ? ` · score ${lastResult.score.total} · ${lastResult.score.suggestedAngleLabel}` : ''}`;
-    const links = (lastResult?.nextSteps ?? []).map(a => `<a class="btn" href="${a.href}">${escape(a.label)}</a>`).join('');
-    $('quick-actions').innerHTML = links;
+      // Saved view
+      $('saved-summary').textContent = `${company} — ${role}${lastResult?.score ? ` · score ${lastResult.score.total} · ${lastResult.score.suggestedAngleLabel}` : ''}`;
+      const links = (lastResult?.nextSteps ?? []).map(a => `<a class="btn" href="${a.href}">${escape(a.label)}</a>`).join('');
+      $('quick-actions').innerHTML = links;
 
-    showStep('saved');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+      showStep('saved');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } finally {
+      saveBtn.disabled = false;
+    }
   });
 
   // ── Mode tabs (single vs bulk) ───────────────────────────────────────
@@ -490,30 +531,56 @@ Another…"></textarea>
     return /^https?:\/\//i.test(line.trim());
   }
 
-  function parseBulkInputs(): BulkItem[] {
+  function parseBulkInputs(): { items: BulkItem[]; skippedOutcomes: BulkOutcome[] } {
     const urlBlock = ($<HTMLTextAreaElement>('bulk-urls')).value.trim();
     const jdBlock = ($<HTMLTextAreaElement>('bulk-jds')).value.trim();
     const items: BulkItem[] = [];
+    // Lines we can't process become visible error rows instead of being
+    // silently dropped — a typo'd URL must not vanish without a trace.
+    const skippedOutcomes: BulkOutcome[] = [];
     if (urlBlock) {
       for (const raw of urlBlock.split(/\r?\n/)) {
         const line = raw.trim();
         if (!line) continue;
-        if (looksLikeUrl(line)) items.push({ id: crypto.randomUUID(), source: line, kind: 'url' });
+        if (looksLikeUrl(line)) {
+          items.push({ id: crypto.randomUUID(), source: line, kind: 'url' });
+        } else {
+          skippedOutcomes.push({
+            id: crypto.randomUUID(),
+            status: 'error',
+            reason: "Skipped: doesn't look like a URL — add https://",
+            source: line,
+          });
+        }
       }
     }
     if (jdBlock) {
-      const chunks = jdBlock.split(/^\s*-{3,}\s*$/m).map(c => c.trim()).filter(c => c.length > 50);
-      for (const chunk of chunks) items.push({ id: crypto.randomUUID(), source: chunk, kind: 'jd' });
+      const chunks = jdBlock.split(/^\s*-{3,}\s*$/m).map(c => c.trim()).filter(Boolean);
+      for (const chunk of chunks) {
+        if (chunk.length > 50) {
+          items.push({ id: crypto.randomUUID(), source: chunk, kind: 'jd' });
+        } else {
+          skippedOutcomes.push({
+            id: crypto.randomUUID(),
+            status: 'error',
+            reason: 'Skipped: JD chunk is too short to analyze (needs more than 50 characters).',
+            source: chunk,
+            board: 'JD paste',
+          });
+        }
+      }
     }
-    return items;
+    return { items, skippedOutcomes };
   }
 
-  function findDuplicate(existingJobs: Job[], item: BulkItem, intake: IntakeResult): Job | null {
+  function findDuplicate(existingJobs: Job[], item: BulkItem, intake: Pick<IntakeResult, 'draft'>): Job | null {
     if (item.kind === 'url') {
-      const a = item.source.replace(/[?#].*$/, '').replace(/\/$/, '').toLowerCase();
+      // Canonicalize both sides first (LinkedIn collections → /jobs/view/N/)
+      // so feed-style URLs dedupe against the canonical URL we now store.
+      const a = cleanJobUrl(item.source).replace(/[?#].*$/, '').replace(/\/$/, '').toLowerCase();
       for (const ex of existingJobs) {
         if (!ex.url) continue;
-        const b = ex.url.replace(/[?#].*$/, '').replace(/\/$/, '').toLowerCase();
+        const b = cleanJobUrl(ex.url).replace(/[?#].*$/, '').replace(/\/$/, '').toLowerCase();
         if (a === b) return ex;
       }
     }
@@ -598,6 +665,9 @@ Another…"></textarea>
 
   // Track the most recent set of outcomes so per-row inline-fix can mutate it.
   let lastOutcomes: BulkOutcome[] = [];
+  // Persistent banner shown above the bulk results (e.g. "proxy not
+  // available in dev"). Survives incremental re-renders.
+  let bulkBanner: string | null = null;
 
   function shortenUrl(url: string, max = 70): string {
     try {
@@ -700,7 +770,8 @@ Another…"></textarea>
 
     const wrap = $('bulk-results');
     wrap.style.display = 'block';
-    wrap.innerHTML = summary + rows;
+    const banner = bulkBanner ? `<div class="bulk-banner">${bulkBanner}</div>` : '';
+    wrap.innerHTML = banner + summary + rows;
     wireBulkResultActions(wrap);
   }
 
@@ -794,39 +865,123 @@ Another…"></textarea>
     });
   }
 
+  function isLinkedInUrl(s: string): boolean {
+    try { return /(^|\.)linkedin\.com$/i.test(new URL(s).hostname); } catch { return false; }
+  }
+
+  const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+
+  // Probe the proxy once per bulk run. Plain `astro dev` has no Pages
+  // Functions, so /api/fetch-job answers with the 404 HTML page — a
+  // non-JSON response means every URL-only row is doomed before we start.
+  async function probeProxyAvailable(): Promise<boolean> {
+    try {
+      const res = await fetch('/api/fetch-job', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      });
+      return (res.headers.get('content-type') ?? '').includes('application/json');
+    } catch {
+      return false;
+    }
+  }
+
+  // Run-token guard: a stale in-flight loop must not interleave with (or
+  // clobber the lastOutcomes of) a newer run.
+  let bulkRunToken = 0;
+
   $('bulk-analyze-btn').addEventListener('click', async () => {
-    const items = parseBulkInputs();
+    const bulkBtn = $<HTMLButtonElement>('bulk-analyze-btn');
+    if (bulkBtn.disabled) return;
+    const { items, skippedOutcomes } = parseBulkInputs();
     const status = $<HTMLElement>('bulk-status');
-    if (items.length === 0) {
-      status.style.display = 'block';
+    status.style.display = 'block';
+    if (items.length === 0 && skippedOutcomes.length === 0) {
       status.textContent = 'Paste at least one URL or JD chunk.';
       return;
     }
-    status.style.display = 'block';
-    status.textContent = `Analyzing 0 / ${items.length}…`;
 
-    lastOutcomes = [];
-    for (let i = 0; i < items.length; i++) {
-      const existing = jobsStore.list(); // re-read each iteration so duplicates within batch are caught
-      const out = await processBulkItem(items[i], existing);
-      lastOutcomes.push(out);
-      const addedSoFar = lastOutcomes.filter(o => o.status === 'added').length;
-      status.textContent = `Analyzing ${i + 1} / ${items.length} · ${addedSoFar} added so far…`;
-      // Render incrementally so the user sees progress, not a frozen block.
-      renderBulkResults();
-      await new Promise(r => setTimeout(r, 0));
+    const token = ++bulkRunToken;
+    bulkBtn.disabled = true;
+    bulkBanner = null;
+    try {
+      lastOutcomes = [...skippedOutcomes];
+      if (lastOutcomes.length) renderBulkResults();
+
+      // Dev-mode guard: without the proxy, URL-only rows can't be fetched —
+      // mark them needs-review up front instead of burning the loop on
+      // guaranteed failures.
+      let queue = items;
+      if (items.some(it => it.kind === 'url')) {
+        status.textContent = 'Checking job-fetch proxy…';
+        const proxyUp = await probeProxyAvailable();
+        if (token !== bulkRunToken) return;
+        if (!proxyUp) {
+          bulkBanner = 'Job-fetch proxy not available in this environment (<code>npm run dev</code>). Use Paste-JD mode, or run <code>npx wrangler pages dev dist</code>.';
+          for (const it of items) {
+            if (it.kind !== 'url') continue;
+            lastOutcomes.push({
+              id: it.id,
+              status: 'error',
+              reason: 'Job-fetch proxy not available in this environment (npm run dev).',
+              hint: 'Use Paste-JD mode, or run `npx wrangler pages dev dist`.',
+              source: it.source,
+              board: boardLabelForItem(it),
+            });
+          }
+          queue = items.filter(it => it.kind !== 'url');
+          renderBulkResults();
+        }
+      }
+
+      let prevWasLinkedIn = false;
+      for (let i = 0; i < queue.length; i++) {
+        if (token !== bulkRunToken) return; // superseded — stop quietly
+        const item = queue[i];
+        const itemIsLinkedIn = item.kind === 'url' && isLinkedInUrl(item.source);
+        // Pace LinkedIn: a 1.5–3s jittered gap between consecutive hits
+        // keeps the guest endpoint from rate-limiting the whole batch.
+        if (itemIsLinkedIn && prevWasLinkedIn) {
+          await sleep(1500 + Math.random() * 1500);
+          if (token !== bulkRunToken) return;
+        }
+        // Re-read jobs each iteration so duplicates within the batch are caught.
+        let out = await processBulkItem(item, jobsStore.list());
+        // One retry with ~5s backoff when LinkedIn rate-limits (429/999)
+        // or the upstream timed out (status 0).
+        if (out.status === 'error' && itemIsLinkedIn
+            && (out.statusCode === 429 || out.statusCode === 999 || out.statusCode === 0)) {
+          status.textContent = `LinkedIn rate-limited — retrying ${i + 1} / ${queue.length} in ~5s…`;
+          await sleep(5000 + Math.random() * 1000);
+          if (token !== bulkRunToken) return;
+          out = await processBulkItem(item, jobsStore.list());
+        }
+        prevWasLinkedIn = itemIsLinkedIn;
+        lastOutcomes.push(out);
+        const addedSoFar = lastOutcomes.filter(o => o.status === 'added').length;
+        status.textContent = `Analyzing ${i + 1} / ${queue.length} · ${addedSoFar} added so far…`;
+        // Render incrementally so the user sees progress, not a frozen block.
+        renderBulkResults();
+        await new Promise(r => setTimeout(r, 0));
+      }
+      const addedFinal = lastOutcomes.filter(o => o.status === 'added').length;
+      const errFinal = lastOutcomes.filter(o => o.status === 'error').length;
+      status.textContent = `Done. ${addedFinal} added${errFinal ? ` · ${errFinal} need attention` : ''}.`;
+      if (queue.length === 0) renderBulkResults();
+    } finally {
+      bulkBtn.disabled = false;
     }
-    const addedFinal = lastOutcomes.filter(o => o.status === 'added').length;
-    const errFinal = lastOutcomes.filter(o => o.status === 'error').length;
-    status.textContent = `Done. ${addedFinal} added${errFinal ? ` · ${errFinal} need attention` : ''}.`;
   });
 
   $('bulk-clear-btn').addEventListener('click', () => {
+    bulkRunToken++; // halt any in-flight run at its next checkpoint
     ($<HTMLTextAreaElement>('bulk-urls')).value = '';
     ($<HTMLTextAreaElement>('bulk-jds')).value = '';
     $('bulk-status').style.display = 'none';
     $('bulk-results').style.display = 'none';
     $('bulk-results').innerHTML = '';
     lastOutcomes = [];
+    bulkBanner = null;
   });
 </script>

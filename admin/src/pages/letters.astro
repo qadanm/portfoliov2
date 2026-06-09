@@ -47,10 +47,18 @@ import { angles } from '@/data/angles';
       </div>
       <label>Recruiter / contact first name<input id="recruiter" placeholder="optional" /></label>
       <label>Custom hook (one sentence)<input id="custom" placeholder="optional — woven into the body" /></label>
+      <label>Attach to job (when saving)
+        <select id="job-link">
+          <option value="">— none —</option>
+        </select>
+      </label>
 
       <div class="row" style="margin-top:8px;">
         <button class="btn btn--primary" id="generate">Generate</button>
         <button class="btn" id="copy">Copy</button>
+      </div>
+      <div class="row">
+        <button class="btn" id="save-letter">Save letter</button>
       </div>
     </section>
 
@@ -60,6 +68,13 @@ import { angles } from '@/data/angles';
       <p class="muted" style="margin-top:8px;font-size:12px;">Always edit before sending. These are sharp drafts, not finished outreach.</p>
     </section>
   </div>
+
+  <section class="card" style="margin-top:16px;">
+    <h2 class="h2">Saved letters</h2>
+    <div id="saved-letters" class="saved-list"></div>
+  </section>
+
+  <div id="letters-toast" class="letters__toast" aria-live="polite"></div>
 </Admin>
 
 <style>
@@ -68,13 +83,62 @@ import { angles } from '@/data/angles';
   .h2 { font-family: var(--font-display); font-size: 22px; font-weight: 400; letter-spacing: -0.01em; margin-bottom: 12px; }
   label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--c-text-subtle); margin-bottom: 12px; }
   .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .muted { color: var(--c-text-subtle); }
+  /* .muted is both static (output hint) and injected (saved-list empty state). */
+  .muted, .saved-list :global(.muted) { color: var(--c-text-subtle); }
   textarea { font-family: var(--font-mono); font-size: 12.5px; line-height: 1.55; min-height: 380px; resize: vertical; }
+
+  /* Saved-letter rows are injected via innerHTML, so they don't carry
+     Astro's scope attribute — style them through the static parent +
+     :global, same pattern as today.astro. */
+  .saved-list { display: flex; flex-direction: column; gap: 8px; }
+  .saved-list :global(.saved-row) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 12px;
+    border: 1px solid var(--c-border-subtle);
+    border-radius: var(--r-md);
+    background: var(--c-bg);
+  }
+  .saved-list :global(.saved-row .preview) {
+    font-size: 12.5px;
+    color: var(--c-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .saved-list :global(.saved-row .meta) {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--c-text-subtle);
+    margin-top: 3px;
+  }
+
+  .letters__toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 14px;
+    background: var(--c-text);
+    color: var(--c-bg);
+    border-radius: var(--r-full);
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 200ms;
+    pointer-events: none;
+    z-index: 100;
+  }
+  .letters__toast.is-visible { opacity: 1; }
 </style>
 
 <script>
-  import { generateMessage, type Tone } from '@/lib/letters';
-  import type { LetterKind } from '@/lib/storage';
+  import { generateMessage, LETTER_KIND_LABELS, type Tone } from '@/lib/letters';
+  import { jobsStore, lettersStore, ensureSchema, type LetterKind, type SavedLetter } from '@/lib/storage';
+  import { onDataChanged } from '@/lib/sync';
+
+  ensureSchema();
 
   // Pre-fill from query string (analyzer, intake, or recruiter CRM)
   const url = new URL(window.location.href);
@@ -87,6 +151,19 @@ import { angles } from '@/data/angles';
   setIf('role', 'role');
   setIf('kind', 'kind');
   setIf('recruiter', 'recruiter');
+
+  function esc(s: string): string {
+    return s.replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]!));
+  }
+
+  let toastTimer: number | null = null;
+  function toast(msg: string) {
+    const el = document.getElementById('letters-toast')!;
+    el.textContent = msg;
+    el.classList.add('is-visible');
+    if (toastTimer) window.clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => el.classList.remove('is-visible'), 2200);
+  }
 
   const out = document.getElementById('output') as HTMLTextAreaElement;
   const generate = () => {
@@ -102,14 +179,107 @@ import { angles } from '@/data/angles';
 
   document.getElementById('generate')?.addEventListener('click', generate);
   document.getElementById('copy')?.addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(out.value);
-      const btn = document.getElementById('copy') as HTMLButtonElement;
+    const btn = document.getElementById('copy') as HTMLButtonElement;
+    const flash = () => {
       const orig = btn.textContent;
       btn.textContent = 'Copied';
       setTimeout(() => { btn.textContent = orig; }, 1200);
-    } catch { /* ignore */ }
+    };
+    try {
+      await navigator.clipboard.writeText(out.value);
+      flash();
+      toast('Copied to clipboard');
+    } catch {
+      // Clipboard API can be unavailable (permissions, non-secure context) —
+      // fall back to select() + execCommand like vault.astro does.
+      out.select();
+      const ok = document.execCommand('copy');
+      if (ok) { flash(); toast('Copied to clipboard'); }
+      else toast('Copy failed — select the text and copy manually.');
+    }
   });
+
+  // ── Job association (for Save) ───────────────────────────────────────
+  const jobSel = document.getElementById('job-link') as HTMLSelectElement;
+  function populateJobs() {
+    const cur = jobSel.value;
+    const jobs = jobsStore.list().slice().sort((a, b) => b.updatedAt - a.updatedAt);
+    jobSel.innerHTML = '<option value="">— none —</option>' + jobs.map(j =>
+      `<option value="${esc(j.id)}">${esc(j.company)} — ${esc(j.role)}</option>`
+    ).join('');
+    if (cur && jobs.some(j => j.id === cur)) jobSel.value = cur;
+  }
+
+  // ── Save / list / load / delete ──────────────────────────────────────
+  const savedEl = document.getElementById('saved-letters')!;
+
+  document.getElementById('save-letter')?.addEventListener('click', () => {
+    const body = out.value.trim();
+    if (!body) { toast('Nothing to save — generate or write a letter first.'); return; }
+    const kind = (document.getElementById('kind') as HTMLSelectElement).value as LetterKind;
+    const tone = (document.getElementById('tone') as HTMLSelectElement).value as SavedLetter['tone'];
+    const now = Date.now();
+    lettersStore.upsert({
+      id: crypto.randomUUID(),
+      kind,
+      tone,
+      jobId: jobSel.value || undefined,
+      body,
+      createdAt: now,
+      updatedAt: now,
+    });
+    renderSavedLetters();
+    toast('Letter saved');
+  });
+
+  function renderSavedLetters() {
+    const letters = lettersStore.list().slice().sort((a, b) => b.createdAt - a.createdAt);
+    if (letters.length === 0) {
+      savedEl.innerHTML = '<p class="muted" style="font-size:12px;">No saved letters yet. Generate one, edit it, then click "Save letter".</p>';
+      return;
+    }
+    const jobsById = new Map(jobsStore.list().map(j => [j.id, j]));
+    savedEl.innerHTML = letters.map(l => {
+      const job = l.jobId ? jobsById.get(l.jobId) : undefined;
+      const jobLabel = job ? `${job.company} — ${job.role}` : '';
+      const when = new Date(l.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: '2-digit' });
+      const preview = l.body.length > 140 ? l.body.slice(0, 140).trim() + '…' : l.body;
+      return `<div class="saved-row" data-id="${esc(l.id)}">
+        <div style="min-width:0;">
+          <div class="preview">${esc(preview)}</div>
+          <div class="meta">${esc(LETTER_KIND_LABELS[l.kind] ?? l.kind)} · ${esc(l.tone)}${jobLabel ? ' · ' + esc(jobLabel) : ''} · ${esc(when)}</div>
+        </div>
+        <button class="btn" data-load="${esc(l.id)}" style="font-size:11px;padding:4px 10px;">Load</button>
+        <button class="btn" data-del="${esc(l.id)}" style="font-size:11px;padding:4px 10px;">Delete</button>
+      </div>`;
+    }).join('');
+
+    savedEl.querySelectorAll<HTMLElement>('[data-load]').forEach(b => b.addEventListener('click', () => {
+      const l = lettersStore.list().find(x => x.id === b.dataset.load);
+      if (!l) { toast('Letter not found — it may have been deleted.'); return; }
+      out.value = l.body;
+      (document.getElementById('kind') as HTMLSelectElement).value = l.kind;
+      (document.getElementById('tone') as HTMLSelectElement).value = l.tone;
+      jobSel.value = (l.jobId && jobsById.has(l.jobId)) ? l.jobId : '';
+      toast('Loaded into editor');
+    }));
+    savedEl.querySelectorAll<HTMLElement>('[data-del]').forEach(b => b.addEventListener('click', () => {
+      if (!confirm('Delete this saved letter?')) return;
+      lettersStore.remove(b.dataset.del!); // records a tombstone for sync
+      renderSavedLetters();
+      toast('Letter deleted');
+    }));
+  }
+
+  // Live updates: refresh the job dropdown and saved list when a sync pull
+  // or another tab changes data (the editor textarea is left alone).
+  onDataChanged(() => {
+    populateJobs();
+    renderSavedLetters();
+  });
+
+  populateJobs();
+  renderSavedLetters();
 
   // Auto-generate on initial load if angle/company/role are pre-filled
   if (url.searchParams.get('angle')) generate();

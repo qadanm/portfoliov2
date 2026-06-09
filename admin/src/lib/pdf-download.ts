@@ -42,18 +42,91 @@ export function openForPrint(job: PdfJob): void {
   }
 }
 
-/** Open both docs in two new tabs. Must be called inside a single
- *  click handler so user activation covers both window.open calls. */
+/** Open BOTH docs in ONE new tab, stacked with a page break, so a single
+ *  print dialog covers both. Two `window.open` calls in one click reliably
+ *  lose to the popup blocker (only the first carries user activation), so
+ *  we open one blank tab synchronously and compose into it. */
 export function openBothForPrint(jobs: [PdfJob, PdfJob]): void {
-  const opened: Window[] = [];
-  for (const job of jobs) {
-    const w = window.open(buildAutoprintUrl(job), '_blank');
-    if (!w) {
-      // If the second open is blocked, close the first so we don't
-      // leave a half-finished state on screen.
-      for (const o of opened) { try { o.close(); } catch { /* swallow */ } }
-      throw new Error('Browser blocked one of the new tabs. Allow popups for this site.');
+  const win = window.open('', '_blank');
+  if (!win) {
+    throw new Error('Browser blocked the new tab. Allow popups for this site.');
+  }
+  try { win.document.write('<title>Preparing documents…</title><p style="font-family:sans-serif">Preparing both documents…</p>'); } catch { /* ignore */ }
+  void composeAndPrint(win, jobs);
+}
+
+function buildEmbedUrl({ url }: PdfJob): string {
+  const sep = url.includes('?') ? '&' : '?';
+  // embed=1 strips admin chrome; NO autoprint — the composed page fires
+  // a single print() itself.
+  return `${url}${sep}embed=1`;
+}
+
+async function composeAndPrint(win: Window, jobs: [PdfJob, PdfJob]): Promise<void> {
+  try {
+    const docs = await Promise.all(jobs.map(async (job) => {
+      const res = await fetch(buildEmbedUrl(job), { credentials: 'same-origin' });
+      if (!res.ok) throw new Error(`Could not load ${job.url} (${res.status})`);
+      return new DOMParser().parseFromString(await res.text(), 'text/html');
+    }));
+
+    // Hoist styles from both documents (dedup), drop all scripts.
+    const seen = new Set<string>();
+    const styleTags: string[] = [];
+    for (const doc of docs) {
+      doc.querySelectorAll('script').forEach(s => s.remove());
+      doc.head.querySelectorAll('style, link[rel="stylesheet"]').forEach(n => {
+        const html = n.outerHTML;
+        if (!seen.has(html)) { seen.add(html); styleTags.push(html); }
+      });
     }
-    opened.push(w);
+    const bodyClass = Array.from(new Set(docs.flatMap(d => (d.body.className || '').split(/\s+/)))).filter(Boolean).join(' ');
+    const title = `${jobs[0].filename} + ${jobs[1].filename}`;
+
+    win.document.open();
+    win.document.write(`<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<base href="${location.origin}/" />
+<title>${title.replace(/[<>&"]/g, '')}</title>
+${styleTags.join('\n')}
+<style>.qa-print-break { page-break-before: always; break-before: page; }</style>
+</head>
+<body class="${bodyClass.replace(/"/g, '')}">
+${docs[0].body.innerHTML}
+<div class="qa-print-break"></div>
+${docs[1].body.innerHTML}
+</body>
+</html>`);
+    win.document.close();
+
+    // Let styles/fonts settle, then ONE print dialog for both documents.
+    const fire = () => { try { win.focus(); win.print(); } catch { /* ignore */ } };
+    try {
+      const fonts = (win.document as Document & { fonts?: { ready: Promise<unknown> } }).fonts;
+      if (fonts?.ready) {
+        await Promise.race([fonts.ready, new Promise(r => setTimeout(r, 1500))]);
+      }
+    } catch { /* ignore */ }
+    setTimeout(fire, 400);
+    win.addEventListener('afterprint', () => { try { win.close(); } catch { /* ignore */ } });
+  } catch (err) {
+    // Compose failed — leave the tab usable with direct links so the user
+    // can still print each doc individually (clicks inside the tab carry
+    // their own activation).
+    try {
+      win.document.open();
+      win.document.write(`<!doctype html><title>Print failed</title>
+<body style="font-family: sans-serif; padding: 24px;">
+<p>Could not combine the documents (${String((err as Error)?.message ?? err).replace(/[<>&"]/g, '')}).</p>
+<p>Open and print each one:</p>
+<ul>
+<li><a href="${buildAutoprintUrl(jobs[0]).replace(/"/g, '&quot;')}">${jobs[0].filename.replace(/[<>&"]/g, '')}</a></li>
+<li><a href="${buildAutoprintUrl(jobs[1]).replace(/"/g, '&quot;')}">${jobs[1].filename.replace(/[<>&"]/g, '')}</a></li>
+</ul>
+</body>`);
+      win.document.close();
+    } catch { /* ignore */ }
   }
 }

@@ -80,7 +80,10 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
   }
 };
 
-export const onRequestPut: PagesFunction<Env> = async (ctx) => {
+// Shared by PUT and POST. POST exists because navigator.sendBeacon — used
+// by the client to flush a pending push when the page is navigated away —
+// can only send POST requests. The body is treated exactly like a PUT.
+const handleWrite: PagesFunction<Env> = async (ctx) => {
   if (!ctx.env.KV) return bindingError();
 
   const ct = ctx.request.headers.get('content-type') ?? '';
@@ -131,6 +134,9 @@ export const onRequestPut: PagesFunction<Env> = async (ctx) => {
 
   return json({ ok: true, updatedAt });
 };
+
+export const onRequestPut: PagesFunction<Env> = handleWrite;
+export const onRequestPost: PagesFunction<Env> = handleWrite;
 
 // Optional: expose a delete for the "wipe cloud copy" admin action.
 export const onRequestDelete: PagesFunction<Env> = async (ctx) => {

@@ -21,49 +21,53 @@ import Admin from '@/layouts/Admin.astro';
   .review { display: flex; flex-direction: column; gap: 14px; }
   .review__filters { display: flex; gap: 6px; flex-wrap: wrap; }
   .review__list { display: flex; flex-direction: column; gap: 10px; }
-  .review__item {
+  /* Review items are injected via innerHTML so they don't carry Astro's
+     scope attribute — style them through the static .review__list parent
+     + :global, same pattern as today.astro. */
+  .review__list :global(.review__item) {
     background: var(--c-bg-elev);
     border: 1px solid var(--c-border);
     border-radius: var(--r-md);
     padding: 14px 18px;
   }
-  .review__item.is-paused { border-color: rgba(245, 158, 11, 0.4); }
-  .review__item.is-blocked { border-color: rgba(248, 113, 113, 0.4); }
-  .review__head {
+  .review__list :global(.review__item.is-paused) { border-color: rgba(245, 158, 11, 0.4); }
+  .review__list :global(.review__item.is-blocked) { border-color: rgba(248, 113, 113, 0.4); }
+  .review__list :global(.review__head) {
     display: flex; align-items: baseline; gap: 10px;
     margin-bottom: 8px;
     flex-wrap: wrap;
   }
-  .review__co { font-family: var(--font-display); font-size: 18px; font-weight: 400; }
-  .review__role { font-family: var(--font-mono); font-size: 11px; color: var(--c-text-muted); }
-  .review__chips { display: flex; gap: 4px; flex-wrap: wrap; margin-left: auto; }
-  .chip {
+  .review__list :global(.review__co) { font-family: var(--font-display); font-size: 18px; font-weight: 400; }
+  .review__list :global(.review__role) { font-family: var(--font-mono); font-size: 11px; color: var(--c-text-muted); }
+  .review__list :global(.review__chips) { display: flex; gap: 4px; flex-wrap: wrap; margin-left: auto; }
+  /* Page-local size variant of global.css's .chip. */
+  .review__list :global(.chip) {
     display: inline-flex; align-items: center;
     font-family: var(--font-mono); font-size: 10px;
     padding: 2px 8px; border-radius: var(--r-full);
     background: var(--c-bg-muted); color: var(--c-text-muted);
     border: 1px solid var(--c-border-subtle);
   }
-  .review__body { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px; }
-  @media (max-width: 720px) { .review__body { grid-template-columns: 1fr; } }
-  .review__why {
+  .review__list :global(.review__body) { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px; }
+  @media (max-width: 720px) { .review__list :global(.review__body) { grid-template-columns: 1fr; } }
+  .review__list :global(.review__why) {
     padding: 10px 12px;
     background: var(--c-bg);
     border-radius: var(--r-md);
     font-size: 13px;
     color: var(--c-text-muted);
   }
-  .review__why strong { color: var(--c-accent); }
-  .review__actions {
+  .review__list :global(.review__why strong) { color: var(--c-accent); }
+  .review__list :global(.review__actions) {
     display: flex; gap: 8px; flex-wrap: wrap;
     margin-top: 10px;
   }
-  .review__last-step {
+  .review__list :global(.review__last-step) {
     font-family: var(--font-mono); font-size: 11px;
     color: var(--c-text-subtle);
     margin-top: 6px;
   }
-  .review__empty { padding: 40px; text-align: center; color: var(--c-text-subtle); font-size: 13px; }
+  .review__list :global(.review__empty) { padding: 40px; text-align: center; color: var(--c-text-subtle); font-size: 13px; }
 </style>
 
 <script>
@@ -159,8 +163,27 @@ import Admin from '@/layouts/Admin.astro';
     if (!a) return;
     if (act === 'retry') {
       updateAttemptStatus(aid, 'queued', { blockReason: undefined, blockNote: undefined });
-      // Notify extension to re-pick this attempt
-      window.postMessage({ source: 'qa-admin', kind: 'attempt-retry', sessionId: a.sessionId, attemptId: aid }, '*');
+      const job = jobsStore.get(a.jobId);
+      const url = a.currentUrl || job?.url;
+      if (url) {
+        // Route retry through the real attempt-open flow (C15): the SW
+        // re-opens/rebinds the tab and clears the per-URL loop-guard so the
+        // runner actually re-runs. The old 'attempt-retry' signal was a
+        // no-op acknowledged by the background and nothing else.
+        window.postMessage({
+          source: 'qa-admin',
+          kind: 'agent.attempt.open',
+          sessionId: a.sessionId,
+          attemptId: a.id,
+          jobId: a.jobId,
+          url,
+          autonomyLevel: a.autonomyLevel,
+          atsType: a.atsType,
+        }, '*');
+      } else {
+        // No URL to open — fall back to the legacy re-queue signal.
+        window.postMessage({ source: 'qa-admin', kind: 'attempt-retry', sessionId: a.sessionId, attemptId: aid }, '*');
+      }
       render();
     } else if (act === 'markApplied') {
       const job = jobsStore.get(a.jobId);

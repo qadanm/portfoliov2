@@ -98,7 +98,9 @@ function normalizeRequest(raw: unknown): DraftRequest | null {
   if (typeof baseline !== 'string') return null;
   return {
     task: task as LlmTask,
-    baseline,
+    // Capped like the other free-text fields — an unbounded baseline can
+    // blow the model context and the request body.
+    baseline: baseline.slice(0, 16000),
     jdText: typeof r.jdText === 'string' ? r.jdText.slice(0, 16000) : undefined,
     resumeContext: typeof r.resumeContext === 'string' ? r.resumeContext.slice(0, 24000) : undefined,
     packetId: typeof r.packetId === 'string' ? r.packetId : undefined,
@@ -132,7 +134,7 @@ function systemPromptFor(task: LlmTask): string {
       base.push(`Task: write a "why this company" answer in 60-100 words. If you don't have a concrete observation about the company, leave a [ADD ONE CONCRETE OBSERVATION] placeholder rather than inventing one.`);
       break;
     case 'short-answer-tell-me-about-yourself':
-      base.push(`Task: write a "tell me about yourself" answer in 90-140 words for screen-stage use. Mention the two anchor projects (ChatOBD2, MagTek) and any matching themes from the JD. No generic openers.`);
+      base.push(`Task: write a "tell me about yourself" answer in 90-140 words for screen-stage use. Anchor it on the most relevant projects from RESUME_CONTEXT (the independent iOS products and MagTek) plus any matching themes from the JD. No generic openers.`);
       break;
     case 'jd-summary':
       base.push(`Task: summarize the JD in 3-4 bullet lines. Bullets only. Focus on what the role does, what stack/process is implied, what the team values, and any red flags.`);
@@ -197,9 +199,16 @@ async function callDeepSeek(apiKey: string, model: string, systemPrompt: string,
         max_tokens: 1200,
         response_format: { type: 'json_object' },
       }),
+      // Upstream timeout — a hung DeepSeek call must not hold the worker
+      // (and the waiting client) open indefinitely.
+      signal: AbortSignal.timeout(25_000),
     });
   } catch (err) {
-    return { error: `DeepSeek fetch failed: ${(err as Error).message}` };
+    const e = err as Error;
+    if (e?.name === 'TimeoutError' || e?.name === 'AbortError') {
+      return { error: 'DeepSeek request timed out after 25s.' };
+    }
+    return { error: `DeepSeek fetch failed: ${e.message}` };
   }
   if (!res.ok) {
     let msg = `DeepSeek HTTP ${res.status}`;
@@ -221,9 +230,10 @@ async function callDeepSeek(apiKey: string, model: string, systemPrompt: string,
   try {
     parsed = JSON.parse(content);
   } catch {
-    // Some models occasionally return prose even with json mode. Treat the
-    // raw content as the draft.
-    parsed = { draft: content };
+    // Model violated json mode — returning the raw prose as `draft` would
+    // hand unvetted output straight into packet fields. Error out so the
+    // client falls back to its baseline.
+    return { error: 'DeepSeek returned a non-JSON draft payload.' };
   }
   if (typeof parsed.draft !== 'string') return { error: 'DeepSeek output missing draft field.' };
   return { draft: parsed.draft, model: body.model ?? model, raw: content };

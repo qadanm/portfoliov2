@@ -216,7 +216,8 @@ import Admin from '@/layouts/Admin.astro';
     background: var(--c-bg); padding: 1px 4px; border-radius: 3px;
   }
 
-  .muted { color: var(--c-text-subtle); font-size: 12px; margin: 6px 0; }
+  /* .muted is both static (section blurbs) and injected (audit-log empty state). */
+  .muted, .audit-log :global(.muted) { color: var(--c-text-subtle); font-size: 12px; margin: 6px 0; }
 
   .audit-log {
     display: flex; flex-direction: column; gap: 4px;
@@ -224,7 +225,10 @@ import Admin from '@/layouts/Admin.astro';
     max-height: 280px; overflow-y: auto;
     font-family: var(--font-mono); font-size: 11px;
   }
-  .audit-row {
+  /* Audit rows are injected via innerHTML so they don't carry Astro's
+     scope attribute — style them through the static .audit-log parent
+     + :global, same pattern as today.astro. */
+  .audit-log :global(.audit-row) {
     padding: 6px 10px;
     background: var(--c-bg);
     border: 1px solid var(--c-border-subtle);
@@ -234,10 +238,10 @@ import Admin from '@/layouts/Admin.astro';
     gap: 8px;
     align-items: center;
   }
-  .audit-row span:nth-child(1) { color: var(--c-text-subtle); }
-  .audit-row span:nth-child(3) { color: var(--c-accent); }
-  .audit-row.is-disabled span:nth-child(3) { color: var(--c-text-subtle); }
-  .audit-row.is-error span:nth-child(3) { color: #F87171; }
+  .audit-log :global(.audit-row span:nth-child(1)) { color: var(--c-text-subtle); }
+  .audit-log :global(.audit-row span:nth-child(3)) { color: var(--c-accent); }
+  .audit-log :global(.audit-row.is-disabled span:nth-child(3)) { color: var(--c-text-subtle); }
+  .audit-log :global(.audit-row.is-error span:nth-child(3)) { color: #F87171; }
 
   .vault__export-card {
     margin-top: 12px;
@@ -280,8 +284,12 @@ import Admin from '@/layouts/Admin.astro';
     type ApplySettings,
     type LlmAuditEntry,
   } from '@/lib/storage';
+  import { onDataChanged } from '@/lib/sync';
 
   ensureSchema();
+  // Page-level snapshots are for RENDERING only. Writes always re-read the
+  // freshest record first (see bindVaultInputs) so a stale snapshot can
+  // never clobber fields that synced in after page load.
   let vault: ProfileVault = vaultStore.get();
   let settings: ApplySettings = applySettingsStore.get();
 
@@ -295,9 +303,11 @@ import Admin from '@/layouts/Admin.astro';
     setTimeout(() => el.classList.remove('is-visible'), 1800);
   }
 
-  // Load → form
+  // Load → form. Never touches the field the user is typing in
+  // (document.activeElement) so a background sync can't clobber input.
   function applyVaultToForm() {
     $$<HTMLInputElement | HTMLTextAreaElement>('[data-vault]').forEach(el => {
+      if (el === document.activeElement) return;
       const key = (el as HTMLElement).dataset.vault!;
       const val = (vault as any)[key];
       if (val == null) {
@@ -312,6 +322,7 @@ import Admin from '@/layouts/Admin.astro';
       }
     });
     $$<HTMLInputElement>('[data-settings]').forEach(el => {
+      if (el === document.activeElement) return;
       const key = el.dataset.settings!;
       const val = (settings as any)[key];
       if (val == null) return;
@@ -320,7 +331,9 @@ import Admin from '@/layouts/Admin.astro';
     });
   }
 
-  // Form → state on change
+  // Form → store on change. Re-read the freshest record, apply ONLY the
+  // changed key, save that — saving the page-load snapshot whole would
+  // overwrite every field another device synced since load.
   function bindVaultInputs() {
     $$<HTMLInputElement | HTMLTextAreaElement>('[data-vault]').forEach(el => {
       el.addEventListener('change', () => {
@@ -330,8 +343,10 @@ import Admin from '@/layouts/Admin.astro';
         if (input.type === 'checkbox') val = input.checked;
         else if (input.type === 'number') val = el.value === '' ? undefined : Number(el.value);
         else val = el.value;
-        (vault as any)[key] = val;
-        vaultStore.save(vault);
+        const fresh = vaultStore.get();
+        (fresh as any)[key] = val;
+        vaultStore.save(fresh);
+        vault = fresh;
         renderStatus();
       });
     });
@@ -342,8 +357,10 @@ import Admin from '@/layouts/Admin.astro';
         if (el.type === 'checkbox') val = el.checked;
         else if (el.type === 'number') val = el.value === '' ? undefined : Number(el.value);
         else val = el.value;
-        (settings as any)[key] = val;
-        applySettingsStore.save(settings);
+        const fresh = applySettingsStore.get();
+        (fresh as any)[key] = val;
+        applySettingsStore.save(fresh);
+        settings = fresh;
       });
     });
   }
@@ -374,7 +391,7 @@ import Admin from '@/layouts/Admin.astro';
     const payload = {
       version: 1,
       exportedAt: Date.now(),
-      vault: { ...vault },
+      vault: { ...vaultStore.get() }, // freshest copy, not the page snapshot
       // Don't include audit log or settings — extension only needs vault.
     };
     blob.value = JSON.stringify(payload, null, 2);
@@ -429,6 +446,17 @@ import Admin from '@/layouts/Admin.astro';
     llmAuditStore.clear();
     renderAuditLog();
     toast('Audit log cleared');
+  });
+
+  // Live updates: when a sync pull or another tab changes the vault,
+  // refresh form values (applyVaultToForm skips the focused field) and
+  // re-render the derived bits.
+  onDataChanged(() => {
+    vault = vaultStore.get();
+    settings = applySettingsStore.get();
+    applyVaultToForm();
+    renderStatus();
+    renderAuditLog();
   });
 
   // Boot

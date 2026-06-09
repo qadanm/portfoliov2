@@ -77,14 +77,23 @@ export async function tryDraft(req: LlmDraftRequest): Promise<LlmDraftResponse> 
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(req),
+      // Hard client-side timeout — a hung proxy must not hang the packet
+      // build or the agent's question flow.
+      signal: AbortSignal.timeout(20_000),
     });
   } catch (err) {
+    const e = err as Error;
+    const timedOut = e?.name === 'TimeoutError' || e?.name === 'AbortError';
     llmAuditStore.append({
       ...auditBase,
       status: 'error',
-      errorMessage: (err as Error)?.message ?? 'fetch failed',
+      errorMessage: timedOut ? 'LLM request timed out (20s)' : (e?.message ?? 'fetch failed'),
     });
-    return { draft: req.baseline, disabled: true, reason: 'Network error; using baseline.' };
+    return {
+      draft: req.baseline,
+      disabled: true,
+      reason: timedOut ? 'LLM request timed out (20s); using baseline.' : 'Network error; using baseline.',
+    };
   }
 
   const ct = res.headers.get('content-type') ?? '';
@@ -137,7 +146,31 @@ export async function tryDraft(req: LlmDraftRequest): Promise<LlmDraftResponse> 
     return { draft: req.baseline, rejectedByScrubber: true, reason: 'Refined draft tripped authenticity scrubber; using baseline.', modelUsed: body.modelUsed };
   }
 
-  const draft = String(body?.draft ?? req.baseline);
+  // Reject obviously-bad drafts — an empty string or a refusal marker would
+  // sail through `?? baseline` and overwrite a good heuristic baseline (C8).
+  const draftRaw = typeof body?.draft === 'string' ? body.draft : '';
+  const draftTrimmed = draftRaw.trim();
+  const baselineLen = req.baseline.trim().length;
+  const rejectReason =
+    draftTrimmed.length === 0
+      ? 'Model returned an empty draft; keeping baseline.'
+      : /\[HUMAN_REVIEW_REQUIRED\]/.test(draftRaw)
+        ? 'Model flagged the task for human review; keeping baseline.'
+        : baselineLen > 0 && draftTrimmed.length < baselineLen * 0.3
+          ? `Model draft suspiciously short (${draftTrimmed.length} chars vs baseline ${baselineLen}); keeping baseline.`
+          : null;
+  if (rejectReason) {
+    llmAuditStore.append({
+      ...auditBase,
+      status: 'rejected-by-scrubber',
+      modelUsed: body?.modelUsed,
+      draftChars: draftTrimmed.length,
+      errorMessage: rejectReason,
+    });
+    return { draft: req.baseline, rejectedByScrubber: true, reason: rejectReason, modelUsed: body?.modelUsed };
+  }
+
+  const draft = draftRaw;
   llmAuditStore.append({
     ...auditBase,
     status: 'ok',

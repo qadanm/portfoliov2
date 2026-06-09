@@ -68,6 +68,17 @@
           sendResponse({ ok: false, error: 'agent-runner-missing' });
           return;
         }
+        case 'agent.history-changed': {
+          // SPA route change (Ashby/Workday push-state steps). The SW
+          // watches webNavigation and nudges us — re-run the agent loop
+          // so step 2+ actually gets processed.
+          if (window.__qadanAgent?.runOnce) {
+            window.__qadanAgent.runOnce().then(() => sendResponse({ ok: true }));
+            return true;
+          }
+          sendResponse({ ok: false, error: 'agent-runner-missing' });
+          return;
+        }
         case 'm3-submit': {
           // Submit is handled by the agent runner with full gate checks.
           // Popup cannot bypass; this endpoint always refuses.

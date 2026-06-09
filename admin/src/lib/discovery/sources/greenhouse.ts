@@ -12,6 +12,7 @@
 
 import type { SourceConfig } from '../types';
 import type { RawSourceJob } from './types';
+import { fetchWithTimeout } from './http';
 
 const ENDPOINT = 'https://boards-api.greenhouse.io/v1/boards';
 
@@ -34,7 +35,7 @@ export async function fetchGreenhouse(source: SourceConfig): Promise<RawSourceJo
   const slug = source.params?.slug;
   if (!slug) throw new Error('Greenhouse source missing required `params.slug`');
 
-  const res = await fetch(`${ENDPOINT}/${encodeURIComponent(slug)}/jobs?content=true`, {
+  const res = await fetchWithTimeout(`${ENDPOINT}/${encodeURIComponent(slug)}/jobs?content=true`, {
     headers: { Accept: 'application/json' },
   });
   if (!res.ok) throw new Error(`Greenhouse ${slug} returned ${res.status}`);
@@ -57,8 +58,14 @@ export async function fetchGreenhouse(source: SourceConfig): Promise<RawSourceJo
     location: j.location?.name,
     salaryRaw: extractSalaryFromMetadata(j.metadata),
     description: stripHtml(j.content ?? ''),
-    publishedAt: j.updated_at ? Date.parse(j.updated_at) : undefined,
+    publishedAt: parseDate(j.updated_at),
   }));
+}
+
+function parseDate(d?: string): number | undefined {
+  if (!d) return undefined;
+  const t = Date.parse(d);
+  return Number.isNaN(t) ? undefined : t;
 }
 
 function extractSalaryFromMetadata(metadata?: GHJob['metadata']): string | undefined {

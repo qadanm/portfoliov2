@@ -22,6 +22,7 @@
 
 import type { SourceConfig } from '../types';
 import type { RawSourceJob } from './types';
+import { fetchWithTimeout } from './http';
 
 const ENDPOINT = 'https://remotive.com/api/remote-jobs';
 
@@ -45,7 +46,7 @@ export async function fetchRemotive(source: SourceConfig): Promise<RawSourceJob[
   const category = source.params?.category ?? 'design';
   const url = `${ENDPOINT}?category=${encodeURIComponent(category)}`;
 
-  const res = await fetch(url, {
+  const res = await fetchWithTimeout(url, {
     method: 'GET',
     headers: { Accept: 'application/json' },
   });

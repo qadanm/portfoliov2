@@ -48,10 +48,16 @@
 
   function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
+  // Literal template placeholders (e.g. "[add one concrete observation here — …]")
+  // must never be pasted into a real form.
+  const PLACEHOLDER_RE = /\[[^\]]{4,}\]/;
+
   // Detect if the page looks like the FINAL "thanks for applying" page.
+  // Requires application context — JDs routinely open with a bare
+  // "Thank you for your interest…" which is NOT a submit confirmation (C4).
   function detectSubmitConfirmation(doc = document) {
-    const txt = doc.body?.innerText?.slice(0, 800).toLowerCase() ?? '';
-    return /thank you|thanks for applying|application (received|submitted)|we (have )?received|your application has been (received|submitted)|application complete/i.test(txt);
+    const txt = doc.body?.innerText?.slice(0, 800) ?? '';
+    return /application (received|submitted|complete)|thank(s| you) for (applying|your application|submitting)|your application has been (received|submitted)/i.test(txt);
   }
 
   // Wait until page settles after a navigation. Uses a MutationObserver
@@ -133,8 +139,11 @@
       title: document.title,
     });
 
-    // Confirm-submit page reached after a prior submit
-    if (detectSubmitConfirmation()) {
+    // Confirm-submit page reached after a prior submit. Only trusted when
+    // THIS attempt actually clicked submit (SW sets `submitClicked` on the
+    // attempt when the runner reports the click) — otherwise a JD page with
+    // thank-you copy would be recorded as a successful submit (C4).
+    if (detectSubmitConfirmation() && attempt.submitClicked) {
       send('agent.runner.submitted-detected', { attemptId: attempt.id, url: location.href });
       return;
     }
@@ -194,7 +203,12 @@
     const fillResult = adapter.fill(map, document, { collectTruncations: true });
     const filledCount = typeof fillResult === 'number' ? fillResult : fillResult.filled;
     const truncations = typeof fillResult === 'number' ? [] : fillResult.truncations || [];
-    const filledKeys = Array.from(new Set(fields
+    const fillFailures = typeof fillResult === 'number' ? [] : fillResult.failures || [];
+    const placeholdersSkipped = typeof fillResult === 'number' ? [] : fillResult.placeholdersSkipped || [];
+    // Report VERIFIED fills when the adapter provides them — the detected
+    // high/packet list is only a fallback (fill counts must not lie, C16).
+    const verifiedKeys = typeof fillResult === 'number' ? null : fillResult.filledKeys || null;
+    const filledKeys = verifiedKeys ?? Array.from(new Set(fields
       .filter(f => (f.confidence === 'high' || f.confidence === 'packet') && f.key)
       .map(f => f.key)));
     const reviewKeys = fields.filter(f => f.confidence === 'medium').map(f => f.key || f.label).slice(0, 8);
@@ -206,10 +220,13 @@
       reviewKeys,
       neverKeys: fields.filter(f => f.confidence === 'never').map(f => f.key || f.label).slice(0, 12),
       truncations,
+      failures: fillFailures.slice(0, 8),
+      placeholdersSkipped: placeholdersSkipped.slice(0, 8),
       customSelects: customSelects.length,
     });
 
     // 5b. Resume upload — only when a session file is staged via popup
+    let uploadFailed = false; // tracked for the live gate payload (C3)
     const resumeInput = ADAPTERS.findResumeInput?.();
     const dropzone = !resumeInput ? ADAPTERS.detectUnboundDropzone?.() : null;
     if (resumeInput) {
@@ -222,6 +239,7 @@
           fileName: fileStaged.name,
         });
         if (!uploaded) {
+          uploadFailed = true;
           send('agent.runner.pause', {
             attemptId: attempt.id,
             blockReason: 'upload-failed',
@@ -232,6 +250,7 @@
         // Verify the upload landed
         await sleep(300);
         if (!resumeInput.files || resumeInput.files.length === 0) {
+          uploadFailed = true;
           send('agent.runner.pause', {
             attemptId: attempt.id,
             blockReason: 'upload-failed',
@@ -275,6 +294,18 @@
           pendingReview.push({ label: field.label, reason: interp?.reason || 'unknown' });
           continue;
         }
+        // Never paste literal placeholder text (C5).
+        if (PLACEHOLDER_RE.test(interp.draft || '')) {
+          pendingReview.push({ label: field.label, reason: 'placeholder' });
+          continue;
+        }
+        // C24: LLM-sourced drafts are paste-eligible only at autonomy >= 3.
+        // At L1/L2 the contract (question-interpreter.ts) is that the user
+        // explicitly accepts the draft — log it and pause for review.
+        if (interp.llmUsed && attempt.autonomyLevel < 3) {
+          pendingReview.push({ label: field.label, reason: 'llm-draft-needs-review', draft: interp.draft });
+          continue;
+        }
         const el = field.selector ? document.querySelector(field.selector) : null;
         if (el && interp.draft && interp.draft.length > 5) {
           setValueViaAdapter(el, interp.draft);
@@ -286,7 +317,8 @@
           attemptId: attempt.id,
           blockReason: 'unknown-required-field',
           message: `${pendingReview.length} question(s) need review: ${pendingReview.map(p => p.label).slice(0, 3).join(' | ')}`,
-          unknownQuestions: pendingReview.map(p => p.label),
+          unknownQuestions: pendingReview.map(p =>
+            p.draft ? `${p.label} — LLM draft (review before pasting): ${p.draft.slice(0, 200)}` : p.label),
         });
         return;
       }
@@ -325,20 +357,28 @@
     // Look for submit button first — if present, this is the final page
     const submitBtn = adapter.findSubmit?.();
     if (submitBtn) {
+      // Re-detect from the LIVE page (C3): the initial counts predate the
+      // fills + question answers above. A required textarea the agent just
+      // answered must no longer count as "unknown required".
+      const liveFields = adapter.detect();
+      const liveUnknownRequired = liveFields.filter(f =>
+        f.confidence === 'low' && f.required && !(f.currentValue || '').trim()).length;
+      const liveDemographicRequired = ADAPTERS.countDemographicRequired(liveFields);
+
       // Check unresolved required fields BEFORE we consider submitting
-      if (counts.requiredUnknown > 0) {
+      if (liveUnknownRequired > 0) {
         send('agent.runner.pause', {
           attemptId: attempt.id,
           blockReason: 'unknown-required-field',
-          message: `${counts.requiredUnknown} unknown required field(s) on submit page.`,
+          message: `${liveUnknownRequired} unknown required field(s) on submit page.`,
         });
         return;
       }
-      if (counts.requiredDemographic > 0) {
+      if (liveDemographicRequired > 0) {
         send('agent.runner.pause', {
           attemptId: attempt.id,
           blockReason: 'demographic-required',
-          message: `${counts.requiredDemographic} demographic field(s) required.`,
+          message: `${liveDemographicRequired} demographic field(s) required.`,
         });
         return;
       }
@@ -353,21 +393,24 @@
         return;
       }
 
-      // L3+: ask SW for the final go/no-go gate decision
+      // L3+: ask SW for the final go/no-go gate decision with REAL page
+      // state — hardcoded constants made the gates decorative (C3).
+      const livePageState = {
+        captchaPresent: !!ADAPTERS.detectCaptcha(),
+        loginPresent: !!ADAPTERS.detectLoginWall(),
+        unknownRequiredFields: liveUnknownRequired,
+        demographicFieldsRequired: liveDemographicRequired,
+        legalFieldsRequired: ADAPTERS.countLegalRequired ? ADAPTERS.countLegalRequired(liveFields) : 0,
+        uploadFailed,
+        pageError: !!ADAPTERS.detectPageError(),
+        url: location.href,
+      };
       const gateRes = await new Promise((resolve) => {
         try {
           chrome.runtime.sendMessage({
             kind: 'agent.runner.request-submit-gate',
             attemptId: attempt.id,
-            pageState: {
-              captchaPresent: false,
-              loginPresent: false,
-              unknownRequiredFields: counts.requiredUnknown,
-              demographicFieldsRequired: counts.requiredDemographic,
-              legalFieldsRequired: 0,
-              uploadFailed: false,
-              pageError: false,
-            },
+            pageState: livePageState,
           }, (resp) => {
             if (chrome.runtime.lastError) return resolve({ ok: false });
             resolve(resp || { ok: false });
@@ -427,11 +470,15 @@
       return;
     }
 
-    if (counts.requiredUnknown > 0) {
+    // Live, value-aware recount (C3): unknown-required fields the agent just
+    // answered (or the user filled) must not block the advance forever.
+    const advUnknownRequired = adapter.detect().filter(f =>
+      f.confidence === 'low' && f.required && !(f.currentValue || '').trim()).length;
+    if (advUnknownRequired > 0) {
       send('agent.runner.pause', {
         attemptId: attempt.id,
         blockReason: 'unknown-required-field',
-        message: `${counts.requiredUnknown} unknown required field(s).`,
+        message: `${advUnknownRequired} unknown required field(s).`,
       });
       return;
     }
@@ -504,7 +551,8 @@
   }
 
   // Ask the admin (via SW + admin-bridge) to interpret an unknown question
-  // text and return a draft. Times out at 8s and falls back to "needsHuman".
+  // text and return a draft. Times out at 20s (the admin-side LLM call is
+  // allowed up to 20s itself) and falls back to "needsHuman".
   async function askAdminForQuestion(attemptId, questionText) {
     return new Promise((resolve) => {
       let done = false;
@@ -512,7 +560,7 @@
         if (done) return;
         done = true;
         resolve({ needsHuman: true, reason: 'timeout', draft: '' });
-      }, 8000);
+      }, 20000);
       try {
         chrome.runtime.sendMessage({
           kind: 'agent.runner.interpret-question',
@@ -596,6 +644,11 @@
     return runOnce();
   }
   window.__qadanAgent = { runOnce, recheck };
+
+  // Immediate beacon: tells the SW a runner is alive on this tab BEFORE the
+  // settle waits (which can take ~7s) so the unsupported-host timer can
+  // stand down early instead of misfiring (C19).
+  send('agent.runner.beacon');
 
   // Fire once after a settle, unless the popup explicitly tells us to wait.
   waitForSettle().then(() => runOnce().catch(err => {

@@ -11,6 +11,7 @@
 
 import type { SourceConfig } from '../types';
 import type { RawSourceJob } from './types';
+import { fetchWithTimeout } from './http';
 
 const ENDPOINT = 'https://remoteok.com/api';
 
@@ -37,7 +38,7 @@ export async function fetchRemoteOk(source: SourceConfig): Promise<RawSourceJob[
     .map(t => t.trim().toLowerCase())
     .filter(Boolean);
 
-  const res = await fetch(ENDPOINT, {
+  const res = await fetchWithTimeout(ENDPOINT, {
     method: 'GET',
     headers: { Accept: 'application/json' },
   });
@@ -71,10 +72,16 @@ export async function fetchRemoteOk(source: SourceConfig): Promise<RawSourceJob[
       location: r.location,
       salaryRaw,
       description: stripHtml(r.description ?? ''),
-      publishedAt: r.date ? Date.parse(r.date) : undefined,
+      publishedAt: parseDate(r.date),
     });
   }
   return matches;
+}
+
+function parseDate(d?: string): number | undefined {
+  if (!d) return undefined;
+  const t = Date.parse(d);
+  return Number.isNaN(t) ? undefined : t;
 }
 
 function stripHtml(html: string): string {

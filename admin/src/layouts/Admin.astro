@@ -24,6 +24,37 @@ function isActive(href: string) {
   <title>{title ? `${title} · Qadan Admin` : 'Qadan Admin'}</title>
 </head>
 <body>
+  <script is:inline>
+    // Storage-failure banner. storage.ts / sync.ts dispatch 'qa-storage-error'
+    // when a localStorage write fails (quota), a stored value fails to parse
+    // (kind: 'corrupt'), or the sync snapshot outgrows the push limit
+    // (kind: 'too-large'). Registered inline — before any module script runs —
+    // so failures during a page's initial reads are caught too. One banner per
+    // page load (no stacking); it stays until reload.
+    (function () {
+      window.addEventListener('qa-storage-error', function (e) {
+        if (document.getElementById('qa-storage-banner')) return;
+        var detail = (e && e.detail) || {};
+        var msg = '⚠ Storage full — changes are NOT being saved. Export a backup and prune old data.';
+        if (detail.kind === 'corrupt') {
+          msg = '⚠ Some stored data is corrupted and could not be loaded (a raw copy was preserved). Export a backup now.';
+        } else if (detail.kind === 'too-large' && detail.message) {
+          msg = '⚠ ' + detail.message + '.';
+        }
+        var banner = document.createElement('div');
+        banner.id = 'qa-storage-banner';
+        banner.setAttribute('role', 'alert');
+        banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#7f1d1d;color:#fff;padding:10px 16px;font:600 13px/1.5 system-ui,sans-serif;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,0.45);';
+        banner.textContent = msg + ' ';
+        var link = document.createElement('a');
+        link.href = '/export';
+        link.textContent = 'Open Export & backup →';
+        link.style.cssText = 'color:#fecaca;text-decoration:underline;font-weight:700;';
+        banner.appendChild(link);
+        document.body.appendChild(banner);
+      });
+    })();
+  </script>
   <div class="admin">
     <aside class="admin__sidebar no-print" data-sidebar>
       <div class="admin__brand-row">

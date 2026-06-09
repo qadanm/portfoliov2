@@ -11,6 +11,8 @@ import {
   jobsStore,
   packetsStore,
   outcomesStore,
+  attemptsStore,
+  applySettingsStore,
   ATS_TIER,
   type ApplyAttempt,
   type ApplySession,
@@ -112,14 +114,25 @@ export function gateDuplicateApplication(jobId: string): GateResult {
   return ok();
 }
 
-export function gateDailyCap(session: ApplySession, _existingAttempts: ApplyAttempt[]): GateResult {
+export function gateDailyCap(session: ApplySession, existingAttempts: ApplyAttempt[]): GateResult {
   const cap = session.settings.dailySubmitCap;
-  // Count today's submitted outcomes across ALL sessions.
   const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
-  const submittedToday = outcomesStore.list()
-    .filter(o => o.kind === 'applied' && o.at >= todayStart.getTime()).length;
-  if (submittedToday >= cap) {
-    return block('over-cap', `Daily auto-submit cap reached (${submittedToday}/${cap}).`);
+  const t0 = todayStart.getTime();
+  // The hard cap counts AGENT submissions today (attempts the agent marked
+  // submitted, across all sessions) — manual applies must not silently
+  // consume the agent's budget (C11).
+  const agentSubmittedToday = existingAttempts.filter(a =>
+    a.status === 'submitted' && (a.submittedAt ?? a.endedAt ?? a.updatedAt) >= t0).length;
+  if (agentSubmittedToday >= cap) {
+    return block('over-cap', `Daily auto-submit cap reached (${agentSubmittedToday}/${cap}).`);
+  }
+  // Separate NON-BLOCKING warning when total volume (manual + agent applied
+  // outcomes) crosses the soft dailyVolumeWarnAt threshold.
+  const warnAt = applySettingsStore.get().dailyVolumeWarnAt;
+  const appliedToday = outcomesStore.list()
+    .filter(o => o.kind === 'applied' && o.at >= t0).length;
+  if (warnAt > 0 && appliedToday >= warnAt) {
+    return { ok: true, reasons: [`Volume warning: ${appliedToday} total applications today (warn threshold ${warnAt}).`] };
   }
   return ok();
 }
@@ -143,6 +156,26 @@ export function gatePerSourceCap(job: Job, session: ApplySession): GateResult {
 export function gateAutoSubmitDenylist(jobId: string, session: ApplySession): GateResult {
   if (session.settings.autoSubmitDenylist.includes(jobId)) {
     return block('gates-failed', 'Job is on auto-submit denylist.');
+  }
+  return ok();
+}
+
+// Literal template placeholders (e.g. "[add one concrete observation
+// here — …]") in any field the agent would paste — hard block (C5).
+const PLACEHOLDER_RE = /\[[^\]]{4,}\]/;
+
+export function gatePlaceholderText(packet: ApplicationPacket): GateResult {
+  const pasteFields: Array<[string, string | undefined]> = [
+    ['cover letter', packet.coverLetter],
+    ['why-role answer', packet.whyRoleAnswer],
+    ['why-company answer', packet.whyCompanyAnswer],
+    ['tell-me-about-yourself', packet.tellMeAboutYourself],
+    ['salary guidance', packet.salaryGuidance],
+  ];
+  const hits = pasteFields.filter(([, v]) => typeof v === 'string' && PLACEHOLDER_RE.test(v));
+  if (hits.length > 0) {
+    return block('packet-not-ready',
+      `Unfilled placeholder text in: ${hits.map(([name]) => name).join(', ')}. Finish the packet before submitting.`);
   }
   return ok();
 }
@@ -188,6 +221,9 @@ export interface SubmitGateContext {
   legalFieldsRequired: number;
   uploadFailed: boolean;
   pageError: boolean;
+  // All attempts (any session) — used by the daily-cap gate to count agent
+  // submissions today. Falls back to attemptsStore when omitted.
+  attempts?: ApplyAttempt[];
 }
 
 export function gatesForSubmit(ctx: SubmitGateContext): GateResult {
@@ -228,12 +264,16 @@ export function gatesForSubmit(ctx: SubmitGateContext): GateResult {
   const claimGate = gateUnsupportedClaims(packet);
   if (!claimGate.ok) return claimGate;
 
+  // Literal placeholder text in paste-bound fields
+  const placeholderGate = gatePlaceholderText(packet);
+  if (!placeholderGate.ok) return placeholderGate;
+
   // Duplicate
   const dup = gateDuplicateApplication(attempt.jobId);
   if (!dup.ok) return dup;
 
   // Daily / per-source caps
-  const dailyGate = gateDailyCap(session, []);
+  const dailyGate = gateDailyCap(session, ctx.attempts ?? attemptsStore.list());
   if (!dailyGate.ok) return dailyGate;
   const job = jobsStore.get(attempt.jobId);
   if (job) {
@@ -270,7 +310,8 @@ export function gatesForSubmit(ctx: SubmitGateContext): GateResult {
     return block('work-auth-ambiguity', packet.warnings.workArrangementConflicts.join(' · '));
   }
 
-  return ok();
+  // Pass — surface any non-blocking warnings (e.g. daily volume) to the UI.
+  return { ok: true, reasons: dailyGate.reasons };
 }
 
 // Friendly explanation for users

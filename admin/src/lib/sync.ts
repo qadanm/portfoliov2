@@ -30,6 +30,7 @@ import {
   SCHEMA_VERSION,
   VAULT_DEFAULTS,
   APPLY_SETTINGS_DEFAULTS,
+  AGENT_LOG_CAP,
   type Job,
   type Recruiter,
   type SavedLetter,
@@ -109,7 +110,18 @@ export function listTombstones(): Tombstone[] {
 
 export function saveTombstones(stones: Tombstone[]): void {
   if (typeof window === 'undefined') return;
-  localStorage.setItem(TOMBSTONE_KEY, JSON.stringify(stones));
+  try {
+    localStorage.setItem(TOMBSTONE_KEY, JSON.stringify(stones));
+  } catch (err) {
+    // Quota — a silently lost tombstone means a delete that resurrects.
+    // Surface it like every other storage failure.
+    try {
+      const message = err instanceof Error ? err.message : String(err);
+      window.dispatchEvent(new CustomEvent('qa-storage-error', { detail: { key: TOMBSTONE_KEY, message } }));
+      // eslint-disable-next-line no-console
+      console.error('[qa-sync] tombstone write failed:', message);
+    } catch { /* no-op */ }
+  }
 }
 
 export function recordTombstone(type: RecordType, id: string): void {
@@ -140,21 +152,44 @@ export function buildLocalSnapshot(): SyncState {
   };
 }
 
-function applySnapshot(snap: SyncState): void {
+// Returns true when the whole snapshot was written. Serializes everything
+// up front, then writes inside one try/catch — a quota throw mid-loop
+// would otherwise leave the stores in a torn, mixed-generation state AND
+// escape to callers that swallow it (status stuck on "Pulling…").
+function applySnapshot(snap: SyncState): boolean {
   // Direct localStorage write; do NOT route through the stores since their
   // upsert() bumps updatedAt and would overwrite synced timestamps.
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(STORAGE_KEYS.jobs, JSON.stringify(snap.jobs));
-  localStorage.setItem(STORAGE_KEYS.recruiters, JSON.stringify(snap.recruiters));
-  localStorage.setItem(STORAGE_KEYS.letters, JSON.stringify(snap.letters));
-  localStorage.setItem(STORAGE_KEYS.packets, JSON.stringify(snap.packets));
-  localStorage.setItem(STORAGE_KEYS.outcomes, JSON.stringify(snap.outcomes));
-  localStorage.setItem(STORAGE_KEYS.sessions, JSON.stringify(snap.sessions ?? []));
-  localStorage.setItem(STORAGE_KEYS.attempts, JSON.stringify(snap.attempts ?? []));
-  localStorage.setItem(STORAGE_KEYS.agentLog, JSON.stringify(snap.agentLog ?? []));
-  localStorage.setItem(STORAGE_KEYS.vault, JSON.stringify(snap.vault));
-  localStorage.setItem(STORAGE_KEYS.applySettings, JSON.stringify(snap.applySettings));
-  saveTombstones(snap.tombstones);
+  if (typeof window === 'undefined') return false;
+  let entries: Array<[string, string]>;
+  try {
+    entries = [
+      [STORAGE_KEYS.jobs, JSON.stringify(snap.jobs)],
+      [STORAGE_KEYS.recruiters, JSON.stringify(snap.recruiters)],
+      [STORAGE_KEYS.letters, JSON.stringify(snap.letters)],
+      [STORAGE_KEYS.packets, JSON.stringify(snap.packets)],
+      [STORAGE_KEYS.outcomes, JSON.stringify(snap.outcomes)],
+      [STORAGE_KEYS.sessions, JSON.stringify(snap.sessions ?? [])],
+      [STORAGE_KEYS.attempts, JSON.stringify(snap.attempts ?? [])],
+      [STORAGE_KEYS.agentLog, JSON.stringify(snap.agentLog ?? [])],
+      [STORAGE_KEYS.vault, JSON.stringify(snap.vault)],
+      [STORAGE_KEYS.applySettings, JSON.stringify(snap.applySettings)],
+      [TOMBSTONE_KEY, JSON.stringify(snap.tombstones)],
+    ];
+  } catch {
+    return false; // unserializable snapshot — never partially write it
+  }
+  try {
+    for (const [key, value] of entries) localStorage.setItem(key, value);
+  } catch (err) {
+    try {
+      const message = err instanceof Error ? err.message : String(err);
+      window.dispatchEvent(new CustomEvent('qa-storage-error', { detail: { key: 'applySnapshot', message } }));
+      // eslint-disable-next-line no-console
+      console.error('[qa-sync] applySnapshot write failed:', message);
+    } catch { /* no-op */ }
+    return false;
+  }
+  return true;
 }
 
 // ── Merge ────────────────────────────────────────────────────────────
@@ -178,16 +213,22 @@ function mergeRecords<T extends Stamped>(
   remote: T[],
   tombstones: Map<string, Tombstone>,
 ): T[] {
+  // Clamp stamps for comparison: a clock-skewed device can stamp a record
+  // far in the future, which would permanently win every merge AND make
+  // the record undeletable (tombstone.deletedAt is always < updatedAt).
+  // Allow 5 minutes of skew; anything beyond is treated as "now + 5m".
+  const maxStamp = Date.now() + 5 * 60_000;
+  const stampOf = (rec: Stamped) => Math.min(getStamp(rec), maxStamp);
   const map = new Map<string, T>();
   for (const r of local) map.set(r.id, r);
   for (const r of remote) {
     const cur = map.get(r.id);
-    if (!cur || getStamp(r) > getStamp(cur)) map.set(r.id, r);
+    if (!cur || stampOf(r) > stampOf(cur)) map.set(r.id, r);
   }
   const out: T[] = [];
   for (const r of map.values()) {
     const t = tombstones.get(`${type}:${r.id}`);
-    if (t && t.deletedAt >= getStamp(r)) continue;
+    if (t && t.deletedAt >= stampOf(r)) continue;
     out.push(r);
   }
   return out;
@@ -206,6 +247,16 @@ function mergeTombstones(local: Tombstone[], remote: Tombstone[]): Tombstone[] {
     if (!cur || t.deletedAt > cur.deletedAt) map.set(k, t);
   }
   return [...map.values()];
+}
+
+// The per-device agentLog cap is defeated if the merge unions trimmed-away
+// entries back in — re-trim to the cap (keep most recent by event time)
+// after every merge so the log can't ratchet up forever.
+function trimAgentLog(entries: AgentLogEntry[]): AgentLogEntry[] {
+  if (entries.length <= AGENT_LOG_CAP) return entries;
+  return [...entries]
+    .sort((a, b) => ((a.at ?? 0) - (b.at ?? 0)) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
+    .slice(-AGENT_LOG_CAP);
 }
 
 export function mergeSnapshots(local: SyncState, remote: SyncState): SyncState {
@@ -230,7 +281,7 @@ export function mergeSnapshots(local: SyncState, remote: SyncState): SyncState {
     outcomes: mergeRecords('outcome', local.outcomes ?? [], remote.outcomes ?? [], tMap),
     sessions: mergeRecords('session' as any, local.sessions ?? [], remote.sessions ?? [], tMap),
     attempts: mergeRecords('attempt' as any, local.attempts ?? [], remote.attempts ?? [], tMap),
-    agentLog: mergeRecords('agentLog' as any, local.agentLog ?? [], remote.agentLog ?? [], tMap),
+    agentLog: trimAgentLog(mergeRecords('agentLog' as any, local.agentLog ?? [], remote.agentLog ?? [], tMap)),
     vault: vault ?? local.vault ?? { ...VAULT_DEFAULTS },
     applySettings: applySettings ?? local.applySettings ?? { ...APPLY_SETTINGS_DEFAULTS },
     tombstones,
@@ -238,19 +289,39 @@ export function mergeSnapshots(local: SyncState, remote: SyncState): SyncState {
   };
 }
 
-// Detects whether two snapshots are byte-equivalent for the data we care
-// about. Used to skip pushing a "merged" result that is identical to what
-// the server already has.
+// Detects whether two snapshots are equivalent for the data we care about.
+// Used to skip pushing a "merged" result that is identical to what the
+// server already has. Order-insensitive (each array is sorted by id before
+// comparing) — two devices holding the same records in different insertion
+// order would otherwise ping-pong redundant PUTs forever.
+function canonicalRecords(arr: Array<{ id: string }> | undefined): string {
+  return JSON.stringify(
+    [...(arr ?? [])].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)),
+  );
+}
+function canonicalTombstones(arr: Tombstone[] | undefined): string {
+  return JSON.stringify(
+    [...(arr ?? [])].sort((a, b) => {
+      const ka = tombstoneKey(a);
+      const kb = tombstoneKey(b);
+      return ka < kb ? -1 : ka > kb ? 1 : 0;
+    }),
+  );
+}
+
 export function snapshotsEqual(a: SyncState, b: SyncState): boolean {
   return (
-    JSON.stringify(a.jobs) === JSON.stringify(b.jobs) &&
-    JSON.stringify(a.recruiters) === JSON.stringify(b.recruiters) &&
-    JSON.stringify(a.letters) === JSON.stringify(b.letters) &&
-    JSON.stringify(a.packets ?? []) === JSON.stringify(b.packets ?? []) &&
-    JSON.stringify(a.outcomes ?? []) === JSON.stringify(b.outcomes ?? []) &&
+    canonicalRecords(a.jobs) === canonicalRecords(b.jobs) &&
+    canonicalRecords(a.recruiters) === canonicalRecords(b.recruiters) &&
+    canonicalRecords(a.letters) === canonicalRecords(b.letters) &&
+    canonicalRecords(a.packets) === canonicalRecords(b.packets) &&
+    canonicalRecords(a.outcomes) === canonicalRecords(b.outcomes) &&
+    canonicalRecords(a.sessions) === canonicalRecords(b.sessions) &&
+    canonicalRecords(a.attempts) === canonicalRecords(b.attempts) &&
+    canonicalRecords(a.agentLog) === canonicalRecords(b.agentLog) &&
     JSON.stringify(a.vault ?? {}) === JSON.stringify(b.vault ?? {}) &&
     JSON.stringify(a.applySettings ?? {}) === JSON.stringify(b.applySettings ?? {}) &&
-    JSON.stringify(a.tombstones) === JSON.stringify(b.tombstones)
+    canonicalTombstones(a.tombstones) === canonicalTombstones(b.tombstones)
   );
 }
 
@@ -307,17 +378,37 @@ interface PushResult {
   updatedAt?: number;
 }
 
+// Client-side snapshot ceiling — stays below the server's 8MB
+// MAX_BODY_BYTES (functions/api/sync.ts) so we fail with a useful message
+// instead of a 413 after uploading the whole body.
+const MAX_PUSH_CHARS = 7_500_000;
+
 async function pushToCloud(state: SyncState, signal?: AbortSignal): Promise<PushResult> {
+  const payload = JSON.stringify({ state, updatedAt: state.exportedAt });
+  if (payload.length > MAX_PUSH_CHARS) {
+    const mb = (payload.length / (1024 * 1024)).toFixed(1);
+    const message = `Snapshot too large (${mb} MB) — prune old data from the Export page`;
+    try {
+      window.dispatchEvent(new CustomEvent('qa-storage-error', { detail: { kind: 'too-large', message } }));
+    } catch { /* no-op */ }
+    return { ok: false, message };
+  }
   let res: Response;
   try {
     res = await fetch('/api/sync', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ state, updatedAt: state.exportedAt }),
+      body: payload,
       signal,
     });
   } catch (e: any) {
     return { ok: false, message: e?.name === 'AbortError' ? 'Push timed out.' : 'Network error.' };
+  }
+  // Same guard as pullFromCloud: a 200 HTML page (expired Cloudflare
+  // Access login, dev server without functions) must not read as "Synced".
+  const ct = res.headers.get('content-type') ?? '';
+  if (!ct.includes('application/json')) {
+    return { ok: false, message: 'Sync endpoint returned a non-JSON response (auth expired or endpoint not running).' };
   }
   let body: any;
   try { body = await res.json(); } catch { body = null; }
@@ -372,7 +463,11 @@ function createSyncManager(): SyncManager {
 
   let pushTimer: number | null = null;
   let pollTimer: number | null = null;
-  let inflight: AbortController | null = null;
+  // Separate controllers per operation kind — a pull must not abort an
+  // in-flight push (or vice versa); each only cancels a previous run of
+  // the SAME kind.
+  let pullInflight: AbortController | null = null;
+  let pushInflight: AbortController | null = null;
 
   function setStatus(next: SyncStatusEvent) {
     current = next;
@@ -392,11 +487,12 @@ function createSyncManager(): SyncManager {
 
   async function pullAndMerge(): Promise<void> {
     setStatus({ status: 'pulling' });
-    inflight?.abort();
-    inflight = new AbortController();
-    const timer = setTimeout(() => inflight?.abort(), FETCH_TIMEOUT_MS);
+    pullInflight?.abort();
+    const ctrl = new AbortController();
+    pullInflight = ctrl;
+    const timer = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT_MS);
     try {
-      const pull = await pullFromCloud(inflight.signal);
+      const pull = await pullFromCloud(ctrl.signal);
       if (pull.kind === 'unconfigured') {
         configured = false;
         setStatus({ status: 'unconfigured', message: pull.message });
@@ -416,7 +512,7 @@ function createSyncManager(): SyncManager {
       if (!remote) {
         // First-time push.
         setStatus({ status: 'pushing' });
-        const push = await pushToCloud(local, inflight.signal);
+        const push = await pushToCloud(local, ctrl.signal);
         if (!push.ok) {
           setStatus({ status: 'error', message: push.message, lastSyncedAt: getLastSynced() });
           return;
@@ -430,13 +526,22 @@ function createSyncManager(): SyncManager {
       // If the merge differs from local, apply it locally and notify the
       // page so views can refresh.
       if (!snapshotsEqual(merged, local)) {
-        applySnapshot(merged);
-        broadcastDataChanged();
+        if (!applySnapshot(merged)) {
+          // Quota (or storage disabled) — pulled data was NOT applied.
+          // Surface as an error instead of leaving status on "Pulling…".
+          setStatus({
+            status: 'error',
+            message: 'Could not write pulled data to local storage (quota?). Export a backup and prune old data.',
+            lastSyncedAt: getLastSynced(),
+          });
+          return;
+        }
+        broadcastDataChanged({ source: 'sync' });
       }
       // If the merge differs from remote, push it back.
       if (!snapshotsEqual(merged, remote)) {
         setStatus({ status: 'pushing' });
-        const push = await pushToCloud(merged, inflight.signal);
+        const push = await pushToCloud(merged, ctrl.signal);
         if (!push.ok) {
           setStatus({ status: 'error', message: push.message, lastSyncedAt: getLastSynced() });
           return;
@@ -452,12 +557,13 @@ function createSyncManager(): SyncManager {
   async function pushNow(): Promise<void> {
     if (!configured) return;
     setStatus({ status: 'pushing' });
-    inflight?.abort();
-    inflight = new AbortController();
-    const timer = setTimeout(() => inflight?.abort(), FETCH_TIMEOUT_MS);
+    pushInflight?.abort();
+    const ctrl = new AbortController();
+    pushInflight = ctrl;
+    const timer = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT_MS);
     try {
       const local = buildLocalSnapshot();
-      const push = await pushToCloud(local, inflight.signal);
+      const push = await pushToCloud(local, ctrl.signal);
       if (!push.ok) {
         setStatus({ status: 'error', message: push.message, lastSyncedAt: getLastSynced() });
         return;
@@ -501,14 +607,34 @@ function createSyncManager(): SyncManager {
         const detail = (e as CustomEvent).detail as { type?: RecordType; id?: string };
         if (detail?.type && detail?.id) recordTombstone(detail.type, detail.id);
       });
-      window.addEventListener('qa-data-changed', () => {
+      window.addEventListener('qa-data-changed', (e: Event) => {
+        // Ignore our own post-pull broadcast — pullAndMerge already pushed
+        // any local-only differences; scheduling another PUT for the data
+        // we just applied is a redundant self-echo.
+        if ((e as CustomEvent).detail?.source === 'sync') return;
         // Debounce a push.
         if (typeof window === 'undefined') return;
         if (!configured) return;
         if (pushTimer != null) clearTimeout(pushTimer);
         pushTimer = window.setTimeout(() => {
+          pushTimer = null;
           pushNow().catch(() => {});
         }, PUSH_DEBOUNCE_MS);
+      });
+
+      // MPA navigation tears the page down before the debounce fires —
+      // flush a pending push via sendBeacon (POST; the server treats it
+      // like a PUT) so the last edit before a link click isn't lost.
+      window.addEventListener('pagehide', () => {
+        if (pushTimer == null || !configured) return;
+        clearTimeout(pushTimer);
+        pushTimer = null;
+        try {
+          const snap = buildLocalSnapshot();
+          const payload = JSON.stringify({ state: snap, updatedAt: snap.exportedAt });
+          if (payload.length > MAX_PUSH_CHARS) return; // server would reject it anyway
+          navigator.sendBeacon('/api/sync', new Blob([payload], { type: 'application/json' }));
+        } catch { /* best effort — the next page load pulls and merges */ }
       });
 
       await pullAndMerge().catch(() => { /* status set inside */ });
@@ -527,6 +653,7 @@ function createSyncManager(): SyncManager {
       if (!configured) return;
       if (pushTimer != null) clearTimeout(pushTimer);
       pushTimer = window.setTimeout(() => {
+        pushTimer = null;
         pushNow().catch(() => {});
       }, PUSH_DEBOUNCE_MS);
     },
@@ -549,9 +676,12 @@ export default sync;
 
 const DATA_EVENT = 'qa-data-changed';
 
-export function broadcastDataChanged(): void {
+// Optional detail lets the sync layer tag its own post-pull broadcast
+// ({ source: 'sync' }) so the push-scheduling listener can ignore the echo.
+// External callers keep calling it with no arguments.
+export function broadcastDataChanged(detail?: { source?: string }): void {
   if (typeof window === 'undefined') return;
-  window.dispatchEvent(new CustomEvent(DATA_EVENT));
+  window.dispatchEvent(detail ? new CustomEvent(DATA_EVENT, { detail }) : new CustomEvent(DATA_EVENT));
 }
 
 export function onDataChanged(fn: () => void): () => void {

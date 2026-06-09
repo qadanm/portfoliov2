@@ -18,7 +18,7 @@ export interface AtsReliability {
   // We treat reaching the submit page successfully under L2 as a positive.
   submitReady: number;
   fillSuccessRate: number;     // % of attempts that filled ≥1 safe field
-  uploadSuccessRate: number;   // % of attempts whose log had a successful upload event
+  uploadSuccessRate: number | null; // % of attempts whose log had a successful upload event; null = no uploads attempted (n/a)
   textareaSuccessRate: number; // % of attempts that filled ≥1 packet textarea
   unknownFieldRate: number;    // % of attempts that paused on unknown-required-field
   blockerRate: number;         // % of attempts that ended needs-review/blocked/failed
@@ -72,8 +72,13 @@ export function reliabilityForAts(ats: AtsType): AtsReliability {
   const blocked = all.filter(a => a.status === 'blocked' || a.status === 'unsupported').length;
   const failed = all.filter(a => a.status === 'failed').length;
 
-  // Submit-ready: actual submit + dry-run reaches with `user-paused` blockReason
-  const dryRunReached = all.filter(a => a.status === 'needs-review' && a.blockReason === 'user-paused' && /dry/i.test(a.blockNote || '')).length;
+  // Submit-ready: actual submit + reaching the submit page under dry-run/L2.
+  // The L2 pause message is "Level 2 — ready to submit…", which /dry/ alone
+  // missed — every L2 success was counted as a failure (C21).
+  const dryRunReached = all.filter(a =>
+    a.status === 'needs-review' &&
+    a.blockReason === 'user-paused' &&
+    /dry|ready to submit/i.test(a.blockNote || '')).length;
   const submitReady = submitted + dryRunReached;
 
   const fillSuccess = all.filter(attemptFilledSomething).length;
@@ -94,7 +99,8 @@ export function reliabilityForAts(ats: AtsType): AtsReliability {
     failed,
     submitReady,
     fillSuccessRate: pct(fillSuccess, total),
-    uploadSuccessRate: pct(uploadOk, uploadAttempts || total),
+    // null = no uploads attempted; rendering 0% would understate reliability.
+    uploadSuccessRate: uploadAttempts === 0 ? null : pct(uploadOk, uploadAttempts),
     textareaSuccessRate: pct(textareaOk, total),
     unknownFieldRate: pct(unknownFields, total),
     blockerRate: pct(anyBlocker, total),

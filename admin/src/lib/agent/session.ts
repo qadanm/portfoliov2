@@ -41,7 +41,9 @@ export function createSession(opts: CreateSessionOptions): ApplySession {
   // Inherit some defaults from global apply settings if user has tuned them
   const global = applySettingsStore.get();
   merged.authenticityThreshold = opts.settingsOverride?.authenticityThreshold ?? global.authenticityThreshold ?? defaults.authenticityThreshold;
-  merged.dailySubmitCap = opts.settingsOverride?.dailySubmitCap ?? global.dailyVolumeWarnAt ?? defaults.dailySubmitCap;
+  // dailyVolumeWarnAt is a soft WARNING threshold, not the agent's hard cap —
+  // conflating the two made the warn level silently cap submits (C10).
+  merged.dailySubmitCap = opts.settingsOverride?.dailySubmitCap ?? defaults.dailySubmitCap;
 
   const now = Date.now();
   const session: ApplySession = {
@@ -205,6 +207,9 @@ export function updateAttemptStatus(
 ): ApplyAttempt | null {
   const a = attemptsStore.get(attemptId);
   if (!a) return null;
+  // Idempotent on status: a repeated same-status call (e.g. multiple
+  // 'needs-review' pauses on one attempt) must not re-bump counters (C13).
+  const statusChanged = a.status !== status;
   a.status = status;
   if (opts?.blockReason) a.blockReason = opts.blockReason;
   if (opts?.blockNote) a.blockNote = opts.blockNote;
@@ -214,9 +219,9 @@ export function updateAttemptStatus(
   if (status === 'submitted') a.submittedAt = a.submittedAt ?? Date.now();
   attemptsStore.upsert(a);
 
-  // Update session counters
+  // Update session counters — only on a real status transition
   const s = sessionsStore.get(a.sessionId);
-  if (s) {
+  if (s && statusChanged) {
     if (status === 'submitted') s.submittedCount += 1;
     else if (status === 'needs-review' || status === 'paused') s.reviewCount += 1;
     else if (status === 'blocked' || status === 'unsupported') s.blockedCount += 1;

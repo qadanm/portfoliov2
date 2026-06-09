@@ -363,23 +363,46 @@ export interface ApplySettings {
 
 // ── Generic accessors ──────────────────────────────────────────────────
 
-function safeParse<T>(raw: string | null, fallback: T): T {
+// Keys already reported as corrupt during this page load. Reads happen on
+// every render — without this guard a single bad key would re-fire the
+// error event and console spam on every list() call.
+const corruptReported = new Set<string>();
+
+function safeParse<T>(raw: string | null, fallback: T, key?: string): T {
   if (!raw) return fallback;
-  try { return JSON.parse(raw) as T; } catch { return fallback; }
+  try { return JSON.parse(raw) as T; } catch (err) {
+    // Corrupted JSON. Returning the fallback silently is dangerous: the
+    // next debounced sync push would upload the EMPTY fallback and wipe
+    // the cloud copy too. Preserve the raw value, shout, then fall back.
+    if (key && typeof window !== 'undefined' && !corruptReported.has(key)) {
+      corruptReported.add(key);
+      try { localStorage.setItem(`${key}.corrupt`, raw); } catch { /* best effort */ }
+      // eslint-disable-next-line no-console
+      console.error(`[qa-storage] corrupt JSON under ${key} — raw value preserved at ${key}.corrupt`, err);
+      try {
+        window.dispatchEvent(new CustomEvent('qa-storage-error', {
+          detail: { key, kind: 'corrupt', message: `Stored data for ${key} could not be parsed; raw value preserved at ${key}.corrupt.` },
+        }));
+      } catch { /* no-op */ }
+    }
+    return fallback;
+  }
 }
 
 function read<T>(key: string, fallback: T): T {
   if (typeof window === 'undefined') return fallback;
   try {
-    return safeParse<T>(localStorage.getItem(key), fallback);
+    return safeParse<T>(localStorage.getItem(key), fallback, key);
   } catch {
     // localStorage can throw under private-browsing / disabled storage.
     return fallback;
   }
 }
 
-function write<T>(key: string, value: T): void {
-  if (typeof window === 'undefined') return;
+// Returns true when the value was actually persisted. Callers that can
+// surface the failure (save/upsert paths) pass the boolean through.
+function write<T>(key: string, value: T): boolean {
+  if (typeof window === 'undefined') return false;
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch (err: unknown) {
@@ -394,7 +417,7 @@ function write<T>(key: string, value: T): void {
       // eslint-disable-next-line no-console
       console.error(`[qa-storage] write failed for ${key}:`, message);
     } catch { /* no-op */ }
-    return;
+    return false;
   }
   // Notify the sync layer (and any other subscribers) that data changed
   // so it can debounce a push to the cloud. This is event-based so
@@ -402,6 +425,7 @@ function write<T>(key: string, value: T): void {
   try {
     window.dispatchEvent(new CustomEvent('qa-data-changed', { detail: { key } }));
   } catch { /* no-op */ }
+  return true;
 }
 
 // Fire a "record was deleted" event so the sync layer can record a
@@ -412,6 +436,33 @@ function notifyDeleted(type: 'job' | 'recruiter' | 'letter' | 'packet' | 'outcom
   try {
     window.dispatchEvent(new CustomEvent('qa-record-deleted', { detail: { type, id } }));
   } catch { /* no-op */ }
+}
+
+// Bulk tombstone writer for wipe/replace operations. Writes straight to
+// the same key sync.ts uses (storage.ts deliberately has no compile-time
+// dependency on sync.ts, and dispatching thousands of per-record events
+// would be O(n²) and lost if sync.init() hasn't run yet). Shape must match
+// sync.ts's Tombstone: { type, id, deletedAt }.
+const TOMBSTONE_KEY = 'qa_tombstones';
+function recordTombstonesBulk(stones: Array<{ type: string; id: string }>): void {
+  if (typeof window === 'undefined' || stones.length === 0) return;
+  try {
+    const now = Date.now();
+    const existing = safeParse<Array<{ type: string; id: string; deletedAt: number }>>(
+      localStorage.getItem(TOMBSTONE_KEY), [],
+    );
+    // De-dupe by (type,id) — newest deletion wins.
+    const map = new Map(existing.map(t => [`${t.type}:${t.id}`, t]));
+    for (const s of stones) map.set(`${s.type}:${s.id}`, { type: s.type, id: s.id, deletedAt: now });
+    localStorage.setItem(TOMBSTONE_KEY, JSON.stringify([...map.values()]));
+  } catch (err) {
+    try {
+      const message = err instanceof Error ? err.message : String(err);
+      window.dispatchEvent(new CustomEvent('qa-storage-error', { detail: { key: TOMBSTONE_KEY, message } }));
+      // eslint-disable-next-line no-console
+      console.error('[qa-storage] bulk tombstone write failed:', message);
+    } catch { /* no-op */ }
+  }
 }
 
 // ── Schema migration ───────────────────────────────────────────────────
@@ -451,15 +502,26 @@ export function ensureSchema(): void {
 
 // ── Domain accessors ───────────────────────────────────────────────────
 
+// A handful of 100KB+ pasted JDs is the fastest way to blow the
+// localStorage quota. Cap at write time — slice, don't reject.
+const JD_TEXT_CAP = 15_000;
+
 export const jobsStore = {
   list(): Job[] { return read<Job[]>(STORAGE_KEYS.jobs, []); },
-  save(jobs: Job[]): void { write(STORAGE_KEYS.jobs, jobs); },
-  upsert(job: Job): void {
+  save(jobs: Job[]): boolean {
+    for (const j of jobs) {
+      if (typeof j.jdText === 'string' && j.jdText.length > JD_TEXT_CAP) {
+        j.jdText = j.jdText.slice(0, JD_TEXT_CAP);
+      }
+    }
+    return write(STORAGE_KEYS.jobs, jobs);
+  },
+  upsert(job: Job): boolean {
     const all = this.list();
     const idx = all.findIndex(j => j.id === job.id);
     job.updatedAt = Date.now();
     if (idx >= 0) all[idx] = job; else all.push(job);
-    this.save(all);
+    return this.save(all);
   },
   remove(id: string): void {
     this.save(this.list().filter(j => j.id !== id));
@@ -470,13 +532,13 @@ export const jobsStore = {
 
 export const recruitersStore = {
   list(): Recruiter[] { return read<Recruiter[]>(STORAGE_KEYS.recruiters, []); },
-  save(rs: Recruiter[]): void { write(STORAGE_KEYS.recruiters, rs); },
-  upsert(r: Recruiter): void {
+  save(rs: Recruiter[]): boolean { return write(STORAGE_KEYS.recruiters, rs); },
+  upsert(r: Recruiter): boolean {
     const all = this.list();
     const idx = all.findIndex(x => x.id === r.id);
     r.updatedAt = Date.now();
     if (idx >= 0) all[idx] = r; else all.push(r);
-    this.save(all);
+    return this.save(all);
   },
   remove(id: string): void {
     this.save(this.list().filter(r => r.id !== id));
@@ -487,13 +549,13 @@ export const recruitersStore = {
 
 export const lettersStore = {
   list(): SavedLetter[] { return read<SavedLetter[]>(STORAGE_KEYS.letters, []); },
-  save(ls: SavedLetter[]): void { write(STORAGE_KEYS.letters, ls); },
-  upsert(l: SavedLetter): void {
+  save(ls: SavedLetter[]): boolean { return write(STORAGE_KEYS.letters, ls); },
+  upsert(l: SavedLetter): boolean {
     const all = this.list();
     const idx = all.findIndex(x => x.id === l.id);
     l.updatedAt = Date.now();
     if (idx >= 0) all[idx] = l; else all.push(l);
-    this.save(all);
+    return this.save(all);
   },
   remove(id: string): void {
     this.save(this.list().filter(l => l.id !== id));
@@ -537,9 +599,9 @@ export const vaultStore = {
     // don't crash callers expecting newer fields.
     return { ...VAULT_DEFAULTS, ...v };
   },
-  save(v: ProfileVault): void {
+  save(v: ProfileVault): boolean {
     v.updatedAt = Date.now();
-    write(STORAGE_KEYS.vault, v);
+    return write(STORAGE_KEYS.vault, v);
   },
 };
 
@@ -547,13 +609,13 @@ export const vaultStore = {
 
 export const packetsStore = {
   list(): ApplicationPacket[] { return read<ApplicationPacket[]>(STORAGE_KEYS.packets, []); },
-  save(ps: ApplicationPacket[]): void { write(STORAGE_KEYS.packets, ps); },
-  upsert(p: ApplicationPacket): void {
+  save(ps: ApplicationPacket[]): boolean { return write(STORAGE_KEYS.packets, ps); },
+  upsert(p: ApplicationPacket): boolean {
     const all = this.list();
     const idx = all.findIndex(x => x.id === p.id);
     p.updatedAt = Date.now();
     if (idx >= 0) all[idx] = p; else all.push(p);
-    this.save(all);
+    return this.save(all);
   },
   remove(id: string): void {
     this.save(this.list().filter(p => p.id !== id));
@@ -572,13 +634,13 @@ export const packetsStore = {
 
 export const outcomesStore = {
   list(): JobOutcome[] { return read<JobOutcome[]>(STORAGE_KEYS.outcomes, []); },
-  save(os: JobOutcome[]): void { write(STORAGE_KEYS.outcomes, os); },
-  upsert(o: JobOutcome): void {
+  save(os: JobOutcome[]): boolean { return write(STORAGE_KEYS.outcomes, os); },
+  upsert(o: JobOutcome): boolean {
     const all = this.list();
     const idx = all.findIndex(x => x.id === o.id);
     o.updatedAt = Date.now();
     if (idx >= 0) all[idx] = o; else all.push(o);
-    this.save(all);
+    return this.save(all);
   },
   remove(id: string): void {
     this.save(this.list().filter(o => o.id !== id));
@@ -761,12 +823,12 @@ const LLM_AUDIT_CAP = 500;
 
 export const llmAuditStore = {
   list(): LlmAuditEntry[] { return read<LlmAuditEntry[]>(STORAGE_KEYS.llmAuditLog, []); },
-  append(entry: LlmAuditEntry): void {
+  append(entry: LlmAuditEntry): boolean {
     const all = this.list();
     all.push(entry);
     // Keep most-recent N
     const trimmed = all.length > LLM_AUDIT_CAP ? all.slice(-LLM_AUDIT_CAP) : all;
-    write(STORAGE_KEYS.llmAuditLog, trimmed);
+    return write(STORAGE_KEYS.llmAuditLog, trimmed);
   },
   clear(): void { write(STORAGE_KEYS.llmAuditLog, []); },
 };
@@ -776,7 +838,7 @@ export const llmAuditStore = {
 export const APPLY_SETTINGS_DEFAULTS: ApplySettings = {
   confirmedSubmitAssistEnabled: false,
   defaultLlmRefinementEnabled: true,
-  dailyVolumeWarnAt: 20,
+  dailyVolumeWarnAt: 50,
   authenticityThreshold: 70,
   similarityThreshold: 0.8,
   updatedAt: 0,
@@ -788,9 +850,9 @@ export const applySettingsStore = {
     if (!s) return { ...APPLY_SETTINGS_DEFAULTS };
     return { ...APPLY_SETTINGS_DEFAULTS, ...s };
   },
-  save(s: ApplySettings): void {
+  save(s: ApplySettings): boolean {
     s.updatedAt = Date.now();
-    write(STORAGE_KEYS.applySettings, s);
+    return write(STORAGE_KEYS.applySettings, s);
   },
 };
 
@@ -828,7 +890,7 @@ export interface AppMemoryEntry {
 
 export const appMemoryStore = {
   list(): AppMemoryEntry[] { return read<AppMemoryEntry[]>(STORAGE_KEYS.applicationMemory, []); },
-  save(es: AppMemoryEntry[]): void { write(STORAGE_KEYS.applicationMemory, es); },
+  save(es: AppMemoryEntry[]): boolean { return write(STORAGE_KEYS.applicationMemory, es); },
   getOrCreate(atsType: AtsType, hostname: string): AppMemoryEntry {
     const id = `${atsType}::${hostname}`;
     const all = this.list();
@@ -848,12 +910,12 @@ export const appMemoryStore = {
     };
     return fresh;
   },
-  upsert(e: AppMemoryEntry): void {
+  upsert(e: AppMemoryEntry): boolean {
     e.updatedAt = Date.now();
     const all = this.list();
     const idx = all.findIndex(x => x.id === e.id);
     if (idx >= 0) all[idx] = e; else all.push(e);
-    this.save(all);
+    return this.save(all);
   },
   remove(id: string): void {
     this.save(this.list().filter(e => e.id !== id));
@@ -867,8 +929,8 @@ export const SESSION_SETTINGS_DEFAULTS: ApplySessionSettings = {
   fitThreshold: 60,
   authenticityThreshold: 70,
   qualityThreshold: 60,
-  dailySubmitCap: 20,
-  perSourceCap: 8,
+  dailySubmitCap: 60,
+  perSourceCap: 25,
   allowAutoSubmitTier1: true,
   allowAutoSubmitTier2: false,
   allowAutoSubmitTier3: false,
@@ -879,13 +941,13 @@ export const SESSION_SETTINGS_DEFAULTS: ApplySessionSettings = {
 
 export const sessionsStore = {
   list(): ApplySession[] { return read<ApplySession[]>(STORAGE_KEYS.sessions, []); },
-  save(s: ApplySession[]): void { write(STORAGE_KEYS.sessions, s); },
-  upsert(s: ApplySession): void {
+  save(s: ApplySession[]): boolean { return write(STORAGE_KEYS.sessions, s); },
+  upsert(s: ApplySession): boolean {
     const all = this.list();
     const idx = all.findIndex(x => x.id === s.id);
     s.updatedAt = Date.now();
     if (idx >= 0) all[idx] = s; else all.push(s);
-    this.save(all);
+    return this.save(all);
   },
   get(id: string): ApplySession | undefined { return this.list().find(s => s.id === id); },
   active(): ApplySession | undefined {
@@ -897,15 +959,24 @@ export const sessionsStore = {
   },
 };
 
+// Attempts are append-heavy (one per job per session) and each carries a
+// step log — unbounded history is the main quota risk at 50 apps/day.
+// reliability.ts only reads a 30-day window, so prune older on save.
+const ATTEMPT_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
+
 export const attemptsStore = {
   list(): ApplyAttempt[] { return read<ApplyAttempt[]>(STORAGE_KEYS.attempts, []); },
-  save(a: ApplyAttempt[]): void { write(STORAGE_KEYS.attempts, a); },
-  upsert(a: ApplyAttempt): void {
+  save(a: ApplyAttempt[]): boolean {
+    const cutoff = Date.now() - ATTEMPT_MAX_AGE_MS;
+    const pruned = a.filter(x => Math.max(Number(x.updatedAt ?? 0), Number(x.startedAt ?? 0)) >= cutoff);
+    return write(STORAGE_KEYS.attempts, pruned);
+  },
+  upsert(a: ApplyAttempt): boolean {
     const all = this.list();
     const idx = all.findIndex(x => x.id === a.id);
     a.updatedAt = Date.now();
     if (idx >= 0) all[idx] = a; else all.push(a);
-    this.save(all);
+    return this.save(all);
   },
   get(id: string): ApplyAttempt | undefined { return this.list().find(a => a.id === id); },
   bySession(sessionId: string): ApplyAttempt[] {
@@ -919,29 +990,32 @@ export const attemptsStore = {
   },
   remove(id: string): void {
     this.save(this.list().filter(a => a.id !== id));
+    notifyDeleted('attempt' as any, id);
   },
 };
 
-const AGENT_LOG_CAP = 2000; // per-page rolling cap; survives sync
+// Per-page rolling cap; survives sync. Exported so the sync layer can
+// re-trim after a merge (the union would otherwise grow past the cap).
+export const AGENT_LOG_CAP = 2000;
 
 export const agentLogStore = {
   list(): AgentLogEntry[] { return read<AgentLogEntry[]>(STORAGE_KEYS.agentLog, []); },
-  save(l: AgentLogEntry[]): void { write(STORAGE_KEYS.agentLog, l); },
-  append(entry: AgentLogEntry): void {
+  save(l: AgentLogEntry[]): boolean { return write(STORAGE_KEYS.agentLog, l); },
+  append(entry: AgentLogEntry): boolean {
     const all = this.list();
     entry.updatedAt = Date.now();
     all.push(entry);
     const trimmed = all.length > AGENT_LOG_CAP ? all.slice(-AGENT_LOG_CAP) : all;
-    this.save(trimmed);
+    return this.save(trimmed);
   },
-  appendMany(entries: AgentLogEntry[]): void {
-    if (entries.length === 0) return;
+  appendMany(entries: AgentLogEntry[]): boolean {
+    if (entries.length === 0) return true;
     const all = this.list();
     const now = Date.now();
     for (const e of entries) e.updatedAt = e.updatedAt || now;
     const merged = [...all, ...entries];
     const trimmed = merged.length > AGENT_LOG_CAP ? merged.slice(-AGENT_LOG_CAP) : merged;
-    this.save(trimmed);
+    return this.save(trimmed);
   },
   forSession(sessionId: string): AgentLogEntry[] {
     return this.list().filter(e => e.sessionId === sessionId).sort((a, b) => a.at - b.at);
@@ -1013,11 +1087,36 @@ export function exportAll(): Backup {
     packets: packetsStore.list(),
     outcomes: outcomesStore.list(),
     applySettings: applySettingsStore.get(),
+    sessions: sessionsStore.list(),
+    attempts: attemptsStore.list(),
+    agentLog: agentLogStore.list(),
   };
 }
 
 export function importAll(backup: Backup, mode: 'replace' | 'merge'): void {
   if (mode === 'replace') {
+    // Tombstone every synced record that exists locally but not in the
+    // incoming backup — otherwise the next sync pull merges the cloud copy
+    // right back in and the "replace" silently undoes itself. Stores that
+    // the replace path does NOT touch (array missing from the backup) get
+    // no tombstones. agentLog is skipped on purpose: entries are unioned
+    // and re-trimmed to a rolling cap by the sync layer, and tombstoning
+    // thousands of log ids would bloat the tombstone list.
+    const removed: Array<{ type: string; id: string }> = [];
+    const collect = (type: string, existing: Array<{ id: string }>, incoming: unknown) => {
+      if (!Array.isArray(incoming)) return; // store not replaced
+      const keep = new Set((incoming as Array<{ id: string }>).map(r => r?.id));
+      for (const r of existing) if (!keep.has(r.id)) removed.push({ type, id: r.id });
+    };
+    collect('job', jobsStore.list(), backup.jobs ?? []);
+    collect('recruiter', recruitersStore.list(), backup.recruiters ?? []);
+    collect('letter', lettersStore.list(), backup.letters ?? []);
+    collect('packet', packetsStore.list(), backup.packets);
+    collect('outcome', outcomesStore.list(), backup.outcomes);
+    collect('session', sessionsStore.list(), backup.sessions);
+    collect('attempt', attemptsStore.list(), backup.attempts);
+    recordTombstonesBulk(removed);
+
     jobsStore.save(backup.jobs ?? []);
     recruitersStore.save(backup.recruiters ?? []);
     lettersStore.save(backup.letters ?? []);
@@ -1087,6 +1186,15 @@ export function importAll(backup: Backup, mode: 'replace' | 'merge'): void {
 }
 
 export function clearAll(): void {
+  // Tombstone everything being wiped FIRST — without tombstones the 60s
+  // sync pull would merge every cloud record straight back in.
+  recordTombstonesBulk([
+    ...jobsStore.list().map(j => ({ type: 'job', id: j.id })),
+    ...recruitersStore.list().map(r => ({ type: 'recruiter', id: r.id })),
+    ...lettersStore.list().map(l => ({ type: 'letter', id: l.id })),
+    ...packetsStore.list().map(p => ({ type: 'packet', id: p.id })),
+    ...outcomesStore.list().map(o => ({ type: 'outcome', id: o.id })),
+  ]);
   jobsStore.save([]);
   recruitersStore.save([]);
   lettersStore.save([]);

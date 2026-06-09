@@ -32,13 +32,13 @@
     let attempt = null;
     let session = null;
     if (tab?.id) {
+      // Popup-originated messages have no sender.tab in the SW, so the
+      // active tab id must travel in the payload (C20).
       const resp = await new Promise((resolve) => {
         try {
-          chrome.tabs.sendMessage(tab.id, { kind: 'ping' }, () => {
-            chrome.runtime.sendMessage({ kind: 'agent.tab.get-attempt' }, (r) => {
-              if (chrome.runtime.lastError) return resolve({ ok: false });
-              resolve(r || { ok: false });
-            });
+          chrome.runtime.sendMessage({ kind: 'agent.tab.get-attempt', tabId: tab.id }, (r) => {
+            if (chrome.runtime.lastError) return resolve({ ok: false });
+            resolve(r || { ok: false });
           });
         } catch { resolve({ ok: false }); }
       });

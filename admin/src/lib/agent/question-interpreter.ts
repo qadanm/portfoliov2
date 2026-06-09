@@ -86,7 +86,9 @@ export async function interpretQuestion(
   if (SALARY_PATTERNS.some(p => p.test(q))) {
     return {
       draft: packet.salaryGuidance || '[Set salary range in vault.]',
-      needsHuman: !packet.salaryGuidance.length,
+      // Packets predating the field have no salaryGuidance at all — must
+      // not crash the interpreter (C22).
+      needsHuman: !(packet.salaryGuidance ?? '').length,
       reason: 'salary',
       llmUsed: false,
     };

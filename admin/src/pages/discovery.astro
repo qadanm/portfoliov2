@@ -300,7 +300,10 @@ import Admin from '@/layouts/Admin.astro';
     flex-wrap: wrap;
   }
   .disc__hints span { opacity: 0.5; }
-  .disc__hints kbd, .disc__bar kbd, .disc__focus kbd, .disc__empty kbd {
+  /* Focus-pane and status kbds are injected via innerHTML (no scope
+     attribute) — reach them with :global through their static parents.
+     Hint/bar kbds are static template markup. */
+  .disc__hints kbd, .disc__bar kbd, .disc__status :global(kbd), .disc__focus :global(kbd) {
     font-family: var(--font-mono);
     font-size: 10px;
     padding: 1px 5px;
@@ -318,8 +321,9 @@ import Admin from '@/layouts/Admin.astro';
     padding: 0 4px;
     min-height: 16px;
   }
-  .disc__status .ok { color: var(--c-text); }
-  .disc__status .err { color: #F87171; }
+  /* Status spans are injected via innerHTML — scope through the static parent. */
+  .disc__status :global(.ok) { color: var(--c-text); }
+  .disc__status :global(.err) { color: #F87171; }
 
   .disc__panel {
     border: 1px solid var(--c-border);
@@ -415,7 +419,9 @@ import Admin from '@/layouts/Admin.astro';
     display: grid;
     gap: 8px;
   }
-  .disc__sources-empty {
+  /* The empty-state <li> is injected via innerHTML (no scope attribute) —
+     scope through the static .disc__sources list + :global. */
+  .disc__sources :global(.disc__sources-empty) {
     padding: 8px 4px;
     font-size: 12px;
     color: var(--c-text-subtle);
@@ -766,7 +772,10 @@ import Admin from '@/layouts/Admin.astro';
     flex-direction: column;
     min-height: 0;
   }
-  .disc__empty {
+  /* .disc__empty is static markup initially but renderFocus() re-injects
+     it via innerHTML, dropping the scope attribute — style it through the
+     static .disc__focus parent + :global. */
+  .disc__focus :global(.disc__empty) {
     color: var(--c-text-subtle);
     font-size: 13px;
     margin: auto;
@@ -1045,7 +1054,10 @@ import Admin from '@/layouts/Admin.astro';
     transform: translate(-50%, 0);
     pointer-events: auto;
   }
-  .disc__toast button {
+  /* The toast action button (e.g. Undo) is injected by flash() via
+     innerHTML (no scope attribute) — scope through the static .disc__toast
+     parent + :global. */
+  .disc__toast :global(button) {
     font: inherit;
     font-size: 11px;
     padding: 4px 10px;
@@ -1055,7 +1067,7 @@ import Admin from '@/layouts/Admin.astro';
     color: var(--c-bg);
     cursor: pointer;
   }
-  .disc__toast button:hover { border-color: var(--c-bg); }
+  .disc__toast :global(button:hover) { border-color: var(--c-bg); }
 
   /* Hide intro chrome on this page */
   :global(main:has(.disc)) :global(header.admin__page-head) { display: none; }
@@ -1585,7 +1597,8 @@ import Admin from '@/layouts/Admin.astro';
       const dedupeNote = run.found === 0 && refreshed > 0
         ? ` (all ${refreshed} already in your queue)`
         : refreshed > 0 ? ` · ${refreshed} already seen` : '';
-      const summary = `Fetched ${run.fetched} · ${run.found} new${dedupeNote} · ${run.filtered} below filters`;
+      const skippedNote = run.skipped ? ` · ${run.skipped} malformed skipped` : '';
+      const summary = `Fetched ${run.fetched} · ${run.found} new${dedupeNote} · ${run.filtered} below filters${skippedNote}`;
       statusEl.innerHTML = errs ? `<span class="ok">${summary}</span> · ${errs}` : `<span class="ok">${summary}</span>`;
       const toastMsg = run.found === 0
         ? `No new jobs — sources unchanged since last run`
@@ -1594,7 +1607,11 @@ import Admin from '@/layouts/Admin.astro';
       refresh();
       renderAutopoll();
     } catch (err: any) {
-      statusEl.innerHTML = `<span class="err">Discovery failed: ${escape(err?.message ?? String(err))}</span>`;
+      if (err?.message === 'discovery-already-running') {
+        statusEl.innerHTML = '<span>Discovery already running…</span>';
+      } else {
+        statusEl.innerHTML = `<span class="err">Discovery failed: ${escape(err?.message ?? String(err))}</span>`;
+      }
     } finally {
       runBtn.disabled = false;
       running = false;
@@ -1668,10 +1685,17 @@ import Admin from '@/layouts/Admin.astro';
   }
 
   function watchedRowHTML(w: WatchedCompany): string {
+    // One malformed stored URL must not blank the whole Sources panel.
+    let fromLabel: string;
+    try {
+      fromLabel = new URL(w.originalJobUrl).hostname;
+    } catch {
+      fromLabel = (w.originalJobUrl || 'unknown source').slice(0, 60);
+    }
     return `<li data-watched-id="${escape(w.id)}">
       <div class="src-info">
         <span class="wc-name">${escape(w.companyName)}</span>
-        <span class="wc-meta">from ${escape(new URL(w.originalJobUrl).hostname)}</span>
+        <span class="wc-meta">from ${escape(fromLabel)}</span>
       </div>
       <input type="url" class="wc-url" placeholder="boards.greenhouse.io/{slug} or jobs.lever.co/{slug}" />
       <button type="button" class="wc-promote">Watch</button>
@@ -1858,9 +1882,10 @@ import Admin from '@/layouts/Admin.astro';
     if (k === 'k' || k === 'ArrowUp')   { e.preventDefault(); move(-1); return; }
     if (k === 'Enter')                  { e.preventDefault(); if (sel) openFocus(); return; }
     if (k === 'Escape')                 { e.preventDefault(); closeFocus(); return; }
+    // Run must work with an empty list — keep it above the selection guard.
+    if (k === 'r' || k === 'R')         { e.preventDefault(); runNow(); return; }
     if (!sel) return;
 
-    if (k === 'r' || k === 'R')         { e.preventDefault(); runNow(); return; }
     if (k === 't' || k === 'T')         { e.preventDefault(); act('queue', sel.id); return; }
     if (k === 's' || k === 'S')         { e.preventDefault(); act('save', sel.id); return; }
     if (k === 'x' || k === 'X')         { e.preventDefault(); act('dismiss', sel.id); return; }
@@ -1995,6 +2020,9 @@ import Admin from '@/layouts/Admin.astro';
   window.setInterval(renderAutopoll, 30_000);
 
   // ── Boot ────────────────────────────────────────────────────────────
+  // Housekeeping: drop dismissed jobs older than the retention window so
+  // the store doesn't grow without bound (full JDs add up fast).
+  discoveredStore.pruneDismissed();
   refresh();
   if (state.visible.length > 0) state.selectedIdx = 0;
   renderList();

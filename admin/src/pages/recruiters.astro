@@ -97,15 +97,20 @@ import Admin from '@/layouts/Admin.astro';
   .editor__row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .editor__form label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--c-text-subtle); }
   .editor__foot { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
-  .pill { padding: 2px 8px; border-radius: var(--r-full); font-family: var(--font-mono); font-size: 10px;
+  /* Pills live in table rows injected via innerHTML so they don't carry
+     Astro's scope attribute — style them through the static #rec-body
+     parent + :global, same pattern as today.astro. */
+  #rec-body :global(.pill) { padding: 2px 8px; border-radius: var(--r-full); font-family: var(--font-mono); font-size: 10px;
     background: var(--c-bg-muted); border: 1px solid var(--c-border-subtle); color: var(--c-text-muted); }
-  .pill--active { color: var(--c-success); border-color: rgba(16,185,129,0.4); background: rgba(16,185,129,0.08); }
-  .pill--cold { color: var(--c-text-subtle); }
-  .pill--overdue { color: #F87171; border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.08); }
+  #rec-body :global(.pill--active) { color: var(--c-success); border-color: rgba(16,185,129,0.4); background: rgba(16,185,129,0.08); }
+  #rec-body :global(.pill--cold) { color: var(--c-text-subtle); }
+  #rec-body :global(.pill--overdue) { color: #F87171; border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.08); }
 </style>
 
 <script>
   import { recruitersStore, ensureSchema, type Recruiter, type RecruiterType, type RelationshipStatus } from '@/lib/storage';
+  import { parseDateInput, toDateInputValue, isOverdue } from '@/lib/dates';
+  import { onDataChanged } from '@/lib/sync';
 
   ensureSchema();
   let recs: Recruiter[] = [];
@@ -127,10 +132,10 @@ import Admin from '@/layouts/Admin.astro';
     const body = document.getElementById('rec-body')!;
     const data = filtered();
     if (!data.length) { body.innerHTML = `<tr><td colspan="7" style="padding:24px;color:var(--c-text-subtle);font-style:italic;">No recruiters yet. Add one to start tracking.</td></tr>`; return; }
-    const now = Date.now();
     const ec = encodeURIComponent;
     body.innerHTML = data.map(r => {
-      const overdue = r.followUpDate && r.followUpDate < now;
+      // Local-day comparison: a follow-up dated today is due, not overdue.
+      const overdue = isOverdue(r.followUpDate);
       const firstName = (r.name || '').split(/\s+/)[0] || '';
       const draftHref = `/letters?kind=check-in&recruiter=${ec(firstName)}&company=${ec(r.company ?? '')}`;
       return `<tr data-id="${r.id}" style="cursor:pointer;">
@@ -168,8 +173,8 @@ import Admin from '@/layouts/Admin.astro';
         const el = form.elements.namedItem(k) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null;
         if (el) (el as any).value = (r as any)[k] ?? '';
       }
-      (form.elements.namedItem('lastContactDate') as HTMLInputElement).value = r.lastContactDate ? new Date(r.lastContactDate).toISOString().slice(0,10) : '';
-      (form.elements.namedItem('followUpDate') as HTMLInputElement).value = r.followUpDate ? new Date(r.followUpDate).toISOString().slice(0,10) : '';
+      (form.elements.namedItem('lastContactDate') as HTMLInputElement).value = r.lastContactDate ? toDateInputValue(r.lastContactDate) : '';
+      (form.elements.namedItem('followUpDate') as HTMLInputElement).value = r.followUpDate ? toDateInputValue(r.followUpDate) : '';
     } else {
       titleEl.textContent = 'Add recruiter';
       deleteBtn.style.display = 'none';
@@ -197,8 +202,8 @@ import Admin from '@/layouts/Admin.astro';
       relationship: (String(fd.get('relationship') || 'cold') as RelationshipStatus),
       rolesDiscussed: String(fd.get('rolesDiscussed') || '').trim() || undefined,
       notes: String(fd.get('notes') || '').trim() || undefined,
-      lastContactDate: last ? new Date(last).getTime() : existing?.lastContactDate,
-      followUpDate: fup ? new Date(fup).getTime() : undefined,
+      lastContactDate: last ? parseDateInput(last) : existing?.lastContactDate,
+      followUpDate: fup ? parseDateInput(fup) : undefined,
       createdAt: existing?.createdAt ?? Date.now(),
       updatedAt: Date.now(),
     };
@@ -219,6 +224,17 @@ import Admin from '@/layouts/Admin.astro';
   ['search','filter-status'].forEach(id => {
     document.getElementById(id)?.addEventListener('input', render);
     document.getElementById(id)?.addEventListener('change', render);
+  });
+
+  // Live updates: re-read + re-render when a sync pull or another tab
+  // changes data. Never destroy an open editor mid-edit — defer to close.
+  let renderQueued = false;
+  onDataChanged(() => {
+    if (dlg.open) { renderQueued = true; return; }
+    load(); render();
+  });
+  dlg.addEventListener('close', () => {
+    if (renderQueued) { renderQueued = false; load(); render(); }
   });
 
   load(); render();

@@ -60,7 +60,10 @@ function detectSalaryFromAnalyzer(r: AnalyzerResult): { min?: number; max?: numb
       const base = Number(`${m[1]}${m[2] ?? ''}`);
       const mult = m[3]?.toLowerCase() === 'k' ? 1000 : m[3]?.toLowerCase() === 'm' ? 1_000_000 : 1;
       return base * mult;
-    }).filter(Boolean);
+    }).filter(Boolean)
+      // Same plausibility clamp as job-intake.ts — "$99/month stipend"
+      // must not become salaryMax 99 and tank the salary-fit score.
+      .filter(n => n >= 30_000 && n <= 1_500_000);
     if (nums.length >= 2) {
       out.min = Math.min(out.min ?? Infinity, nums[0]);
       out.max = Math.max(out.max ?? 0, nums[1]);

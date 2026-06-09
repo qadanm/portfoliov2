@@ -133,6 +133,8 @@ export interface DiscoveryRun {
   filtered: number;
   /** Re-encountered jobs whose lifecycle status was preserved (dedupe). */
   refreshed?: number;
+  /** Malformed rows skipped during normalize (missing company/title or threw). */
+  skipped?: number;
   /** Errors per source. */
   errors: { source: string; message: string }[];
 }

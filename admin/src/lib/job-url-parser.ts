@@ -73,11 +73,20 @@ export function parseJobUrl(input: string): UrlParseResult {
   // ── Greenhouse ──────────────────────────────────────────────────────
   else if (host === 'boards.greenhouse.io' || host.endsWith('.greenhouse.io')) {
     board = 'greenhouse';
-    // boards.greenhouse.io/{company}/jobs/{id}
-    const m = path.match(/^\/(?:embed\/)?([^\/]+)(?:\/jobs\/(\d+))?/);
-    if (m) {
-      companyHint = titleize(m[1]);
-      jobIdHint = m[2];
+    // boards.greenhouse.io/{company}/jobs/{id}. Embed URLs put the company
+    // in the query ( /embed/job_app?for={slug}&token={id} ) — the path
+    // segment "job_app" is not a slug.
+    if (path.startsWith('/embed/')) {
+      const forSlug = url.searchParams.get('for');
+      if (forSlug) companyHint = titleize(forSlug);
+      const token = url.searchParams.get('token');
+      if (token && /^\d+$/.test(token)) jobIdHint = token;
+    } else {
+      const m = path.match(/^\/([^\/]+)(?:\/jobs\/(\d+))?/);
+      if (m) {
+        companyHint = titleize(m[1]);
+        jobIdHint = m[2];
+      }
     }
     fetchLikelyToWork = true;
     notes.push('Greenhouse boards are sometimes browser-fetchable. Will try, but paste the JD if it fails.');
@@ -182,6 +191,13 @@ export function parseJobUrl(input: string): UrlParseResult {
 export function cleanJobUrl(input: string): string {
   try {
     const url = new URL(input);
+    // LinkedIn collections/search pages point at a feed — the actual job id
+    // lives in ?currentJobId=N. Rewrite to the canonical job URL so storage
+    // and URL-dedupe point at the posting, not the feed.
+    if (url.hostname.toLowerCase().endsWith('linkedin.com') && /\/jobs\/(collections|search)\b/.test(url.pathname)) {
+      const id = url.searchParams.get('currentJobId');
+      if (id && /^\d+$/.test(id)) return `https://www.linkedin.com/jobs/view/${id}/`;
+    }
     const drop = ['utm_source','utm_medium','utm_campaign','utm_term','utm_content','gh_jid','trk','trackingId','refId','recommendedFlavor','currentJobId','position','pipeline'];
     for (const p of drop) url.searchParams.delete(p);
     // Workday LinkedIn-fed redirects sometimes have giant param chains; if path

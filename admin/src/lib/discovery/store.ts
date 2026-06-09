@@ -101,10 +101,21 @@ export const discoveredStore = {
     for (const j of jobs) {
       const existing = byId.get(j.id);
       if (existing) {
-        // Preserve user decisions; refresh score and discoveredAt.
+        // Preserve user decisions (queued/saved/dismissed); refresh score
+        // and discoveredAt. 'filtered' is a SYSTEM decision, not a user
+        // one: if the incoming row now passes the filters (status 'new'),
+        // promote it back to 'new' so relaxed prefs actually resurface
+        // previously-filtered jobs.
+        const status = existing.status === 'filtered' && j.status === 'new'
+          ? 'new'
+          : existing.status;
         byId.set(j.id, {
           ...j,
-          status: existing.status,
+          status,
+          // When the row stays filtered, keep the filter metadata instead
+          // of dropping it (an incoming 'new' row carries none).
+          filterReasons: status === 'filtered' ? (j.filterReasons ?? existing.filterReasons) : undefined,
+          filteredAt: status === 'filtered' ? (j.filteredAt ?? existing.filteredAt) : undefined,
           queuedAt: existing.queuedAt,
           savedAt: existing.savedAt,
           dismissedAt: existing.dismissedAt,
@@ -311,7 +322,7 @@ function defaultSources(): SourceConfig[] {
   const curated: SourceConfig[] = CURATED_BOARDS.map(b => ({
     id: `${b.type}-${b.slug}`,
     type: b.type,
-    name: `${b.type === 'greenhouse' ? 'Greenhouse' : 'Lever'} · ${b.companyName}`,
+    name: `${b.type === 'greenhouse' ? 'Greenhouse' : b.type === 'lever' ? 'Lever' : 'Ashby'} · ${b.companyName}`,
     companyName: b.companyName,
     slug: b.slug,
     boardUrl: b.boardUrl,

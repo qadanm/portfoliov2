@@ -70,12 +70,33 @@ const STRENGTHS = new Set([
 ]);
 
 // Stack keywords that are *not* part of Moe's profile (would-need-to-learn flags).
+// Note: the bare 'r' token (R language) was removed — even with word
+// boundaries it false-positives on ordinary prose, and R roles aren't in
+// the target surface anyway.
 const GAPS = new Set([
   'vue', 'svelte', 'angular', 'rails', 'django', 'flask', 'php', 'wordpress',
   'webflow', 'shopify liquid', 'gatsby', 'remix', 'kotlin', 'swift native',
   'android native', 'unity', 'unreal', 'figma plugins', 'sketch',
-  'webgl', 'three.js', 'd3', 'r ', 'matlab',
+  'webgl', 'three.js', 'd3', 'matlab',
 ]);
+
+// Word-boundary matchers, built once per token. Substring matching was
+// far too loose: 'ai' matched *maintain/email/training* and inflated AI
+// relevance on nearly every JD. Multi-word tokens match as phrases;
+// regex-special chars (next.js, asp.net, three.js) are escaped. The
+// trailing `s?` keeps simple plurals ("platforms", "agents") matching,
+// which substring matching used to catch.
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+function tokenMatchers(tokens: Set<string>): { token: string; re: RegExp }[] {
+  return Array.from(tokens).map(token => ({
+    token,
+    re: new RegExp(`\\b${escapeRegExp(token)}s?\\b`),
+  }));
+}
+const STRENGTH_MATCHERS = tokenMatchers(STRENGTHS);
+const GAP_MATCHERS = tokenMatchers(GAPS);
 
 const STOPWORDS = new Set([
   'the', 'a', 'an', 'and', 'or', 'but', 'if', 'then', 'else', 'is', 'are',
@@ -121,9 +142,9 @@ export function analyzeJD(jdRaw: string): AnalyzerResult | null {
     ? ranked[0].angle
     : angles.find(a => a.id === 'ux-engineer')!;
 
-  // Strength + gap matching.
-  const matchedStrengths = Array.from(STRENGTHS).filter(s => lower.includes(s));
-  const potentialGaps = Array.from(GAPS).filter(s => lower.includes(s));
+  // Strength + gap matching (word-boundary, not substring).
+  const matchedStrengths = STRENGTH_MATCHERS.filter(m => m.re.test(lower)).map(m => m.token);
+  const potentialGaps = GAP_MATCHERS.filter(m => m.re.test(lower)).map(m => m.token);
 
   // Top keywords (excluding stopwords + already-classified strengths).
   const wordCounts = new Map<string, number>();

@@ -26,11 +26,21 @@ const STORAGE_KEY = 'qa_agent_state';
 const DEFAULT_STATE = {
   activeSession: null,         // { id, status, settings, jobIdsLeft, currentAttemptId }
   activeAttempts: {},          // tabId → attempt info
-  pendingLogs: [],             // batched log entries to push to admin
+  pendingLogs: [],             // log entries that could NOT be delivered to an admin tab
+  pendingAttemptUpdates: [],   // attempt status updates that could NOT be delivered
   vault: null,                 // mirrored vault from chrome.storage.local
   packetsByJob: {},            // jobId → packet snapshot
   attemptsById: {},            // attemptId → attempt snapshot (lightweight)
+  gateContext: null,           // { todaySubmitCount, appliedUrlKeys, dailySubmitCap, perSourceCap }
+  questionCache: {},           // normalized question text → interpretation
 };
+
+// Content scripts (agent-runner) use chrome.storage.session for the per-URL
+// loop guard; session storage is trusted-contexts-only by default, so grant
+// access here or every content-script read/write throws silently.
+try {
+  chrome.storage.session.setAccessLevel({ accessLevel: 'TRUSTED_AND_UNTRUSTED_CONTEXTS' });
+} catch { /* older Chrome — loop guard degrades gracefully */ }
 
 async function readState() {
   return new Promise((resolve) => {
@@ -59,28 +69,63 @@ function rid() {
 // ── Admin notify ─────────────────────────────────────────────────────
 // Send a message to any admin-bridge content scripts that are alive on
 // admin tabs. They will forward to the admin page via window.postMessage.
+// Returns true when at least one admin tab acknowledged delivery.
 async function notifyAdmin(payload) {
   try {
     const tabs = await chrome.tabs.query({
       url: ['http://localhost:4322/*', 'http://127.0.0.1:4322/*', 'https://admin.qadan.co/*'],
     });
-    for (const t of tabs) {
-      if (!t.id) continue;
+    let delivered = 0;
+    await Promise.all(tabs.map(t => new Promise((resolve) => {
+      if (!t.id) return resolve();
       try {
-        chrome.tabs.sendMessage(t.id, payload, () => { void chrome.runtime.lastError; });
-      } catch { /* ignore */ }
-    }
-  } catch { /* ignore */ }
+        chrome.tabs.sendMessage(t.id, payload, () => {
+          if (!chrome.runtime.lastError) delivered += 1;
+          resolve();
+        });
+      } catch { resolve(); }
+    })));
+    return delivered > 0;
+  } catch { return false; }
 }
 
-function pushLog(state, entry) {
-  state.pendingLogs.push(entry);
-  if (state.pendingLogs.length > 200) state.pendingLogs = state.pendingLogs.slice(-200);
-  notifyAdmin({ kind: 'agent.bridge.log', entry });
+// Log entry → admin. Queued in SW storage when no admin tab is reachable;
+// the admin-bridge drains the queue via `agent.pending.flush` (page load +
+// 60s interval) so events land late rather than never.
+async function pushLog(state, entry) {
+  const delivered = await notifyAdmin({ kind: 'agent.bridge.log', entry });
+  if (!delivered) {
+    state.pendingLogs.push(entry);
+    if (state.pendingLogs.length > 200) state.pendingLogs = state.pendingLogs.slice(-200);
+  }
+}
+
+// Attempt status update → admin. Same queue-on-failure contract as pushLog;
+// only updates carrying a `status` are queued (metadata-only updates are
+// cosmetic and can be dropped).
+async function sendAttemptUpdate(state, attemptUpdate) {
+  const delivered = await notifyAdmin({ kind: 'agent.bridge.state-update', attemptUpdate });
+  if (!delivered && attemptUpdate && attemptUpdate.status) {
+    state.pendingAttemptUpdates.push({ at: Date.now(), attemptUpdate });
+    if (state.pendingAttemptUpdates.length > 100) {
+      state.pendingAttemptUpdates = state.pendingAttemptUpdates.slice(-100);
+    }
+  }
+  return delivered;
 }
 
 function attemptOf(state, tabId) {
   return state.activeAttempts[String(tabId)] || null;
+}
+
+// Normalized URL key for duplicate detection. MUST stay in sync with the
+// identical helper in admin/src/pages/auto-apply.astro (snapshot builder).
+function urlKeyOf(raw) {
+  if (!raw) return '';
+  try {
+    const u = new URL(raw);
+    return `${u.hostname.replace(/^www\./, '')}${u.pathname.replace(/\/+$/, '')}`.toLowerCase();
+  } catch { return ''; }
 }
 
 // ── Gate evaluation ──────────────────────────────────────────────────
@@ -123,6 +168,24 @@ function evaluateSubmitGate(state, attempt, packet, pageState) {
   if (s.autoSubmitDenylist?.includes(attempt.jobId)) {
     return { ok: false, reasons: ['denylisted'], blockReason: 'gates-failed' };
   }
+  // Literal placeholder text in packet fields must never be submitted
+  // (mirrors gates.ts gatePlaceholderText).
+  const PLACEHOLDER_RE = /\[[^\]]{4,}\]/;
+  const pasteValues = [packet.coverLetter, packet.whyRoleAnswer, packet.whyCompanyAnswer, packet.tellMeAboutYourself, packet.salaryGuidance];
+  if (pasteValues.some(v => typeof v === 'string' && PLACEHOLDER_RE.test(v))) {
+    return { ok: false, reasons: ['placeholder text in packet fields'], blockReason: 'packet-not-ready' };
+  }
+  // Daily cap — counts agent submissions today, snapshot from the admin.
+  const gc = state.gateContext || {};
+  const dailyCap = gc.dailySubmitCap ?? s.dailySubmitCap;
+  if (typeof dailyCap === 'number' && (gc.todaySubmitCount ?? 0) >= dailyCap) {
+    return { ok: false, reasons: [`daily cap reached (${gc.todaySubmitCount}/${dailyCap})`], blockReason: 'over-cap' };
+  }
+  // Duplicate application — normalized URL key against already-applied jobs.
+  const dupKey = attempt.jobUrlKey || urlKeyOf(attempt.currentUrl || '');
+  if (dupKey && Array.isArray(gc.appliedUrlKeys) && gc.appliedUrlKeys.includes(dupKey)) {
+    return { ok: false, reasons: ['already applied to this URL'], blockReason: 'duplicate' };
+  }
   if (pageState?.captchaPresent) return { ok: false, reasons: ['captcha'], blockReason: 'captcha' };
   if (pageState?.loginPresent) return { ok: false, reasons: ['login'], blockReason: 'login-required' };
   if (pageState?.pageError) return { ok: false, reasons: ['page error'], blockReason: 'page-error' };
@@ -131,6 +194,9 @@ function evaluateSubmitGate(state, attempt, packet, pageState) {
   }
   if (pageState?.demographicFieldsRequired > 0) {
     return { ok: false, reasons: [`${pageState.demographicFieldsRequired} demographic required`], blockReason: 'demographic-required' };
+  }
+  if (pageState?.legalFieldsRequired > 0) {
+    return { ok: false, reasons: [`${pageState.legalFieldsRequired} legal field(s) required`], blockReason: 'legal-required' };
   }
   if (pageState?.uploadFailed) return { ok: false, reasons: ['upload failed'], blockReason: 'upload-failed' };
 
@@ -151,7 +217,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
     // Tab-side queries
     if (msg.kind === 'agent.tab.get-attempt') {
-      const tabId = sender?.tab?.id;
+      // Popup messages have no sender.tab — the popup passes the active
+      // tab id explicitly in the payload (C20).
+      const tabId = msg.tabId ?? sender?.tab?.id;
       const a = attemptOf(state, tabId);
       if (!a) { sendResponse({ ok: false, error: 'no-attempt' }); return; }
       const packet = state.packetsByJob[a.jobId] || null;
@@ -169,14 +237,26 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.kind === 'agent.runner.idle') {
       sendResponse({ ok: true }); return;
     }
+    if (msg.kind === 'agent.runner.beacon') {
+      // Lightweight "a runner is alive on this tab" ping sent before the
+      // settle waits — lets the unsupported-host timer stand down (C19).
+      const a = attemptOf(state, sender?.tab?.id);
+      if (a) {
+        a.beaconAt = Date.now();
+        await writeState(state);
+      }
+      sendResponse({ ok: true });
+      return;
+    }
     if (msg.kind === 'agent.runner.page-loaded') {
       const a = attemptOf(state, sender?.tab?.id);
       if (a) {
+        a.beaconAt = a.beaconAt || Date.now();
         // Friendly title — short, prefix ATS name
         const hostShort = (() => {
           try { return new URL(msg.url).hostname.replace(/^www\./, ''); } catch { return ''; }
         })();
-        pushLog(state, {
+        await pushLog(state, {
           id: rid(), at: Date.now(),
           sessionId: state.activeSession?.id,
           attemptId: a.attemptId,
@@ -200,7 +280,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         if (c.never) parts.push(`${c.never} never-fill`);
         if (c.requiredUnknown) parts.push(`${c.requiredUnknown} unknown required`);
         const message = `Scanned form — ${parts.length ? parts.join(', ') : 'no fields'}`;
-        pushLog(state, {
+        a.beaconAt = a.beaconAt || Date.now();
+        await pushLog(state, {
           id: rid(), at: Date.now(),
           sessionId: state.activeSession?.id,
           attemptId: a.attemptId,
@@ -221,24 +302,27 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         const truncMsg = (msg.truncations || []).length
           ? ` · truncated ${msg.truncations.length} long field(s) to fit limit`
           : '';
-        pushLog(state, {
+        const failMsg = (msg.failures || []).length
+          ? ` · ${msg.failures.length} field(s) failed verification`
+          : '';
+        const phMsg = (msg.placeholdersSkipped || []).length
+          ? ` · skipped ${msg.placeholdersSkipped.length} placeholder field(s)`
+          : '';
+        await pushLog(state, {
           id: rid(), at: Date.now(),
           sessionId: state.activeSession?.id,
           attemptId: a.attemptId,
           kind: 'attempt-fields-filled',
-          message: keyList ? `${baseMsg}: ${keyList}${truncMsg}` : `${baseMsg}${truncMsg}`,
-          meta: { filledKeys: msg.filledKeys, reviewKeys: msg.reviewKeys, neverKeys: msg.neverKeys, truncations: msg.truncations },
+          message: keyList ? `${baseMsg}: ${keyList}${truncMsg}${failMsg}${phMsg}` : `${baseMsg}${truncMsg}${failMsg}${phMsg}`,
+          meta: { filledKeys: msg.filledKeys, reviewKeys: msg.reviewKeys, neverKeys: msg.neverKeys, truncations: msg.truncations, failures: msg.failures, placeholdersSkipped: msg.placeholdersSkipped },
         });
         // Push attempt-level field metadata back to admin so it shows in /review
-        notifyAdmin({
-          kind: 'agent.bridge.state-update',
-          attemptUpdate: {
-            id: a.attemptId,
-            filledFields: msg.filledKeys,
-            reviewFields: msg.reviewKeys,
-            neverFields: msg.neverKeys,
-            currentUrl: sender?.tab?.url,
-          },
+        await sendAttemptUpdate(state, {
+          id: a.attemptId,
+          filledFields: msg.filledKeys,
+          reviewFields: msg.reviewKeys,
+          neverFields: msg.neverKeys,
+          currentUrl: sender?.tab?.url,
         });
         await writeState(state);
       }
@@ -248,7 +332,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.kind === 'agent.runner.pause') {
       const a = attemptOf(state, sender?.tab?.id);
       if (a) {
-        pushLog(state, {
+        await pushLog(state, {
           id: rid(), at: Date.now(),
           sessionId: state.activeSession?.id,
           attemptId: a.attemptId,
@@ -256,16 +340,18 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
           message: `Pause: ${msg.blockReason} · ${msg.message}`,
           meta: { blockReason: msg.blockReason },
         });
-        notifyAdmin({
-          kind: 'agent.bridge.state-update',
-          attemptUpdate: {
-            id: a.attemptId,
-            status: 'needs-review',
-            blockReason: msg.blockReason,
-            blockNote: msg.message,
-            currentUrl: sender?.tab?.url,
-          },
-        });
+        const pauseUpdate = {
+          id: a.attemptId,
+          status: 'needs-review',
+          blockReason: msg.blockReason,
+          blockNote: msg.message,
+          currentUrl: sender?.tab?.url,
+        };
+        // Surface pending question drafts in the review queue.
+        if (Array.isArray(msg.unknownQuestions) && msg.unknownQuestions.length > 0) {
+          pauseUpdate.unknownQuestions = msg.unknownQuestions;
+        }
+        await sendAttemptUpdate(state, pauseUpdate);
         await writeState(state);
       }
       sendResponse({ ok: true });
@@ -274,13 +360,14 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.kind === 'agent.runner.advance') {
       const a = attemptOf(state, sender?.tab?.id);
       if (a) {
-        pushLog(state, {
+        await pushLog(state, {
           id: rid(), at: Date.now(),
           sessionId: state.activeSession?.id,
           attemptId: a.attemptId,
           kind: 'attempt-advance',
           message: `Advancing: clicked "${msg.buttonText}"`,
         });
+        await writeState(state);
       }
       sendResponse({ ok: true });
       return;
@@ -291,7 +378,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       const packet = a ? state.packetsByJob[a.jobId] : null;
       if (!attempt) { sendResponse({ ok: false, reasons: ['no attempt'], blockReason: 'gates-failed' }); return; }
       const res = evaluateSubmitGate(state, attempt, packet, msg.pageState);
-      pushLog(state, {
+      await pushLog(state, {
         id: rid(), at: Date.now(),
         sessionId: state.activeSession?.id,
         attemptId: attempt.id,
@@ -305,13 +392,18 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.kind === 'agent.runner.submit-attempted') {
       const a = attemptOf(state, sender?.tab?.id);
       if (a) {
-        pushLog(state, {
+        // C4: record that THIS attempt actually clicked submit. A
+        // confirmation page is only trusted when this flag is set.
+        a.submitClicked = true;
+        if (state.attemptsById[a.attemptId]) state.attemptsById[a.attemptId].submitClicked = true;
+        await pushLog(state, {
           id: rid(), at: Date.now(),
           sessionId: state.activeSession?.id,
           attemptId: a.attemptId,
           kind: 'attempt-submit-attempted',
           message: `Clicking submit on ${msg.url}`,
         });
+        await writeState(state);
       }
       sendResponse({ ok: true });
       return;
@@ -319,21 +411,22 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.kind === 'agent.runner.submitted' || msg.kind === 'agent.runner.submitted-detected') {
       const a = attemptOf(state, sender?.tab?.id);
       if (a) {
-        pushLog(state, {
+        await pushLog(state, {
           id: rid(), at: Date.now(),
           sessionId: state.activeSession?.id,
           attemptId: a.attemptId,
           kind: 'attempt-submitted',
           message: `Submitted (${msg.url || sender?.tab?.url || 'unknown'})`,
         });
-        notifyAdmin({
-          kind: 'agent.bridge.state-update',
-          attemptUpdate: {
-            id: a.attemptId,
-            status: 'submitted',
-            currentUrl: sender?.tab?.url,
-          },
+        await sendAttemptUpdate(state, {
+          id: a.attemptId,
+          status: 'submitted',
+          currentUrl: sender?.tab?.url,
         });
+        // Keep the daily-cap counter live between snapshots.
+        if (state.gateContext && typeof state.gateContext.todaySubmitCount === 'number') {
+          state.gateContext.todaySubmitCount += 1;
+        }
         // Clear this tab from active attempts
         delete state.activeAttempts[String(sender.tab.id)];
         await writeState(state);
@@ -344,7 +437,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.kind === 'agent.runner.upload') {
       const a = attemptOf(state, sender?.tab?.id);
       if (a) {
-        pushLog(state, {
+        await pushLog(state, {
           id: rid(), at: Date.now(),
           sessionId: state.activeSession?.id,
           attemptId: a.attemptId,
@@ -360,7 +453,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.kind === 'agent.runner.questions-answered') {
       const a = attemptOf(state, sender?.tab?.id);
       if (a) {
-        pushLog(state, {
+        await pushLog(state, {
           id: rid(), at: Date.now(),
           sessionId: state.activeSession?.id,
           attemptId: a.attemptId,
@@ -387,6 +480,17 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.kind === 'agent.runner.interpret-question') {
       // Forward to admin bridge for DeepSeek interpretation.
       try {
+        // Cache per job + normalized question text — retries don't re-pay
+        // the LLM latency (C7). Keyed by job so a company-specific answer
+        // can never leak into another company's form.
+        const senderAttempt = attemptOf(state, sender?.tab?.id);
+        const normText = String(msg.questionText || '').toLowerCase().replace(/\s+/g, ' ').trim().slice(0, 300);
+        const norm = normText ? `${senderAttempt?.jobId || 'global'}::${normText}` : '';
+        const cached = norm ? (state.questionCache || {})[norm] : null;
+        if (cached) {
+          sendResponse({ ok: true, interpretation: cached, cached: true });
+          return;
+        }
         const adminTabs = await chrome.tabs.query({
           url: ['http://localhost:4322/*', 'http://127.0.0.1:4322/*', 'https://admin.qadan.co/*'],
         });
@@ -411,17 +515,25 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
             attemptId: msg.attemptId,
             questionText: msg.questionText,
           }, () => { void chrome.runtime.lastError; });
+          // Must outlast the admin-side LLM timeout (20s client fetch).
           setTimeout(() => {
             if (!resolved) {
               resolved = true;
               chrome.runtime.onMessage.removeListener(listener);
               resolve({ ok: false });
             }
-          }, 9000);
+          }, 25000);
         });
         if (!result || !result.ok) {
           sendResponse({ ok: false, interpretation: { needsHuman: true, reason: 'no-result', draft: '' } });
         } else {
+          if (norm && result.interpretation) {
+            state.questionCache = state.questionCache || {};
+            state.questionCache[norm] = result.interpretation;
+            const keys = Object.keys(state.questionCache);
+            if (keys.length > 50) delete state.questionCache[keys[0]];
+            await writeState(state);
+          }
           sendResponse({ ok: true, interpretation: result.interpretation });
         }
       } catch (e) {
@@ -432,20 +544,28 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.kind === 'agent.runner.error') {
       const a = attemptOf(state, sender?.tab?.id);
       if (a) {
-        pushLog(state, {
+        await pushLog(state, {
           id: rid(), at: Date.now(),
           sessionId: state.activeSession?.id,
           attemptId: a.attemptId,
           kind: 'attempt-failed',
           message: `Runner error: ${msg.message}`,
         });
-        notifyAdmin({
-          kind: 'agent.bridge.state-update',
-          attemptUpdate: { id: a.attemptId, status: 'failed', blockNote: msg.message },
-        });
+        await sendAttemptUpdate(state, { id: a.attemptId, status: 'failed', blockNote: msg.message });
         await writeState(state);
       }
       sendResponse({ ok: true });
+      return;
+    }
+    if (msg.kind === 'agent.pending.flush') {
+      // Admin-bridge drains updates/logs that were queued while no admin
+      // tab was reachable (C6). Returned once, then cleared.
+      const logs = state.pendingLogs || [];
+      const updates = state.pendingAttemptUpdates || [];
+      state.pendingLogs = [];
+      state.pendingAttemptUpdates = [];
+      await writeState(state);
+      sendResponse({ ok: true, logs, updates });
       return;
     }
 
@@ -467,11 +587,27 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.kind === 'agent.session.snapshot') {
       // The bridge pushes the latest session + attempts + vault + packets here.
       state.activeSession = msg.session || null;
+      const priorAttempts = state.attemptsById || {};
       state.attemptsById = {};
-      for (const a of (msg.attempts || [])) state.attemptsById[a.id] = a;
+      for (const a of (msg.attempts || [])) {
+        // Preserve SW-side per-attempt flags (submitClicked) across refreshes.
+        const prior = priorAttempts[a.id];
+        state.attemptsById[a.id] = prior && prior.submitClicked ? { ...a, submitClicked: true } : a;
+      }
       state.packetsByJob = {};
       for (const p of (msg.packets || [])) state.packetsByJob[p.jobId] = p;
-      if (msg.vault) state.vault = msg.vault;
+      if (msg.gateContext) state.gateContext = msg.gateContext;
+      if (msg.vault) {
+        state.vault = msg.vault;
+        // C1: writeState deliberately strips `vault` from qa_agent_state, and
+        // readState reads vault ONLY from the dedicated 'vault' key (the one
+        // the popup's manual paste-import writes). Persist the snapshot vault
+        // there too, or it is silently discarded and the runner pauses every
+        // attempt with "Vault not imported into extension."
+        await new Promise((resolve) => {
+          chrome.storage.local.set({ vault: msg.vault, vaultImportedAt: Date.now() }, resolve);
+        });
+      }
       await writeState(state);
       sendResponse({ ok: true });
       return;
@@ -539,51 +675,58 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         if (state.attemptsById[msg.attemptId]) {
           state.attemptsById[msg.attemptId].status = 'running';
           state.attemptsById[msg.attemptId].tabId = tabId;
+          // Re-opening resets the submit flag — a fresh run hasn't clicked yet.
+          state.attemptsById[msg.attemptId].submitClicked = false;
         }
-        pushLog(state, {
+        // C15: clear the runner's per-URL loop-guard for this attempt so a
+        // retry actually re-runs instead of tripping the 3-fire guard.
+        try {
+          const all = await chrome.storage.session.get(null);
+          const stale = Object.keys(all || {}).filter(k =>
+            k.startsWith('loopguard:') && k.includes(`:${msg.attemptId}:`));
+          if (stale.length > 0) await chrome.storage.session.remove(stale);
+        } catch { /* session storage unavailable — guard simply stays */ }
+        await pushLog(state, {
           id: rid(), at: Date.now(),
           sessionId: msg.sessionId,
           attemptId: msg.attemptId,
           kind: 'attempt-started',
           message: `Opened tab ${tabId} → ${msg.url}`,
         });
-        notifyAdmin({
-          kind: 'agent.bridge.state-update',
-          attemptUpdate: { id: msg.attemptId, status: 'running', tabId, currentUrl: msg.url },
-        });
+        await sendAttemptUpdate(state, { id: msg.attemptId, status: 'running', tabId, currentUrl: msg.url });
         await writeState(state);
 
         // Unsupported-host timeout: if the content script doesn't ping
-        // within 6s, the extension has no permission for this host and
-        // the agent literally cannot run. Mark as unsupported.
+        // within 15s, the extension has no permission for this host and
+        // the agent literally cannot run. Mark as unsupported. (The runner
+        // sends an immediate beacon before its settle waits, which can take
+        // ~7s, so anything shorter misfires on slow ATS pages — C19.)
         setTimeout(async () => {
           const fresh = await readState();
           const stillAssigned = fresh.activeAttempts[String(tabId)];
           if (!stillAssigned) return; // tab closed or replaced
-          // Did the runner produce any log entry for this attempt? If not, host is unsupported.
+          // Beacon (or any runner log) means the runner is alive on the host.
+          if (stillAssigned.beaconAt) return;
           const sawRunner = fresh.pendingLogs.some(l =>
             l.attemptId === msg.attemptId && (l.kind === 'attempt-page-loaded' || l.kind === 'attempt-fields-detected'));
           if (sawRunner) return;
           // Still no runner activity — mark unsupported, free the tabId mapping.
           delete fresh.activeAttempts[String(tabId)];
-          pushLog(fresh, {
+          await pushLog(fresh, {
             id: rid(), at: Date.now(),
             sessionId: msg.sessionId,
             attemptId: msg.attemptId,
             kind: 'attempt-blocked',
             message: 'Host not in extension permissions — agent can\'t inject. Mark this job manually.',
           });
-          notifyAdmin({
-            kind: 'agent.bridge.state-update',
-            attemptUpdate: {
-              id: msg.attemptId,
-              status: 'unsupported',
-              blockReason: 'unsupported-ats',
-              blockNote: `Extension has no content-script permission on this host. Supported: Greenhouse / Lever / Ashby / Workday / SmartRecruiters / LinkedIn.`,
-            },
+          await sendAttemptUpdate(fresh, {
+            id: msg.attemptId,
+            status: 'unsupported',
+            blockReason: 'unsupported-ats',
+            blockNote: `Extension has no content-script permission on this host. Supported: Greenhouse / Lever / Ashby / Workday / SmartRecruiters / LinkedIn.`,
           });
           await writeState(fresh);
-        }, 6500);
+        }, 15000);
 
         sendResponse({ ok: true, tabId });
       } catch (e) {
@@ -592,8 +735,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       return;
     }
     if (msg.kind === 'agent.attempt.retry') {
-      // Admin asks to retry an attempt; reset SW-side block state if any
-      // The actual retry happens when the tab loads again.
+      // Legacy retry signal. Review now routes retries through
+      // `agent.attempt.open` (which rebinds the tab and clears the
+      // loop-guard); this ack remains for backwards compatibility.
       sendResponse({ ok: true });
       return;
     }
@@ -622,6 +766,27 @@ chrome.runtime.onMessageExternal.addListener((msg, sender, sendResponse) => {
   sendResponse({ ok: false, error: 'bad-msg' });
   return true;
 });
+
+// ── SPA navigation → re-run the agent (C18) ──────────────────────────
+// Ashby/Workday advance steps via history.pushState, so the content script
+// is never re-injected and step 2+ would never process. Watch history
+// updates on tabs with active attempts and nudge the runner (debounced).
+const historyDebounce = new Map();
+try {
+  chrome.webNavigation.onHistoryStateUpdated.addListener(async (details) => {
+    if (details.frameId !== 0) return;
+    const state = await readState();
+    if (!attemptOf(state, details.tabId)) return;
+    const prior = historyDebounce.get(details.tabId);
+    if (prior) clearTimeout(prior);
+    historyDebounce.set(details.tabId, setTimeout(() => {
+      historyDebounce.delete(details.tabId);
+      try {
+        chrome.tabs.sendMessage(details.tabId, { kind: 'agent.history-changed', url: details.url }, () => { void chrome.runtime.lastError; });
+      } catch { /* ignore */ }
+    }, 800));
+  });
+} catch { /* webNavigation unavailable */ }
 
 // Recover state on install / startup
 chrome.runtime.onInstalled.addListener(async (details) => {

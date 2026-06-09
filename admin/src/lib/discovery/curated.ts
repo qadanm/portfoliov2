@@ -1,8 +1,11 @@
-// Curated public boards. Each entry's slug has been chosen because the
-// company is publicly known to host its careers page on the named ATS at
-// the time of writing — not because we've live-verified each URL. If a
-// slug ever drifts, the source will surface its lastError after the next
-// run and Moe can disable or remove it without touching code.
+// Curated public boards. Every entry below was live-verified against the
+// public ATS API on 2026-06-09 (greenhouse: boards-api.greenhouse.io,
+// lever: api.lever.co, ashby: api.ashbyhq.com) and returned >0 postings.
+// Boards that 404'd or returned empty were removed; companies that moved
+// ATS (Notion/Linear/Ramp/Plaid/Cursor → Ashby, Mistral → Lever,
+// Lyft/Inflection → Greenhouse) were migrated to their live host. If a
+// slug ever drifts again, the source will surface its lastError after the
+// next run and Moe can disable or remove it without touching code.
 //
 // Every curated source ships disabled. The Discovery panel surfaces the
 // list under "Curated boards"; the user opts in by toggling on. This
@@ -10,8 +13,10 @@
 // hundreds of irrelevant company-wide listings).
 //
 // Companies whose ATS is unknown, behind their own bespoke flow, or
-// (Workday/Ashby/SmartRecruiters) blocked by CORS are NOT seeded — manual
-// paste handles those. We do not fake an active source.
+// (Workday/SmartRecruiters) blocked by CORS are NOT seeded — manual
+// paste handles those. We do not fake an active source. Dropped as dead
+// with no live alternative on a supported host: Retool, Rippling,
+// Hugging Face, Replicate, Netflix (bespoke ATS).
 
 export type CuratedBoardType = 'greenhouse' | 'lever' | 'ashby';
 
@@ -43,24 +48,10 @@ export const CURATED_BOARDS: CuratedBoard[] = [
   },
   {
     type: 'greenhouse',
-    slug: 'notion',
-    companyName: 'Notion',
-    boardUrl: 'https://boards.greenhouse.io/notion',
-    notes: 'Productivity · product design',
-  },
-  {
-    type: 'greenhouse',
     slug: 'vercel',
     companyName: 'Vercel',
     boardUrl: 'https://boards.greenhouse.io/vercel',
     notes: 'Frontend platform · developer tools',
-  },
-  {
-    type: 'greenhouse',
-    slug: 'linear',
-    companyName: 'Linear',
-    boardUrl: 'https://boards.greenhouse.io/linear',
-    notes: 'Product-led SaaS · design quality',
   },
   {
     type: 'greenhouse',
@@ -71,31 +62,10 @@ export const CURATED_BOARDS: CuratedBoard[] = [
   },
   {
     type: 'greenhouse',
-    slug: 'ramp',
-    companyName: 'Ramp',
-    boardUrl: 'https://boards.greenhouse.io/ramp',
-    notes: 'Fintech · finance ops · design systems',
-  },
-  {
-    type: 'greenhouse',
     slug: 'brex',
     companyName: 'Brex',
     boardUrl: 'https://boards.greenhouse.io/brex',
     notes: 'Fintech · spend management',
-  },
-  {
-    type: 'greenhouse',
-    slug: 'plaid',
-    companyName: 'Plaid',
-    boardUrl: 'https://boards.greenhouse.io/plaid',
-    notes: 'Fintech · API platform · developer UX',
-  },
-  {
-    type: 'greenhouse',
-    slug: 'retool',
-    companyName: 'Retool',
-    boardUrl: 'https://boards.greenhouse.io/retool',
-    notes: 'Internal tools · low-code · developer tools',
   },
   {
     type: 'greenhouse',
@@ -113,13 +83,6 @@ export const CURATED_BOARDS: CuratedBoard[] = [
   },
   {
     type: 'greenhouse',
-    slug: 'rippling',
-    companyName: 'Rippling',
-    boardUrl: 'https://boards.greenhouse.io/rippling',
-    notes: 'HRIS · platform UX',
-  },
-  {
-    type: 'greenhouse',
     slug: 'lattice',
     companyName: 'Lattice',
     boardUrl: 'https://boards.greenhouse.io/lattice',
@@ -130,46 +93,67 @@ export const CURATED_BOARDS: CuratedBoard[] = [
     slug: 'figma',
     companyName: 'Figma',
     boardUrl: 'https://boards.greenhouse.io/figma',
-    notes: 'Design tools · product/design (verify if Workday)',
+    notes: 'Design tools · product/design',
   },
   {
     type: 'greenhouse',
-    slug: 'huggingface',
-    companyName: 'Hugging Face',
-    boardUrl: 'https://boards.greenhouse.io/huggingface',
-    notes: 'AI · ML platform · developer UX',
+    slug: 'lyft',
+    companyName: 'Lyft',
+    boardUrl: 'https://job-boards.greenhouse.io/lyft',
+    notes: 'Transportation · product design',
   },
   {
     type: 'greenhouse',
-    slug: 'replicate',
-    companyName: 'Replicate',
-    boardUrl: 'https://boards.greenhouse.io/replicate',
-    notes: 'AI inference platform · developer tools',
+    slug: 'inflectionai',
+    companyName: 'Inflection AI',
+    boardUrl: 'https://job-boards.greenhouse.io/inflectionai',
+    notes: 'AI · enterprise AI · product design',
   },
 
   // ── Lever ──────────────────────────────────────────────────────────
   {
     type: 'lever',
-    slug: 'netflix',
-    companyName: 'Netflix',
-    boardUrl: 'https://jobs.lever.co/netflix',
-    notes: 'Media · product design · platform UX',
-  },
-  {
-    type: 'lever',
-    slug: 'lyft',
-    companyName: 'Lyft',
-    boardUrl: 'https://jobs.lever.co/lyft',
-    notes: 'Transportation · product design',
+    slug: 'mistral',
+    companyName: 'Mistral AI',
+    boardUrl: 'https://jobs.lever.co/mistral',
+    notes: 'AI · open-weight LLMs · product/frontend',
   },
 
   // ── Ashby (lots of AI-native companies host here) ─────────────────
   {
     type: 'ashby',
-    slug: 'anysphere',
+    slug: 'notion',
+    companyName: 'Notion',
+    boardUrl: 'https://jobs.ashbyhq.com/notion',
+    notes: 'Productivity · product design',
+  },
+  {
+    type: 'ashby',
+    slug: 'linear',
+    companyName: 'Linear',
+    boardUrl: 'https://jobs.ashbyhq.com/linear',
+    notes: 'Product-led SaaS · design quality',
+  },
+  {
+    type: 'ashby',
+    slug: 'cursor',
     companyName: 'Cursor (Anysphere)',
-    boardUrl: 'https://jobs.ashbyhq.com/anysphere',
+    boardUrl: 'https://jobs.ashbyhq.com/cursor',
     notes: 'AI-native code editor · design + frontend',
+  },
+  {
+    type: 'ashby',
+    slug: 'ramp',
+    companyName: 'Ramp',
+    boardUrl: 'https://jobs.ashbyhq.com/ramp',
+    notes: 'Fintech · finance ops · design systems',
+  },
+  {
+    type: 'ashby',
+    slug: 'plaid',
+    companyName: 'Plaid',
+    boardUrl: 'https://jobs.ashbyhq.com/plaid',
+    notes: 'Fintech · API platform · developer UX',
   },
   {
     type: 'ashby',
@@ -180,23 +164,9 @@ export const CURATED_BOARDS: CuratedBoard[] = [
   },
   {
     type: 'ashby',
-    slug: 'inflection-ai',
-    companyName: 'Inflection AI',
-    boardUrl: 'https://jobs.ashbyhq.com/inflection-ai',
-    notes: 'AI · personal AI · product design',
-  },
-  {
-    type: 'ashby',
     slug: 'suno',
     companyName: 'Suno',
     boardUrl: 'https://jobs.ashbyhq.com/suno',
     notes: 'AI · music generation · product design',
-  },
-  {
-    type: 'ashby',
-    slug: 'mistral',
-    companyName: 'Mistral AI',
-    boardUrl: 'https://jobs.ashbyhq.com/mistral',
-    notes: 'AI · open-weight LLMs · product/frontend',
   },
 ];

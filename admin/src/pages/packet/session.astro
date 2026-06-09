@@ -164,10 +164,13 @@ import Admin from '@/layouts/Admin.astro';
   .apply__hint-sep { opacity: 0.4; margin: 0 4px; }
 
   .apply__warnings { display: flex; flex-direction: column; gap: 6px; }
-  .warn { padding: 8px 12px; border-radius: var(--r-md); font-size: 12px;
+  /* Warnings are injected via insertAdjacentHTML so they don't carry
+     Astro's scope attribute — style them through the static parent
+     + :global, same pattern as today.astro. */
+  .apply__warnings :global(.warn) { padding: 8px 12px; border-radius: var(--r-md); font-size: 12px;
     background: var(--c-bg-elev); border: 1px solid var(--c-border-subtle); }
-  .warn--red { border-color: rgba(248, 113, 113, 0.4); color: #FCA5A5; }
-  .warn--yellow { border-color: rgba(245, 158, 11, 0.4); color: var(--c-accent); }
+  .apply__warnings :global(.warn--red) { border-color: rgba(248, 113, 113, 0.4); color: #FCA5A5; }
+  .apply__warnings :global(.warn--yellow) { border-color: rgba(245, 158, 11, 0.4); color: var(--c-accent); }
 
   .apply__split {
     display: grid;
@@ -197,7 +200,10 @@ import Admin from '@/layouts/Admin.astro';
     list-style: none; padding: 0; margin: 0;
     display: flex; flex-direction: column; gap: 6px;
   }
-  .apply__checklist li {
+  /* Checklist items are created with document.createElement so they don't
+     carry Astro's scope attribute — style them through the static
+     .apply__checklist parent + :global. */
+  .apply__checklist :global(li) {
     display: flex; align-items: flex-start; gap: 8px;
     padding: 8px 10px;
     background: var(--c-bg);
@@ -205,9 +211,9 @@ import Admin from '@/layouts/Admin.astro';
     border-radius: var(--r-sm);
     font-size: 12px;
   }
-  .apply__checklist li.is-done { opacity: 0.55; }
-  .apply__checklist input[type=checkbox] { margin-top: 2px; }
-  .apply__checklist .check-copy {
+  .apply__checklist :global(li.is-done) { opacity: 0.55; }
+  .apply__checklist :global(input[type=checkbox]) { margin-top: 2px; }
+  .apply__checklist :global(.check-copy) {
     margin-left: auto;
     font-family: var(--font-mono); font-size: 10px;
     color: var(--c-accent); cursor: pointer; background: transparent; border: 0;

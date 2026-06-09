@@ -130,6 +130,8 @@ import { JOB_STATUSES } from '@/lib/storage';
       </footer>
     </form>
   </dialog>
+
+  <div id="jobs-toast" class="jobs__toast" aria-live="polite"></div>
 </Admin>
 
 <style>
@@ -164,7 +166,10 @@ import { JOB_STATUSES } from '@/lib/storage';
     overflow-x: auto;
     padding-bottom: 8px;
   }
-  .col {
+  /* Columns and cards are injected via innerHTML so they don't carry
+     Astro's scope attribute — style them through the static .kanban
+     parent + :global, same pattern as today.astro. */
+  .kanban :global(.col) {
     background: var(--c-bg-elev);
     border: 1px solid var(--c-border);
     border-radius: var(--r-lg);
@@ -173,26 +178,32 @@ import { JOB_STATUSES } from '@/lib/storage';
     flex-direction: column;
     min-height: 200px;
   }
-  .col__head {
+  .kanban :global(.col__head) {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
   }
-  .col__title {
+  .kanban :global(.col__title) {
     font-family: var(--font-mono);
     font-size: 11px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--c-text-muted);
   }
-  .col__count {
+  .kanban :global(.col__count) {
     font-family: var(--font-mono);
     font-size: 11px;
     color: var(--c-text-subtle);
   }
-  .col__body { display: flex; flex-direction: column; gap: 8px; }
-  .kcard {
+  .kanban :global(.col__body) { display: flex; flex-direction: column; gap: 8px; }
+  /* Drag-and-drop affordances. */
+  .kanban :global(.col.is-drop-target) {
+    border-color: var(--c-accent);
+    background: var(--c-accent-dim);
+  }
+  .kanban :global(.kcard.is-dragging) { opacity: 0.5; }
+  .kanban :global(.kcard) {
     background: var(--c-bg);
     border: 1px solid var(--c-border-subtle);
     border-radius: var(--r-md);
@@ -200,16 +211,18 @@ import { JOB_STATUSES } from '@/lib/storage';
     cursor: pointer;
     transition: border-color 120ms;
   }
-  .kcard:hover { border-color: var(--c-accent); }
-  .kcard__company { font-size: 13px; color: var(--c-text); font-weight: 500; }
-  .kcard__role { font-size: 12px; color: var(--c-text-muted); margin-top: 2px; }
-  .kcard__meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; font-family: var(--font-mono); font-size: 10px; color: var(--c-text-subtle); }
-  .kcard__pill { padding: 2px 6px; border-radius: var(--r-full); background: var(--c-bg-muted); border: 1px solid var(--c-border-subtle); }
-  .kcard__pill--p1 { color: var(--c-accent); border-color: var(--c-accent); }
+  .kanban :global(.kcard:hover) { border-color: var(--c-accent); }
+  .kanban :global(.kcard__company) { font-size: 13px; color: var(--c-text); font-weight: 500; }
+  .kanban :global(.kcard__role) { font-size: 12px; color: var(--c-text-muted); margin-top: 2px; }
+  .kanban :global(.kcard__meta) { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; font-family: var(--font-mono); font-size: 10px; color: var(--c-text-subtle); }
+  /* Pills render inside kanban cards AND injected table rows — scope
+     through .view, which both static sections carry. */
+  .view :global(.kcard__pill) { padding: 2px 6px; border-radius: var(--r-full); background: var(--c-bg-muted); border: 1px solid var(--c-border-subtle); }
+  .view :global(.kcard__pill--p1) { color: var(--c-accent); border-color: var(--c-accent); }
 
-  /* Compact list */
+  /* Compact list (rows injected via innerHTML) */
   .compact-list { list-style: none; padding: 0; margin: 0; }
-  .compact-list li {
+  .compact-list :global(li) {
     display: grid;
     grid-template-columns: 1fr auto auto auto;
     gap: 12px;
@@ -218,8 +231,8 @@ import { JOB_STATUSES } from '@/lib/storage';
     align-items: center;
     font-size: 13px;
   }
-  .compact-list li:last-child { border-bottom: none; }
-  .compact-list .c-status { font-family: var(--font-mono); font-size: 10px; color: var(--c-text-subtle); }
+  .compact-list :global(li:last-child) { border-bottom: none; }
+  .compact-list :global(.c-status) { font-family: var(--font-mono); font-size: 10px; color: var(--c-text-subtle); }
 
   /* Editor */
   .editor {
@@ -239,10 +252,29 @@ import { JOB_STATUSES } from '@/lib/storage';
   .editor__form label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--c-text-subtle); }
   .editor__form input, .editor__form select, .editor__form textarea { font-size: 13px; }
   .editor__foot { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+
+  .jobs__toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 14px;
+    background: var(--c-text);
+    color: var(--c-bg);
+    border-radius: var(--r-full);
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 200ms;
+    pointer-events: none;
+    z-index: 100;
+  }
+  .jobs__toast.is-visible { opacity: 1; }
 </style>
 
 <script>
   import { jobsStore, ensureSchema, JOB_STATUSES, ACTIVE_STATUSES, type Job, type JobStatus } from '@/lib/storage';
+  import { parseDateInput, toDateInputValue } from '@/lib/dates';
+  import { onDataChanged } from '@/lib/sync';
 
   ensureSchema();
 
@@ -301,13 +333,47 @@ import { JOB_STATUSES } from '@/lib/storage';
     }).join('');
     root.querySelectorAll<HTMLElement>('.kcard').forEach(c => {
       c.addEventListener('click', () => openEditor(c.dataset.id!));
+      c.addEventListener('dragstart', (e) => {
+        if (e.dataTransfer) {
+          e.dataTransfer.setData('text/plain', c.dataset.id!);
+          e.dataTransfer.effectAllowed = 'move';
+        }
+        c.classList.add('is-dragging');
+      });
+      c.addEventListener('dragend', () => {
+        c.classList.remove('is-dragging');
+        root.querySelectorAll('.col.is-drop-target').forEach(x => x.classList.remove('is-drop-target'));
+      });
+    });
+    root.querySelectorAll<HTMLElement>('.col').forEach(col => {
+      col.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+        if (!col.classList.contains('is-drop-target')) {
+          root.querySelectorAll('.col.is-drop-target').forEach(x => x.classList.remove('is-drop-target'));
+          col.classList.add('is-drop-target');
+        }
+      });
+      col.addEventListener('dragleave', (e) => {
+        // Ignore leave events caused by entering a child of the column.
+        if (!col.contains(e.relatedTarget as Node)) col.classList.remove('is-drop-target');
+      });
+      col.addEventListener('drop', (e) => {
+        e.preventDefault();
+        col.classList.remove('is-drop-target');
+        const id = e.dataTransfer?.getData('text/plain');
+        const status = col.dataset.status as JobStatus | undefined;
+        if (!id || !status) return;
+        const j = jobsStore.get(id);
+        if (j && j.status !== status) quickStatus(id, status);
+      });
     });
   }
   function cardHTML(j: Job): string {
     const pri = j.priority ? `<span class="kcard__pill kcard__pill--p${j.priority}">P${j.priority}</span>` : '';
     const fit = j.fitScore ? `<span class="kcard__pill">Fit ${j.fitScore}</span>` : '';
     const sal = (j.salaryMin || j.salaryMax) ? `<span class="kcard__pill">${fmtSalary(j)}</span>` : '';
-    return `<div class="kcard" data-id="${j.id}">
+    return `<div class="kcard" data-id="${j.id}" draggable="true">
       <div class="kcard__company">${escape(j.company)}</div>
       <div class="kcard__role">${escape(j.role)}</div>
       <div class="kcard__meta">${pri}${fit}${sal}</div>
@@ -332,7 +398,11 @@ import { JOB_STATUSES } from '@/lib/storage';
       </tr>
     `).join('');
     tbody.querySelectorAll<HTMLElement>('[data-edit]').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); openEditor(b.getAttribute('data-edit')!); }));
-    tbody.querySelectorAll<HTMLSelectElement>('[data-status]').forEach(s => s.addEventListener('change', () => quickStatus(s.dataset.id!, s.value as JobStatus)));
+    tbody.querySelectorAll<HTMLSelectElement>('[data-status]').forEach(s => {
+      // Clicking the select must not bubble to the row (which opens the editor).
+      s.addEventListener('click', e => e.stopPropagation());
+      s.addEventListener('change', () => quickStatus(s.dataset.id!, s.value as JobStatus));
+    });
     tbody.querySelectorAll<HTMLElement>('tr[data-id]').forEach(r => r.addEventListener('click', () => openEditor(r.getAttribute('data-id')!)));
   }
 
@@ -378,7 +448,7 @@ import { JOB_STATUSES } from '@/lib/storage';
     form.reset();
     if (id) {
       const j = jobsStore.get(id);
-      if (!j) return;
+      if (!j) { toast('Job not found — it may have been deleted.'); return; }
       titleEl.textContent = `Edit · ${j.company}`;
       deleteBtn.style.display = 'inline-flex';
       (form.elements.namedItem('id') as HTMLInputElement).value = id;
@@ -389,8 +459,8 @@ import { JOB_STATUSES } from '@/lib/storage';
       (form.elements.namedItem('salaryMin') as HTMLInputElement).value = j.salaryMin ? String(j.salaryMin) : '';
       (form.elements.namedItem('salaryMax') as HTMLInputElement).value = j.salaryMax ? String(j.salaryMax) : '';
       (form.elements.namedItem('priority') as HTMLSelectElement).value = j.priority ? String(j.priority) : '';
-      (form.elements.namedItem('dateApplied') as HTMLInputElement).value = j.dateApplied ? new Date(j.dateApplied).toISOString().slice(0,10) : '';
-      (form.elements.namedItem('followUpDate') as HTMLInputElement).value = j.followUpDate ? new Date(j.followUpDate).toISOString().slice(0,10) : '';
+      (form.elements.namedItem('dateApplied') as HTMLInputElement).value = j.dateApplied ? toDateInputValue(j.dateApplied) : '';
+      (form.elements.namedItem('followUpDate') as HTMLInputElement).value = j.followUpDate ? toDateInputValue(j.followUpDate) : '';
     } else {
       titleEl.textContent = 'Add job';
       deleteBtn.style.display = 'none';
@@ -404,11 +474,18 @@ import { JOB_STATUSES } from '@/lib/storage';
     e.preventDefault();
     const fd = new FormData(form);
     const id = String(fd.get('id') || '') || crypto.randomUUID();
-    const existing = jobsStore.get(id);
+    // Re-read the freshest stored copy at save time and spread it as the
+    // base, so fields the form doesn't edit (deferredAt, fitScore, jdText,
+    // letterId, anything added later) and edits synced since page load
+    // survive the save. Form fields only override what the form owns.
+    const fresh = jobsStore.get(id);
     const dateApplied = String(fd.get('dateApplied') || '');
     const followUpDate = String(fd.get('followUpDate') || '');
     const j: Job = {
       id,
+      createdAt: Date.now(),
+      dateFound: Date.now(),
+      ...fresh,
       company: String(fd.get('company') || '').trim(),
       role: String(fd.get('role') || '').trim(),
       url: String(fd.get('url') || '').trim() || undefined,
@@ -423,13 +500,8 @@ import { JOB_STATUSES } from '@/lib/storage';
       notes: String(fd.get('notes') || '').trim() || undefined,
       resumeAngle: String(fd.get('resumeAngle') || '').trim() || undefined,
       priority: (Number(fd.get('priority')) as 1|2|3) || undefined,
-      dateFound: existing?.dateFound ?? Date.now(),
-      dateApplied: dateApplied ? new Date(dateApplied).getTime() : existing?.dateApplied,
-      followUpDate: followUpDate ? new Date(followUpDate).getTime() : undefined,
-      fitScore: existing?.fitScore,
-      jdText: existing?.jdText,
-      letterId: existing?.letterId,
-      createdAt: existing?.createdAt ?? Date.now(),
+      dateApplied: dateApplied ? parseDateInput(dateApplied) : fresh?.dateApplied,
+      followUpDate: followUpDate ? parseDateInput(followUpDate) : undefined,
       updatedAt: Date.now(),
     };
     jobsStore.upsert(j);
@@ -465,6 +537,28 @@ import { JOB_STATUSES } from '@/lib/storage';
   if (qid) setTimeout(() => openEditor(qid), 100);
 
   function escape(s: string): string { return s.replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]!)); }
+
+  // ── Toast ────────────────────────────────────────────────────────────
+  let toastTimer: number | null = null;
+  function toast(msg: string) {
+    const el = document.getElementById('jobs-toast')!;
+    el.textContent = msg;
+    el.classList.add('is-visible');
+    if (toastTimer) window.clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => el.classList.remove('is-visible'), 2200);
+  }
+
+  // ── Live updates ─────────────────────────────────────────────────────
+  // Re-read + re-render when a sync pull or another tab changes data.
+  // Never destroy an open editor mid-edit — defer the re-render to close.
+  let renderQueued = false;
+  onDataChanged(() => {
+    if (dlg.open) { renderQueued = true; return; }
+    load(); render();
+  });
+  dlg.addEventListener('close', () => {
+    if (renderQueued) { renderQueued = false; load(); render(); }
+  });
 
   load();
   render();

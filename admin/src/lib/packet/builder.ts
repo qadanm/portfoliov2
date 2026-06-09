@@ -70,27 +70,29 @@ function salaryConflicts(job: Job, vault: ProfileVault): string[] {
   return out;
 }
 
-export function buildPacket(jobId: string): ApplicationPacket | null {
+export function buildPacket(jobId: string, forcedAngleId?: string): ApplicationPacket | null {
   const job = jobsStore.get(jobId);
   if (!job) return null;
   const vault = vaultStore.get();
 
-  // 1. Angle
+  // 1. Angle — auto recommendation unless the caller forces one (C9: a
+  // forced angle must drive the DRAFTS, not just the label).
   const rec = selectAngle(job);
+  const angleId = forcedAngleId ?? rec.angleId;
 
   // 2. Resume selection
-  const selection = tailorResume({ angleId: rec.angleId, jdText: job.jdText });
+  const selection = tailorResume({ angleId, jdText: job.jdText });
 
   // 3. JD summary + theme keywords
   const summary = summarizeJD(job.jdText, job.role, job.company);
   const jdKeywords = extractJdKeywords(job.jdText);
 
   // 4. Drafts (heuristic baselines)
-  const coverLetter = draftCoverLetter({ job, vault, angleId: rec.angleId });
-  const shortAns = draftShortAnswers({ job, vault, angleId: rec.angleId });
-  const recruiterDm = draftRecruiterDm({ job, vault, angleId: rec.angleId });
-  const followUp = draftFollowUp({ job, vault, angleId: rec.angleId });
-  const summaryKicker = jdAwareKicker(rec.angleId, job, jdKeywords);
+  const coverLetter = draftCoverLetter({ job, vault, angleId });
+  const shortAns = draftShortAnswers({ job, vault, angleId });
+  const recruiterDm = draftRecruiterDm({ job, vault, angleId });
+  const followUp = draftFollowUp({ job, vault, angleId });
+  const summaryKicker = jdAwareKicker(angleId, job, jdKeywords);
 
   // 5. ATS detection + playbook
   const atsType = detectAts(job.url, job.jdText);
@@ -107,8 +109,10 @@ export function buildPacket(jobId: string): ApplicationPacket | null {
   const packet: ApplicationPacket = {
     id: rid(),
     jobId,
-    resumeAngleId: rec.angleId,
-    recommendedAngleReason: rec.reason,
+    resumeAngleId: angleId,
+    recommendedAngleReason: forcedAngleId && forcedAngleId !== rec.angleId
+      ? `Angle set manually (auto pick was ${rec.angleId}).`
+      : rec.reason,
     resumeSelection: selection,
     summaryKicker,
     coverLetter,
@@ -227,7 +231,10 @@ export function rebuildPacketDrafts(packetId: string, opts?: { angleId?: string 
   if (!existing) return null;
   const job = jobsStore.get(existing.jobId);
   if (!job) return existing;
-  const fresh = buildPacket(existing.jobId);
+  // Thread the forced angle through the build so the DRAFTS are generated
+  // for the chosen angle — relabelling resumeAngleId afterwards left the
+  // copy mismatched with the angle (C9).
+  const fresh = buildPacket(existing.jobId, opts?.angleId);
   if (!fresh) return existing;
   // Preserve user-applied state we should NOT regenerate
   fresh.id = existing.id;
@@ -239,10 +246,6 @@ export function rebuildPacketDrafts(packetId: string, opts?: { angleId?: string 
   for (const item of fresh.checklist) {
     const prior = existing.checklist.find(p => p.label === item.label);
     if (prior) { item.done = prior.done; item.doneAt = prior.doneAt; }
-  }
-  // If a specific angle was forced, override
-  if (opts?.angleId) {
-    fresh.resumeAngleId = opts.angleId;
   }
   packetsStore.upsert(fresh);
   return fresh;

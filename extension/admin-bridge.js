@@ -11,8 +11,10 @@
 //   - `session-start | session-pause | session-resume | session-stop`
 //        → forwarded to service worker for runtime state
 //   - `attempt-retry` → asks SW to re-queue a specific attempt
-//   - Periodically polls SW for pending log/attempt updates and pushes them
-//     into the admin via custom DOM events so admin scripts re-render.
+//   - On page load and every 60s, drains the SW's queue of log/attempt
+//     updates that could not be delivered while no admin tab was open
+//     (`agent.pending.flush`) and dispatches them through the normal
+//     state-update path so outcomes get recorded late rather than never.
 
 (function () {
   if (window.__qadanAdminBridgeInstalled) return;
@@ -42,6 +44,9 @@
     if (e.source !== window) return;
     const d = e.data;
     if (!d || d.source !== 'qa-admin') return;
+    // First qa-admin message proves the page has live agent handlers —
+    // safe to start draining the SW's pending queue (C6).
+    markPageReady();
     if (d.kind === 'ping') {
       send('pong', { version: '0.2.0' });
       return;
@@ -86,6 +91,7 @@
         attempts: d.attempts,
         packets: d.packets,
         vault: d.vault,
+        gateContext: d.gateContext,
       });
       return;
     }
@@ -121,6 +127,31 @@
       }
     });
   } catch { /* ignore */ }
+
+  // Drain log/attempt updates the SW queued while no admin tab was open.
+  // Each queued item is dispatched through the same window-message path a
+  // live update would take, so dateApplied/outcomes get recorded late
+  // rather than never (C6). Armed by the page's first qa-admin message —
+  // flushing into a page without agent handlers would lose the queue.
+  let pageReady = false;
+  async function flushPending() {
+    const resp = await ask('agent.pending.flush', {});
+    if (!resp || !resp.ok) return;
+    for (const entry of (resp.logs || [])) {
+      if (entry) send('agent.bridge.log', { entry });
+    }
+    for (const u of (resp.updates || [])) {
+      const attemptUpdate = u && u.attemptUpdate ? u.attemptUpdate : u;
+      if (attemptUpdate && attemptUpdate.id) send('agent.bridge.state-update', { attemptUpdate });
+    }
+  }
+  function markPageReady() {
+    if (pageReady) return;
+    pageReady = true;
+    // Give the page's listeners a beat, then drain now + every ~60s.
+    setTimeout(flushPending, 800);
+    setInterval(flushPending, 60_000);
+  }
 
   // Announce presence
   send('bridge-ready', { version: '0.2.0' });

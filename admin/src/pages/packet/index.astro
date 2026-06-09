@@ -208,32 +208,35 @@ import Admin from '@/layouts/Admin.astro';
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 10px;
   }
-  .score-card {
+  /* Score cards and warnings are injected via innerHTML so they don't
+     carry Astro's scope attribute — style them through their static
+     parents + :global, same pattern as today.astro. */
+  .packet__scoreboard :global(.score-card) {
     padding: 10px 14px;
     background: var(--c-bg-elev);
     border: 1px solid var(--c-border-subtle);
     border-radius: var(--r-md);
     display: flex; flex-direction: column; gap: 4px;
   }
-  .score-card__label {
+  .packet__scoreboard :global(.score-card__label) {
     font-family: var(--font-mono); font-size: 10px;
     letter-spacing: 0.1em; text-transform: uppercase;
     color: var(--c-text-subtle);
   }
-  .score-card__value {
+  .packet__scoreboard :global(.score-card__value) {
     font-family: var(--font-display); font-size: 32px; line-height: 1;
     color: var(--c-text);
   }
-  .score-card__value.is-low { color: #F87171; }
-  .score-card__value.is-mid { color: var(--c-accent); }
-  .score-card__value.is-high { color: var(--c-success); }
-  .score-card__bar {
+  .packet__scoreboard :global(.score-card__value.is-low) { color: #F87171; }
+  .packet__scoreboard :global(.score-card__value.is-mid) { color: var(--c-accent); }
+  .packet__scoreboard :global(.score-card__value.is-high) { color: var(--c-success); }
+  .packet__scoreboard :global(.score-card__bar) {
     height: 4px;
     background: var(--c-bg-muted);
     border-radius: 2px;
     overflow: hidden;
   }
-  .score-card__bar > span {
+  .packet__scoreboard :global(.score-card__bar > span) {
     display: block;
     height: 100%;
     background: var(--c-accent);
@@ -241,16 +244,16 @@ import Admin from '@/layouts/Admin.astro';
   }
 
   .packet__warnings { display: flex; flex-direction: column; gap: 6px; }
-  .warn {
+  .packet__warnings :global(.warn) {
     padding: 8px 12px;
     border-radius: var(--r-md);
     font-size: 12px;
     background: var(--c-bg-elev);
     border: 1px solid var(--c-border-subtle);
   }
-  .warn--red { border-color: rgba(248, 113, 113, 0.4); color: #FCA5A5; }
-  .warn--yellow { border-color: rgba(245, 158, 11, 0.4); color: var(--c-accent); }
-  .warn--blue { border-color: rgba(96, 165, 250, 0.4); color: #93C5FD; }
+  .packet__warnings :global(.warn--red) { border-color: rgba(248, 113, 113, 0.4); color: #FCA5A5; }
+  .packet__warnings :global(.warn--yellow) { border-color: rgba(245, 158, 11, 0.4); color: var(--c-accent); }
+  .packet__warnings :global(.warn--blue) { border-color: rgba(96, 165, 250, 0.4); color: #93C5FD; }
 
   .packet__split {
     display: grid;
@@ -291,7 +294,9 @@ import Admin from '@/layouts/Admin.astro';
   .block__body { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
   .block__actions { display: flex; align-items: center; gap: 8px; }
   .micro-btn { padding: 4px 10px; font-size: 11px; }
-  .micro {
+  /* .micro/.muted are both static (labels, hints) and injected (score-card
+     sublines, portfolio mentions). */
+  .micro, .packet__scoreboard :global(.micro) {
     font-family: var(--font-mono);
     font-size: 11px;
     color: var(--c-text-muted);
@@ -301,7 +306,7 @@ import Admin from '@/layouts/Admin.astro';
     border-top: 1px dashed var(--c-border-subtle);
     padding-top: 8px;
   }
-  .muted { color: var(--c-text-subtle); }
+  .muted, .packet__scoreboard :global(.muted), #portfolio-mentions :global(.muted) { color: var(--c-text-subtle); }
 
   .alt-angles { display: flex; flex-wrap: wrap; gap: 6px; }
   .alt-angle {
@@ -332,7 +337,8 @@ import Admin from '@/layouts/Admin.astro';
     display: flex; flex-direction: column; gap: 4px;
     max-height: 400px; overflow-y: auto;
   }
-  .field-row {
+  /* Field rows are injected via innerHTML — scope through static .field-map. */
+  .field-map :global(.field-row) {
     display: grid;
     grid-template-columns: 130px 1fr 60px;
     gap: 8px;
@@ -343,21 +349,21 @@ import Admin from '@/layouts/Admin.astro';
     font-family: var(--font-mono); font-size: 11px;
     align-items: center;
   }
-  .field-row__key { color: var(--c-text-muted); }
-  .field-row__value {
+  .field-map :global(.field-row__key) { color: var(--c-text-muted); }
+  .field-map :global(.field-row__value) {
     color: var(--c-text);
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
-  .field-row__conf {
+  .field-map :global(.field-row__conf) {
     text-align: right;
     font-size: 10px;
     letter-spacing: 0.06em;
     text-transform: uppercase;
   }
-  .field-row__conf.is-high { color: var(--c-success); }
-  .field-row__conf.is-medium { color: var(--c-accent); }
-  .field-row__conf.is-low { color: var(--c-text-muted); }
-  .field-row__conf.is-never { color: #F87171; }
+  .field-map :global(.field-row__conf.is-high) { color: var(--c-success); }
+  .field-map :global(.field-row__conf.is-medium) { color: var(--c-accent); }
+  .field-map :global(.field-row__conf.is-low) { color: var(--c-text-muted); }
+  .field-map :global(.field-row__conf.is-never) { color: #F87171; }
 
   .packet__footer {
     display: flex;

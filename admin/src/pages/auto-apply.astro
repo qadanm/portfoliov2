@@ -60,8 +60,8 @@ import Admin from '@/layouts/Admin.astro';
             <label>Fit ≥ <input type="number" min="0" max="100" data-setting="fitThreshold" value="60" /></label>
             <label>Authenticity ≥ <input type="number" min="0" max="100" data-setting="authenticityThreshold" value="70" /></label>
             <label>Quality ≥ <input type="number" min="0" max="100" data-setting="qualityThreshold" value="60" /></label>
-            <label>Daily cap <input type="number" min="1" max="200" data-setting="dailySubmitCap" value="20" /></label>
-            <label>Per-source cap <input type="number" min="1" max="50" data-setting="perSourceCap" value="8" /></label>
+            <label>Daily cap <input type="number" min="1" max="200" data-setting="dailySubmitCap" value="60" /></label>
+            <label>Per-source cap <input type="number" min="1" max="50" data-setting="perSourceCap" value="25" /></label>
           </div>
 
           <label class="aa__label" style="margin-top: 12px;">ATS tiers allowed for auto-submit</label>
@@ -156,7 +156,9 @@ import Admin from '@/layouts/Admin.astro';
   .aa { display: flex; flex-direction: column; gap: 14px; }
   .aa__h2 { font-family: var(--font-display); font-size: 22px; font-weight: 400; margin-bottom: 10px; }
   .aa__h3 { font-family: var(--font-display); font-size: 18px; font-weight: 400; margin-top: 18px; margin-bottom: 8px; }
-  .muted { color: var(--c-text-subtle); font-size: 12px; }
+  /* .muted is both static (headings, hints) and injected (attempts/log
+     empty states). */
+  .muted, .aa__attempts :global(.muted), .aa__log :global(.muted) { color: var(--c-text-subtle); font-size: 12px; }
 
   .aa__active {
     position: sticky; top: 0; z-index: 10;
@@ -265,7 +267,10 @@ import Admin from '@/layouts/Admin.astro';
     border: 1px solid var(--c-border-subtle);
     border-radius: var(--r-md);
   }
-  .aa__job-row {
+  /* Job rows are injected via innerHTML so they don't carry Astro's scope
+     attribute — style them through the static .aa__job-list parent
+     + :global, same pattern as today.astro. */
+  .aa__job-list :global(.aa__job-row) {
     display: grid;
     grid-template-columns: 26px 1fr 90px 60px 50px;
     gap: 8px;
@@ -275,19 +280,20 @@ import Admin from '@/layouts/Admin.astro';
     font-size: 12px;
     font-family: var(--font-mono);
   }
-  .aa__job-row:last-child { border-bottom: none; }
-  .aa__job-row label { display: flex; align-items: center; }
-  .aa__job-row .role { color: var(--c-text-muted); font-size: 11px; }
-  .aa__job-row .company { color: var(--c-text); font-size: 13px; }
-  .aa__job-row .ats { color: var(--c-text-muted); }
-  .aa__job-row .ats-tier1 { color: var(--c-success); }
-  .aa__job-row .ats-tier2 { color: var(--c-accent); }
-  .aa__job-row .ats-tier3 { color: #FCA5A5; }
+  .aa__job-list :global(.aa__job-row:last-child) { border-bottom: none; }
+  .aa__job-list :global(.aa__job-row label) { display: flex; align-items: center; }
+  .aa__job-list :global(.aa__job-row .role) { color: var(--c-text-muted); font-size: 11px; }
+  .aa__job-list :global(.aa__job-row .company) { color: var(--c-text); font-size: 13px; }
+  .aa__job-list :global(.aa__job-row .ats) { color: var(--c-text-muted); }
+  .aa__job-list :global(.aa__job-row .ats-tier1) { color: var(--c-success); }
+  .aa__job-list :global(.aa__job-row .ats-tier2) { color: var(--c-accent); }
+  .aa__job-list :global(.aa__job-row .ats-tier3) { color: #FCA5A5; }
 
   .aa__setup-actions { margin-top: 14px; display: flex; gap: 8px; }
 
   .aa__attempts { display: flex; flex-direction: column; gap: 6px; }
-  .aa__attempt {
+  /* Attempt rows are injected via innerHTML — scope through static .aa__attempts. */
+  .aa__attempts :global(.aa__attempt) {
     display: grid;
     grid-template-columns: 1fr 80px 80px 90px 70px 24px;
     gap: 8px;
@@ -298,16 +304,16 @@ import Admin from '@/layouts/Admin.astro';
     border-radius: var(--r-sm);
     font-family: var(--font-mono); font-size: 11px;
   }
-  .aa__attempt:has(.aa-open-attempt) { /* same template */ }
-  .aa__attempt.is-submitted { border-color: rgba(16, 185, 129, 0.4); }
-  .aa__attempt.is-running { border-color: var(--c-accent); }
-  .aa__attempt.is-needs-review { border-color: rgba(245, 158, 11, 0.5); }
-  .aa__attempt.is-blocked, .aa__attempt.is-failed, .aa__attempt.is-unsupported { border-color: rgba(248, 113, 113, 0.4); }
-  .aa__attempt .summary { color: var(--c-text); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .aa__attempt .status { color: var(--c-text-muted); }
-  .aa__attempt .ats { color: var(--c-text-subtle); }
-  .aa__attempt .reason { color: var(--c-accent); font-size: 10px; }
-  .aa-open-attempt {
+  .aa__attempts :global(.aa__attempt:has(.aa-open-attempt)) { /* same template */ }
+  .aa__attempts :global(.aa__attempt.is-submitted) { border-color: rgba(16, 185, 129, 0.4); }
+  .aa__attempts :global(.aa__attempt.is-running) { border-color: var(--c-accent); }
+  .aa__attempts :global(.aa__attempt.is-needs-review) { border-color: rgba(245, 158, 11, 0.5); }
+  .aa__attempts :global(.aa__attempt.is-blocked), .aa__attempts :global(.aa__attempt.is-failed), .aa__attempts :global(.aa__attempt.is-unsupported) { border-color: rgba(248, 113, 113, 0.4); }
+  .aa__attempts :global(.aa__attempt .summary) { color: var(--c-text); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .aa__attempts :global(.aa__attempt .status) { color: var(--c-text-muted); }
+  .aa__attempts :global(.aa__attempt .ats) { color: var(--c-text-subtle); }
+  .aa__attempts :global(.aa__attempt .reason) { color: var(--c-accent); font-size: 10px; }
+  .aa__attempts :global(.aa-open-attempt) {
     background: var(--c-accent-dim);
     border: 1px solid var(--c-accent);
     color: var(--c-accent);
@@ -317,7 +323,7 @@ import Admin from '@/layouts/Admin.astro';
     font-size: 10px;
     cursor: pointer;
   }
-  .aa-open-attempt:hover { background: var(--c-accent); color: var(--c-bg); }
+  .aa__attempts :global(.aa-open-attempt:hover) { background: var(--c-accent); color: var(--c-bg); }
 
   .aa__log {
     max-height: 360px; overflow-y: auto;
@@ -325,16 +331,17 @@ import Admin from '@/layouts/Admin.astro';
     display: flex; flex-direction: column-reverse;
     gap: 2px;
   }
-  .log-row {
+  /* Log rows are injected via innerHTML — scope through static .aa__log. */
+  .aa__log :global(.log-row) {
     display: grid;
     grid-template-columns: 80px 160px 1fr;
     gap: 8px;
     padding: 4px 8px;
     border-bottom: 1px solid var(--c-border-subtle);
   }
-  .log-row .time { color: var(--c-text-subtle); }
-  .log-row .kind { color: var(--c-accent); }
-  .log-row .msg { color: var(--c-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .aa__log :global(.log-row .time) { color: var(--c-text-subtle); }
+  .aa__log :global(.log-row .kind) { color: var(--c-accent); }
+  .aa__log :global(.log-row .msg) { color: var(--c-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
   .aa__health-grid {
     display: grid;
@@ -364,7 +371,9 @@ import Admin from '@/layouts/Admin.astro';
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 8px;
   }
-  .rl-cell {
+  /* Reliability cells are injected via innerHTML — scope through the
+     static .aa__reliability-grid. */
+  .aa__reliability-grid :global(.rl-cell) {
     padding: 10px 12px;
     background: var(--c-bg);
     border: 1px solid var(--c-border-subtle);
@@ -373,21 +382,21 @@ import Admin from '@/layouts/Admin.astro';
     flex-direction: column;
     gap: 6px;
   }
-  .rl-cell.is-reliable { border-color: rgba(16, 185, 129, 0.4); }
-  .rl-cell.is-needs-attention { border-color: rgba(245, 158, 11, 0.4); }
-  .rl-cell.is-unstable { border-color: rgba(248, 113, 113, 0.4); }
-  .rl-cell.is-no-data { opacity: 0.5; }
-  .rl-cell .rl-head { display: flex; align-items: baseline; justify-content: space-between; }
-  .rl-cell .rl-name { font-family: var(--font-display); font-size: 16px; }
-  .rl-cell .rl-tier { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; }
-  .rl-cell .rl-stats {
+  .aa__reliability-grid :global(.rl-cell.is-reliable) { border-color: rgba(16, 185, 129, 0.4); }
+  .aa__reliability-grid :global(.rl-cell.is-needs-attention) { border-color: rgba(245, 158, 11, 0.4); }
+  .aa__reliability-grid :global(.rl-cell.is-unstable) { border-color: rgba(248, 113, 113, 0.4); }
+  .aa__reliability-grid :global(.rl-cell.is-no-data) { opacity: 0.5; }
+  .aa__reliability-grid :global(.rl-cell .rl-head) { display: flex; align-items: baseline; justify-content: space-between; }
+  .aa__reliability-grid :global(.rl-cell .rl-name) { font-family: var(--font-display); font-size: 16px; }
+  .aa__reliability-grid :global(.rl-cell .rl-tier) { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .aa__reliability-grid :global(.rl-cell .rl-stats) {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 4px 12px;
     font-family: var(--font-mono); font-size: 10.5px;
     color: var(--c-text-muted);
   }
-  .rl-cell .rl-stats strong { color: var(--c-text); }
+  .aa__reliability-grid :global(.rl-cell .rl-stats strong) { color: var(--c-text); }
 
   .aa__dry-run input { margin-right: 6px; vertical-align: -2px; }
   .aa__dry-run strong { color: var(--c-accent); }
@@ -420,7 +429,8 @@ import Admin from '@/layouts/Admin.astro';
     ensureSchema,
   } from '@/lib/storage';
   import { detectAts, atsLabel } from '@/lib/ats/detect';
-  import { createSession, startSession, pauseSession, resumeSession, stopSession, timeSavedEstimate } from '@/lib/agent/session';
+  import { createSession, startSession, pauseSession, resumeSession, stopSession, finishSession, timeSavedEstimate, updateAttemptStatus, nextQueuedAttempt } from '@/lib/agent/session';
+  import { appendLog } from '@/lib/agent/runlog';
   import { onDataChanged } from '@/lib/sync';
 
   ensureSchema();
@@ -434,6 +444,28 @@ import Admin from '@/layouts/Admin.astro';
   let selectedJobIds = new Set<string>();
   let activeSessionId: string | null = null;
   let extConnected = false;
+
+  // Normalized URL key for duplicate detection. MUST stay in sync with the
+  // identical helper in extension/background.js (gate mirror).
+  function urlKeyOf(raw?: string): string {
+    if (!raw) return '';
+    try {
+      const u = new URL(raw);
+      return `${u.hostname.replace(/^www\./, '')}${u.pathname.replace(/\/+$/, '')}`.toLowerCase();
+    } catch { return ''; }
+  }
+
+  // Prefer the explicitly-started session; otherwise the most recently
+  // updated running/paused one. `sessionsStore.active()` returns the FIRST
+  // match, which let zombie sessions hijack the UI (C12).
+  function currentActiveSession(): ApplySession | undefined {
+    const live = sessionsStore.list().filter(s => s.status === 'running' || s.status === 'paused');
+    if (activeSessionId) {
+      const own = live.find(s => s.id === activeSessionId);
+      if (own) return own;
+    }
+    return live.sort((a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0))[0];
+  }
 
   // ── Render: extension status ─────────────────────────────────────
   function pingExtension() {
@@ -469,18 +501,39 @@ import Admin from '@/layouts/Admin.astro';
     if (d.kind === 'agent.bridge.request-snapshot') {
       const session = sessionsStore.get(d.sessionId!);
       if (!session) return;
-      const attempts = attemptsStore.bySession(session.id);
+      // Attach each attempt's normalized job-URL key so the SW's gate
+      // mirror can do duplicate detection (C2).
+      const attempts = attemptsStore.bySession(session.id).map(a => ({
+        ...a,
+        jobUrlKey: urlKeyOf(jobsStore.get(a.jobId)?.url),
+      }));
       const packets = attempts
         .map(a => a.packetId ? packetsStore.get(a.packetId) : packetsStore.byJobId(a.jobId))
         .filter(Boolean);
       const { vaultStore } = await import('@/lib/storage');
       const vault = vaultStore.get();
+      // Gate context for the SW's submit-gate mirror: agent submissions
+      // today, normalized URLs of already-applied jobs, and the caps (C2).
+      const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
+      const t0 = todayStart.getTime();
+      const todaySubmitCount = attemptsStore.list().filter(a =>
+        a.status === 'submitted' && (a.submittedAt ?? a.updatedAt) >= t0).length;
+      const appliedUrlKeys = jobsStore.list()
+        .filter(j => j.dateApplied || j.status === 'Applied')
+        .map(j => urlKeyOf(j.url))
+        .filter(Boolean);
       // Push snapshot back via the bridge (admin-bridge content script
       // forwards messages with source qa-admin to the SW).
       window.postMessage({
         source: 'qa-admin',
         kind: 'agent.session.snapshot.push',
         session, attempts, packets, vault,
+        gateContext: {
+          todaySubmitCount,
+          appliedUrlKeys,
+          dailySubmitCap: session.settings.dailySubmitCap,
+          perSourceCap: session.settings.perSourceCap,
+        },
       }, '*');
       // Also tell SW directly via chrome.runtime if available — the bridge
       // intercepts qa-admin messages we send, but a dedicated SW-bound
@@ -491,9 +544,15 @@ import Admin from '@/layouts/Admin.astro';
     if (d.kind === 'agent.bridge.state-update' && d.attemptUpdate) {
       const a = attemptsStore.get(d.attemptUpdate.id);
       if (a) {
-        Object.assign(a, d.attemptUpdate);
+        const { status, blockReason, blockNote, ...rest } = d.attemptUpdate;
+        // Non-status metadata (filled fields, urls, tab ids) merges directly.
+        Object.assign(a, rest);
+        attemptsStore.upsert(a);
+        // Status flows through updateAttemptStatus so the session counters
+        // reflect agent-driven work — exactly once per transition (C13).
+        if (status) updateAttemptStatus(a.id, status, { blockReason, blockNote });
         // If status flipped to submitted, also record outcome + bump job
-        if (d.attemptUpdate.status === 'submitted') {
+        if (status === 'submitted') {
           const { recordOutcome } = await import('@/lib/insights/outcomes');
           const job = jobsStore.get(a.jobId);
           if (job && !job.dateApplied) {
@@ -502,9 +561,14 @@ import Admin from '@/layouts/Admin.astro';
             recordOutcome(job.id, 'applied', { packetId: a.packetId });
           }
         }
-        attemptsStore.upsert(a);
+        // L4 batch orchestration: a terminal attempt hands off to the next
+        // queued one automatically (C14).
+        if (status && ['submitted', 'needs-review', 'skipped', 'unsupported'].includes(status)) {
+          maybeOpenNextL4(a.sessionId);
+        }
       }
       renderAttempts();
+      renderActive();
       return;
     }
     if (d.kind === 'agent.bridge.log' && d.entry) {
@@ -682,7 +746,7 @@ import Admin from '@/layouts/Admin.astro';
 
   // ── Render: active session ───────────────────────────────────────
   function renderActive() {
-    const active = sessionsStore.active() ?? (activeSessionId ? sessionsStore.get(activeSessionId) ?? undefined : undefined);
+    const active = currentActiveSession() ?? (activeSessionId ? sessionsStore.get(activeSessionId) ?? undefined : undefined);
     const bar = document.getElementById('aa-active') as HTMLDivElement;
     const setup = document.getElementById('aa-setup') as HTMLDivElement;
     const attemptsCard = document.getElementById('aa-attempts-card') as HTMLDivElement;
@@ -798,6 +862,25 @@ import Admin from '@/layouts/Admin.astro';
       atsType: a.atsType,
     }, '*');
   }
+
+  // L4 batch orchestration (C14): after a terminal attempt, open the next
+  // queued one through the same path as the "Open ▶" button — with a short
+  // delay, and only while the session is still running at L4.
+  let l4NextTimer: ReturnType<typeof setTimeout> | null = null;
+  function maybeOpenNextL4(sessionId: string) {
+    const s = sessionsStore.get(sessionId);
+    if (!s || s.status !== 'running' || s.settings.autonomyLevel < 4) return;
+    if (l4NextTimer) return; // one hand-off in flight at a time
+    l4NextTimer = setTimeout(() => {
+      l4NextTimer = null;
+      const fresh = sessionsStore.get(sessionId);
+      if (!fresh || fresh.status !== 'running' || fresh.settings.autonomyLevel < 4) return; // stopped meanwhile
+      if (!extConnected) return; // no alert spam from the automated path
+      const next = nextQueuedAttempt(sessionId);
+      if (!next) return; // queue drained
+      openAttemptTab(next.id);
+    }, 3000);
+  }
   function renderAttempt(a: ApplyAttempt): string {
     const job = jobsStore.get(a.jobId);
     const cls = `aa__attempt is-${a.status}`;
@@ -857,7 +940,7 @@ import Admin from '@/layouts/Admin.astro';
     const { vaultStore, attemptsStore, applySettingsStore } = await import('@/lib/storage');
     const vault = vaultStore.get();
     const settings = applySettingsStore.get();
-    const session = sessionsStore.active() ?? (activeSessionId ? sessionsStore.get(activeSessionId) : undefined);
+    const session = currentActiveSession() ?? (activeSessionId ? sessionsStore.get(activeSessionId) : undefined);
 
     const setHc = (id: string, tier: 'ok' | 'warn' | 'bad' | 'none', val: string) => {
       const el = document.getElementById(id);
@@ -928,7 +1011,7 @@ import Admin from '@/layouts/Admin.astro';
         <span>Attempts <strong>${r.total}</strong></span>
         <span>Submit-ready <strong>${r.submitReadyRate}%</strong></span>
         <span>Fill rate <strong>${r.fillSuccessRate}%</strong></span>
-        <span>Upload <strong>${r.uploadSuccessRate}%</strong></span>
+        <span>Upload <strong>${r.uploadSuccessRate == null ? 'n/a' : `${r.uploadSuccessRate}%`}</strong></span>
         <span>Textarea <strong>${r.textareaSuccessRate}%</strong></span>
         <span>Unknown <strong>${r.unknownFieldRate}%</strong></span>
       </div>
@@ -936,7 +1019,20 @@ import Admin from '@/layouts/Admin.astro';
   }
 
   // Boot
-  const initial = sessionsStore.active();
+  // Auto-finish zombie sessions (C12): running/paused sessions started >12h
+  // ago are crash leftovers — nothing else clears them, and active() would
+  // keep handing them to the UI ahead of any new session.
+  for (const s of sessionsStore.list()) {
+    if ((s.status === 'running' || s.status === 'paused') && Date.now() - s.startedAt > 12 * 3600_000) {
+      finishSession(s.id);
+      appendLog({
+        sessionId: s.id,
+        kind: 'session-finished',
+        message: 'Auto-finished stale session (running/paused for >12h — likely a crashed run).',
+      });
+    }
+  }
+  const initial = currentActiveSession();
   if (initial) activeSessionId = initial.id;
   renderJobList();
   renderActive();

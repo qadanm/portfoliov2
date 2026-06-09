@@ -6,6 +6,7 @@
 
 import type { SourceConfig } from '../types';
 import type { RawSourceJob } from './types';
+import { fetchWithTimeout } from './http';
 
 const ENDPOINT = 'https://api.lever.co/v0/postings';
 
@@ -31,7 +32,7 @@ export async function fetchLever(source: SourceConfig): Promise<RawSourceJob[]> 
   const slug = source.params?.slug;
   if (!slug) throw new Error('Lever source missing required `params.slug`');
 
-  const res = await fetch(`${ENDPOINT}/${encodeURIComponent(slug)}?mode=json`, {
+  const res = await fetchWithTimeout(`${ENDPOINT}/${encodeURIComponent(slug)}?mode=json`, {
     headers: { Accept: 'application/json' },
   });
   if (!res.ok) throw new Error(`Lever ${slug} returned ${res.status}`);

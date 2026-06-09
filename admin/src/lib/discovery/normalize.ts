@@ -59,6 +59,20 @@ function parseSalary(raw: string | undefined): { min?: number; max?: number } {
   return best;
 }
 
+/**
+ * Storage cap for the persisted JD. The full text still feeds the analyzer
+ * (synthesizeJD above runs before capping) — this only bounds what lands
+ * in localStorage so hundreds of full JDs can't blow the quota.
+ */
+const MAX_DESCRIPTION_CHARS = 4000;
+
+function capDescription(description: string | undefined): string | undefined {
+  if (!description) return description;
+  return description.length > MAX_DESCRIPTION_CHARS
+    ? description.slice(0, MAX_DESCRIPTION_CHARS)
+    : description;
+}
+
 function buildExcerpt(description: string | undefined): string | undefined {
   if (!description) return undefined;
   const cleaned = description.replace(/\s+/g, ' ').trim();
@@ -229,7 +243,7 @@ export function normalize(raw: RawSourceJob, opts: NormalizeOptions = {}): Disco
     salaryMin: sal.min,
     salaryMax: sal.max,
     salaryRaw: raw.salaryRaw,
-    description: raw.description,
+    description: capDescription(raw.description),
     excerpt: buildExcerpt(raw.description),
     roleFamily: score.suggestedAngleLabel,
     seniority,

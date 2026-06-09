@@ -4,19 +4,27 @@
 import type { ApplicationPacket, Job, PacketScores, CallbackStrength } from '../storage';
 import { authenticityScore } from './authenticity';
 
+// Literal template placeholders (e.g. "[add one concrete observation
+// here — …]"). A field still carrying one is NOT filled (C5).
+const PLACEHOLDER_RE = /\[[^\]]{4,}\]/;
+
 // Counts non-trivial generated fields. "Non-trivial" = > 40 chars or contains
-// 5+ words. Salary/portfolio mentions don't need length.
+// 5+ words, with no unfilled bracket placeholder. Salary/portfolio mentions
+// don't need length.
 function countFilledFields(p: ApplicationPacket): number {
   let n = 0;
-  const trivial = (s: string) => !s || (s.trim().length < 40 && s.trim().split(/\s+/).length < 5);
+  const trivial = (s: string) =>
+    !s || PLACEHOLDER_RE.test(s) || (s.trim().length < 40 && s.trim().split(/\s+/).length < 5);
+  const filledShort = (s: string | undefined) =>
+    !!s && s.trim().length > 0 && !PLACEHOLDER_RE.test(s);
   if (!trivial(p.coverLetter)) n++;
   if (!trivial(p.whyRoleAnswer)) n++;
   if (!trivial(p.whyCompanyAnswer)) n++;
   if (!trivial(p.tellMeAboutYourself)) n++;
-  if (p.summaryKicker && p.summaryKicker.trim().length > 0) n++;
-  if (p.jdSummary && p.jdSummary.trim().length > 0) n++;
-  if (p.recruiterDm && p.recruiterDm.trim().length > 0) n++;
-  if (p.salaryGuidance && p.salaryGuidance.trim().length > 0) n++;
+  if (filledShort(p.summaryKicker)) n++;
+  if (filledShort(p.jdSummary)) n++;
+  if (filledShort(p.recruiterDm)) n++;
+  if (filledShort(p.salaryGuidance)) n++;
   if (p.portfolioMentions && p.portfolioMentions.length > 0) n++;
   if (p.resumeSelection?.projectIds?.length > 0) n++;
   return n;

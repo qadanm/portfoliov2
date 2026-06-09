@@ -77,43 +77,47 @@ import Admin from '@/layouts/Admin.astro';
   .insights__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; }
   @media (max-width: 720px) { .insights__grid { grid-template-columns: 1fr; } }
   .funnel-bars { display: flex; flex-direction: column; gap: 6px; }
-  .funnel-row {
+  /* Rows are injected via innerHTML so they don't carry Astro's scope
+     attribute — style them through the static containers (.funnel-bars,
+     .bar-table, #ghosting) + :global, same pattern as today.astro. */
+  .funnel-bars :global(.funnel-row) {
     display: grid; grid-template-columns: 130px 1fr 50px 50px;
     gap: 8px; align-items: center;
     font-family: var(--font-mono); font-size: 11px;
   }
-  .funnel-row span:first-child { color: var(--c-text-muted); }
-  .funnel-bar {
+  .funnel-bars :global(.funnel-row span:first-child) { color: var(--c-text-muted); }
+  .funnel-bars :global(.funnel-bar) {
     height: 12px;
     background: var(--c-bg-muted); border-radius: var(--r-sm);
     overflow: hidden;
   }
-  .funnel-bar > span { display: block; height: 100%; background: var(--c-accent); }
-  .funnel-row .ct { text-align: right; color: var(--c-text); }
-  .funnel-row .pct { text-align: right; color: var(--c-text-subtle); }
+  .funnel-bars :global(.funnel-bar > span) { display: block; height: 100%; background: var(--c-accent); }
+  .funnel-bars :global(.funnel-row .ct) { text-align: right; color: var(--c-text); }
+  .funnel-bars :global(.funnel-row .pct) { text-align: right; color: var(--c-text-subtle); }
 
   .bar-table { display: flex; flex-direction: column; gap: 6px; font-family: var(--font-mono); font-size: 11px; }
-  .bar-row {
+  .bar-table :global(.bar-row) {
     display: grid; grid-template-columns: 150px 1fr 36px 36px;
     gap: 8px; align-items: center;
   }
-  .bar-row .lbl { color: var(--c-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .bar-row .bar {
+  .bar-table :global(.bar-row .lbl) { color: var(--c-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bar-table :global(.bar-row .bar) {
     height: 8px; background: var(--c-bg-muted);
     border-radius: var(--r-sm); overflow: hidden;
   }
-  .bar-row .bar > span { display: block; height: 100%; background: var(--c-success); }
-  .bar-row .ct { text-align: right; color: var(--c-text); }
-  .bar-row .pct { text-align: right; color: var(--c-text-subtle); font-size: 10px; }
+  .bar-table :global(.bar-row .bar > span) { display: block; height: 100%; background: var(--c-success); }
+  .bar-table :global(.bar-row .ct) { text-align: right; color: var(--c-text); }
+  .bar-table :global(.bar-row .pct) { text-align: right; color: var(--c-text-subtle); font-size: 10px; }
 
-  .ghost-row {
+  #ghosting :global(.ghost-row) {
     display: grid; grid-template-columns: 1fr 100px 80px;
     gap: 8px; padding: 8px 0;
     border-bottom: 1px solid var(--c-border-subtle);
     font-family: var(--font-mono); font-size: 12px;
   }
-  .ghost-row .ct { color: var(--c-accent); text-align: right; }
-  .muted { color: var(--c-text-subtle); }
+  #ghosting :global(.ghost-row .ct) { color: var(--c-accent); text-align: right; }
+  /* .muted only occurs in injected markup on this page (empty states, dates). */
+  .bar-table :global(.muted), #ghosting :global(.muted) { color: var(--c-text-subtle); }
 
   .ins__content { font-family: var(--font-mono); font-size: 12px; line-height: 1.6; }
   #spam-card.is-warning { border-color: rgba(245, 158, 11, 0.4); }
@@ -123,34 +127,13 @@ import Admin from '@/layouts/Admin.astro';
 <script>
   import { computeInsights } from '@/lib/insights/correlator';
   import { applySettingsStore, ensureSchema } from '@/lib/storage';
+  import { onDataChanged } from '@/lib/sync';
 
   ensureSchema();
-  const data = computeInsights();
-  const settings = applySettingsStore.get();
 
   function esc(s: string): string {
     return s.replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]!));
   }
-
-  // Top metrics
-  const setM = (k: string, v: string | number) => {
-    document.querySelectorAll(`[data-i="${k}"]`).forEach(el => { el.textContent = String(v); });
-  };
-  setM('applied', data.totalApplied);
-  setM('callbacks', data.totalCallbacks);
-  setM('rate', `${data.callbackRate}%`);
-  setM('last7', data.spamCheck.appliedLast7Days);
-
-  // Funnel bars
-  const funnelMax = Math.max(...data.funnel.map(f => f.count), 1);
-  document.getElementById('funnel-bars')!.innerHTML = data.funnel.map(f => `
-    <div class="funnel-row">
-      <span>${esc(f.label)}</span>
-      <div class="funnel-bar"><span style="width:${Math.round((f.count / funnelMax) * 100)}%"></span></div>
-      <span class="ct">${f.count}</span>
-      <span class="pct">${f.pctOfApplied}%</span>
-    </div>
-  `).join('');
 
   // Generic bar-table renderer
   function renderBars(elId: string, rows: { label: string; applied: number; callbacks: number; rate: number }[]) {
@@ -168,63 +151,95 @@ import Admin from '@/layouts/Admin.astro';
       </div>
     `).join('');
   }
-  renderBars('by-angle', data.byAngle.map(r => ({ label: r.label, applied: r.applied, callbacks: r.callbacks, rate: r.rate })));
-  renderBars('by-source', data.bySource.map(r => ({ label: r.source, applied: r.applied, callbacks: r.callbacks, rate: r.rate })));
-  renderBars('by-ats', data.byAts.map(r => ({ label: r.ats, applied: r.applied, callbacks: r.callbacks, rate: r.rate })));
 
-  // Quality correlation
-  const qMax = Math.max(...data.qualityCorrelation.map(q => q.value), 1);
-  document.getElementById('quality-corr')!.innerHTML = data.qualityCorrelation.map(q => `
-    <div class="bar-row">
-      <span class="lbl">${esc(q.label)}</span>
-      <div class="bar"><span style="width:${Math.round((q.value / qMax) * 100)}%"></span></div>
-      <span class="ct">—</span>
-      <span class="pct">${q.value}%</span>
-    </div>
-  `).join('');
+  function render() {
+    const data = computeInsights();
+    const settings = applySettingsStore.get();
 
-  // Ghosting
-  if (data.ghostingCompanies.length === 0) {
-    document.getElementById('ghosting')!.innerHTML = '<p class="muted">No ghosting yet (or no outcomes recorded yet).</p>';
-  } else {
-    document.getElementById('ghosting')!.innerHTML = data.ghostingCompanies.map(g => `
-      <div class="ghost-row">
-        <span>${esc(g.company)}</span>
-        <span class="ct">${g.daysWaiting}d</span>
-        <span class="muted">${new Date(g.appliedAt).toLocaleDateString()}</span>
+    // Top metrics
+    const setM = (k: string, v: string | number) => {
+      document.querySelectorAll(`[data-i="${k}"]`).forEach(el => { el.textContent = String(v); });
+    };
+    setM('applied', data.totalApplied);
+    setM('callbacks', data.totalCallbacks);
+    setM('rate', `${data.callbackRate}%`);
+    setM('last7', data.spamCheck.appliedLast7Days);
+
+    // Funnel bars
+    const funnelMax = Math.max(...data.funnel.map(f => f.count), 1);
+    document.getElementById('funnel-bars')!.innerHTML = data.funnel.map(f => `
+      <div class="funnel-row">
+        <span>${esc(f.label)}</span>
+        <div class="funnel-bar"><span style="width:${Math.round((f.count / funnelMax) * 100)}%"></span></div>
+        <span class="ct">${f.count}</span>
+        <span class="pct">${f.pctOfApplied}%</span>
       </div>
     `).join('');
+
+    renderBars('by-angle', data.byAngle.map(r => ({ label: r.label, applied: r.applied, callbacks: r.callbacks, rate: r.rate })));
+    renderBars('by-source', data.bySource.map(r => ({ label: r.source, applied: r.applied, callbacks: r.callbacks, rate: r.rate })));
+    renderBars('by-ats', data.byAts.map(r => ({ label: r.ats, applied: r.applied, callbacks: r.callbacks, rate: r.rate })));
+
+    // Quality correlation
+    const qMax = Math.max(...data.qualityCorrelation.map(q => q.value), 1);
+    document.getElementById('quality-corr')!.innerHTML = data.qualityCorrelation.map(q => `
+      <div class="bar-row">
+        <span class="lbl">${esc(q.label)}</span>
+        <div class="bar"><span style="width:${Math.round((q.value / qMax) * 100)}%"></span></div>
+        <span class="ct">—</span>
+        <span class="pct">${q.value}%</span>
+      </div>
+    `).join('');
+
+    // Ghosting
+    if (data.ghostingCompanies.length === 0) {
+      document.getElementById('ghosting')!.innerHTML = '<p class="muted">No ghosting yet (or no outcomes recorded yet).</p>';
+    } else {
+      document.getElementById('ghosting')!.innerHTML = data.ghostingCompanies.map(g => `
+        <div class="ghost-row">
+          <span>${esc(g.company)}</span>
+          <span class="ct">${g.daysWaiting}d</span>
+          <span class="muted">${new Date(g.appliedAt).toLocaleDateString()}</span>
+        </div>
+      `).join('');
+    }
+
+    // Anti-spam check
+    const sc = data.spamCheck;
+    const card = document.getElementById('spam-card') as HTMLElement;
+    const content = document.getElementById('spam-content')!;
+    if (sc.appliedLast7Days > 0) {
+      card.hidden = false;
+      let mood: 'good' | 'warn' | 'danger' = 'good';
+      const issues: string[] = [];
+      if (sc.appliedToday >= settings.dailyVolumeWarnAt && sc.avgAuthenticityLast7 < settings.authenticityThreshold) {
+        mood = 'danger';
+        issues.push(`⚠ High volume today (${sc.appliedToday}) AND low avg authenticity (${sc.avgAuthenticityLast7}). Pause and review packets.`);
+      }
+      if (sc.similarityWarn) {
+        mood = mood === 'good' ? 'warn' : mood;
+        issues.push(`Recent cover letters share ${sc.similarityScore}% phrasing. Tailor before sending.`);
+      }
+      if (sc.avgFitLast7 < 50 && sc.appliedLast7Days >= 10) {
+        mood = mood === 'good' ? 'warn' : mood;
+        issues.push(`Avg fit this week is ${sc.avgFitLast7}/100. Filter more aggressively before applying.`);
+      }
+      card.classList.toggle('is-danger', mood === 'danger');
+      card.classList.toggle('is-warning', mood === 'warn');
+      const moodLine = mood === 'good'
+        ? '✓ Volume and authenticity look balanced.'
+        : '';
+      content.innerHTML = `
+        <p>This week: <strong>${sc.appliedLast7Days}</strong> applied · avg authenticity <strong>${sc.avgAuthenticityLast7}</strong> · avg fit <strong>${sc.avgFitLast7}</strong></p>
+        ${moodLine ? `<p>${esc(moodLine)}</p>` : ''}
+        ${issues.length ? `<ul>${issues.map(i => `<li>${esc(i)}</li>`).join('')}</ul>` : ''}
+      `;
+    } else {
+      card.hidden = true;
+    }
   }
 
-  // Anti-spam check
-  const sc = data.spamCheck;
-  const card = document.getElementById('spam-card') as HTMLElement;
-  const content = document.getElementById('spam-content')!;
-  if (sc.appliedLast7Days > 0) {
-    card.hidden = false;
-    let mood: 'good' | 'warn' | 'danger' = 'good';
-    const issues: string[] = [];
-    if (sc.appliedToday >= settings.dailyVolumeWarnAt && sc.avgAuthenticityLast7 < settings.authenticityThreshold) {
-      mood = 'danger';
-      issues.push(`⚠ High volume today (${sc.appliedToday}) AND low avg authenticity (${sc.avgAuthenticityLast7}). Pause and review packets.`);
-    }
-    if (sc.similarityWarn) {
-      mood = mood === 'good' ? 'warn' : mood;
-      issues.push(`Recent cover letters share ${sc.similarityScore}% phrasing. Tailor before sending.`);
-    }
-    if (sc.avgFitLast7 < 50 && sc.appliedLast7Days >= 10) {
-      mood = mood === 'good' ? 'warn' : mood;
-      issues.push(`Avg fit this week is ${sc.avgFitLast7}/100. Filter more aggressively before applying.`);
-    }
-    card.classList.toggle('is-danger', mood === 'danger');
-    card.classList.toggle('is-warning', mood === 'warn');
-    const moodLine = mood === 'good'
-      ? '✓ Volume and authenticity look balanced.'
-      : '';
-    content.innerHTML = `
-      <p>This week: <strong>${sc.appliedLast7Days}</strong> applied · avg authenticity <strong>${sc.avgAuthenticityLast7}</strong> · avg fit <strong>${sc.avgFitLast7}</strong></p>
-      ${moodLine ? `<p>${esc(moodLine)}</p>` : ''}
-      ${issues.length ? `<ul>${issues.map(i => `<li>${esc(i)}</li>`).join('')}</ul>` : ''}
-    `;
-  }
+  // Re-render whenever a sync pull or another tab changes the data.
+  onDataChanged(render);
+  render();
 </script>

@@ -65,9 +65,11 @@ export function isRunning(): boolean { return _isRunning; }
 
 export async function runDiscovery(opts: RunOptions = {}): Promise<DiscoveryRun> {
   if (_isRunning) {
-    // Caller should treat this as a no-op; surface the prior run as the result.
-    const last = runStore.last();
-    if (last) return last;
+    // A run is already in flight. Throw a distinguishable error instead of
+    // silently returning the stale prior run (or, worse, racing a second
+    // concurrent run when no prior run exists) — callers surface this as
+    // "already running" rather than fresh results.
+    throw new Error('discovery-already-running');
   }
   _isRunning = true;
   try {
@@ -116,9 +118,26 @@ export async function runDiscovery(opts: RunOptions = {}): Promise<DiscoveryRun>
     );
     run.fetched = allRaw.length;
 
-    const normalized = allRaw.map(({ raw, sourceConfigId, sourceReliability }) =>
-      normalize(raw, { sourceConfigId, sourceReliability }),
-    );
+    // Normalize per-row with skip-and-count: one malformed row (missing
+    // company/title, or a field that makes normalize throw) must not
+    // reject the whole run.
+    const normalized: DiscoveredJob[] = [];
+    let skipped = 0;
+    for (const { raw, sourceConfigId, sourceReliability } of allRaw) {
+      try {
+        const company = typeof raw.company === 'string' ? raw.company.trim() : '';
+        const title = typeof raw.title === 'string' ? raw.title.trim() : '';
+        if (!company || !title) { skipped++; continue; }
+        normalized.push(normalize(raw, { sourceConfigId, sourceReliability }));
+      } catch {
+        skipped++;
+      }
+    }
+    if (skipped > 0) {
+      // eslint-disable-next-line no-console
+      console.warn(`[discovery] skipped ${skipped} malformed row${skipped === 1 ? '' : 's'} during normalize`);
+      run.skipped = skipped;
+    }
 
     const prefs = prefsStore.get();
     const { kept, dropped } = applyFilters(normalized, prefs);

@@ -373,6 +373,9 @@ export async function runIntakeAsync(input: IntakeInput): Promise<IntakeAsyncOut
     if (!d.salaryMin && outcome.data.salaryMin) d.salaryMin = outcome.data.salaryMin;
     if (!d.salaryMax && outcome.data.salaryMax) d.salaryMax = outcome.data.salaryMax;
     if (!d.source && outcome.data.source) d.source = outcome.data.source;
+    // Prefer the proxy's canonical URL (e.g. linkedin.com/jobs/view/{id}/)
+    // over what the user pasted — collections/feed URLs break URL dedupe.
+    if (outcome.data.url) d.url = cleanJobUrl(outcome.data.url);
 
     return {
       result,

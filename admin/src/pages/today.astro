@@ -113,7 +113,10 @@ import Admin from '@/layouts/Admin.astro';
     flex-wrap: wrap;
   }
   .today__hint-sep { opacity: 0.5; }
-  .today__bar kbd, .today__detail kbd, .today__empty kbd {
+  /* Detail-pane kbds (incl. the re-injected empty state) arrive via
+     innerHTML without Astro's scope attribute — reach them with :global
+     through the static .today__detail parent. Bar kbds are static. */
+  .today__bar kbd, .today__detail :global(kbd) {
     font-family: var(--font-mono);
     font-size: 10px;
     padding: 1px 5px;
@@ -241,7 +244,10 @@ import Admin from '@/layouts/Admin.astro';
     display: flex;
     flex-direction: column;
   }
-  .today__empty {
+  /* .today__empty is static markup initially but renderDetail() re-injects
+     it ("No job selected.") via innerHTML, dropping the scope attribute —
+     style it through the static .today__detail parent + :global. */
+  .today__detail :global(.today__empty) {
     color: var(--c-text-subtle);
     font-size: 13px;
     margin: auto;
@@ -464,11 +470,13 @@ import Admin from '@/layouts/Admin.astro';
 </style>
 
 <script>
-  import { jobsStore, packetsStore, applySettingsStore, type Job, type JobStatus } from '@/lib/storage';
+  import { jobsStore, packetsStore, outcomesStore, applySettingsStore, type Job, type JobStatus } from '@/lib/storage';
   import { angleById } from '@/data/angles';
   import { openForPrint, openBothForPrint } from '@/lib/pdf-download';
   import { detectGhostRisk } from '@/lib/packet/ghost-detect';
   import { appliedToday as appliedTodayCount, avgAuthenticityToday } from '@/lib/insights/correlator';
+  import { recordOutcome } from '@/lib/insights/outcomes';
+  import { onDataChanged } from '@/lib/sync';
 
   function packetStatusLabel(jobId: string): string {
     const p = packetsStore.byJobId(jobId);
@@ -525,15 +533,6 @@ import Admin from '@/layouts/Admin.astro';
     else if (state.selectedIdx < 0 || state.selectedIdx >= state.queue.length) state.selectedIdx = 0;
   }
 
-  function appliedToday(): number {
-    const start = new Date();
-    start.setHours(0, 0, 0, 0);
-    const startMs = start.getTime();
-    return jobsStore.list().filter(j =>
-      j.status === 'Applied' && j.dateApplied != null && j.dateApplied >= startMs
-    ).length;
-  }
-
   // ── Render ───────────────────────────────────────────────────────────
   function renderHeader() {
     appliedEl.textContent = String(appliedTodayCount());
@@ -574,11 +573,25 @@ import Admin from '@/layouts/Admin.astro';
     return s.replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]!));
   }
 
+  // Ghost-risk memo. detectGhostRisk scans the whole queue per job (O(n²)
+  // per pass) and renderQueue runs on every j/k keypress. Cache the results
+  // keyed on the queue snapshot so pure navigation re-renders reuse them.
+  let ghostCache: { key: string; map: Map<string, ReturnType<typeof detectGhostRisk>> } | null = null;
+  function ghostRiskMap(queue: Job[]): Map<string, ReturnType<typeof detectGhostRisk>> {
+    const key = queue.map(j => `${j.id}:${j.updatedAt ?? 0}`).join('|');
+    if (ghostCache && ghostCache.key === key) return ghostCache.map;
+    const map = new Map<string, ReturnType<typeof detectGhostRisk>>();
+    for (const j of queue) map.set(j.id, detectGhostRisk(j, queue));
+    ghostCache = { key, map };
+    return map;
+  }
+
   function renderQueue() {
     if (state.queue.length === 0) {
       queueEl.innerHTML = '';
       return;
     }
+    const ghosts = ghostRiskMap(state.queue);
     queueEl.innerHTML = state.queue.map((j, i) => {
       const sel = i === state.selectedIdx ? 'is-selected' : '';
       const def = isDeferred(j) ? 'is-deferred' : '';
@@ -591,7 +604,7 @@ import Admin from '@/layouts/Admin.astro';
       const packetDot = packet
         ? `<span class="today__dot today__dot--${packet.status}" title="Packet: ${packet.status}"></span>`
         : `<span class="today__dot today__dot--none" title="No packet built"></span>`;
-      const ghost = detectGhostRisk(j, state.queue);
+      const ghost = ghosts.get(j.id)!;
       const ghostDot = ghost.risk !== 'low'
         ? `<span class="today__dot today__dot--ghost-${ghost.risk}" title="Ghost risk: ${ghost.risk}"></span>`
         : '';
@@ -784,8 +797,19 @@ import Admin from '@/layouts/Admin.astro';
   }
 
   // ── Actions ──────────────────────────────────────────────────────────
+  // An open inline edit (editingIds) holds typed-but-unsaved input that any
+  // re-render destroys. Gate navigation / status transitions behind a
+  // confirm so a stray j/k/a/S can't silently eat the edit.
+  function confirmDiscardEdit(): boolean {
+    if (editingIds.size === 0) return true;
+    if (!confirm('Discard unsaved edit?')) return false;
+    editingIds.clear();
+    return true;
+  }
+
   function select(idx: number) {
     if (idx < 0 || idx >= state.queue.length) return;
+    if (!confirmDiscardEdit()) return;
     state.selectedIdx = idx;
     renderQueue();
     renderDetail();
@@ -853,7 +877,7 @@ import Admin from '@/layouts/Admin.astro';
         { url: `/resume/${encodeURIComponent(angleId)}`, filename: resumeFilename(job) },
         { url: `/letter/?id=${encodeURIComponent(job.id)}`, filename: letterFilename(job) },
       ]);
-      toast('Two tabs opened — Save in each print dialog.');
+      toast('Print window opened — both documents in one dialog.');
     } catch (e) {
       toast(e instanceof Error ? e.message : 'Open failed.');
     }
@@ -874,6 +898,7 @@ import Admin from '@/layouts/Admin.astro';
   function moveToStatus(status: JobStatus) {
     const job = state.queue[state.selectedIdx];
     if (!job) return;
+    if (!confirmDiscardEdit()) return;
     const followUp = job.followUpDate ?? (status === 'Applied' ? Date.now() + 7 * 86400_000 : undefined);
     const updated: Job = {
       ...job,
@@ -881,24 +906,23 @@ import Admin from '@/layouts/Admin.astro';
       ...(status === 'Applied' ? { dateApplied: Date.now(), followUpDate: followUp } : {}),
       updatedAt: Date.now(),
     };
+    // Capture BEFORE the write: upsert fires qa-data-changed synchronously
+    // and the live-update listener may re-point the selection.
+    const prevIdx = state.selectedIdx;
     jobsStore.upsert(updated);
 
     // Record outcome when transitioning to Applied (deduped: only if no
-    // existing 'applied' outcome for this job).
+    // existing 'applied' outcome for this job). Statically imported and
+    // synchronous, so the write lands BEFORE renderHeader below — the
+    // "applied today" counter and guardrail update immediately.
     if (status === 'Applied') {
-      // Defer-import outcomes helper to avoid SSR issues
-      import('@/lib/insights/outcomes').then(({ recordOutcome }) => {
-        import('@/lib/storage').then(({ outcomesStore, packetsStore }) => {
-          const already = outcomesStore.byJobId(job.id).some(o => o.kind === 'applied');
-          if (!already) {
-            const packet = packetsStore.byJobId(job.id);
-            recordOutcome(job.id, 'applied', { packetId: packet?.id });
-          }
-        });
-      });
+      const already = outcomesStore.byJobId(job.id).some(o => o.kind === 'applied');
+      if (!already) {
+        const packet = packetsStore.byJobId(job.id);
+        recordOutcome(job.id, 'applied', { packetId: packet?.id });
+      }
     }
 
-    const prevIdx = state.selectedIdx;
     loadQueue();
     state.selectedIdx = Math.min(prevIdx, state.queue.length - 1);
     renderHeader();
@@ -910,13 +934,15 @@ import Admin from '@/layouts/Admin.astro';
   function toggleDefer() {
     const job = state.queue[state.selectedIdx];
     if (!job) return;
+    if (!confirmDiscardEdit()) return;
     const updated: Job = {
       ...job,
       deferredAt: isDeferred(job) ? undefined : Date.now(),
       updatedAt: Date.now(),
     };
-    jobsStore.upsert(updated);
+    // Capture BEFORE the write (the live-update listener runs on upsert).
     const prevIdx = state.selectedIdx;
+    jobsStore.upsert(updated);
     loadQueue();
     state.selectedIdx = Math.min(prevIdx, state.queue.length - 1);
     renderQueue();
@@ -926,6 +952,7 @@ import Admin from '@/layouts/Admin.astro';
   function startEdit() {
     const job = state.queue[state.selectedIdx];
     if (!job) return;
+    if (editingIds.has(job.id)) return; // already editing — don't wipe typed input
     editingIds.add(job.id);
     renderDetail();
     // Focus the company input
@@ -940,7 +967,8 @@ import Admin from '@/layouts/Admin.astro';
     const job = state.queue[state.selectedIdx];
     if (!job) return;
     editingIds.delete(job.id);
-    renderDetail();
+    if (syncRenderQueued) { syncRenderQueued = false; refreshFromStore(); }
+    else renderDetail();
   }
 
   function saveEdit() {
@@ -958,9 +986,8 @@ import Admin from '@/layouts/Admin.astro';
     };
     jobsStore.upsert(updated);
     editingIds.delete(job.id);
-    loadQueue();
-    renderQueue();
-    renderDetail();
+    syncRenderQueued = false; // refreshFromStore re-reads everything anyway
+    refreshFromStore();
     toast('Saved');
   }
 
@@ -1020,15 +1047,36 @@ import Admin from '@/layouts/Admin.astro';
         e.preventDefault(); startEdit(); break;
       case 'p': {
         const job = state.queue[state.selectedIdx];
-        if (job) window.location.href = `/packet?jobId=${encodeURIComponent(job.id)}`;
+        if (job && confirmDiscardEdit()) window.location.href = `/packet?jobId=${encodeURIComponent(job.id)}`;
         break;
       }
       case 'S': {
         const job = state.queue[state.selectedIdx];
-        if (job) window.location.href = `/packet/session?jobId=${encodeURIComponent(job.id)}`;
+        if (job && confirmDiscardEdit()) window.location.href = `/packet/session?jobId=${encodeURIComponent(job.id)}`;
         break;
       }
     }
+  });
+
+  // ── Live updates ─────────────────────────────────────────────────────
+  // Re-read + re-render when a sync pull or another tab changes the data,
+  // keeping the current selection by job id. If an inline edit is open,
+  // defer the re-render until the edit closes so typed input survives.
+  let syncRenderQueued = false;
+  function refreshFromStore() {
+    const prevId = state.queue[state.selectedIdx]?.id;
+    loadQueue();
+    if (prevId) {
+      const idx = state.queue.findIndex(j => j.id === prevId);
+      if (idx >= 0) state.selectedIdx = idx;
+    }
+    renderHeader();
+    renderQueue();
+    renderDetail();
+  }
+  onDataChanged(() => {
+    if (editingIds.size > 0) { syncRenderQueued = true; return; }
+    refreshFromStore();
   });
 
   // ── Init ─────────────────────────────────────────────────────────────

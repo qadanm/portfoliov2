@@ -92,13 +92,17 @@
   }
 
   // Dispatch React-friendly input + change so controlled inputs see the value.
-  // Returns true on success. If the element is detached or rejects the set,
-  // verifies post-set and reports failure so the caller can re-find.
+  // Returns true ONLY when the value verifiably stuck — callers count fills
+  // from this result, so an unverified set must not report success (C16).
   function setValue(el, value) {
     if (!el) return false;
     // Detached node?
     if (!el.isConnected) return false;
     const tag = el.tagName.toLowerCase();
+    const stuck = () => {
+      if (tag === 'select') return el.value === value;
+      return el.value === value || el.value.startsWith(value.slice(0, 8));
+    };
     try {
       if (tag === 'select') {
         el.value = value;
@@ -116,8 +120,8 @@
       return false;
     }
     // Verify the value actually stuck (React-controlled fields can reset)
-    if (tag !== 'select' && el.value !== value && !el.value.startsWith(value.slice(0, 8))) {
-      // Try once more with a small delay
+    if (!stuck() && tag !== 'select') {
+      // Try once more
       try {
         el.focus();
         const desc = Object.getOwnPropertyDescriptor(el, 'value')
@@ -128,6 +132,8 @@
         el.dispatchEvent(new Event('change', { bubbles: true }));
       } catch { /* ignore */ }
     }
+    // Re-check after the retry; only mark + count verified fills.
+    if (!stuck()) return false;
     el.setAttribute('data-qa-filled', 'true');
     if (!el.style.outline) el.style.outline = '2px solid rgba(245, 158, 11, 0.6)';
     return true;
@@ -229,6 +235,9 @@
         key,
         confidence,
         type: isFile ? 'file' : (isTextarea ? 'textarea' : (el.type || el.tagName.toLowerCase())),
+        // Annotated from the live element — a selector round-trip misses
+        // id-less inputs and breaks on CSS.escape'd ids (C16).
+        required: !!(el.required || el.getAttribute('aria-required') === 'true'),
         currentValue: el.value || '',
       });
     }
@@ -255,15 +264,25 @@
     return text.slice(0, limit - 1).trimEnd() + '…';
   }
 
+  // Literal template placeholders (e.g. "[add one concrete observation
+  // here — …]") must never be pasted into a real form (C5).
+  const PLACEHOLDER_RE = /\[[^\]]{4,}\]/;
+
   function fillGeneric(map, doc, opts) {
     opts = opts || {};
     const truncations = [];
+    const failures = [];
+    const placeholdersSkipped = [];
+    const filledKeys = [];
     let filled = 0;
     const inputs = $$('input, textarea, select', doc).filter(el => {
       const type = (el.type || '').toLowerCase();
       if (['hidden', 'submit', 'button', 'reset', 'image', 'file'].includes(type)) return false;
       if (el.disabled || el.readOnly) return false;
-      return true;
+      // Visibility filter — mirrors detectGeneric. Never type into invisible
+      // inputs: honeypots and off-screen mirror fields live there (C16).
+      const rect = el.getBoundingClientRect();
+      return rect.width > 0 && rect.height > 0;
     });
     const rf = window.__qadanRedFlags;
     for (const el of inputs) {
@@ -277,6 +296,11 @@
       if (rf?.isSensitive(label) && !map.__allowSensitive) continue;
       // Packet-paste fields: only if caller opted in
       if (PACKET_FIELD_KEYS.has(key) && !map.__allowPacketPaste) continue;
+      // Skip literal placeholder text — surfaced to the caller as a note.
+      if (typeof val === 'string' && PLACEHOLDER_RE.test(val)) {
+        placeholdersSkipped.push({ key, label });
+        continue;
+      }
       // Respect maxlength
       const maxlen = Number(el.getAttribute('maxlength') || 0);
       if (maxlen > 0 && val.length > maxlen) {
@@ -284,10 +308,15 @@
         val = truncateToFit(val, maxlen);
         truncations.push({ key, label, before, after: val.length, maxlen });
       }
-      setValue(el, val);
-      filled++;
+      // Count only VERIFIED fills; report per-field failures (C16).
+      if (setValue(el, val)) {
+        filled++;
+        if (!filledKeys.includes(key)) filledKeys.push(key);
+      } else {
+        failures.push({ key, label });
+      }
     }
-    if (opts.collectTruncations) return { filled, truncations };
+    if (opts.collectTruncations) return { filled, truncations, failures, placeholdersSkipped, filledKeys };
     return filled;
   }
 
@@ -437,10 +466,28 @@
     return out;
   }
 
+  // Buttons that must never be picked as advance/submit targets:
+  // third-party apply shortcuts and feedback widgets (C17).
+  const BUTTON_EXCLUDE_RE = /apply with|feedback/i;
+  // Step-advance wording — a submit-typed button with this text is a
+  // multi-step "next", not the final submit.
+  const STEP_BUTTON_RE = /\b(next|continue|previous|back|review)\b/i;
+
+  function buttonTextOf(el) {
+    return (el.textContent || el.value || el.getAttribute('aria-label') || '').toLowerCase().trim();
+  }
+  function escapeRe(s) {
+    return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+  // Whole-word/phrase match — substring matching grabbed "Apply with
+  // LinkedIn" for the label "apply" (C17).
+  function matchesLabel(text, labels) {
+    return labels.some(l => new RegExp(`\\b${escapeRe(l.toLowerCase())}\\b`, 'i').test(text));
+  }
+
   // Find a button whose visible text matches one of `labels` (case-insensitive
-  // substring). Returns the first visible enabled match.
+  // whole-word). Returns the first visible enabled match.
   function findButtonByLabels(labels, doc = document) {
-    const matchers = labels.map(l => l.toLowerCase());
     const candidates = [
       ...$$('button[type=submit]', doc),
       ...$$('button', doc),
@@ -448,14 +495,46 @@
       ...$$('a[role=button]', doc),
     ];
     for (const el of candidates) {
-      const text = (el.textContent || el.value || el.getAttribute('aria-label') || '').toLowerCase().trim();
+      const text = buttonTextOf(el);
       if (!text) continue;
       if (el.disabled || el.getAttribute('aria-disabled') === 'true') continue;
       const rect = el.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) continue;
-      if (matchers.some(m => text.includes(m))) return el;
+      if (BUTTON_EXCLUDE_RE.test(text)) continue;
+      if (matchesLabel(text, labels)) return el;
     }
     return null;
+  }
+
+  // The form most likely to be the actual application (most visible fields).
+  function applicationForm(doc = document) {
+    let best = null;
+    let bestCount = 0;
+    for (const f of $$('form', doc)) {
+      const n = f.querySelectorAll('input:not([type=hidden]), textarea, select').length;
+      if (n > bestCount) { best = f; bestCount = n; }
+    }
+    return bestCount >= 2 ? best : null;
+  }
+
+  // Submit-button finder: prefer an explicit `button[type=submit]` INSIDE the
+  // application form (skipping social-apply / feedback / step-advance
+  // buttons), then fall back to label matching (C17).
+  function findSubmitButton(labels, doc = document) {
+    const form = applicationForm(doc);
+    if (form) {
+      for (const el of $$('button[type=submit], input[type=submit]', form)) {
+        if (el.disabled || el.getAttribute('aria-disabled') === 'true') continue;
+        const rect = el.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) continue;
+        const text = buttonTextOf(el);
+        if (!text) continue;
+        if (BUTTON_EXCLUDE_RE.test(text)) continue;
+        if (STEP_BUTTON_RE.test(text)) continue;
+        if (matchesLabel(text, labels) || /\bsubmit\b/i.test(text)) return el;
+      }
+    }
+    return findButtonByLabels(labels, doc);
   }
 
   // CAPTCHA / login detection — universal. Any adapter can defer to this.
@@ -508,96 +587,90 @@
   function countDemographicRequired(fields) {
     return fields.filter(f => f.confidence === 'never' && f.required).length;
   }
-
-  // Mark required state on detected fields. Helper used by per-ATS detect.
-  function annotateRequired(fields, doc = document) {
-    const inputs = $$('input, textarea, select', doc);
-    const inputByEl = new Map();
-    for (const el of inputs) {
-      if (el.id) inputByEl.set(`#${el.id}`, el);
-    }
-    return fields.map(f => {
-      const el = (f.selector && inputByEl.get(f.selector)) || null;
-      const required = !!(el?.required || el?.getAttribute('aria-required') === 'true');
-      return { ...f, required };
-    });
+  // Required legal attestations (certifications, consents, e-signatures) —
+  // the agent never answers these; the gate needs a real count (C3).
+  const LEGAL_FIELD_RE = /\b(certify|attest|acknowledge|consent|signature|e-?sign|i agree|agree to the|terms (and|of) (conditions|service|use)|privacy policy|non-?compete|nda|authorization to verify)\b/i;
+  function countLegalRequired(fields) {
+    return fields.filter(f => f.required && LEGAL_FIELD_RE.test(f.label || '')).length;
   }
 
   // ── Greenhouse adapter ─────────────────────────────────────────
+  // detect() annotates `required` inline from the live element; fill()
+  // forwards the runner's options so truncation telemetry works (C16).
   const greenhouse = {
     name: 'greenhouse',
     matches: () => /greenhouse\.io/.test(location.hostname),
-    detect: () => annotateRequired(detectGeneric(document)),
-    fill: (map) => fillGeneric(map, document),
+    detect: () => detectGeneric(document),
+    fill: (map, doc, opts) => fillGeneric(map, doc || document, opts),
     findNext: () => findButtonByLabels(['save & continue', 'continue', 'next']),
-    findSubmit: () => findButtonByLabels(['submit application', 'submit', 'send application']),
+    findSubmit: () => findSubmitButton(['submit application', 'submit', 'send application']),
   };
 
   // ── Lever adapter ──────────────────────────────────────────────
   const lever = {
     name: 'lever',
     matches: () => /lever\.co/.test(location.hostname),
-    detect: () => annotateRequired(detectGeneric(document)),
-    fill: (map) => fillGeneric(map, document),
+    detect: () => detectGeneric(document),
+    fill: (map, doc, opts) => fillGeneric(map, doc || document, opts),
     findNext: () => findButtonByLabels(['continue', 'next']),
-    findSubmit: () => findButtonByLabels(['submit application', 'submit']),
+    findSubmit: () => findSubmitButton(['submit application', 'submit']),
   };
 
   // ── Ashby adapter ──────────────────────────────────────────────
   const ashby = {
     name: 'ashby',
     matches: () => /ashbyhq\.com/.test(location.hostname),
-    detect: () => annotateRequired(detectGeneric(document)),
-    fill: (map) => fillGeneric(map, document),
+    detect: () => detectGeneric(document),
+    fill: (map, doc, opts) => fillGeneric(map, doc || document, opts),
     // Ashby is single-page; "next" usually doesn't exist.
     findNext: () => null,
-    findSubmit: () => findButtonByLabels(['submit application', 'submit', 'send application']),
+    findSubmit: () => findSubmitButton(['submit application', 'submit', 'send application']),
   };
 
   // ── Workday adapter ────────────────────────────────────────────
   const workday = {
     name: 'workday',
     matches: () => /myworkdayjobs\.com|workday\.com/.test(location.hostname),
-    detect: () => annotateRequired(detectGeneric(document)),
-    fill: (map) => fillGeneric(map, document),
+    detect: () => detectGeneric(document),
+    fill: (map, doc, opts) => fillGeneric(map, doc || document, opts),
     // Workday's next is usually "Save and Continue". Submit is "Submit".
     findNext: () => findButtonByLabels(['save and continue', 'continue', 'next']),
-    findSubmit: () => findButtonByLabels(['submit', 'review and submit']),
+    findSubmit: () => findSubmitButton(['submit', 'review and submit']),
   };
 
   // ── SmartRecruiters adapter ────────────────────────────────────
   const smartrecruiters = {
     name: 'smartrecruiters',
     matches: () => /smartrecruiters\.com/.test(location.hostname),
-    detect: () => annotateRequired(detectGeneric(document)),
-    fill: (map) => fillGeneric(map, document),
+    detect: () => detectGeneric(document),
+    fill: (map, doc, opts) => fillGeneric(map, doc || document, opts),
     findNext: () => findButtonByLabels(['next', 'continue']),
-    findSubmit: () => findButtonByLabels(['submit', 'apply']),
+    findSubmit: () => findSubmitButton(['submit', 'apply']),
   };
 
   // ── LinkedIn Easy Apply adapter ────────────────────────────────
   const linkedin = {
     name: 'linkedin-easy',
     matches: () => /linkedin\.com\/jobs/.test(location.href),
-    detect: () => annotateRequired(detectGeneric(document)),
-    fill: (map) => {
+    detect: () => detectGeneric(document),
+    fill: (map, doc, opts) => {
       const safeMap = { ...map };
       // LinkedIn screening questions are knockout-style; never autofill
       // numeric years-experience or yes/no answers.
       delete safeMap.yearsExperience;
-      return fillGeneric(safeMap, document);
+      return fillGeneric(safeMap, doc || document, opts);
     },
     findNext: () => findButtonByLabels(['next', 'review']),
-    findSubmit: () => findButtonByLabels(['submit application', 'submit']),
+    findSubmit: () => findSubmitButton(['submit application', 'submit']),
   };
 
   const generic = {
     name: 'generic',
     matches: () => true,
-    detect: () => annotateRequired(detectGeneric(document)),
-    fill: (map) => fillGeneric(map, document),
+    detect: () => detectGeneric(document),
+    fill: (map, doc, opts) => fillGeneric(map, doc || document, opts),
     findNext: () => findButtonByLabels(['continue', 'next', 'save and continue']),
-    findSubmit: () => findButtonByLabels(['submit application', 'submit']),
+    findSubmit: () => findSubmitButton(['submit application', 'submit']),
   };
 
   const ADAPTERS = [greenhouse, lever, ashby, workday, smartrecruiters, linkedin, generic];
@@ -613,6 +686,7 @@
     detectPageError,
     countUnknownRequiredFields,
     countDemographicRequired,
+    countLegalRequired,
     clickButton,
     findResumeInput,
     uploadFileToInput,

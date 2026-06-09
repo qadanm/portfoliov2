@@ -11,6 +11,7 @@
 
 import type { SourceConfig } from '../types';
 import type { RawSourceJob } from './types';
+import { fetchWithTimeout } from './http';
 
 const ENDPOINT = 'https://api.ashbyhq.com/posting-api/job-board';
 
@@ -45,7 +46,7 @@ export async function fetchAshby(source: SourceConfig): Promise<RawSourceJob[]> 
   const slug = source.params?.slug;
   if (!slug) throw new Error('Ashby source missing required `params.slug`');
 
-  const res = await fetch(`${ENDPOINT}/${encodeURIComponent(slug)}?includeCompensation=true`, {
+  const res = await fetchWithTimeout(`${ENDPOINT}/${encodeURIComponent(slug)}?includeCompensation=true`, {
     headers: { Accept: 'application/json' },
   });
   if (!res.ok) throw new Error(`Ashby ${slug} returned ${res.status}`);
@@ -68,8 +69,14 @@ export async function fetchAshby(source: SourceConfig): Promise<RawSourceJob[]> 
     location: p.locationName ?? p.location ?? (p.isRemote ? 'Remote' : undefined),
     salaryRaw: extractSalary(p),
     description: p.descriptionPlain ?? stripHtml(p.description ?? ''),
-    publishedAt: p.publishedDate ? Date.parse(p.publishedDate) : undefined,
+    publishedAt: parseDate(p.publishedDate),
   }));
+}
+
+function parseDate(d?: string): number | undefined {
+  if (!d) return undefined;
+  const t = Date.parse(d);
+  return Number.isNaN(t) ? undefined : t;
 }
 
 function extractSalary(p: AshbyPosting): string | undefined {

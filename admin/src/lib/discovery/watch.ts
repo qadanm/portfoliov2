@@ -25,10 +25,17 @@ export function detectPlatform(url: string | undefined): PlatformDetect {
   const path = parsed.pathname;
 
   if (host.endsWith('greenhouse.io') || host === 'job-boards.greenhouse.io' || host === 'boards.greenhouse.io') {
-    // boards.greenhouse.io/{slug}/jobs/{id}  OR  job-boards.greenhouse.io/{slug}/jobs/{id}
-    const m = path.match(/^\/(?:embed\/)?([^/]+)/);
-    if (m && m[1] && m[1] !== 'jobs') {
-      const slug = m[1];
+    // boards.greenhouse.io/{slug}/jobs/{id}  OR  job-boards.greenhouse.io/{slug}/jobs/{id}.
+    // Embed URLs ( /embed/job_app?for={slug} ) carry the slug in the query,
+    // not the path — "job_app" is NOT a company.
+    let slug: string | null = null;
+    if (path.startsWith('/embed/')) {
+      slug = parsed.searchParams.get('for');
+    } else {
+      const m = path.match(/^\/([^/]+)/);
+      if (m && m[1] && m[1] !== 'jobs' && m[1] !== 'embed') slug = m[1];
+    }
+    if (slug) {
       return {
         platform: 'greenhouse',
         slug,

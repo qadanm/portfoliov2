@@ -2,12 +2,15 @@
 //
 // Strategy: monthly thread by user `whoishiring`. Each top-level comment is
 // one job posting. Algolia (HN's official search API) is CORS-friendly and
-// lets us pull the latest thread + filter comments by keyword.
+// lets us pull the latest thread's comments.
 //
-//   1. /api/v1/search?query=Ask HN: Who is hiring?&tags=story,author_whoishiring
-//      → newest "Who is hiring" story id
-//   2. /api/v1/search?tags=comment,story_{id}&query={keyword}&hitsPerPage=200
-//      → comments matching one of Moe's role keywords
+//   1. /api/v1/search_by_date?query=who is hiring&tags=story,author_whoishiring
+//      → newest "Ask HN: Who is hiring?" story id (sorted newest-first;
+//        relevance ranking can surface years-old threads)
+//   2. /api/v1/search?query=&tags=comment,story_{id}&hitsPerPage=1000&page=N
+//      → ALL comments in the thread. Algolia ANDs query terms, so passing
+//        the keyword list as a query matches nothing — keyword matching
+//        happens client-side in the post-filter below.
 //
 // Each comment text is a fairly free-form JD. We extract the company,
 // title, salary, and a URL using simple heuristics — the analyzer in the
@@ -15,12 +18,14 @@
 
 import type { SourceConfig } from '../types';
 import type { RawSourceJob } from './types';
+import { fetchWithTimeout } from './http';
 
 const ALGOLIA = 'https://hn.algolia.com/api/v1';
 
 interface AlgoliaHit {
   objectID: string;
   story_id?: number;
+  title?: string;
   comment_text?: string;
   author?: string;
   created_at_i?: number;
@@ -29,34 +34,41 @@ interface AlgoliaHit {
 
 interface AlgoliaSearchResponse {
   hits?: AlgoliaHit[];
+  nbPages?: number;
 }
 
 export async function fetchHNHiring(source: SourceConfig): Promise<RawSourceJob[]> {
   const keywordParam = source.params?.keywords ?? 'design,frontend,ux,product designer,design engineer,react';
   const keywords = keywordParam.split(',').map(k => k.trim().toLowerCase()).filter(Boolean);
 
-  // 1. Find the newest "Who is hiring?" thread.
-  const storyRes = await fetch(
-    `${ALGOLIA}/search?query=${encodeURIComponent('Ask HN: Who is hiring?')}&tags=story,author_whoishiring&hitsPerPage=1`,
+  // 1. Find the newest "Who is hiring?" thread. `search_by_date` sorts
+  // newest-first; the default relevance ranking can surface years-old
+  // threads. Filter to the canonical monthly title so the sibling "Who
+  // wants to be hired?" / "Freelancer?" threads don't match.
+  const storyRes = await fetchWithTimeout(
+    `${ALGOLIA}/search_by_date?query=${encodeURIComponent('who is hiring')}&tags=story,author_whoishiring&hitsPerPage=10`,
     { headers: { Accept: 'application/json' } },
   );
   if (!storyRes.ok) throw new Error(`HN story search returned ${storyRes.status}`);
   const storyBody = (await storyRes.json()) as AlgoliaSearchResponse;
-  const storyId = storyBody.hits?.[0]?.objectID;
+  const storyId = storyBody.hits?.find(h => /^ask hn: who is hiring/i.test(h.title ?? ''))?.objectID;
   if (!storyId) throw new Error('No "Who is hiring?" thread found');
 
-  // 2. Pull a generous batch of comments matching ANY of the keywords. We
-  // OR-search across keywords by issuing one wide query and post-filtering
-  // — Algolia's `query` is full-text, not boolean, so this is the cleanest
-  // approach.
-  const wideQuery = keywords.join(' ');
-  const commentsRes = await fetch(
-    `${ALGOLIA}/search?query=${encodeURIComponent(wideQuery)}&tags=comment,story_${storyId}&hitsPerPage=200`,
-    { headers: { Accept: 'application/json' } },
-  );
-  if (!commentsRes.ok) throw new Error(`HN comment search returned ${commentsRes.status}`);
-  const commentsBody = (await commentsRes.json()) as AlgoliaSearchResponse;
-  const hits = commentsBody.hits ?? [];
+  // 2. Pull the thread's comments with NO keyword query — Algolia ANDs
+  // query terms, so a multi-keyword query matches nothing. Fetch the full
+  // comment set (paginated, big threads run >1000 comments) and let the
+  // post-filter below do the keyword matching client-side.
+  const hits: AlgoliaHit[] = [];
+  for (let page = 0; page < 3; page++) {
+    const commentsRes = await fetchWithTimeout(
+      `${ALGOLIA}/search?query=&tags=comment,story_${storyId}&hitsPerPage=1000&page=${page}`,
+      { headers: { Accept: 'application/json' } },
+    );
+    if (!commentsRes.ok) throw new Error(`HN comment search returned ${commentsRes.status}`);
+    const commentsBody = (await commentsRes.json()) as AlgoliaSearchResponse;
+    hits.push(...(commentsBody.hits ?? []));
+    if (page + 1 >= (commentsBody.nbPages ?? 1)) break;
+  }
 
   const jobs: RawSourceJob[] = [];
   for (const hit of hits) {

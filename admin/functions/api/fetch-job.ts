@@ -120,6 +120,16 @@ async function fetchLinkedIn(url: URL): Promise<Result> {
   });
 
   if (!res.ok) {
+    // status 0 = our own timeout/network abort, not a LinkedIn response.
+    if (res.status === 0) {
+      return {
+        ok: false,
+        error: 'upstream-timeout',
+        message: 'Upstream request timed out.',
+        hint: 'LinkedIn was slow or unreachable. Try again, or paste the JD manually.',
+        statusCode: 0,
+      };
+    }
     return {
       ok: false,
       error: 'linkedin-upstream',
@@ -185,6 +195,16 @@ async function fetchGeneric(url: URL): Promise<Result> {
   });
 
   if (!res.ok) {
+    // status 0 = our own timeout/network abort, not an upstream response.
+    if (res.status === 0) {
+      return {
+        ok: false,
+        error: 'upstream-timeout',
+        message: 'Upstream request timed out.',
+        hint: 'The site was slow or unreachable. Try again, or paste the JD into the box.',
+        statusCode: 0,
+      };
+    }
     return {
       ok: false,
       error: 'upstream-status',
@@ -374,15 +394,19 @@ function readMoney(x: any): number | undefined {
 }
 
 function extractOpenGraph(html: string): Omit<Extracted, 'via'> {
-  const get = (prop: string) => {
-    const re = new RegExp(
-      `<meta[^>]+(?:property|name)=["']${prop}["'][^>]+content=["']([^"']+)["'][^>]*>`,
-      'i'
-    );
-    const m = html.match(re);
-    if (!m) return undefined;
-    return decodeHtmlEntities(m[1]);
-  };
+  // Two-pass: collect every <meta …> tag, then read its attributes
+  // independently — many ATS templates emit content BEFORE property
+  // (<meta content="…" property="og:title">), which a single
+  // property-then-content regex misses.
+  const metas = html.match(/<meta\b[^>]*>/gi) ?? [];
+  const byProp = new Map<string, string>();
+  for (const tag of metas) {
+    const prop = tag.match(/(?:property|name)\s*=\s*["']([^"']+)["']/i)?.[1]?.toLowerCase();
+    const content = tag.match(/\bcontent\s*=\s*["']([^"']*)["']/i)?.[1];
+    if (!prop || content == null || byProp.has(prop)) continue;
+    byProp.set(prop, decodeHtmlEntities(content));
+  }
+  const get = (prop: string) => byProp.get(prop.toLowerCase());
   const title = get('og:title') ?? get('twitter:title');
   const description = get('og:description') ?? get('description');
   return {
@@ -443,7 +467,16 @@ function cleanString(s: any): string | undefined {
 
 function htmlToText(s: any): string | undefined {
   if (typeof s !== 'string') return undefined;
-  return decodeHtmlEntities(stripTags(s).replace(/\s+/g, ' ')).trim() || undefined;
+  // Convert block-level boundaries to newlines BEFORE stripping tags —
+  // collapsing everything to one line starves the client's line-based
+  // extractors (Title:/Company:/Location: patterns, bullet headers).
+  const blocky = s.replace(/<\/?(p|br|div|li|h[1-6])\b[^>]*>/gi, '\n');
+  const text = decodeHtmlEntities(stripTags(blocky))
+    .replace(/[ \t]+/g, ' ')
+    .replace(/[ \t]*\n[ \t]*/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+  return text || undefined;
 }
 
 function json(data: unknown, status = 200): Response {
@@ -477,13 +510,13 @@ async function safeFetch(url: string, init: RequestInit): Promise<SafeFetchResul
       return { ok: true, status: res.status, text: t.slice(0, MAX_RESPONSE_BYTES) };
     }
     const chunks: Uint8Array[] = [];
-    let total = 0;
+    let total = 0; // bytes actually pushed — allocate exactly this much
     while (true) {
       const { value, done } = await reader.read();
       if (done) break;
-      total += value.byteLength;
-      if (total > MAX_RESPONSE_BYTES) break;
+      if (total + value.byteLength > MAX_RESPONSE_BYTES) break;
       chunks.push(value);
+      total += value.byteLength;
     }
     const all = new Uint8Array(total);
     let off = 0;
