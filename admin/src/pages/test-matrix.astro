@@ -168,9 +168,15 @@ import Admin from '@/layouts/Admin.astro';
 
   .tm__controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .muted { color: var(--c-text-subtle); font-size: 12px; margin-left: auto; }
+  /* Injected .muted bits (result rows, safety rows, paste output) only want
+     the muted color — the margin-left:auto above is for the controls bar. */
+  .tm__results :global(.muted), .tm__safety :global(.muted), .tm__paste-result :global(.muted) { color: var(--c-text-subtle); }
 
+  /* Result/safety/paste rows are injected via innerHTML so they don't carry
+     Astro's scope attribute — style them through their static containers
+     + :global, same pattern as today.astro. */
   .tm__results { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
-  .tm-row {
+  .tm__results :global(.tm-row) {
     display: grid;
     grid-template-columns: 200px 1fr;
     gap: 12px;
@@ -179,52 +185,52 @@ import Admin from '@/layouts/Admin.astro';
     border-left: 3px solid var(--c-border);
     border-radius: var(--r-sm);
   }
-  .tm-row.is-pass { border-left-color: var(--c-success); }
-  .tm-row.is-warn { border-left-color: var(--c-accent); }
-  .tm-row.is-fail { border-left-color: #F87171; }
-  .tm-row .name { font-family: var(--font-display); font-size: 16px; }
-  .tm-row .meta { font-family: var(--font-mono); font-size: 11px; color: var(--c-text-muted); line-height: 1.6; }
-  .tm-row .meta strong { color: var(--c-text); }
-  .tm-row ul { margin: 4px 0 0; padding-left: 18px; font-size: 11px; color: var(--c-text-muted); }
-  .tm-row .check { display: flex; gap: 6px; align-items: baseline; }
-  .tm-row .check .k { color: var(--c-text-subtle); min-width: 88px; }
-  .tm-row .check .v.is-ok { color: var(--c-success); }
-  .tm-row .check .v.is-warn { color: var(--c-accent); }
-  .tm-row .check .v.is-bad { color: #F87171; }
+  .tm__results :global(.tm-row.is-pass) { border-left-color: var(--c-success); }
+  .tm__results :global(.tm-row.is-warn) { border-left-color: var(--c-accent); }
+  .tm__results :global(.tm-row.is-fail) { border-left-color: #F87171; }
+  .tm__results :global(.tm-row .name) { font-family: var(--font-display); font-size: 16px; }
+  .tm__results :global(.tm-row .meta) { font-family: var(--font-mono); font-size: 11px; color: var(--c-text-muted); line-height: 1.6; }
+  .tm__results :global(.tm-row .meta strong) { color: var(--c-text); }
+  .tm__results :global(.tm-row ul) { margin: 4px 0 0; padding-left: 18px; font-size: 11px; color: var(--c-text-muted); }
+  .tm__results :global(.tm-row .check) { display: flex; gap: 6px; align-items: baseline; }
+  .tm__results :global(.tm-row .check .k) { color: var(--c-text-subtle); min-width: 88px; }
+  .tm__results :global(.tm-row .check .v.is-ok) { color: var(--c-success); }
+  .tm__results :global(.tm-row .check .v.is-warn) { color: var(--c-accent); }
+  .tm__results :global(.tm-row .check .v.is-bad) { color: #F87171; }
 
   .tm__paste-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-top: 10px; }
   .tm__paste-actions { display: flex; flex-direction: column; gap: 6px; }
   .tm__paste-input { font-family: var(--font-mono); font-size: 11px; }
   .tm__paste-result { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
-  .tm__paste-summary {
+  .tm__paste-result :global(.tm__paste-summary) {
     padding: 10px 12px; background: var(--c-bg); border-radius: var(--r-md);
     font-family: var(--font-mono); font-size: 11px; line-height: 1.6;
   }
-  .tm__paste-summary strong { color: var(--c-text); }
-  .tm__paste-summary .pill { padding: 1px 6px; border-radius: var(--r-full); margin-right: 4px; }
-  .tm__paste-summary .pill.is-high { background: rgba(16, 185, 129, 0.15); color: var(--c-success); }
-  .tm__paste-summary .pill.is-packet { background: rgba(245, 158, 11, 0.15); color: var(--c-accent); }
-  .tm__paste-summary .pill.is-medium { background: rgba(96, 165, 250, 0.15); color: #93C5FD; }
-  .tm__paste-summary .pill.is-low { background: var(--c-bg-muted); color: var(--c-text-muted); }
-  .tm__paste-summary .pill.is-never { background: rgba(248, 113, 113, 0.15); color: #FCA5A5; }
-  .tm__paste-fields {
+  .tm__paste-result :global(.tm__paste-summary strong) { color: var(--c-text); }
+  .tm__paste-result :global(.tm__paste-summary .pill) { padding: 1px 6px; border-radius: var(--r-full); margin-right: 4px; }
+  .tm__paste-result :global(.tm__paste-summary .pill.is-high) { background: rgba(16, 185, 129, 0.15); color: var(--c-success); }
+  .tm__paste-result :global(.tm__paste-summary .pill.is-packet) { background: rgba(245, 158, 11, 0.15); color: var(--c-accent); }
+  .tm__paste-result :global(.tm__paste-summary .pill.is-medium) { background: rgba(96, 165, 250, 0.15); color: #93C5FD; }
+  .tm__paste-result :global(.tm__paste-summary .pill.is-low) { background: var(--c-bg-muted); color: var(--c-text-muted); }
+  .tm__paste-result :global(.tm__paste-summary .pill.is-never) { background: rgba(248, 113, 113, 0.15); color: #FCA5A5; }
+  .tm__paste-result :global(.tm__paste-fields) {
     display: grid; grid-template-columns: 1fr 100px 80px 50px;
     gap: 6px; font-family: var(--font-mono); font-size: 11px;
     padding: 6px 0;
   }
-  .tm__paste-fields .row { display: contents; }
-  .tm__paste-fields .row .lbl { color: var(--c-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .tm__paste-fields .row .key { color: var(--c-text-muted); }
-  .tm__paste-fields .row .conf.is-high { color: var(--c-success); }
-  .tm__paste-fields .row .conf.is-packet { color: var(--c-accent); }
-  .tm__paste-fields .row .conf.is-medium { color: #93C5FD; }
-  .tm__paste-fields .row .conf.is-low { color: var(--c-text-muted); }
-  .tm__paste-fields .row .conf.is-never { color: #FCA5A5; }
-  .tm__paste-fields .row .req { color: var(--c-accent); }
-  .tm__paste-fields .head { color: var(--c-text-subtle); border-bottom: 1px solid var(--c-border-subtle); padding-bottom: 4px; margin-bottom: 4px; }
+  .tm__paste-result :global(.tm__paste-fields .row) { display: contents; }
+  .tm__paste-result :global(.tm__paste-fields .row .lbl) { color: var(--c-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tm__paste-result :global(.tm__paste-fields .row .key) { color: var(--c-text-muted); }
+  .tm__paste-result :global(.tm__paste-fields .row .conf.is-high) { color: var(--c-success); }
+  .tm__paste-result :global(.tm__paste-fields .row .conf.is-packet) { color: var(--c-accent); }
+  .tm__paste-result :global(.tm__paste-fields .row .conf.is-medium) { color: #93C5FD; }
+  .tm__paste-result :global(.tm__paste-fields .row .conf.is-low) { color: var(--c-text-muted); }
+  .tm__paste-result :global(.tm__paste-fields .row .conf.is-never) { color: #FCA5A5; }
+  .tm__paste-result :global(.tm__paste-fields .row .req) { color: var(--c-accent); }
+  .tm__paste-result :global(.tm__paste-fields .head) { color: var(--c-text-subtle); border-bottom: 1px solid var(--c-border-subtle); padding-bottom: 4px; margin-bottom: 4px; }
 
   .tm__safety { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
-  .safety-row {
+  .tm__safety :global(.safety-row) {
     display: grid;
     grid-template-columns: 24px 1fr 60px;
     gap: 8px;
@@ -234,11 +240,11 @@ import Admin from '@/layouts/Admin.astro';
     border-radius: var(--r-sm);
     font-family: var(--font-mono); font-size: 11px;
   }
-  .safety-row.is-pass { border-color: rgba(16, 185, 129, 0.4); }
-  .safety-row.is-fail { border-color: rgba(248, 113, 113, 0.4); }
-  .safety-row .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c-text-subtle); margin-top: 6px; }
-  .safety-row.is-pass .dot { background: var(--c-success); }
-  .safety-row.is-fail .dot { background: #F87171; }
+  .tm__safety :global(.safety-row.is-pass) { border-color: rgba(16, 185, 129, 0.4); }
+  .tm__safety :global(.safety-row.is-fail) { border-color: rgba(248, 113, 113, 0.4); }
+  .tm__safety :global(.safety-row .dot) { width: 8px; height: 8px; border-radius: 50%; background: var(--c-text-subtle); margin-top: 6px; }
+  .tm__safety :global(.safety-row.is-pass .dot) { background: var(--c-success); }
+  .tm__safety :global(.safety-row.is-fail .dot) { background: #F87171; }
 
   .tm__fixtures { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
   @media (max-width: 900px) { .tm__fixtures { grid-template-columns: 1fr; } }

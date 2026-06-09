@@ -33,37 +33,41 @@ import { angles } from '@/data/angles';
 <style>
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   @media (max-width: 1000px) { .grid { grid-template-columns: 1fr; } }
-  .h2 { font-family: var(--font-display); font-size: 22px; font-weight: 400; letter-spacing: -0.01em; margin-bottom: 12px; }
+  /* .h2 and .muted are both static (left pane) and injected (results pane). */
+  .h2, #results-pane :global(.h2) { font-family: var(--font-display); font-size: 22px; font-weight: 400; letter-spacing: -0.01em; margin-bottom: 12px; }
   .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
   .row > input { flex: 1; min-width: 140px; }
-  .muted { color: var(--c-text-subtle); font-size: 13px; }
+  .muted, #results-pane :global(.muted) { color: var(--c-text-subtle); font-size: 13px; }
   textarea { resize: vertical; min-height: 200px; font-family: var(--font-mono); font-size: 12px; }
 
-  .score {
+  /* Results are injected via innerHTML so they don't carry Astro's scope
+     attribute — style them through the static #results-pane parent
+     + :global, same pattern as today.astro. */
+  #results-pane :global(.score) {
     display: flex; align-items: baseline; gap: 12px;
     padding: 16px; background: var(--c-bg); border-radius: var(--r-md);
     border: 1px solid var(--c-border);
     margin-bottom: 16px;
   }
-  .score__value { font-family: var(--font-display); font-size: 48px; line-height: 1; }
-  .score__label { font-family: var(--font-mono); font-size: 11px; color: var(--c-text-subtle); letter-spacing: 0.08em; text-transform: uppercase; }
+  #results-pane :global(.score__value) { font-family: var(--font-display); font-size: 48px; line-height: 1; }
+  #results-pane :global(.score__label) { font-family: var(--font-mono); font-size: 11px; color: var(--c-text-subtle); letter-spacing: 0.08em; text-transform: uppercase; }
 
-  .pill-list { display: flex; flex-wrap: wrap; gap: 6px; }
-  .pill { padding: 4px 10px; border-radius: var(--r-full); font-family: var(--font-mono); font-size: 11px;
+  #results-pane :global(.pill-list) { display: flex; flex-wrap: wrap; gap: 6px; }
+  #results-pane :global(.pill) { padding: 4px 10px; border-radius: var(--r-full); font-family: var(--font-mono); font-size: 11px;
     background: var(--c-bg-muted); border: 1px solid var(--c-border-subtle); color: var(--c-text-muted); }
-  .pill--good { color: var(--c-success); border-color: rgba(16, 185, 129, 0.4); background: rgba(16,185,129,0.08); }
-  .pill--gap { color: #F87171; border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.08); }
-  .pill--warn { color: var(--c-accent); border-color: var(--c-accent); background: var(--c-accent-dim); }
+  #results-pane :global(.pill--good) { color: var(--c-success); border-color: rgba(16, 185, 129, 0.4); background: rgba(16,185,129,0.08); }
+  #results-pane :global(.pill--gap) { color: #F87171; border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.08); }
+  #results-pane :global(.pill--warn) { color: var(--c-accent); border-color: var(--c-accent); background: var(--c-accent-dim); }
 
-  .section { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--c-border-subtle); }
-  .section h3 { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-text-subtle); margin-bottom: 8px; }
+  #results-pane :global(.section) { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--c-border-subtle); }
+  #results-pane :global(.section h3) { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-text-subtle); margin-bottom: 8px; }
 
-  .ranked-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--c-border-subtle); font-size: 13px; }
-  .ranked-row:last-child { border-bottom: none; }
-  .ranked-row .ranked-name { color: var(--c-text); }
-  .ranked-row .ranked-score { font-family: var(--font-mono); color: var(--c-text-subtle); }
+  #results-pane :global(.ranked-row) { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--c-border-subtle); font-size: 13px; }
+  #results-pane :global(.ranked-row:last-child) { border-bottom: none; }
+  #results-pane :global(.ranked-row .ranked-name) { color: var(--c-text); }
+  #results-pane :global(.ranked-row .ranked-score) { font-family: var(--font-mono); color: var(--c-text-subtle); }
 
-  .actions { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+  #results-pane :global(.actions) { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
 </style>
 
 <script>
