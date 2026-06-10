@@ -347,8 +347,9 @@ export interface LlmAuditEntry {
 // ── Apply Session settings (global app prefs) ─────────────────────────
 
 export interface ApplySettings {
-  // M3 confirmed-submit assist. Default OFF; even when ON, each submit
-  // requires user typing "SUBMIT" in a per-job confirmation modal.
+  // Confirmed-submit assist. Default OFF; when ON, the guided apply
+  // session requires typing "SUBMIT" in a per-job confirmation modal
+  // before an application is logged as submitted (packet/session.astro).
   confirmedSubmitAssistEnabled: boolean;
   // Default for the packet builder's "Use AI refinement" toggle.
   defaultLlmRefinementEnabled: boolean;

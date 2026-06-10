@@ -104,11 +104,12 @@ import Admin from '@/layouts/Admin.astro';
     <div id="apply-toast" class="apply__toast"></div>
   </section>
 
-  <!-- Confirmed submit modal (M3 — disabled by default) -->
+  <!-- Confirmed-submit modal. Shown only when Confirmed Submit Assist is
+       enabled in Vault settings (off by default); doMarkApplied gates on it. -->
   <div id="confirm-submit" class="confirm-modal" hidden role="dialog" aria-modal="true">
     <div class="confirm-modal__body">
       <h3>Confirm submit?</h3>
-      <p class="muted">M3 Confirmed-Submit Assist is OFF. This modal is only shown when you've explicitly enabled it in Vault settings.</p>
+      <p class="muted" id="confirm-context">Log this application as submitted.</p>
       <p>Type <strong>SUBMIT</strong> below to confirm.</p>
       <input id="confirm-text" type="text" autocomplete="off" />
       <div class="confirm-modal__actions">
@@ -255,6 +256,10 @@ import Admin from '@/layouts/Admin.astro';
     display: flex; align-items: center; justify-content: center;
     z-index: 200;
   }
+  /* `display: flex` above beats the UA's [hidden] { display: none } rule —
+     without this the modal is permanently visible and the page is dead
+     behind an unclickable overlay. */
+  .confirm-modal[hidden] { display: none !important; }
   .confirm-modal__body {
     background: var(--c-bg-elev);
     border: 1px solid var(--c-accent);
@@ -306,6 +311,8 @@ import Admin from '@/layouts/Admin.astro';
   let cursor = 0;
   let packet: ApplicationPacket | null = null;
   let job: Job | undefined;
+  let sessionDone = false;
+  const stats = { applied: 0, skipped: 0, passed: 0 };
 
   const settings = applySettingsStore.get();
 
@@ -454,42 +461,125 @@ import Admin from '@/layouts/Admin.astro';
   }
 
   function bindCopyButtons() {
+    // Panel copy buttons only — checklist .check-copy buttons are re-created
+    // and bound inside renderChecklist; binding them here too fired every
+    // copy twice on first render.
     $$<HTMLButtonElement>('[data-copy]').forEach(btn => {
+      if (btn.classList.contains('check-copy')) return;
       btn.addEventListener('click', () => copyByKey(btn.dataset.copy!));
     });
   }
 
-  function next() { if (cursor < queueJobIds.length - 1) cursor++; renderAll(); }
-  function prev() { if (cursor > 0) cursor--; renderAll(); }
+  function next() { if (sessionDone) return; if (cursor < queueJobIds.length - 1) cursor++; renderAll(); }
+  function prev() { if (sessionDone) return; if (cursor > 0) cursor--; renderAll(); }
+
+  // After an action on the current job: advance, or finish the session when
+  // it was the last one (previously the page just sat on the handled job).
+  function advanceAfterAction() {
+    if (cursor < queueJobIds.length - 1) { cursor++; renderAll(); return; }
+    completeSession();
+  }
+
+  function completeSession() {
+    sessionDone = true;
+    const section = document.querySelector('.apply');
+    if (!section) return;
+    // Inline styles on purpose: injected markup doesn't carry Astro's scope
+    // attribute, so scoped page styles would not apply here.
+    section.innerHTML = `
+      <div style="padding:48px 24px; text-align:center; display:flex; flex-direction:column; gap:12px; align-items:center;">
+        <h2 style="font-family:var(--font-display); font-size:28px; font-weight:400;">Session complete</h2>
+        <p style="color:var(--c-text-muted); font-size:14px;">
+          ${stats.applied} applied · ${stats.skipped} skipped · ${stats.passed} passed
+        </p>
+        <div style="display:flex; gap:8px; margin-top:8px;">
+          <a class="btn" href="/today">Back to Today</a>
+          <a class="btn" href="/jobs">Open tracker</a>
+        </div>
+      </div>`;
+  }
+
+  // ── Confirmed-submit modal (only when enabled in Vault settings) ─────
+  const confirmModal = $('#confirm-submit') as HTMLElement;
+  const confirmText = $('#confirm-text') as HTMLInputElement;
+  const confirmGo = $('#confirm-go') as HTMLButtonElement;
+  let confirmAction: (() => void) | null = null;
+
+  function confirmModalOpen(): boolean { return !confirmModal.hidden; }
+
+  function openConfirmModal(context: string, onConfirm: () => void) {
+    confirmAction = onConfirm;
+    ($('#confirm-context') as HTMLElement).textContent = context;
+    confirmText.value = '';
+    confirmGo.disabled = true;
+    confirmModal.hidden = false;
+    confirmText.focus();
+  }
+
+  function closeConfirmModal() {
+    confirmModal.hidden = true;
+    confirmAction = null;
+  }
+
+  function bindConfirmModal() {
+    confirmText.addEventListener('input', () => {
+      confirmGo.disabled = confirmText.value.trim().toUpperCase() !== 'SUBMIT';
+    });
+    confirmText.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !confirmGo.disabled) confirmGo.click();
+      if (e.key === 'Escape') closeConfirmModal();
+    });
+    confirmGo.addEventListener('click', () => {
+      if (confirmGo.disabled) return;
+      const action = confirmAction;
+      closeConfirmModal();
+      action?.();
+    });
+    ($('#confirm-cancel') as HTMLButtonElement).addEventListener('click', closeConfirmModal);
+  }
 
   function doMarkApplied() {
-    if (!job || !packet) return;
+    if (sessionDone || !job || !packet) return;
     if (packet.scores.authenticity < settings.authenticityThreshold) {
       if (!confirm(`Authenticity (${packet.scores.authenticity}) below threshold (${settings.authenticityThreshold}). Mark applied anyway?`)) return;
     }
+    // Re-read at action time so flipping the Vault toggle doesn't require a
+    // reload of an open session tab.
+    if (applySettingsStore.get().confirmedSubmitAssistEnabled) {
+      openConfirmModal(`Log the ${job.company ?? ''} application as submitted.`, actuallyMarkApplied);
+      return;
+    }
+    actuallyMarkApplied();
+  }
+
+  function actuallyMarkApplied() {
+    if (!job || !packet) return;
     markApplied(job, packet);
     packet.status = 'submitted';
     packet.submittedAt = Date.now();
     packet = persistPacket(packet);
+    stats.applied++;
     toast(`Applied · ${job.company}`);
-    next();
+    advanceAfterAction();
   }
 
   function doSkip() {
-    if (!job) return;
+    if (sessionDone || !job) return;
     const updated: Job = { ...job, deferredAt: Date.now(), updatedAt: Date.now() };
     jobsStore.upsert(updated);
+    stats.skipped++;
     toast('Deferred to later');
-    next();
+    advanceAfterAction();
   }
 
   function doPass() {
-    if (!job) return;
+    if (sessionDone || !job) return;
     if (!confirm('Move this job to Archived and remove from queue?')) return;
     const updated: Job = { ...job, status: 'Archived', updatedAt: Date.now() };
     jobsStore.upsert(updated);
+    stats.passed++;
     toast('Passed');
-    next();
+    advanceAfterAction();
   }
 
   function bindActions() {
@@ -500,6 +590,12 @@ import Admin from '@/layouts/Admin.astro';
 
   function bindKeys() {
     document.addEventListener('keydown', e => {
+      if (sessionDone) return;
+      // While the confirm modal is open, the only global shortcut is Escape.
+      if (confirmModalOpen()) {
+        if (e.key === 'Escape') closeConfirmModal();
+        return;
+      }
       // Ignore when focused in a text field
       const tag = (e.target as HTMLElement).tagName;
       if (tag === 'TEXTAREA' || tag === 'INPUT' || tag === 'SELECT') return;
@@ -518,6 +614,7 @@ import Admin from '@/layouts/Admin.astro';
   }
 
   function renderAll() {
+    if (sessionDone) return;
     loadCursor();
     renderHead();
     renderWarnings();
@@ -529,5 +626,6 @@ import Admin from '@/layouts/Admin.astro';
   renderAll();
   bindCopyButtons();
   bindActions();
+  bindConfirmModal();
   bindKeys();
 </script>
