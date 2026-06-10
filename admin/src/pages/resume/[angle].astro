@@ -46,7 +46,7 @@ const textBody = resumeToText(resume);
 
       <section class="resume__section">
         <h2 class="resume__h2">Experience</h2>
-        {resume.projects.map(p => (
+        {resume.work.map(p => (
           <div class="resume__job">
             <div class="resume__job-head">
               <div>
@@ -61,6 +61,26 @@ const textBody = resumeToText(resume);
           </div>
         ))}
       </section>
+
+      {resume.independent.length > 0 && (
+        <section class="resume__section">
+          <h2 class="resume__h2">Independent Products</h2>
+          {resume.independent.map(p => (
+            <div class="resume__job">
+              <div class="resume__job-head">
+                <div>
+                  <h3 class="resume__job-title">{p.title}{p.company && <span class="resume__job-company"> · {p.company}</span>}</h3>
+                  <p class="resume__job-role">{p.role}{p.location && <span> · {p.location}</span>}</p>
+                </div>
+                <span class="resume__job-period">{p.period}</span>
+              </div>
+              <ul class="resume__bullets">
+                {p.bullets.map(b => <li>{b}</li>)}
+              </ul>
+            </div>
+          ))}
+        </section>
+      )}
 
       <section class="resume__section">
         <h2 class="resume__h2">Skills</h2>
@@ -105,7 +125,7 @@ const textBody = resumeToText(resume);
       <p>{resume.summary}</p>
 
       <h2>Experience</h2>
-      {resume.projects.map(p => (
+      {resume.work.map(p => (
         <div>
           <h3>{p.title}{p.company ? ` — ${p.company}` : ''}</h3>
           <p>{p.role} | {p.period}{p.location ? ` | ${p.location}` : ''}</p>
@@ -114,6 +134,21 @@ const textBody = resumeToText(resume);
           </ul>
         </div>
       ))}
+
+      {resume.independent.length > 0 && (
+        <>
+          <h2>Independent Products</h2>
+          {resume.independent.map(p => (
+            <div>
+              <h3>{p.title}{p.company ? ` — ${p.company}` : ''}</h3>
+              <p>{p.role} | {p.period}{p.location ? ` | ${p.location}` : ''}</p>
+              <ul>
+                {p.bullets.map(b => <li>{b}</li>)}
+              </ul>
+            </div>
+          ))}
+        </>
+      )}
 
       <h2>Skills</h2>
       {resume.skillGroups.map(g => (
@@ -190,6 +225,14 @@ const textBody = resumeToText(resume);
     padding-bottom: 8px;
     border-bottom: 1px solid var(--c-border-subtle);
   }
+  /* Five entries across two sections run to a second printed page — never
+     strand a section heading at the bottom of a page. */
+  @media print {
+    .resume__h2 {
+      break-after: avoid;
+      page-break-after: avoid;
+    }
+  }
   .resume__job { margin-bottom: 18px; break-inside: avoid; }
   .resume__job-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 6px; }
   .resume__job-title { font-family: var(--font-display); font-size: 18px; font-weight: 400; letter-spacing: -0.01em; }
@@ -244,6 +287,8 @@ const textBody = resumeToText(resume);
   .resume--ats li { margin-bottom: 4px; }
   @media print {
     .resume--ats { padding: 14mm 16mm; max-width: none; }
+    .resume--ats h2 { break-after: avoid; page-break-after: avoid; }
+    .resume--ats > div { break-inside: avoid; page-break-inside: avoid; }
   }
 
   /* ─── Plain text ───────────────────────────────────────────────────── */

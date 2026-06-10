@@ -8,23 +8,41 @@ export interface Bullet {
   weight: number;
 }
 
+// 'work' entries render in the resume's Experience section (always first);
+// 'independent' entries render in the Independent Products section after it.
+export type ProjectKind = 'work' | 'independent';
+
+// Per-angle rank within a section + bullet-budget tier. There is no 'omit':
+// every entry appears on every angle by design — the angle only decides
+// which app leads and how many bullets each entry gets.
+export type RolePriority = 'lead' | 'support' | 'mention';
+
 export interface Project {
   id: string;
+  kind: ProjectKind;
   title: string;
   company?: string;
   role: string;
   period: string;
   location?: string;
-  // Per-angle role priority. 'lead' = primary case. 'support' = secondary. 'mention' = one-liner. 'omit' = drop entirely.
-  role_priority: Record<string, 'lead' | 'support' | 'mention' | 'omit'>;
-  // Pool of bullets — engine selects the best 3–5 per angle.
+  // Rank within the entry's section. 'lead' = fullest budget, 'mention' = smallest.
+  // A missing angle key is treated as 'mention' by the engine.
+  role_priority: Record<string, RolePriority>;
+  // Optional per-project override of the engine's default bullet budgets.
+  bullet_budget?: Partial<Record<RolePriority, number>>;
+  // Pool of bullets — engine selects the best N per angle, N = bullet budget.
   bullets: Bullet[];
 }
 
+// ORDERING INVARIANT: work entries (kind: 'work') must stay in
+// reverse-chronological order relative to each other — the engine renders
+// the Experience section in data order. Independent entries are re-sorted
+// per angle by role_priority, with data order as the tie-break.
 // Note: Date ranges below are placeholders where unknown. Edit before sending.
 export const projects: Project[] = [
   {
     id: 'chatobd2',
+    kind: 'independent',
     title: 'ChatOBD2',
     role: 'Founder, Product Designer & Engineer',
     period: '2025 — Present',
@@ -32,10 +50,10 @@ export const projects: Project[] = [
     role_priority: {
       'product-designer': 'lead',
       'senior-product-designer': 'lead',
-      'ux-engineer': 'support',
-      'frontend-ux-engineer': 'support',
+      'ux-engineer': 'lead',
+      'frontend-ux-engineer': 'lead',
       'design-engineer': 'lead',
-      'web-experience-manager': 'mention',
+      'web-experience-manager': 'lead',
       'design-systems-engineer': 'support',
       'ai-product-designer': 'lead',
       'ux-product-lead': 'lead',
@@ -85,6 +103,7 @@ export const projects: Project[] = [
   },
   {
     id: 'vinly',
+    kind: 'independent',
     title: 'VINly',
     role: 'Founder, Designer & Engineer',
     period: '2026',
@@ -92,11 +111,11 @@ export const projects: Project[] = [
     role_priority: {
       'product-designer': 'support',
       'senior-product-designer': 'support',
-      'ux-engineer': 'omit',
+      'ux-engineer': 'mention',
       'frontend-ux-engineer': 'support',
-      'design-engineer': 'omit',
-      'web-experience-manager': 'omit',
-      'design-systems-engineer': 'omit',
+      'design-engineer': 'mention',
+      'web-experience-manager': 'mention',
+      'design-systems-engineer': 'mention',
       'ai-product-designer': 'support',
       'ux-product-lead': 'support',
     },
@@ -145,20 +164,21 @@ export const projects: Project[] = [
   },
   {
     id: 'carspotter',
+    kind: 'independent',
     title: 'CarSpotter',
     role: 'Founder, Designer & Engineer',
     period: '2026',
     location: 'Independent',
     role_priority: {
-      'product-designer': 'omit',
-      'senior-product-designer': 'omit',
+      'product-designer': 'mention',
+      'senior-product-designer': 'mention',
       'ux-engineer': 'support',
-      'frontend-ux-engineer': 'omit',
+      'frontend-ux-engineer': 'mention',
       'design-engineer': 'support',
-      'web-experience-manager': 'omit',
-      'design-systems-engineer': 'support',
-      'ai-product-designer': 'omit',
-      'ux-product-lead': 'omit',
+      'web-experience-manager': 'support',
+      'design-systems-engineer': 'lead',
+      'ai-product-designer': 'mention',
+      'ux-product-lead': 'mention',
     },
     bullets: [
       {
@@ -205,6 +225,7 @@ export const projects: Project[] = [
   },
   {
     id: 'magtek',
+    kind: 'work',
     title: 'MagTek Platform',
     company: 'MagTek',
     role: 'UX & Frontend Systems',
@@ -217,7 +238,7 @@ export const projects: Project[] = [
       'design-engineer': 'support',
       'web-experience-manager': 'lead',
       'design-systems-engineer': 'lead',
-      'ai-product-designer': 'mention',
+      'ai-product-designer': 'support',
       'ux-product-lead': 'support',
     },
     bullets: [
@@ -260,13 +281,15 @@ export const projects: Project[] = [
   },
   {
     id: 'investcloud',
+    kind: 'work',
     title: 'Advisor Platforms',
     company: 'InvestCloud, Inc.',
     role: 'Front End Developer, UX',
     period: 'Aug 2020 – May 2021',
     location: 'West Hollywood, CA · Remote',
-    // InvestCloud is a real shipped role and must appear on EVERY angle. Use
-    // 'mention' (2 bullets) at minimum. Engine selectProjects will not omit it.
+    // Real shipped employment — renders in the Experience section on every
+    // angle. The support budget is bumped to 4 bullets via bullet_budget.
+    bullet_budget: { support: 4 },
     role_priority: {
       'product-designer': 'mention',
       'senior-product-designer': 'mention',

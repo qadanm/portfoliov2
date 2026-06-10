@@ -93,7 +93,7 @@ export function draftTellMeAboutYourself(ctx: ShortAnswerContext): string {
   const archetype = angleArchetypePhrase(ctx.angleId);
   return [
     `I'm Moe — ${archetype}.`,
-    `Right now I'm designing and shipping my own iOS products end to end: ChatOBD2, an AI-native diagnostics app, and VINly, an AI used-car buyer report. My day job is MagTek's multi-site platform, where I own UX and frontend systems across the public surface.`,
+    `Right now I'm designing and shipping my own iOS products end to end: ChatOBD2, an AI-native diagnostics app; VINly, an AI used-car buyer report; and CarSpotter, a daily car-spotting game. My day job is MagTek's multi-site platform, where I own UX and frontend systems across the public surface.`,
     `Earlier, I built advisor portals at InvestCloud across 50+ wealth institutions.`,
     `The work I'm looking for next is the same shape: where design and frontend live in the same head, and the team ships under real constraints.`,
   ].join(' ');

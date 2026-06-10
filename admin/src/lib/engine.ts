@@ -1,5 +1,5 @@
 import { angleById, type Angle, type EmphasisKey } from '@/data/angles';
-import { projects, type Project, type Bullet } from '@/data/projects';
+import { projects, type Project, type ProjectKind, type RolePriority, type Bullet } from '@/data/projects';
 import { skills, type Skill } from '@/data/skills';
 import { headlines, summaries, kickers } from '@/data/content';
 import { identity } from '@/data/identity';
@@ -7,6 +7,7 @@ import { education, type EducationEntry } from '@/data/education';
 
 export interface ResumeProject {
   id: string;
+  kind: ProjectKind;
   title: string;
   company?: string;
   role: string;
@@ -27,6 +28,11 @@ export interface Resume {
   headline: string;
   summary: string;
   kicker: string;
+  // Two-section experience: employment first, then the independent apps.
+  work: ResumeProject[];
+  independent: ResumeProject[];
+  // Ordered concat of [...work, ...independent], kept for consumers that
+  // treat the experience list as one stream (text serializer, LLM context).
   projects: ResumeProject[];
   skillGroups: ResumeSkillGroup[];
   education: EducationEntry[];
@@ -59,24 +65,46 @@ function scoreSkill(skill: Skill, angle: Angle): number {
   return emphasisScore * skill.weight;
 }
 
-function priorityCount(p: Project, angleId: string): number {
-  const pri = p.role_priority[angleId];
-  if (pri === 'lead') return 6;
-  if (pri === 'support') return 4;
-  if (pri === 'mention') return 2;
-  return 0;
+// Default bullet budgets per section + priority tier. Work entries lead the
+// resume and get the larger budgets; independent apps stay tighter. A project
+// can override a tier via its optional `bullet_budget`.
+export const BULLET_BUDGET: Record<ProjectKind, Record<RolePriority, number>> = {
+  work:        { lead: 6, support: 5, mention: 3 },
+  independent: { lead: 5, support: 3, mention: 2 },
+};
+
+// A missing angle key counts as 'mention' — nothing can fall off a resume.
+function priorityOf(p: Project, angleId: string): RolePriority {
+  return p.role_priority[angleId] ?? 'mention';
+}
+
+export function bulletBudget(p: Project, angleId: string): number {
+  const pri = priorityOf(p, angleId);
+  return p.bullet_budget?.[pri] ?? BULLET_BUDGET[p.kind][pri];
 }
 
 function priorityRank(p: Project, angleId: string): number {
-  const pri = p.role_priority[angleId];
+  const pri = priorityOf(p, angleId);
   if (pri === 'lead') return 0;
   if (pri === 'support') return 1;
-  if (pri === 'mention') return 2;
-  return 99;
+  return 2;
+}
+
+// Section-aware ordering shared by the engine and the packet tailor.
+// Work entries keep data order (reverse-chronological invariant documented
+// in projects.ts); independent entries re-rank per angle, data order as the
+// stable tie-break.
+export function orderedProjectsForAngle(angle: Angle): { work: Project[]; independent: Project[] } {
+  const work = projects.filter(p => p.kind === 'work');
+  const independent = projects
+    .filter(p => p.kind === 'independent')
+    .slice()
+    .sort((a, b) => priorityRank(a, angle.id) - priorityRank(b, angle.id));
+  return { work, independent };
 }
 
 function selectBullets(p: Project, angle: Angle): string[] {
-  const max = priorityCount(p, angle.id);
+  const max = bulletBudget(p, angle.id);
   if (max === 0) return [];
   const ranked = [...p.bullets]
     .map(b => ({ b, score: scoreBullet(b, angle) }))
@@ -86,20 +114,17 @@ function selectBullets(p: Project, angle: Angle): string[] {
   return ranked;
 }
 
-function selectProjects(angle: Angle): ResumeProject[] {
-  return projects
-    .filter(p => p.role_priority[angle.id] !== 'omit')
-    .slice() // copy
-    .sort((a, b) => priorityRank(a, angle.id) - priorityRank(b, angle.id))
-    .map(p => ({
-      id: p.id,
-      title: p.title,
-      company: p.company,
-      role: p.role,
-      period: p.period,
-      location: p.location,
-      bullets: selectBullets(p, angle),
-    }));
+function toResumeProject(p: Project, angle: Angle): ResumeProject {
+  return {
+    id: p.id,
+    kind: p.kind,
+    title: p.title,
+    company: p.company,
+    role: p.role,
+    period: p.period,
+    location: p.location,
+    bullets: selectBullets(p, angle),
+  };
 }
 
 function selectSkills(angle: Angle): ResumeSkillGroup[] {
@@ -138,13 +163,18 @@ function selectSkills(angle: Angle): ResumeSkillGroup[] {
 export function buildResume(angleId: string): Resume | null {
   const angle = angleById(angleId);
   if (!angle) return null;
+  const ordered = orderedProjectsForAngle(angle);
+  const work = ordered.work.map(p => toResumeProject(p, angle));
+  const independent = ordered.independent.map(p => toResumeProject(p, angle));
   return {
     identity,
     angle,
     headline: headlines[angleId] ?? '',
     summary: summaries[angleId] ?? '',
     kicker: kickers[angleId] ?? '',
-    projects: selectProjects(angle),
+    work,
+    independent,
+    projects: [...work, ...independent],
     skillGroups: selectSkills(angle),
     education,
   };
@@ -165,12 +195,20 @@ export function resumeToText(r: Resume): string {
   out.push(sep);
   out.push('EXPERIENCE');
 
-  for (const p of r.projects) {
+  const renderEntry = (p: ResumeProject) => {
     out.push('');
     const company = p.company ? ` · ${p.company}` : '';
     out.push(`${p.title}${company}`);
     out.push(`${p.role} · ${p.period}${p.location ? ' · ' + p.location : ''}`);
     for (const b of p.bullets) out.push(`  - ${b}`);
+  };
+
+  for (const p of r.work) renderEntry(p);
+
+  if (r.independent.length > 0) {
+    out.push(sep);
+    out.push('INDEPENDENT PRODUCTS');
+    for (const p of r.independent) renderEntry(p);
   }
 
   out.push(sep);

@@ -1,19 +1,22 @@
 // Letter / message generator. Templates that read like real writing.
 // Variables: {{company}} {{role}} {{recruiterFirstName}} {{customLine}}
 //
-// COVER LETTER PHILOSOPHY (read me before "improving" the cover-letter
-// path again): the only personalization is the opener — recruiter name
-// (if any), role title, company name. The rest of the body is the
-// per-angle generic block defined in COVER_LETTER_BODIES below. No JD
-// keyword weaving, no "what stood out from the posting" reach, no
-// auto-generated relevance prose. That stuff reads as AI slop and
-// usually misrepresents the role anyway. Edit the per-angle bodies in
-// place if you want different content; don't reintroduce dynamic
-// substitution into the body.
+// COVER LETTER PHILOSOPHY: deterministic, evidence-named, theme-matched.
+// The letter is assembled from authored building blocks in
+// src/data/cover-evidence.ts: a per-angle positioning line, two concrete
+// evidence lines naming real shipped work (MagTek, InvestCloud, ChatOBD2,
+// VINly, CarSpotter), and either a JD-theme sentence or a craft closer.
+// The JD influences WHICH authored lines are chosen and which matched
+// strengths are named; it never injects raw JD prose into the letter, so
+// the anti-slop guarantee holds: every sentence was written by a human and
+// every claim is grounded in resume vocabulary. The LLM refine path
+// remains an optional layer on top and is instructed to keep all claims.
 
 import { recruiterPacks } from '@/data/recruiter';
 import { angleById } from '@/data/angles';
 import { identity } from '@/data/identity';
+import { POSITIONING, EVIDENCE, CRAFT, type EvidenceLine } from '@/data/cover-evidence';
+import { analyzeJD } from './analyzer';
 import type { LetterKind } from './storage';
 
 export type Tone = 'direct' | 'warm' | 'design' | 'technical' | 'senior';
@@ -25,7 +28,7 @@ export interface LetterContext {
   recruiterFirstName?: string;
   jobUrl?: string;
   customLine?: string; // accepted for API compatibility; ignored by cover letters
-  jdText?: string;     // accepted for API compatibility; ignored by cover letters
+  jdText?: string;     // used to pick evidence lines + matched themes; never quoted verbatim
 }
 
 // ── Tone presets ──────────────────────────────────────────────────────
@@ -54,57 +57,68 @@ const CLOSERS: Record<Tone, string> = {
   senior: `If a conversation makes sense, I'd welcome it. The work I want to do next is exactly the shape of what's described here. ${identity.email}.`,
 };
 
-// ── Per-angle generic cover-letter bodies ────────────────────────────
-//
-// One body per angle. Edit these in place to tune your voice. They are
-// the ENTIRE personality of the cover letter — the only dynamic content
-// is the opening paragraph (greeting + role + company) and a generic
-// closer. Body text never references the company or JD.
+// ── Evidence selection ────────────────────────────────────────────────
+// Rank the angle's authored evidence lines (src/data/cover-evidence.ts) by
+// overlap with the JD's matched strengths. Authored order breaks ties and
+// is the no-JD default.
 
-const COVER_LETTER_BODIES: Record<string, string> = {
-  'product-designer':
-    `I'm a product designer who ships. The work has spanned consumer mobile, complex B2B dashboards, multi-site enterprise platforms, and AI-native product surfaces — and the through-line is the same in every case: build the version that actually ships, then keep tightening it.\n\nWhat sets me apart is that I don't hand off. I work in Figma when the surface is still being defined and in TypeScript when it's time to make it real, which collapses the loop between intent and shipped product. Engineers and PMs end up moving faster because there's a single person carrying the design decision through to the live experience.\n\nA few things I care about: tight visual hierarchy, accessible defaults, motion that earns its keep, and a willingness to delete UI rather than dress it up.`,
+const MIN_JD_CHARS = 80;
 
-  'senior-product-designer':
-    `I'm a senior product designer leading design on ambitious product surfaces — AI tools, consumer mobile, dense data UIs, and platform work. I take a feature from a fuzzy prompt to a shipped, measured experience with very little hand-holding.\n\nMost of the work I'm proud of is the kind that requires real judgment: which problem is actually worth solving, which competing priorities to honor, when to invest in a system versus shipping a one-off. I write design specs that engineers can build from and prototypes that stakeholders can poke at. When the team needs a strategist I show up that way; when it needs a craftsperson I show up that way.\n\nI work hands-on across Figma and the production codebase, which means I can advocate for design decisions in the same vocabulary the engineering org uses. That tends to be where senior design hires either earn their keep or get bottlenecked, and I've leaned toward the former.`,
+// 'design system' / 'design systems' both live in the strengths vocabulary;
+// never name both in the weave sentence.
+function sameTheme(a: string, b: string): boolean {
+  return a === b || a === `${b}s` || b === `${a}s`;
+}
 
-  'ux-engineer':
-    `I'm a UX engineer — a designer who writes production code and an engineer who actually thinks about UX. Comfortable across React, TypeScript, design systems, animation, and accessibility. The role I'm best at is the one that sits between design and engineering and unblocks both.\n\nIn practice that's looked like: building the design-system primitives that the rest of the front-end is composed from, prototyping interactions in real code so design reviews are productive, owning the front-end of complex flows where the design intent is fragile, and quietly fixing the long tail of accessibility regressions that nobody's tracking.\n\nI care about the things that compound: typed APIs, motion that doesn't fight the platform, performance budgets that are actually defended, and components that produce predictable visual outcomes when an arbitrary engineer reaches for them.`,
+function pickEvidence(angleId: string, jdText?: string): { lines: EvidenceLine[]; matchedThemes: string[] } {
+  const pool = EVIDENCE[angleId] ?? EVIDENCE['product-designer'] ?? [];
+  const jd = (jdText ?? '').trim();
+  if (jd.length < MIN_JD_CHARS) {
+    return { lines: pool.slice(0, 2), matchedThemes: [] };
+  }
+  const analysis = analyzeJD(jd);
+  const matched = new Set(analysis?.matchedStrengths ?? []);
+  if (matched.size === 0) {
+    return { lines: pool.slice(0, 2), matchedThemes: [] };
+  }
+  const ranked = pool
+    .map((line, idx) => ({
+      line,
+      idx,
+      overlap: line.themes.filter(t => matched.has(t)).length,
+    }))
+    .sort((a, b) => b.overlap - a.overlap || a.idx - b.idx)
+    .slice(0, 2);
+  // Present the two chosen lines in authored order so the paragraph reads
+  // the way it was written.
+  ranked.sort((a, b) => a.idx - b.idx);
 
-  'frontend-ux-engineer':
-    `I'm a frontend engineer with deep design fluency. I ship React + TypeScript front-ends to production, and I make design decisions in code along the way — type sizes, motion curves, layout density, color contrast — instead of treating those as someone else's spec to implement.\n\nMost of my recent work has been on AI-native and data-heavy product surfaces: real-time interfaces, streaming UIs, dashboards built on top of complex backend semantics. The pattern I bring to model-in-the-loop work: prompts live in the system rather than scattered across components, outputs are schema-bound, the model is held as one constrained stage in a structured pipeline. I work fluently in modern React (server components, suspense, hooks), CSS that scales (custom properties, container queries, real cascade discipline), and the tooling layer (Vite, Turbo, the build pipeline of the moment).\n\nI'm easy to work with on a team because I do the unfashionable parts of front-end well: bug bashes, accessibility audits, perf regressions, the long tail of Safari weirdness.`,
-
-  'design-engineer':
-    `I'm a design engineer — I design and ship the production surface in the same loop. Comfortable across the design + front-end stack: Figma, React, TypeScript, design systems, motion, real CSS, accessibility.\n\nMy strongest work happens on small teams where the boundary between design and engineering has to be permeable to move fast. I can take a vague problem statement to a shipped, polished experience without a relay race of artifacts and reviews. I ship the prototype, then the production code, then the system primitives the rest of the team uses to keep shipping it.\n\nAI runs through the build as production infrastructure: Claude and Cursor for code work, Figma for precision, Claude Design when a visual frame is faster than markup. The codebase stays the source of truth across all of them.\n\nI care about the craft layer most product teams under-invest in: typography, spacing, motion timing, focus states, hover affordances, the keyboard model. The compounding payoff there is real, but it requires someone who can both notice and fix the issue.`,
-
-  'web-experience-manager':
-    `I'm a product designer and UX engineer leading the web surface end-to-end — strategy, design, the production front-end, the systems behind it, and the people doing the work. I've owned the marketing site, the product surface, and the design-system layer at the same time, and I have a strong point of view about how those should reinforce each other.\n\nI'm comfortable as the bridge between marketing, product, and engineering: translating the brand into a design system that the product team can actually use, defining a publishing model the marketing team can move fast in, and keeping the engineering org confident that the front-end is maintainable.\n\nWhat I bring to a Web Experience role specifically is the rare combination of taste, technical judgment, and the willingness to operate across surfaces that most candidates only handle one of.`,
-
-  'design-systems-engineer':
-    `I'm a designer-engineer hybrid with deep design-system experience. I've built and maintained component libraries that span marketing surfaces, product surfaces, and internal tools, and I'm comfortable as both the designer of the system and the engineer who ships it. Currently maintaining a 100+ component Razor partial library with typed ViewModels at MagTek.\n\nMy approach: tokens before components, accessibility as a non-negotiable default, real coverage tests that catch regressions in the things that actually break (focus order, color contrast, screen-reader output), and documentation that engineers reach for when they're trying to ship — not after.\n\nI work across React, TypeScript, modern CSS (custom properties, container queries, cascade layers), Razor + Bootstrap, Figma variables, and the tooling layer (Storybook, Chromatic, the build pipeline). The piece I care about most is the part most systems get wrong: the gap between the documented component and what an arbitrary engineer ships when they reach for it under deadline.`,
-
-  'ai-product-designer':
-    `I'm a product designer with deep specialization in AI-native product surfaces — chat interfaces, agent loops, generative tools, and the messy interaction model around model output that traditional product design hasn't really worked out yet. I've shipped these surfaces to production and I have strong opinions about the design patterns that actually work versus the ones that look novel in a screenshot.\n\nThe job in AI product design is mostly the unsexy work: holding the model as one constrained stage inside a structured pipeline, designing for failure modes, surfacing model uncertainty without creating anxiety, and giving the user enough control to recover when the model is wrong. Prompts live in the system rather than in components; outputs are schema-bound; analytics taxonomies stay coherent because the prompt layer is single-sourced. I do that work with requirement discovery via the model itself, prototyping in real code, and a strong bias toward shipping small and observing.\n\nI'm hands-on across Figma and the production front-end, which is more or less mandatory for AI surfaces — the interaction model can't be fully spec'd in a static design tool. Prompt engineering is part of the same hands-on practice, not a separate concern.`,
-
-  'ux-product-lead':
-    `I'm a product/UX leader driving design end-to-end on ambitious product surfaces. I've led design through 0-to-1 launches and the messier work of evolving an existing product without breaking what users already trust.\n\nMy style as a lead: clear bets on the shape of the next quarter's work, a tight feedback loop with the engineering org, design reviews that produce decisions instead of opinions, and a deliberate investment in the people doing the day-to-day craft. I'm equally comfortable in a strategy review, a stakeholder presentation, and a hands-on Figma file.\n\nWhere I add the most value is on small-to-mid-sized teams where the lead has to operate across product strategy, design, and front-end engineering without losing fluency in any of them. That's the shape of role I look for.`,
-};
-
-function bodyForAngle(angleId: string): string {
-  return COVER_LETTER_BODIES[angleId] ?? COVER_LETTER_BODIES['product-designer'];
+  const matchedThemes: string[] = [];
+  for (const r of ranked) {
+    for (const t of r.line.themes) {
+      if (!matched.has(t)) continue;
+      if (matchedThemes.some(existing => sameTheme(existing, t))) continue;
+      matchedThemes.push(t);
+    }
+  }
+  return { lines: ranked.map(r => r.line), matchedThemes };
 }
 
 // ── Cover letter ──────────────────────────────────────────────────────
 
-// Three-paragraph cover letter:
-//  1. Greeting (Hi [recruiter or 'there'],) + opener naming role + company.
-//     This is the ONLY personalized text.
-//  2. Generic angle body from COVER_LETTER_BODIES — no JD weaving.
-//  3. Generic closer + sign-off.
+// Assembled, not generated. Paragraphs:
+//  1. Greeting naming the role + company (recruiter name when given).
+//  2. Per-angle positioning line.
+//  3. Two authored evidence lines, chosen by JD-theme overlap.
+//  4. A JD-theme sentence (matched-strength vocabulary only, never raw JD
+//     prose) when the JD surfaced two or more themes; otherwise the
+//     angle's craft line.
+//  5. Closer.
+//  6. Sign-off — MUST stay the final paragraph: the letter page styles the
+//     first paragraph as the greeting and the last as the sign-off.
 //
 // Tone parameter is accepted for API compatibility with generateMessage()
-// but does not vary the body — the body is a fixed per-angle template by
-// design.
+// but does not vary the structure.
 export function generateCoverLetter(ctx: LetterContext, _tone?: Tone): string {
   const angle = angleById(ctx.angleId);
   if (!angle) return '';
@@ -114,16 +128,25 @@ export function generateCoverLetter(ctx: LetterContext, _tone?: Tone): string {
   const company = ctx.company?.trim() || 'your team';
 
   const opener =
-    `Hi ${greetingName}, I'm writing to express my interest in the ${role} role at ${company}.`;
+    `Hi ${greetingName}, I'm writing about the ${role} role at ${company}.`;
 
-  const body = bodyForAngle(ctx.angleId);
+  const positioning = POSITIONING[ctx.angleId] ?? POSITIONING['product-designer'];
+
+  const { lines, matchedThemes } = pickEvidence(ctx.angleId, ctx.jdText);
+  const evidence = lines.map(l => l.text).join(' ');
+
+  const weaveOrCraft = matchedThemes.length >= 2
+    ? `The posting's emphasis on ${matchedThemes[0]} and ${matchedThemes[1]} maps to where my last few years have gone.`
+    : (CRAFT[ctx.angleId] ?? CRAFT['product-designer']);
 
   const closer =
     `If any of this is the shape of who you're looking for, I'd welcome the conversation. The fastest way to reach me is ${identity.email}.`;
 
   const paragraphs = [
     opener,
-    body,
+    positioning,
+    evidence,
+    weaveOrCraft,
     closer,
     `Best,\n${identity.name}`,
   ];

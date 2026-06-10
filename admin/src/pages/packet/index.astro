@@ -585,10 +585,10 @@ import Admin from '@/layouts/Admin.astro';
   function renderResumePreview() {
     if (!packet) return;
     const el = $('#resume-preview')!;
-    // Show the existing engine's resumeToText for the chosen angle, prefixed
-    // by the kicker. Since tailoring only re-orders bullets within a project
-    // and selectProjects() in engine.ts is angle-driven, the tailored output
-    // is essentially the engine's output for the angle.
+    // Show the engine's resumeToText for the chosen angle, prefixed by the
+    // kicker. The tailored output shares the engine's sectioning and project
+    // ordering (work first, then independent apps); it differs only where
+    // the JD boost picks different bullets within a project.
     const resume = buildResume(packet.resumeAngleId);
     if (!resume) { el.textContent = '(no resume for this angle)'; return; }
     const text = resumeToText(resume);

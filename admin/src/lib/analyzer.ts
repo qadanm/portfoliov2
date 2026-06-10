@@ -5,7 +5,8 @@ import { angles, type Angle } from '@/data/angles';
 import { skills } from '@/data/skills';
 
 // Keywords that map a JD signal to an angle. Tuned for the 9 angles.
-const ANGLE_SIGNALS: Record<string, string[]> = {
+// Exported for angle-selector's title-weighting pass.
+export const ANGLE_SIGNALS: Record<string, string[]> = {
   'product-designer': [
     'product designer', 'product design', 'user experience', 'ux design',
     'ui designer', 'ui design', 'visual designer', 'interaction designer',
@@ -58,8 +59,9 @@ const ANGLE_SIGNALS: Record<string, string[]> = {
   ],
 };
 
-// Stack keywords Moe is strong on.
-const STRENGTHS = new Set([
+// Stack keywords Moe is strong on. Exported for resume-tailor's
+// JD-boost term weighting (TECH_TERMS + phrase matching).
+export const STRENGTHS = new Set([
   'react', 'typescript', 'javascript', 'astro', 'next', 'next.js',
   'react native', 'expo', 'tailwind', 'css', 'html', 'figma', 'cursor',
   'claude', 'razor', 'asp.net', 'mvc', 'design systems', 'design tokens',
@@ -98,7 +100,8 @@ function tokenMatchers(tokens: Set<string>): { token: string; re: RegExp }[] {
 const STRENGTH_MATCHERS = tokenMatchers(STRENGTHS);
 const GAP_MATCHERS = tokenMatchers(GAPS);
 
-const STOPWORDS = new Set([
+// Exported so resume-tailor shares one stopword source.
+export const STOPWORDS = new Set([
   'the', 'a', 'an', 'and', 'or', 'but', 'if', 'then', 'else', 'is', 'are',
   'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does',
   'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'shall',
@@ -195,7 +198,10 @@ export function analyzeJD(jdRaw: string): AnalyzerResult | null {
 
   return {
     recommendedAngle,
-    rankedAngles: ranked.slice(0, 5),
+    // All 9 angles, ranked. Angle-selector title-weights the full list; a
+    // top-5 slice here used to make designer angles unreachable on
+    // engineering-heavy JDs no matter what the job title said.
+    rankedAngles: ranked,
     matchedStrengths,
     potentialGaps,
     topKeywords,

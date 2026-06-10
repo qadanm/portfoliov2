@@ -8,8 +8,10 @@
 
 import type { PacketSelection } from '../storage';
 import { angleById, type Angle, type EmphasisKey } from '@/data/angles';
-import { projects, type Project, type Bullet } from '@/data/projects';
+import { projects, projectById, type Bullet } from '@/data/projects';
 import { skills, type Skill } from '@/data/skills';
+import { orderedProjectsForAngle, bulletBudget } from '../engine';
+import { STOPWORDS, STRENGTHS } from '../analyzer';
 
 export function bulletKey(projectId: string, bulletIndex: number): string {
   return `${projectId}::${bulletIndex}`;
@@ -33,21 +35,71 @@ export function findBulletByKey(key: string): Bullet | null {
   return findBullet(parsed.projectId, parsed.bulletIndex);
 }
 
-function scoreBullet(b: Bullet, angle: Angle, jdLower: string): number {
+// ── JD-aware bullet boost ──────────────────────────────────────────────
+// The old boost counted every 4+ char JD word found via substring match,
+// +2 each, uncapped — on a long JD it (easily 40+) swamped the curated
+// emphasis score (max ~65) and stopwords like "team" matched everything.
+// The new boost: token-set intersection, stopwords removed, technical and
+// JD-rare terms weighted up, multi-word strength phrases counted, and the
+// whole boost clamped so emphasis × weight stays dominant.
+
+// JD boilerplate that says nothing about fit, on top of analyzer STOPWORDS.
+const JD_BOILERPLATE = new Set([
+  'experience', 'experiences', 'team', 'teams', 'work', 'working', 'works',
+  'role', 'roles', 'years', 'skills', 'skill', 'strong', 'ability',
+  'candidate', 'candidates', 'responsibilities', 'responsibility',
+  'requirements', 'required', 'requirement', 'qualifications', 'qualified',
+  'benefits', 'including', 'include', 'includes', 'looking', 'join',
+  'help', 'great', 'good', 'well', 'plus', 'bonus', 'preferred', 'must',
+  'will', 'within', 'across', 'using', 'use', 'used', 'every', 'least',
+]);
+
+// Terms that signal real technical/stack fit: analyzer strengths plus the
+// resume's own skill names.
+const TECH_TERMS = new Set<string>([
+  ...Array.from(STRENGTHS),
+  ...skills.map(s => s.name.toLowerCase()),
+]);
+
+const STRENGTH_PHRASES = Array.from(STRENGTHS).filter(s => s.includes(' '));
+
+const MAX_JD_BOOST = 8;
+
+interface JdContext {
+  counts: Map<string, number>;
+  phrases: string[];
+}
+
+function buildJdContext(jdLower: string): JdContext | null {
+  if (!jdLower) return null;
+  const counts = new Map<string, number>();
+  for (const tok of jdLower.match(/[a-z][a-z0-9.+#-]{2,}/g) ?? []) {
+    if (STOPWORDS.has(tok) || JD_BOILERPLATE.has(tok)) continue;
+    counts.set(tok, (counts.get(tok) ?? 0) + 1);
+  }
+  const phrases = STRENGTH_PHRASES.filter(p => jdLower.includes(p));
+  return { counts, phrases };
+}
+
+function scoreBullet(b: Bullet, angle: Angle, jd: JdContext | null): number {
   let emphasis = 0;
   for (const k of b.serves) emphasis += angle.emphasis[k as EmphasisKey] ?? 0;
   let base = emphasis * b.weight;
-  // JD keyword boost
-  if (jdLower) {
+  if (jd) {
     const blower = b.text.toLowerCase();
-    // Cheap n-gram match — count occurrences of any 4+ char word from JD
-    const jdWords = jdLower.match(/\b[a-z][a-z0-9.+\-]{3,}\b/g) ?? [];
-    const uniqueWords = new Set(jdWords);
-    let hits = 0;
-    for (const w of uniqueWords) {
-      if (blower.includes(w)) hits++;
+    const bulletTokens = new Set(blower.match(/[a-z][a-z0-9.+#-]{2,}/g) ?? []);
+    let boost = 0;
+    for (const tok of bulletTokens) {
+      const inJd = jd.counts.get(tok);
+      if (!inJd) continue;
+      boost += 1;
+      if (TECH_TERMS.has(tok)) boost += 1;
+      if (inJd <= 2) boost += 1; // rare in the JD = likely load-bearing
     }
-    base += hits * 2;
+    for (const phrase of jd.phrases) {
+      if (blower.includes(phrase)) boost += 2;
+    }
+    base += Math.min(boost, MAX_JD_BOOST);
   }
   return base;
 }
@@ -58,22 +110,6 @@ function scoreSkill(s: Skill, angle: Angle, jdLower: string): number {
   let base = emphasis * s.weight;
   if (jdLower && jdLower.includes(s.name.toLowerCase())) base += 4;
   return base;
-}
-
-function priorityCap(p: Project, angleId: string): number {
-  const pri = p.role_priority[angleId];
-  if (pri === 'lead') return 6;
-  if (pri === 'support') return 4;
-  if (pri === 'mention') return 2;
-  return 0;
-}
-
-function priorityRank(p: Project, angleId: string): number {
-  const pri = p.role_priority[angleId];
-  if (pri === 'lead') return 0;
-  if (pri === 'support') return 1;
-  if (pri === 'mention') return 2;
-  return 99;
 }
 
 export interface TailorContext {
@@ -87,18 +123,18 @@ export function tailorResume(ctx: TailorContext): PacketSelection {
     return { projectIds: [], bulletIdsByProject: {}, skillGroupOrder: [] };
   }
   const jdLower = (ctx.jdText ?? '').toLowerCase();
+  const jd = buildJdContext(jdLower);
 
-  // Project ordering
-  const includedProjects = projects
-    .filter(p => p.role_priority[angle.id] !== 'omit')
-    .slice()
-    .sort((a, b) => priorityRank(a, angle.id) - priorityRank(b, angle.id));
+  // Section-aware ordering shared with the engine: work first (data order),
+  // then independent apps ranked per angle.
+  const ordered = orderedProjectsForAngle(angle);
+  const includedProjects = [...ordered.work, ...ordered.independent];
 
   const bulletIdsByProject: Record<string, string[]> = {};
   for (const p of includedProjects) {
-    const cap = priorityCap(p, angle.id);
+    const cap = bulletBudget(p, angle.id);
     const ranked = p.bullets
-      .map((b, idx) => ({ b, idx, score: scoreBullet(b, angle, jdLower) }))
+      .map((b, idx) => ({ b, idx, score: scoreBullet(b, angle, jd) }))
       .sort((a, b) => b.score - a.score)
       .slice(0, cap)
       .map(x => bulletKey(p.id, x.idx));
@@ -132,7 +168,10 @@ export function tailorResume(ctx: TailorContext): PacketSelection {
 
 // Serialize a selection back to plain text (for copy / preview). Bullets
 // always come from the source-of-truth project data; this function never
-// modifies them.
+// modifies them. Entries are grouped into the same two sections the resume
+// renders (EXPERIENCE / INDEPENDENT PRODUCTS) — grouping happens at render
+// time by project kind, so selections persisted before the sectioning
+// change still render correctly.
 export function selectionToText(selection: PacketSelection, kicker: string, angleId: string): string {
   const angle = angleById(angleId);
   const lines: string[] = [];
@@ -140,11 +179,12 @@ export function selectionToText(selection: PacketSelection, kicker: string, angl
     lines.push(kicker.trim());
     lines.push('');
   }
-  for (const projectId of selection.projectIds) {
-    const p = projects.find(x => x.id === projectId);
-    if (!p) continue;
+
+  const renderEntry = (projectId: string) => {
+    const p = projectById(projectId);
+    if (!p) return;
     const bulletKeys = selection.bulletIdsByProject[projectId] ?? [];
-    if (bulletKeys.length === 0) continue;
+    if (bulletKeys.length === 0) return;
     const company = p.company ? ` · ${p.company}` : '';
     lines.push(`${p.title}${company}`);
     lines.push(`${p.role} · ${p.period}${p.location ? ' · ' + p.location : ''}`);
@@ -153,7 +193,22 @@ export function selectionToText(selection: PacketSelection, kicker: string, angl
       if (b) lines.push(`  - ${b.text}`);
     }
     lines.push('');
+  };
+
+  const workIds = selection.projectIds.filter(id => projectById(id)?.kind === 'work');
+  const independentIds = selection.projectIds.filter(id => projectById(id)?.kind === 'independent');
+
+  if (workIds.length > 0) {
+    lines.push('EXPERIENCE');
+    lines.push('');
+    for (const id of workIds) renderEntry(id);
   }
+  if (independentIds.length > 0) {
+    lines.push('INDEPENDENT PRODUCTS');
+    lines.push('');
+    for (const id of independentIds) renderEntry(id);
+  }
+
   if (angle) lines.push(`(Tailored for: ${angle.label})`);
   return lines.join('\n');
 }

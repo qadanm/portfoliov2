@@ -35,7 +35,7 @@ import { identity } from '@/data/identity';
       <label>Recruiter first name <span class="letter-foot__hint">optional — appears in the greeting</span>
         <input type="text" id="letter-recruiter" placeholder="" />
       </label>
-      <p class="letter-foot__note">The body is a fixed generic paragraph for this resume angle. Only the greeting and the role/company line change per job — that's by design. Edit the per-angle bodies in <code>admin/src/lib/letters.ts</code> if you want to change the wording.</p>
+      <p class="letter-foot__note">The body is assembled from authored building blocks: a per-angle positioning line, the two evidence lines that best match this job's JD (real shipped work — MagTek, InvestCloud, ChatOBD2, VINly, CarSpotter), and a matched-theme or craft closer. The JD only picks which authored lines run; it never injects its own prose. Edit the lines in <code>admin/src/data/cover-evidence.ts</code> to tune content.</p>
     </footer>
 
     <div class="letter-toast" id="letter-toast" aria-live="polite"></div>

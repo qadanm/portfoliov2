@@ -20,6 +20,7 @@ import {
 
 import { selectAngle } from './angle-selector';
 import { tailorResume, selectionToText } from './resume-tailor';
+import { projectById } from '@/data/projects';
 import { draftCoverLetter } from './cover-letter';
 import { draftShortAnswers } from './short-answers';
 import { draftRecruiterDm, draftFollowUp } from './recruiter-msgs';
@@ -101,8 +102,12 @@ export function buildPacket(jobId: string, forcedAngleId?: string): ApplicationP
   // 6. Ghost risk
   const ghost = detectGhostRisk(job, jobsStore.list());
 
-  // 7. Portfolio mentions: top project ids by emphasis
-  const portfolioMentions = selection.projectIds.slice(0, 2);
+  // 7. Portfolio mentions: the top two independent apps for this angle
+  // (selection.projectIds is work-first ordered, so a plain slice would
+  // name the employers instead of the portfolio pieces).
+  const portfolioMentions = selection.projectIds
+    .filter(id => projectById(id)?.kind === 'independent')
+    .slice(0, 2);
 
   // 8. Construct packet shell so we can run scoring (which needs the
   // populated text fields).
