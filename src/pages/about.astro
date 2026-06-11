@@ -135,12 +135,17 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
                 seconds. The interesting part is the spine: a content-addressed
                 media pipeline that can't orphan a photo, a fail-loud content
                 bundler, and a pure-TypeScript game engine carrying 234 tests.
-                Designed, built, and branded end to end; preparing the App
-                Store submission.
+                Designed, built, branded, and shipped end to end — now on
+                the App Store.
               </p>
               <p class="about__career-stack">
                 Expo / React Native · TypeScript · Zustand · MMKV ·
                 Turborepo · Astro · ImageMagick pipeline
+              </p>
+              <p class="about__career-links">
+                <a href="https://apps.apple.com/app/carspotter-daily-car-game/id6777868215" target="_blank" rel="noopener" data-track="cta_click" data-track-cta="about-appstore" data-track-project="car-spotter">App Store ↗</a>
+                <span aria-hidden="true">·</span>
+                <a href="https://carspottergame.com" target="_blank" rel="noopener" data-track="cta_click" data-track-cta="about-site" data-track-project="car-spotter">carspottergame.com ↗</a>
               </p>
             </li>
 
@@ -164,12 +169,17 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
                 an opening offer, a walk-away floor. The hard part was
                 trust. The numbers that cost money are computed by
                 deterministic functions and pinned by tests, so the model
-                explains an offer it is never allowed to invent. Submitted
-                to the App Store and in review.
+                explains an offer it is never allowed to invent. Live on
+                the App Store.
               </p>
               <p class="about__career-stack">
                 Expo / React Native · TypeScript · Supabase Edge (Deno) ·
                 Anthropic Sonnet + DeepSeek · RevenueCat · Astro
+              </p>
+              <p class="about__career-links">
+                <a href="https://apps.apple.com/app/vinly-buyer-reports/id6774041303" target="_blank" rel="noopener" data-track="cta_click" data-track-cta="about-appstore" data-track-project="vinly">App Store ↗</a>
+                <span aria-hidden="true">·</span>
+                <a href="https://vinly.dev" target="_blank" rel="noopener" data-track="cta_click" data-track-cta="about-site" data-track-project="vinly">vinly.dev ↗</a>
               </p>
             </li>
 
@@ -1044,6 +1054,25 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     color: var(--color-text);
     font-weight: 600;
   }
+
+  .about__career-links {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    margin: var(--space-3) 0 0;
+  }
+  .about__career-links span { color: var(--color-text-subtle); }
+  .about__career-links a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color 200ms var(--ease-out);
+  }
+  .about__career-links a:hover { color: var(--color-text); }
 
   .about__career-stack {
     position: relative;

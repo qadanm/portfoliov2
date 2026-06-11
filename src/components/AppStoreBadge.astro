@@ -1,0 +1,53 @@
+---
+// Official Apple "Download on the App Store" badge (black lockup, en-US),
+// from Apple's official badge asset pack. The black lockup is Apple's
+// preferred badge and its white keyline works on light and dark themes;
+// the white alternate is also in /public/badges/ if ever needed.
+// Never restyle, recolor, or modify the artwork itself. Apple's minimum
+// rendered height on web is 40px, with clear space ≥ 1/4 badge height.
+interface Props {
+  href: string;
+  /** Rendered height in px (Apple minimum: 40). */
+  height?: number;
+  /** Analytics: project slug for data-track-project. */
+  project?: string;
+  /** Analytics: cta name for data-track-cta. */
+  cta?: string;
+}
+const { href, height = 44, project, cta = 'appstore-badge' } = Astro.props;
+// Official badge aspect ratio: 119.66407 × 40.
+const width = Math.round(height * (119.66407 / 40));
+---
+
+<a
+  class="appstore-badge"
+  href={href}
+  target="_blank"
+  rel="noopener"
+  aria-label="Download on the App Store"
+  data-track="cta_click"
+  data-track-cta={cta}
+  data-track-project={project}
+>
+  <img
+    src="/badges/app-store-badge.svg"
+    alt="Download on the App Store"
+    width={width}
+    height={height}
+    loading="lazy"
+    decoding="async"
+  />
+</a>
+
+<style>
+  .appstore-badge {
+    display: inline-flex;
+    line-height: 0;
+    border-radius: 8px;
+    transition: transform 200ms var(--ease-out);
+  }
+  .appstore-badge:hover {
+    transform: translateY(-1px);
+  }
+  .appstore-badge img { display: block; height: auto; }
+</style>

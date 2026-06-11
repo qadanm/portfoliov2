@@ -11,6 +11,7 @@ import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
 import AdvisorVisual from '@/components/diagrams/AdvisorVisual.astro';
 import ReadingProgress from '@/components/ReadingProgress.astro';
 import CaseStudyMobileBar from '@/components/work/CaseStudyMobileBar.astro';
+import AppStoreBadge from '@/components/AppStoreBadge.astro';
 import SchemaArticle from '@/components/seo/SchemaArticle.astro';
 import SchemaBreadcrumb from '@/components/seo/SchemaBreadcrumb.astro';
 import { getCollection } from 'astro:content';
@@ -166,6 +167,30 @@ const categoryKey = data.category.toLowerCase();
             </div>
           )}
         </dl>
+
+        {(data.appStoreUrl || data.siteUrl) && (
+          <div class="cs__get">
+            {data.appStoreUrl && (
+              <AppStoreBadge href={data.appStoreUrl} height={44} project={project.slug} cta="case-study-appstore" />
+            )}
+            {data.siteUrl && (
+              <a
+                class="cs__get-site"
+                href={data.siteUrl}
+                target="_blank"
+                rel="noopener"
+                data-track="cta_click"
+                data-track-cta="case-study-site"
+                data-track-project={project.slug}
+              >
+                {new URL(data.siteUrl).hostname}
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M3 13L13 3M13 3H5M13 3v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+            )}
+          </div>
+        )}
       </div>
     </header>
 
@@ -232,6 +257,34 @@ const categoryKey = data.category.toLowerCase();
       <div class="prose cs__prose">
         <Content />
       </div>
+
+      {data.appStoreUrl && (
+        <aside class="cs__download" aria-label={`Get ${data.title}`}>
+          <div class="cs__download-copy">
+            <h2 class="cs__download-title">{data.title} is on the App Store.</h2>
+            <p class="cs__download-sub">The fastest way to judge the work is to use it.</p>
+          </div>
+          <div class="cs__download-actions">
+            <AppStoreBadge href={data.appStoreUrl} height={48} project={project.slug} cta="case-study-download-cta" />
+            {data.siteUrl && (
+              <a
+                class="cs__get-site"
+                href={data.siteUrl}
+                target="_blank"
+                rel="noopener"
+                data-track="cta_click"
+                data-track-cta="case-study-download-site"
+                data-track-project={project.slug}
+              >
+                {new URL(data.siteUrl).hostname}
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M3 13L13 3M13 3H5M13 3v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+            )}
+          </div>
+        </aside>
+      )}
     </div>
 
     {project.slug === 'chatobd2' && (
@@ -1337,6 +1390,58 @@ const categoryKey = data.category.toLowerCase();
     background-color: var(--color-text-subtle);
     box-shadow: none;
     animation: none;
+  }
+
+  /* ── Live-product links: header badge row + closing download band ──── */
+  .cs__get {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-top: var(--space-6);
+  }
+  .cs__get-site {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+    transition: color 200ms var(--ease-out);
+  }
+  .cs__get-site:hover { color: var(--color-text); }
+  .cs__get-site svg { transition: transform 200ms var(--ease-out); }
+  .cs__get-site:hover svg { transform: translate(2px, -2px); }
+
+  .cs__download {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+    flex-wrap: wrap;
+    margin-top: var(--space-12);
+    padding: var(--space-7) var(--space-7);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    background: linear-gradient(180deg, var(--color-bg-elevated), var(--color-bg-muted));
+  }
+  .cs__download-title {
+    font-family: var(--font-display);
+    font-size: clamp(22px, 3vw, 28px);
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    margin-bottom: 6px;
+  }
+  .cs__download-sub {
+    font-size: 14px;
+    color: var(--color-text-muted);
+  }
+  .cs__download-actions {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
   }
 
   @media (prefers-reduced-motion: reduce) {

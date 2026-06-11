@@ -25,6 +25,10 @@ const build = defineCollection({
     role: z.string().optional(),
     scope: z.string().optional(),
     status: z.string().optional(),
+    // Live-product links: when present, the case study renders an App Store
+    // badge + marketing-site link in the header and a closing download CTA.
+    appStoreUrl: z.string().url().optional(),
+    siteUrl: z.string().url().optional(),
     outcomes: z.array(z.object({
       label: z.string(),
       value: z.string(),
