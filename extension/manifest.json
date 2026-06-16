@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Qadan Apply Assist",
   "short_name": "Apply Assist",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Autonomous job-application agent for the Qadan admin cockpit. Fills, auto-advances, and (with explicit confirmation) auto-submits on supported ATS platforms. Never bypasses CAPTCHA or login. Never autofills demographics.",
   "permissions": ["storage", "activeTab", "scripting", "tabs", "webNavigation"],
   "minimum_chrome_version": "102",

@@ -80,6 +80,15 @@ import Admin from '@/layouts/Admin.astro';
             <input type="checkbox" data-setting="dryRun" checked />
             <strong>Dry run</strong> — fill + advance + reach submit page, but <em>do not click submit</em>. Recommended for testing.
           </label>
+
+          <div class="aa__resume" style="margin-top: 12px;">
+            <label class="aa__label" style="display:block; margin-bottom: 6px;">
+              <strong>Master résumé</strong> — staged once, sent to the agent with every session so batch runs need no popup.
+            </label>
+            <input type="file" id="aa-resume-file" accept="application/pdf,.pdf" />
+            <span class="muted" id="aa-resume-status" style="margin-left: 8px;">no résumé staged</span>
+            <button class="btn" id="aa-resume-clear" type="button" style="margin-left: 8px;" hidden>Clear</button>
+          </div>
         </div>
       </div>
 
@@ -528,6 +537,7 @@ import Admin from '@/layouts/Admin.astro';
         source: 'qa-admin',
         kind: 'agent.session.snapshot.push',
         session, attempts, packets, vault,
+        resume: getStagedResume(),
         gateContext: {
           todaySubmitCount,
           appliedUrlKeys,
@@ -700,6 +710,57 @@ import Admin from '@/layouts/Admin.astro';
     selectedJobIds.clear();
     renderJobList();
   });
+
+  // ── Master résumé staging (hands-off) ────────────────────────────
+  // Persist a base64 PDF in localStorage so it rides along in every session
+  // snapshot (the `resume` field above) and the SW stages it for the agent —
+  // no extension-popup "Pick resume PDF" step needed for batch runs. Set once,
+  // reused across sessions and browser restarts.
+  const RESUME_KEY = 'qa_agent_resume';
+  function getStagedResume(): { name: string; type: string; size: number; base64: string } | null {
+    try {
+      const raw = localStorage.getItem(RESUME_KEY);
+      if (!raw) return null;
+      const r = JSON.parse(raw);
+      return (r && r.base64) ? r : null;
+    } catch { return null; }
+  }
+  function renderResumeStatus() {
+    const status = document.getElementById('aa-resume-status');
+    const clearBtn = document.getElementById('aa-resume-clear') as HTMLButtonElement | null;
+    const r = getStagedResume();
+    if (status) status.textContent = r
+      ? `staged: ${r.name} (${Math.round((r.size || 0) / 1024)} KB)`
+      : 'no résumé staged';
+    if (clearBtn) clearBtn.hidden = !r;
+  }
+  document.getElementById('aa-resume-file')?.addEventListener('change', (e) => {
+    const input = e.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      // reader.result is a data URL: strip the "data:...;base64," prefix.
+      const dataUrl = String(reader.result || '');
+      const base64 = dataUrl.includes(',') ? dataUrl.slice(dataUrl.indexOf(',') + 1) : dataUrl;
+      try {
+        localStorage.setItem(RESUME_KEY, JSON.stringify({
+          name: file.name, type: file.type || 'application/pdf', size: file.size, base64,
+        }));
+        renderResumeStatus();
+      } catch (err) {
+        alert('Could not stage résumé (too large for localStorage?). ' + (err as Error).message);
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+  document.getElementById('aa-resume-clear')?.addEventListener('click', () => {
+    localStorage.removeItem(RESUME_KEY);
+    const input = document.getElementById('aa-resume-file') as HTMLInputElement | null;
+    if (input) input.value = '';
+    renderResumeStatus();
+  });
+  renderResumeStatus();
 
   // ── Start session ────────────────────────────────────────────────
   document.getElementById('aa-start')?.addEventListener('click', () => {
@@ -960,16 +1021,18 @@ import Admin from '@/layouts/Admin.astro';
     setHc('hc-vault', vaultMissing.length ? 'warn' : 'ok',
       vaultMissing.length ? `missing: ${vaultMissing.join(', ')}` : 'complete');
 
-    // Resume staged — ask SW via the bridge ping pattern. Best-effort.
-    let resumeStaged: string | null = null;
-    try {
-      // No direct page→storage access; admin can't ask without the bridge.
-      // Surface a hint: we know it's staged if a recent log entry mentioned it.
-      const last = agentLogStore.list().slice(-50).reverse().find(e => /Resume uploaded|Staged/i.test(e.message || ''));
-      if (last) resumeStaged = last.message;
-    } catch { /* ignore */ }
+    // Resume staged — prefer the admin-staged master résumé (rides along in
+    // every snapshot), else fall back to a recent log hint from a popup stage.
+    const adminResume = getStagedResume();
+    let resumeStaged: string | null = adminResume ? `${adminResume.name} (admin)` : null;
+    if (!resumeStaged) {
+      try {
+        const last = agentLogStore.list().slice(-50).reverse().find(e => /Resume uploaded|Staged/i.test(e.message || ''));
+        if (last) resumeStaged = last.message;
+      } catch { /* ignore */ }
+    }
     setHc('hc-resume', resumeStaged ? 'ok' : 'warn',
-      resumeStaged ? 'staged' : 'pick PDF in extension popup');
+      resumeStaged ? (adminResume ? 'staged (admin)' : 'staged') : 'stage a PDF above or in the popup');
 
     // DeepSeek health
     let llmOk = false;

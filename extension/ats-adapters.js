@@ -649,19 +649,54 @@
   };
 
   // ── LinkedIn Easy Apply adapter ────────────────────────────────
+  // LinkedIn Easy Apply is unlike every other ATS: the form lives inside a
+  // MODAL that only exists after the user clicks "Easy Apply", and its steps
+  // advance via React state on the SAME url — no navigation, no history push.
+  // So we (a) open the modal in prepare() before the agent scans, and (b)
+  // scope all detection + button lookups to the modal so we never grab the
+  // page's own search box / nav. (The same-url step re-run lives in the
+  // agent runner, which drives the modal steps in-process for this adapter.)
+  function linkedInModal(doc = document) {
+    const m = doc.querySelector('.jobs-easy-apply-modal, .jobs-easy-apply-content');
+    if (m) return m.closest('[role="dialog"]') || m;
+    return Array.from(doc.querySelectorAll('div[role="dialog"]')).find(d =>
+      /^apply to /i.test((d.textContent || '').trim()) || d.querySelector('input, textarea, select')) || null;
+  }
+  function linkedInApplyTrigger(doc = document) {
+    const direct = doc.querySelector('button.jobs-apply-button');
+    if (direct && /easy apply/i.test(direct.getAttribute('aria-label') || direct.textContent || '')) return direct;
+    return Array.from(doc.querySelectorAll('button')).find(b =>
+      /^easy apply/i.test((b.textContent || '').trim()) && !b.closest('[role="dialog"]')) || null;
+  }
+  // Open the Easy Apply modal if it isn't already open. Resolves true once a
+  // modal containing at least one input is present (or already was).
+  async function openLinkedInEasyApply() {
+    const ready = () => { const m = linkedInModal(); return !!(m && m.querySelector('input, textarea, select')); };
+    if (ready()) return true;
+    const trigger = linkedInApplyTrigger();
+    if (!trigger) return ready();
+    clickButton(trigger);
+    for (let i = 0; i < 25; i++) {            // up to ~5s for the modal to mount
+      await new Promise(r => setTimeout(r, 200));
+      if (ready()) return true;
+    }
+    return ready();
+  }
   const linkedin = {
     name: 'linkedin-easy',
     matches: () => /linkedin\.com\/jobs/.test(location.href),
-    detect: () => detectGeneric(document),
+    // Async hook the runner awaits before scanning — opens the modal.
+    prepare: () => openLinkedInEasyApply(),
+    detect: () => detectGeneric(linkedInModal() || document),
     fill: (map, doc, opts) => {
       const safeMap = { ...map };
       // LinkedIn screening questions are knockout-style; never autofill
       // numeric years-experience or yes/no answers.
       delete safeMap.yearsExperience;
-      return fillGeneric(safeMap, doc || document, opts);
+      return fillGeneric(safeMap, doc || linkedInModal() || document, opts);
     },
-    findNext: () => findButtonByLabels(['next', 'review']),
-    findSubmit: () => findSubmitButton(['submit application', 'submit']),
+    findNext: () => findButtonByLabels(['next', 'review'], linkedInModal() || document),
+    findSubmit: () => findSubmitButton(['submit application', 'submit'], linkedInModal() || document),
   };
 
   const generic = {

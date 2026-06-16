@@ -91,6 +91,7 @@
         attempts: d.attempts,
         packets: d.packets,
         vault: d.vault,
+        resume: d.resume,
         gateContext: d.gateContext,
       });
       return;

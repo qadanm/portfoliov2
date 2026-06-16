@@ -608,6 +608,23 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
           chrome.storage.local.set({ vault: msg.vault, vaultImportedAt: Date.now() }, resolve);
         });
       }
+      // Hands-off résumé staging: the admin can include a base64 PDF in the
+      // snapshot so batch runs don't depend on a manual popup → "Pick resume
+      // PDF" step each time. Stored under the SAME session key the runner
+      // reads (getStagedResumeFile → chrome.storage.session.stagedResume), so
+      // a popup-staged file and an admin-staged file are interchangeable.
+      if (msg.resume && msg.resume.base64) {
+        try {
+          await new Promise((resolve) => {
+            chrome.storage.session.set({ stagedResume: {
+              name: msg.resume.name || 'resume.pdf',
+              type: msg.resume.type || 'application/pdf',
+              size: msg.resume.size || 0,
+              base64: msg.resume.base64,
+            } }, resolve);
+          });
+        } catch { /* session storage unavailable — popup staging still works */ }
+      }
       await writeState(state);
       sendResponse({ ok: true });
       return;

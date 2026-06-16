@@ -109,7 +109,20 @@
     });
   }
 
+  // LinkedIn Easy Apply advances its multi-step modal on ONE url with no
+  // navigation, so the runner drives those steps in-process (see end of
+  // runOnce). This counter caps that recursion so a stuck modal can't loop
+  // forever. Resets per page load (each attempt opens in a fresh tab).
+  let __qaLinkedInStep = 0;
+
   async function runOnce() {
+    const adapter = ADAPTERS.pickAdapter();
+    // LinkedIn: the application form is inside a modal that must be opened by
+    // clicking "Easy Apply" first. Do that before we wait for / scan fields —
+    // otherwise we scan the bare job page, find no form, and pause (the bug).
+    if (adapter.prepare) {
+      try { await adapter.prepare(); } catch { /* best effort */ }
+    }
     // Wait for hydration before we ask the SW anything — content scripts
     // often fire on document_idle, which is BEFORE React hydrates form fields.
     await waitForFormVisible(3500);
@@ -130,7 +143,7 @@
     }
 
     const { attempt, session, vault, packet } = ctx;
-    const adapter = ADAPTERS.pickAdapter();
+    // (adapter is picked at the top of runOnce so prepare() can run first)
 
     send('agent.runner.page-loaded', {
       attemptId: attempt.id,
@@ -344,14 +357,19 @@
 
     // Loop guard — track how many times the runner has fired on this same
     // URL during this session. After 3 fires without progress, stop.
-    const loopGuardOk = await registerLoopFire(session.id, attempt.id, location.href);
-    if (!loopGuardOk) {
-      send('agent.runner.pause', {
-        attemptId: attempt.id,
-        blockReason: 'page-changed',
-        message: 'Possible navigation loop — agent ran 3× on the same URL without progress. Stopped.',
-      });
-      return;
+    // Skip for LinkedIn: its modal steps share ONE url by design, so this
+    // URL-keyed guard would false-trip on step 3 — the __qaLinkedInStep cap
+    // protects the in-process LinkedIn recursion instead.
+    if (adapter.name !== 'linkedin-easy') {
+      const loopGuardOk = await registerLoopFire(session.id, attempt.id, location.href);
+      if (!loopGuardOk) {
+        send('agent.runner.pause', {
+          attemptId: attempt.id,
+          blockReason: 'page-changed',
+          message: 'Possible navigation loop — agent ran 3× on the same URL without progress. Stopped.',
+        });
+        return;
+      }
     }
 
     // Look for submit button first — if present, this is the final page
@@ -508,6 +526,16 @@
         blockReason: 'unknown-required-field',
         message: `Validation: ${errors.slice(0, 2).join(' · ')}`,
       });
+      return;
+    }
+    // LinkedIn Easy Apply advances on the same URL with no navigation and no
+    // history push — so neither re-injection nor the SW history-nudge fires.
+    // Drive the next modal step in-process, bounded by the step cap. Submit on
+    // the final step still flows through the L3 gates in the branch above.
+    if (adapter.name === 'linkedin-easy' && __qaLinkedInStep < 12) {
+      __qaLinkedInStep += 1;
+      await waitForSettle({ quiet: 500, cap: 3000 });
+      return runOnce();
     }
   }
 
