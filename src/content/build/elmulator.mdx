@@ -1,0 +1,66 @@
+---
+title: elmulator
+short: An open-source ELM327 adapter emulator that puts a car app's Bluetooth code under test in CI, with no car and no hardware.
+category: Product
+keyFocus:
+  - Test infrastructure
+  - Cross-language conformance
+  - Protocol-oriented design
+role: Creator, sole author
+period: '2026'
+status: Open source · live on PyPI, Swift Package Index & the GitHub Marketplace
+scope: Swift + Python packages, two CLIs, a GitHub Action, a conformance suite
+engagement: independent
+siteUrl: https://github.com/qadanm/elmulator
+outcomes:
+  - label: Distribution channels
+    value: '3'
+  - label: Servers kept byte-identical
+    value: '2'
+  - label: Third-party runtime deps
+    value: '0'
+  - label: Example scenarios, each a fixture
+    value: '7'
+stack:
+  - Swift 6
+  - SwiftPM
+  - CoreBluetooth
+  - Python (stdlib)
+  - GitHub Actions
+  - JSON Schema
+placeholder:
+  from: '#0B0F17'
+  to: '#15243C'
+  label: elmulator
+  sublabel: OBD2 CI harness
+  angle: 135
+  labelTone: light
+featured: false
+order: 2.5
+---
+
+## The premise
+
+Most OBD2 apps reach the car through a Bluetooth adapter, and that link is the single hardest thing to test. The iOS Simulator has no Bluetooth at all. There is no supported way to mock `CBPeripheral`. So the Bluetooth path, the part most likely to break in a stranger's driveway, is usually the part that never gets a test.
+
+The usual workaround is a phone, a real adapter, and a car in the parking lot. That doesn't run in CI, and it doesn't run at 2am when a refactor lands.
+
+## A different idea
+
+elmulator is a fake ELM327 you can script. It started as the test harness inside my own OBD2 app and came out as a standalone, MIT-licensed tool so the Bluetooth code can run on an ordinary CI runner instead of a car.
+
+One JSON scenario describes a synthetic conversation: what the adapter replies, how it chunks the reply across BLE notifications, how long it waits, and when it stalls, drops the connection, or sends back garbage. The same scenario can drive a fast in-process unit test, your real CoreBluetooth code through a mock peripheral, an on-device BLE peripheral, or a plain TCP socket for any language.
+
+## Three decisions that shaped it
+
+**Two implementations, held byte-for-byte identical.** There is a Swift server and a pure-standard-library Python server, and a conformance suite runs the same scenarios through both and diffs the bytes. Neither is allowed to drift from the other. That differential test is the spine of the project: it is what lets a scenario mean exactly one thing no matter which runtime plays it.
+
+**A protocol seam, not a mock framework.** The connection logic sits behind a `CentralStack` protocol that the real CoreBluetooth central and the fake one both implement. Tests swap one for the other and run the whole power-on, scan, connect, discover, subscribe, ready flow with no radio. The state machine is a plain value type, so it is trivial to drive and assert on.
+
+**Scenarios are fixtures.** Each scenario also records the scan result it should produce, so the file that fakes the adapter is the same file that guards against regressions. Add a scenario, and you have both a new test case and a new piece of documentation.
+
+## Shipped, not just published
+
+elmulator is distributed the way a dependency should be: `pip install elmulator`, a Swift package on the Swift Package Index, and a one-line GitHub Action on the Marketplace. Releases publish themselves through OIDC trusted publishing, CI gates every change on the conformance suite, and there are zero third-party runtime dependencies to carry.
+
+It is the open-source counterpart to the car apps: the same domain, taken down a layer, and handed to anyone building on iOS OBD2.

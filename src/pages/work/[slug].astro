@@ -6,6 +6,7 @@ import VinlyArtifact from '@/components/artifacts/VinlyArtifact.astro';
 import PlatformArtifact from '@/components/artifacts/PlatformArtifact.astro';
 import AdvisorArtifact from '@/components/artifacts/AdvisorArtifact.astro';
 import CarSpotterArtifact from '@/components/artifacts/CarSpotterArtifact.astro';
+import ElmulatorArtifact from '@/components/artifacts/ElmulatorArtifact.astro';
 import ChatOBDFlow from '@/components/diagrams/ChatOBDFlow.astro';
 import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
 import AdvisorVisual from '@/components/diagrams/AdvisorVisual.astro';
@@ -49,6 +50,7 @@ const artifactMap: Record<string, any> = {
   'car-spotter': CarSpotterArtifact,
   'magtek-platform': PlatformArtifact,
   'financial-platforms': AdvisorArtifact,
+  'elmulator': ElmulatorArtifact,
 };
 const Artifact = artifactMap[project.slug] ?? null;
 const categoryKey = data.category.toLowerCase();
@@ -1030,6 +1032,123 @@ const categoryKey = data.category.toLowerCase();
       </>
     )}
 
+    {project.slug === 'elmulator' && (
+      <>
+        <section class="container-narrow cs__pull">
+          <p class="cs__pull-text">
+            Two servers, one scenario, and a diff that never lets them disagree.
+          </p>
+          <span class="cs__pull-caption">Where the trust comes from</span>
+        </section>
+
+        <section class="container-site cs__post">
+          <header class="cs__post-head">
+            <div class="cs__post-sxn">
+              <span class="cs__post-num">04</span>
+              <span class="cs__post-eyebrow">The pitch in one image</span>
+              <span class="cs__post-rule" aria-hidden="true"></span>
+            </div>
+            <h2 class="cs__post-title">Your real Bluetooth code, tested with no hardware.</h2>
+            <p class="cs__post-sub">
+              The app connects to a scripted ELM327 exactly as it would to a
+              real adapter, over a mock BLE central, and the whole scan runs
+              green on an ordinary CI runner. No car, no adapter, no radio.
+            </p>
+          </header>
+          <div class="cs__shot-grid">
+            <figure class="cs__shot">
+              <img
+                src="/images/elmulator/architecture-dark.svg"
+                alt="elmulator architecture: your OBD2 app sends commands and receives replies from elmulator, a scripted ELM327 over mock BLE, and swift test passes on any runner, with the car, adapter, and radio all crossed out."
+                width="900"
+                height="300"
+                loading="lazy"
+              />
+              <figcaption>
+                One image, the whole idea. The app talks to elmulator instead
+                of a car, and CI goes green with the three things you normally
+                need, car, adapter, radio, struck out.
+              </figcaption>
+            </figure>
+          </div>
+        </section>
+
+        <section class="container-site cs__post cs__post--alt">
+          <header class="cs__post-head">
+            <div class="cs__post-sxn">
+              <span class="cs__post-num">05</span>
+              <span class="cs__post-eyebrow">One engine, every surface</span>
+              <span class="cs__post-rule" aria-hidden="true"></span>
+            </div>
+            <h2 class="cs__post-title">Six ways to fake the same adapter.</h2>
+            <p class="cs__post-sub">
+              A single scenario engine backs an in-process double, a
+              CoreBluetooth-Mock bridge for real CBCentralManager code, an
+              on-device peripheral, a TCP server for any language, a GitHub
+              Action, and a Python server held byte-for-byte identical to the
+              Swift one.
+            </p>
+          </header>
+          <div class="cs__shot-grid">
+            <figure class="cs__shot">
+              <img
+                src="/images/elmulator/features-dark.svg"
+                alt="elmulator capability grid: in-process BLE double, CoreBluetooth-Mock bridge, real BLE peripheral, TCP server for any language, GitHub Action, and byte-for-byte parity between the Python and Swift servers."
+                width="900"
+                height="392"
+                loading="lazy"
+              />
+              <figcaption>
+                The same JSON scenario drives all six. Pick the surface the test
+                needs, from a millisecond in-process check to your real
+                CoreBluetooth stack under swift test.
+              </figcaption>
+            </figure>
+          </div>
+        </section>
+
+        <section class="container-site cs__post">
+          <header class="cs__post-head">
+            <div class="cs__post-sxn">
+              <span class="cs__post-num">06</span>
+              <span class="cs__post-eyebrow">The receipt</span>
+              <span class="cs__post-rule" aria-hidden="true"></span>
+            </div>
+            <h2 class="cs__post-title">Green on a runner with no radio.</h2>
+            <p class="cs__post-sub">
+              The suite that ships with elmulator runs a full BLE scan against
+              a scripted adapter, reassembles a reply split across many
+              notifications, and refuses to crash on garbage, all on a plain
+              macOS runner.
+            </p>
+          </header>
+          <div class="cs__shot-grid">
+            <figure class="cs__shot">
+              <img
+                src="/images/elmulator/demo.svg"
+                alt="A terminal running swift test against elmulator: connects over BLE and reads a stored P0420, reassembles a reply split across many BLE notifications, does not crash on malformed adapter output, then 3 tests passed on a plain macOS runner with zero hardware."
+                width="820"
+                height="372"
+                loading="lazy"
+              />
+              <figcaption>
+                Real CoreBluetooth code, a scripted adapter, and a green run
+                with zero hardware attached.
+              </figcaption>
+            </figure>
+          </div>
+          <p class="cs__post-closing">
+            elmulator ships the way a dependency should: <code>pip install elmulator</code>,
+            a package on the Swift Package Index, and a one-line GitHub Action
+            on the Marketplace, releasing themselves through OIDC trusted
+            publishing with the conformance suite gating every change. It is the
+            open-source counterpart to the car apps, the same domain taken down
+            a layer and handed to anyone building on iOS OBD2.
+          </p>
+        </section>
+      </>
+    )}
+
     <footer class="cs__footer">
       <div class="container-site">
         <div class="cs__next-head">
@@ -1659,7 +1778,8 @@ const categoryKey = data.category.toLowerCase();
   .cs__cover-artifact :global(.vinart),
   .cs__cover-artifact :global(.part),
   .cs__cover-artifact :global(.csart),
-  .cs__cover-artifact :global(.aart) {
+  .cs__cover-artifact :global(.aart),
+  .cs__cover-artifact :global(.elart) {
     position: absolute;
     inset: 0;
   }

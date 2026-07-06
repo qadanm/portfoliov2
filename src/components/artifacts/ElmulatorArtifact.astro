@@ -1,0 +1,289 @@
+---
+// elmulator thumbnail. Theme-aware: deep blue-black terminal in dark mode,
+// soft blue-white in light mode. Keeps the elmulator blue + a green CI pass
+// so the project identity reads at a glance. Mirrors the README demo: a
+// scripted ELM327 driving an iOS OBD2 test suite green with no radio.
+---
+
+<div class="elart" aria-hidden="true">
+  <div class="elart__bg"></div>
+  <div class="elart__grid"></div>
+  <div class="elart__halo"></div>
+
+  <div class="elart__plate">
+    <div class="elart__bar">
+      <span class="elart__dot elart__dot--r"></span>
+      <span class="elart__dot elart__dot--y"></span>
+      <span class="elart__dot elart__dot--g"></span>
+      <span class="elart__bar-title">iOS OBD2 tests in CI</span>
+    </div>
+
+    <div class="elart__body">
+      <div class="elart__cmd">
+        <span class="elart__prompt">$</span>
+        <span class="elart__cmd-text">swift test</span>
+      </div>
+
+      <div class="elart__note">scripted ELM327 · mock BLE · no radio</div>
+
+      <ul class="elart__checks">
+        <li><span class="elart__tick">✔</span> connects over BLE, reads a stored P0420</li>
+        <li><span class="elart__tick">✔</span> reassembles a chunked reply</li>
+        <li><span class="elart__tick">✔</span> survives malformed adapter output</li>
+      </ul>
+
+      <div class="elart__foot">
+        <span class="elart__pass"><span class="elart__tick">✔</span> 3 tests passed</span>
+        <span class="elart__chip">Python == Swift</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="elart__caption">
+    <span class="elart__caption-line"></span>
+    <span>CI surface · elmulator</span>
+  </div>
+</div>
+
+<style>
+  .elart {
+    --elart-atmos:
+      radial-gradient(ellipse 80% 80% at 78% 14%, rgba(47, 129, 247, 0.16), transparent 60%),
+      radial-gradient(ellipse 60% 60% at 12% 92%, rgba(47, 129, 247, 0.06), transparent 60%),
+      linear-gradient(155deg, #0B0F17 0%, #0D1320 60%, #090C12 100%);
+    --elart-text: #E8EEF7;
+    --elart-muted: rgba(232, 238, 247, 0.6);
+    --elart-subtle: rgba(232, 238, 247, 0.42);
+    --elart-grid: rgba(255, 255, 255, 0.025);
+    --elart-dot-1: rgba(47, 129, 247, 0.05);
+    --elart-dot-2: rgba(255, 255, 255, 0.03);
+    --elart-halo: radial-gradient(circle, rgba(47, 129, 247, 0.22), transparent 65%);
+    --elart-plate-bg: linear-gradient(180deg, rgba(16, 22, 34, 0.94), rgba(11, 15, 23, 0.96));
+    --elart-plate-border: rgba(255, 255, 255, 0.08);
+    --elart-plate-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      0 16px 32px rgba(0, 0, 0, 0.42),
+      0 4px 12px rgba(0, 0, 0, 0.3);
+    --elart-bar-bg: rgba(255, 255, 255, 0.03);
+    --elart-divider: rgba(255, 255, 255, 0.07);
+    --elart-blue: #66A6FF;
+    --elart-blue-strong: #2f81f7;
+    --elart-green: #3FB950;
+    --elart-chip-bg: rgba(47, 129, 247, 0.12);
+    --elart-chip-border: rgba(47, 129, 247, 0.4);
+    --elart-caption: rgba(232, 238, 247, 0.45);
+    --elart-caption-rule: rgba(232, 238, 247, 0.3);
+  }
+
+  :global([data-theme="light"]) .elart {
+    --elart-atmos:
+      radial-gradient(ellipse 80% 80% at 78% 14%, rgba(9, 105, 218, 0.10), transparent 60%),
+      radial-gradient(ellipse 60% 60% at 12% 92%, rgba(9, 105, 218, 0.05), transparent 60%),
+      linear-gradient(155deg, #F4F8FF 0%, #EAF1FE 60%, #F7FAFF 100%);
+    --elart-text: #0C1626;
+    --elart-muted: rgba(12, 22, 38, 0.62);
+    --elart-subtle: rgba(12, 22, 38, 0.5);
+    --elart-grid: rgba(12, 22, 38, 0.04);
+    --elart-dot-1: rgba(9, 105, 218, 0.06);
+    --elart-dot-2: rgba(12, 22, 38, 0.04);
+    --elart-halo: radial-gradient(circle, rgba(9, 105, 218, 0.18), transparent 65%);
+    --elart-plate-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(244, 248, 255, 0.94));
+    --elart-plate-border: rgba(12, 22, 38, 0.08);
+    --elart-plate-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.7),
+      0 1px 2px rgba(12, 22, 38, 0.04),
+      0 16px 32px rgba(12, 22, 38, 0.08),
+      0 4px 12px rgba(12, 22, 38, 0.04);
+    --elart-bar-bg: rgba(12, 22, 38, 0.03);
+    --elart-divider: rgba(12, 22, 38, 0.08);
+    --elart-blue: #0969DA;
+    --elart-blue-strong: #0969DA;
+    --elart-green: #1A7F37;
+    --elart-chip-bg: rgba(9, 105, 218, 0.08);
+    --elart-chip-border: rgba(9, 105, 218, 0.35);
+    --elart-caption: rgba(12, 22, 38, 0.5);
+    --elart-caption-rule: rgba(12, 22, 38, 0.25);
+  }
+
+  .elart {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: var(--elart-atmos);
+    color: var(--elart-text);
+    container-type: inline-size;
+  }
+
+  .elart__bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(var(--elart-dot-1) 1px, transparent 1px),
+      radial-gradient(var(--elart-dot-2) 1px, transparent 1px);
+    background-size: 14px 14px, 32px 32px;
+    background-position: 0 0, 7px 7px;
+  }
+
+  .elart__grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, var(--elart-grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--elart-grid) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: linear-gradient(180deg, transparent 0%, #000 55%);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 55%);
+  }
+
+  .elart__halo {
+    position: absolute;
+    top: -12%;
+    right: -18%;
+    width: 58%;
+    height: 58%;
+    border-radius: 50%;
+    background: var(--elart-halo);
+    filter: blur(22px);
+    pointer-events: none;
+  }
+
+  .elart__plate {
+    position: absolute;
+    left: 7%;
+    right: 7%;
+    top: 54%;
+    transform: translateY(-50%);
+    border: 1px solid var(--elart-plate-border);
+    border-radius: 12px;
+    background: var(--elart-plate-bg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: var(--elart-plate-shadow);
+    overflow: hidden;
+  }
+
+  .elart__bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 12px;
+    background: var(--elart-bar-bg);
+    border-bottom: 1px solid var(--elart-divider);
+  }
+
+  .elart__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .elart__dot--r { background: #FF5F56; }
+  .elart__dot--y { background: #FFBD2E; }
+  .elart__dot--g { background: #27C93F; }
+
+  .elart__bar-title {
+    margin-left: auto;
+    margin-right: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--elart-subtle);
+    letter-spacing: 0.04em;
+    transform: translateX(-14px);
+  }
+
+  .elart__body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 14px 13px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  @container (min-width: 360px) {
+    .elart__body { padding: 15px 17px 16px; gap: 9px; }
+  }
+
+  .elart__cmd { display: flex; align-items: baseline; gap: 8px; }
+  .elart__prompt { color: var(--elart-blue); font-size: 12px; font-weight: 700; }
+  .elart__cmd-text { font-size: 12px; color: var(--elart-text); }
+  @container (min-width: 360px) {
+    .elart__prompt, .elart__cmd-text { font-size: 13px; }
+  }
+
+  .elart__note {
+    font-size: 9.5px;
+    color: var(--elart-subtle);
+    letter-spacing: 0.02em;
+  }
+  @container (min-width: 360px) { .elart__note { font-size: 10.5px; } }
+
+  .elart__checks {
+    list-style: none;
+    margin: 2px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .elart__checks li {
+    font-size: 9.5px;
+    color: var(--elart-muted);
+    line-height: 1.25;
+    display: flex;
+    gap: 7px;
+  }
+  @container (min-width: 360px) { .elart__checks li { font-size: 11px; } }
+
+  .elart__tick { color: var(--elart-green); font-weight: 700; flex-shrink: 0; }
+
+  .elart__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 4px;
+    padding-top: 9px;
+    border-top: 1px solid var(--elart-divider);
+  }
+
+  .elart__pass {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--elart-green);
+  }
+  @container (min-width: 360px) { .elart__pass { font-size: 12.5px; } }
+
+  .elart__chip {
+    font-size: 9px;
+    padding: 3px 8px;
+    border-radius: 9999px;
+    background: var(--elart-chip-bg);
+    border: 1px solid var(--elart-chip-border);
+    color: var(--elart-blue);
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+  @container (min-width: 360px) { .elart__chip { font-size: 10px; } }
+
+  .elart__caption {
+    position: absolute;
+    bottom: 12px;
+    left: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--elart-caption);
+    letter-spacing: 0.06em;
+  }
+
+  .elart__caption-line {
+    width: 14px;
+    height: 1px;
+    background-color: var(--elart-caption-rule);
+  }
+</style>

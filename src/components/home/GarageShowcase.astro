@@ -32,6 +32,14 @@ const apps = {
     poster: '/images/chatobd2/poster.webp',
     alt: 'ChatOBD2 portfolio poster — a light blue tech layout with the AI car-diagnostics app and an OBD-II adapter.',
   },
+  elmulator: {
+    href: '/work/elmulator',
+    github: 'https://github.com/qadanm/elmulator',
+    marketplace: 'https://github.com/marketplace/actions/elmulator',
+    pypi: 'https://pypi.org/project/elmulator/',
+    poster: '/images/elmulator/poster.svg',
+    alt: 'elmulator portfolio poster — a dark blue terminal showing a green iOS OBD2 test run against a scripted ELM327, beside the elmulator wordmark.',
+  },
 };
 ---
 
@@ -52,7 +60,8 @@ const apps = {
         I'm a car guy who ships car apps — three of them, designed and
         engineered solo. A daily spotting game and an AI buyer's report,
         both on the App Store today, and an AI mechanic in your pocket on
-        the way.
+        the way. And under them, an open-source ELM327 emulator I pulled
+        out and shipped so anyone's car app can be tested in CI.
       </p>
     </header>
 
@@ -203,6 +212,96 @@ const apps = {
         </div>
       </a>
     </div>
+
+    {/* ── Open source: elmulator ───────────────────────────────────── */}
+    <article
+      class="garage__oss"
+      data-reveal
+      data-reveal-delay="5"
+    >
+      <span class="garage__hero-corner garage__hero-corner--tl garage__oss-corner" aria-hidden="true"></span>
+      <span class="garage__hero-corner garage__hero-corner--tr garage__oss-corner" aria-hidden="true"></span>
+      <span class="garage__hero-corner garage__hero-corner--bl garage__oss-corner" aria-hidden="true"></span>
+      <span class="garage__hero-corner garage__hero-corner--br garage__oss-corner" aria-hidden="true"></span>
+
+      <div class="garage__oss-media">
+        <img src={apps.elmulator.poster} alt={apps.elmulator.alt} width="2560" height="1600" loading="lazy" decoding="async" />
+      </div>
+
+      <div class="garage__oss-body">
+        <div class="garage__hero-tags">
+          <span class="garage__chip garage__chip--oss">Open source</span>
+          <span class="garage__hero-kind">Swift + Python · CLI + Action</span>
+        </div>
+        <h3 class="garage__oss-name">elmulator</h3>
+        <p class="garage__hero-desc">
+          The test harness under the car apps, pulled out and shipped. A
+          scriptable ELM327 adapter that puts your Bluetooth OBD2 code under
+          test in CI — no car, no adapter, no radio.
+        </p>
+        <ul class="garage__spec garage__spec--oss">
+          <li><span>Swift + Python</span></li>
+          <li><span>Byte-for-byte parity</span></li>
+          <li><span>GitHub Action</span></li>
+        </ul>
+        <a
+          href={apps.elmulator.href}
+          class="garage__cta garage__cta--stretch"
+          data-track="cta_click"
+          data-track-cta="garage-oss"
+          data-track-project="elmulator"
+        >
+          Open the case study
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M3 13L13 3M13 3H5M13 3v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        <div class="garage__store garage__store--oss">
+          <a
+            class="garage__site garage__site--strong"
+            href={apps.elmulator.github}
+            target="_blank"
+            rel="noopener"
+            data-track="cta_click"
+            data-track-cta="garage-github"
+            data-track-project="elmulator"
+          >
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/>
+            </svg>
+            GitHub
+          </a>
+          <a
+            class="garage__site"
+            href={apps.elmulator.marketplace}
+            target="_blank"
+            rel="noopener"
+            data-track="cta_click"
+            data-track-cta="garage-marketplace"
+            data-track-project="elmulator"
+          >
+            Marketplace
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M3 13L13 3M13 3H5M13 3v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+          <a
+            class="garage__site"
+            href={apps.elmulator.pypi}
+            target="_blank"
+            rel="noopener"
+            data-track="cta_click"
+            data-track-cta="garage-pypi"
+            data-track-project="elmulator"
+          >
+            PyPI
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M3 13L13 3M13 3H5M13 3v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </article>
   </div>
 </section>
 
@@ -642,12 +741,104 @@ const apps = {
     z-index: 1;
   }
 
+  /* ─── Open-source band: elmulator ───────────────────────────────── */
+  .garage__chip--oss {
+    color: #EAF2FF;
+    background: #2f81f7;
+    box-shadow: 0 0 14px rgba(47, 129, 247, 0.4);
+  }
+
+  .garage__oss {
+    --oss-rgb: 47, 129, 247;
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
+    background: linear-gradient(180deg, var(--color-bg-elevated), var(--color-bg-muted));
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    margin-top: var(--space-5);
+    transition: border-color 360ms var(--ease-out), box-shadow 360ms var(--ease-out), transform 360ms var(--ease-out);
+    will-change: transform;
+  }
+  @media (min-width: 880px) {
+    .garage__oss { grid-template-columns: 1.32fr 1fr; }
+  }
+  .garage__oss:hover {
+    transform: translateY(-4px);
+    border-color: rgba(var(--oss-rgb), 0.5);
+    box-shadow: var(--shadow-card-hover), 0 0 0 1px rgba(var(--oss-rgb), 0.22), 0 24px 60px rgba(var(--oss-rgb), 0.10);
+  }
+
+  .garage__oss-corner { border-color: rgba(47, 129, 247, 0); }
+  .garage__oss:hover .garage__oss-corner { border-color: #2f81f7; }
+
+  .garage__oss-media {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+    background: #0B0F17;
+    border-bottom: 1px solid var(--color-border);
+  }
+  @media (min-width: 880px) {
+    .garage__oss-media { border-bottom: none; border-right: 1px solid var(--color-border); aspect-ratio: auto; }
+  }
+  .garage__oss-media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: transform 700ms var(--ease-out);
+    will-change: transform;
+  }
+  .garage__oss:hover .garage__oss-media img { transform: scale(1.03); }
+
+  .garage__oss-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-7) var(--space-6);
+  }
+  @media (min-width: 880px) {
+    .garage__oss-body { padding: var(--space-10) var(--space-8); justify-content: center; }
+  }
+
+  .garage__oss-name {
+    font-family: var(--font-display);
+    font-size: clamp(34px, 5vw, 52px);
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    color: var(--color-text);
+  }
+
+  .garage__spec--oss li::before {
+    background: #2f81f7;
+    box-shadow: 0 0 6px rgba(47, 129, 247, 0.6);
+  }
+
+  .garage__oss:hover .garage__cta { color: #66a6ff; }
+  :global([data-theme="light"]) .garage__oss:hover .garage__cta { color: #0969da; }
+  .garage__oss:hover .garage__cta svg { transform: translate(3px, -3px); }
+
+  .garage__site--strong {
+    color: var(--color-text-muted);
+    font-weight: 600;
+  }
+  .garage__site--strong svg { transform: none; }
+  .garage__site--strong:hover svg { transform: translateY(-1px); }
+
   @media (prefers-reduced-motion: reduce) {
     .garage__hero, .garage__app, .garage__hero-media img, .garage__app-media img,
-    .garage__hero-redline, .garage__cta svg, .garage__app-link svg {
+    .garage__hero-redline, .garage__cta svg, .garage__app-link svg,
+    .garage__oss, .garage__oss-media img {
       transition: none !important;
     }
-    .garage__hero:hover, .garage__app:hover { transform: none; }
-    .garage__hero:hover .garage__hero-media img, .garage__app:hover .garage__app-media img { transform: none; }
+    .garage__hero:hover, .garage__app:hover, .garage__oss:hover { transform: none; }
+    .garage__hero:hover .garage__hero-media img, .garage__app:hover .garage__app-media img,
+    .garage__oss:hover .garage__oss-media img { transform: none; }
   }
 </style>
