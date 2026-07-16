@@ -1,0 +1,658 @@
+---
+// The social engine: one authored day → five vertical reels, rendered headless.
+//
+// Every number here is real, read off the renderer: 1080×1920, 30fps, 814 frames (27.1s), and the
+// beat table in social/renderer/src/DailyReveal.tsx. The narration is three permanent ElevenLabs
+// takes reused across every render — not per-video TTS.
+//
+// UX: the stage plays the beats on a loop so the shape of the video is legible at a glance; the
+// timeline underneath is the real timecode, and every beat is a button you can scrub to. Pauses on
+// hover/focus and honours prefers-reduced-motion (no loop — pick a beat yourself).
+
+const FPS = 30;
+const TOTAL_FRAMES = 814;
+const secs = (f: number) => f / FPS;
+
+// f → the beat, straight from DailyReveal.tsx's header table.
+const BEATS = [
+  { f: 0, key: 'open', label: 'Cold open', note: 'Title card alone. No panel, no HUD — one hook.' },
+  { f: 104, key: 'power', label: 'Power on', note: 'Panel and reticles strike together.' },
+  { f: 123, key: 'scan', label: 'Scan', note: 'Scan-wipe reveals the crop; detection markers land.' },
+  { f: 161, key: 'cards', label: 'Four answers', note: 'The cards deal in. Now you’re playing.' },
+  { f: 193, key: 'count', label: 'Countdown', note: 'Five real seconds, cut to the narrator’s pace.' },
+  { f: 360, key: 'lock', label: 'Lock', note: 'A held beat, then the answer commits.' },
+  { f: 446, key: 'reveal', label: 'The bloom', note: 'The crop opens out to the whole car.' },
+  { f: 488, key: 'fact', label: 'Identified', note: 'The name, then the one line worth knowing.' },
+  { f: 584, key: 'cta', label: 'Sign-off', note: 'Crossfade to the wall. Brand stamp. Out.' },
+];
+
+// The three permanent voice takes — recorded once, reused by every render.
+const VO = [
+  { key: 'intro', from: 0, to: 104, line: '“CAN YOU guess this car?”' },
+  { key: 'count', from: 193, to: 348, line: '“Five. Four. Three. Two. One.”' },
+  { key: 'outro', from: 584, to: 660, line: '“CarSpotter.”' },
+];
+
+const pct = (f: number) => (f / TOTAL_FRAMES) * 100;
+---
+
+<figure
+  class="reel"
+  data-reel
+  aria-label={`How one authored day becomes five vertical videos: ${BEATS.map((b) => b.label).join(', ')} — a ${secs(TOTAL_FRAMES).toFixed(1)}-second reel at 1080×1920, narrated by three reused voice takes.`}
+>
+  <!-- Fan-out: the day → the five reels -->
+  <div class="reel__fan">
+    <div class="reel__src">
+      <span class="reel__src-eyebrow">One authored day</span>
+      <span class="reel__src-title">Daily 5</span>
+      <ol class="reel__pips" aria-hidden="true">
+        {[0, 1, 2, 3, 4].map((i) => <li style={`--i:${i}`}></li>)}
+      </ol>
+    </div>
+
+    <div class="reel__arrow" aria-hidden="true">
+      <span class="reel__arrow-line"></span>
+      <span class="reel__arrow-label">render</span>
+    </div>
+
+    <ol class="reel__out" aria-hidden="true">
+      {[0, 1, 2, 3, 4].map((i) => (
+        <li class="reel__out-item" style={`--i:${i}`}>
+          <span class="reel__out-frame"></span>
+        </li>
+      ))}
+    </ol>
+
+    <p class="reel__fan-note">
+      Five clues in, five 9:16 videos out — <strong>one per clue</strong>, every one narrated,
+      animated, and cut to the same beat sheet. No timeline, no editor, no hand.
+    </p>
+  </div>
+
+  <!-- The anatomy of one reel -->
+  <div class="reel__body">
+    <div class="reel__stage-wrap">
+      <div class="reel__stage" data-stage>
+        <!-- 01 cold open -->
+        <div class="reel__scene reel__scene--open" data-scene="open">
+          <span class="reel__hook">ONE DETAIL.</span>
+          <span class="reel__hook reel__hook--lime">TEN SECONDS.</span>
+        </div>
+        <!-- 02-04 the clue -->
+        <div class="reel__scene reel__scene--clue" data-scene="power scan cards count lock">
+          <div class="reel__panel">
+            <span class="reel__reticle reel__reticle--tl"></span>
+            <span class="reel__reticle reel__reticle--tr"></span>
+            <span class="reel__reticle reel__reticle--bl"></span>
+            <span class="reel__reticle reel__reticle--br"></span>
+            <span class="reel__wipe" data-wipe></span>
+          </div>
+          <span class="reel__count" data-count>5</span>
+          <ol class="reel__cards">
+            <li style="--i:0"></li>
+            <li style="--i:1" data-card-lock></li>
+            <li style="--i:2"></li>
+            <li style="--i:3"></li>
+          </ol>
+        </div>
+        <!-- 05-06 the reveal -->
+        <div class="reel__scene reel__scene--reveal" data-scene="reveal fact">
+          <div class="reel__car"></div>
+          <div class="reel__fact">
+            <span class="reel__fact-name">Lincoln MKS</span>
+            <span class="reel__fact-line"></span>
+            <span class="reel__fact-line reel__fact-line--short"></span>
+          </div>
+        </div>
+        <!-- 07 sign-off -->
+        <div class="reel__scene reel__scene--cta" data-scene="cta">
+          <span class="reel__wall" aria-hidden="true"></span>
+          <span class="reel__stamp">CARSPOTTER</span>
+        </div>
+
+        <span class="reel__grain" aria-hidden="true"></span>
+        <span class="reel__ratio" aria-hidden="true">1080 × 1920 · 30fps</span>
+      </div>
+    </div>
+
+    <div class="reel__side">
+      <ol class="reel__beats" data-beats>
+        {BEATS.map((b, i) => (
+          <li>
+            <button type="button" class="reel__beat" data-beat={b.key} data-i={i} aria-pressed={i === 0 ? 'true' : 'false'}>
+              <span class="reel__beat-t">{secs(b.f).toFixed(1)}s</span>
+              <span class="reel__beat-main">
+                <span class="reel__beat-label">{b.label}</span>
+                <span class="reel__beat-note">{b.note}</span>
+              </span>
+            </button>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+
+  <!-- Real timecode + the narration track -->
+  <div class="reel__track">
+    <div class="reel__scale">
+      <span class="reel__play" data-play></span>
+      {BEATS.map((b) => <span class="reel__tick" style={`left:${pct(b.f)}%`} data-tick={b.key}></span>)}
+    </div>
+    <div class="reel__vo">
+      <span class="reel__vo-label">Narration</span>
+      <div class="reel__vo-lane">
+        {VO.map((v) => (
+          <span class="reel__vo-clip" style={`left:${pct(v.from)}%; width:${pct(v.to - v.from)}%`} data-vo={v.key}>
+            <span class="reel__vo-line">{v.line}</span>
+          </span>
+        ))}
+      </div>
+    </div>
+    <p class="reel__track-note">
+      Three voice takes, recorded once and reused by every render — a trailer-narrator read, not
+      per-video TTS. The countdown is <strong>one continuous take</strong>: five words spliced onto a
+      rigid frame grid is exactly what makes a countdown sound robotic.
+      <span class="reel__track-dur">{secs(TOTAL_FRAMES).toFixed(1)}s</span>
+    </p>
+  </div>
+</figure>
+
+<style>
+  .reel {
+    --lime: #c8ff00;
+    --ink: #0b0c0e;
+    --line: rgba(255, 255, 255, 0.09);
+    --dim: rgba(231, 233, 236, 0.5);
+    margin: 0;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    background:
+      radial-gradient(ellipse 90% 70% at 12% 0%, rgba(200, 255, 0, 0.05), transparent 60%),
+      linear-gradient(165deg, #111316 0%, var(--ink) 62%, #08090b 100%);
+    padding: clamp(18px, 3vw, 34px);
+    color: #e7e9ec;
+    overflow: hidden;
+  }
+
+  /* ── fan-out ─────────────────────────────────────────── */
+  .reel__fan {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    align-items: center;
+    gap: clamp(12px, 2vw, 26px);
+  }
+  .reel__src {
+    border: 1px solid rgba(200, 255, 0, 0.28);
+    border-radius: 12px;
+    padding: 12px 16px;
+    background: rgba(200, 255, 0, 0.05);
+    display: grid;
+    gap: 6px;
+  }
+  .reel__src-eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+  .reel__src-title {
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 0.02em;
+  }
+  .reel__pips {
+    display: flex;
+    gap: 4px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .reel__pips li {
+    width: 16px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--lime);
+    opacity: 0.35;
+    animation: reel-pip 5s calc(var(--i) * 0.28s) infinite;
+  }
+  @keyframes reel-pip {
+    0%, 60%, 100% { opacity: 0.3; }
+    12%, 40% { opacity: 1; }
+  }
+
+  .reel__arrow {
+    display: grid;
+    justify-items: center;
+    gap: 4px;
+    min-width: 74px;
+  }
+  .reel__arrow-line {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--lime));
+    position: relative;
+  }
+  .reel__arrow-line::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: -3px;
+    border-left: 6px solid var(--lime);
+    border-top: 3.5px solid transparent;
+    border-bottom: 3.5px solid transparent;
+  }
+  .reel__arrow-label {
+    font-size: 9px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+
+  .reel__out {
+    display: flex;
+    gap: 7px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .reel__out-frame {
+    display: block;
+    width: 26px;
+    aspect-ratio: 9 / 16;
+    border-radius: 4px;
+    border: 1px solid rgba(200, 255, 0, 0.4);
+    background: linear-gradient(170deg, rgba(200, 255, 0, 0.14), rgba(200, 255, 0, 0.03));
+    animation: reel-out 5s calc(var(--i) * 0.28s + 0.5s) infinite;
+  }
+  @keyframes reel-out {
+    0%, 55%, 100% { opacity: 0.28; transform: translateY(2px); }
+    16%, 44% { opacity: 1; transform: translateY(0); }
+  }
+  .reel__fan-note {
+    grid-column: 1 / -1;
+    margin: 4px 0 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--dim);
+    max-width: 68ch;
+  }
+  .reel__fan-note strong { color: #e7e9ec; font-weight: 600; }
+
+  /* ── body: stage + beats ─────────────────────────────── */
+  .reel__body {
+    margin-top: clamp(18px, 2.6vw, 30px);
+    display: grid;
+    grid-template-columns: minmax(150px, 210px) 1fr;
+    gap: clamp(16px, 2.4vw, 30px);
+    align-items: start;
+  }
+  .reel__stage-wrap { position: sticky; top: 90px; }
+  .reel__stage {
+    position: relative;
+    aspect-ratio: 9 / 16;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: #050607;
+    overflow: hidden;
+  }
+  .reel__ratio {
+    position: absolute;
+    left: 8px;
+    bottom: 7px;
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    color: rgba(255, 255, 255, 0.3);
+    z-index: 5;
+  }
+  .reel__grain {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    opacity: 0.5;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.05) 0.5px, transparent 0.5px);
+    background-size: 3px 3px;
+  }
+
+  .reel__scene {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    /* align-content centres the stack vertically. The column must be an EXPLICIT 1fr: an implicit grid
+       track sizes to its content, which collapsed the 4:3 panel to ~60% of the stage. */
+    grid-template-columns: minmax(0, 1fr);
+    align-content: center;
+    justify-items: stretch;
+    gap: 6px;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    padding: 12px;
+  }
+  .reel__scene.is-on { opacity: 1; }
+  /* The two type-only scenes do want their content centred rather than stretched. */
+  .reel__scene--open, .reel__scene--cta { justify-items: center; }
+
+  /* cold open */
+  .reel__hook {
+    font-weight: 800;
+    font-size: clamp(13px, 1.5vw, 17px);
+    letter-spacing: 0.01em;
+    text-align: center;
+    line-height: 1.1;
+  }
+  .reel__hook--lime { color: var(--lime); }
+
+  /* clue */
+  .reel__scene--clue { align-content: center; gap: 10px; }
+  .reel__panel {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #2b2f36, #14161a);
+    overflow: hidden;
+  }
+  .reel__reticle {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border: 2px solid var(--lime);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .is-power .reel__reticle, .is-scan .reel__reticle, .is-cards .reel__reticle,
+  .is-count .reel__reticle, .is-lock .reel__reticle { opacity: 1; }
+  .reel__reticle--tl { top: 5px; left: 5px; border-right: 0; border-bottom: 0; }
+  .reel__reticle--tr { top: 5px; right: 5px; border-left: 0; border-bottom: 0; }
+  .reel__reticle--bl { bottom: 5px; left: 5px; border-right: 0; border-top: 0; }
+  .reel__reticle--br { bottom: 5px; right: 5px; border-left: 0; border-top: 0; }
+  .reel__wipe {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg, transparent 40%, rgba(200, 255, 0, 0.5) 50%, transparent 60%);
+    transform: translateX(-100%);
+  }
+  .is-scan .reel__wipe { animation: reel-wipe 0.9s ease-out; }
+  @keyframes reel-wipe { to { transform: translateX(100%); } }
+
+  .reel__count {
+    justify-self: center;
+    font-weight: 800;
+    font-size: 22px;
+    color: var(--lime);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    font-variant-numeric: tabular-nums;
+  }
+  .is-count .reel__count { opacity: 1; }
+
+  .reel__cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+  }
+  .reel__cards li {
+    height: 16px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    opacity: 0;
+    transform: translateY(5px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition-delay: calc(var(--i) * 60ms);
+  }
+  .is-cards .reel__cards li, .is-count .reel__cards li, .is-lock .reel__cards li {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .is-lock [data-card-lock] { background: var(--lime); box-shadow: 0 0 12px rgba(200, 255, 0, 0.5); }
+
+  /* reveal */
+  .reel__scene--reveal { align-content: center; gap: 10px; }
+  .reel__car {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #3d434c, #191c21);
+    transform: scale(1.5);
+    opacity: 0;
+    transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.5s ease;
+  }
+  .is-reveal .reel__car, .is-fact .reel__car { transform: scale(1); opacity: 1; }
+  .reel__fact {
+    display: grid;
+    gap: 4px;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.4s ease 0.15s, transform 0.4s ease 0.15s;
+  }
+  .is-fact .reel__fact { opacity: 1; transform: translateY(0); }
+  .reel__fact-name { font-weight: 700; font-size: 11px; color: var(--lime); }
+  .reel__fact-line {
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.16);
+  }
+  .reel__fact-line--short { width: 62%; }
+
+  /* sign-off */
+  .reel__wall {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 22px 30px;
+    opacity: 0.5;
+  }
+  .reel__stamp {
+    position: relative;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    color: var(--lime);
+  }
+
+  /* ── beats list ──────────────────────────────────────── */
+  .reel__beats { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .reel__beat {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 10px;
+    align-items: baseline;
+    text-align: left;
+    background: transparent;
+    border: 0;
+    border-left: 2px solid transparent;
+    border-radius: 0 8px 8px 0;
+    padding: 7px 10px;
+    color: inherit;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+    font: inherit;
+  }
+  .reel__beat:hover { background: rgba(255, 255, 255, 0.03); }
+  .reel__beat[aria-pressed='true'] {
+    background: rgba(200, 255, 0, 0.06);
+    border-left-color: var(--lime);
+  }
+  .reel__beat:focus-visible { outline: 2px solid var(--lime); outline-offset: -2px; }
+  .reel__beat-t {
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    color: var(--dim);
+  }
+  .reel__beat[aria-pressed='true'] .reel__beat-t { color: var(--lime); }
+  .reel__beat-main { display: grid; gap: 1px; }
+  .reel__beat-label { font-size: 13px; font-weight: 600; }
+  .reel__beat-note { font-size: 12px; line-height: 1.5; color: var(--dim); }
+
+  /* ── timeline + VO ───────────────────────────────────── */
+  .reel__track { margin-top: clamp(16px, 2.4vw, 26px); }
+  .reel__scale {
+    position: relative;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .reel__tick {
+    position: absolute;
+    top: -2px;
+    width: 1px;
+    height: 7px;
+    background: rgba(255, 255, 255, 0.22);
+  }
+  .reel__tick.is-on { background: var(--lime); }
+  .reel__play {
+    position: absolute;
+    top: -3px;
+    left: 0;
+    width: 2px;
+    height: 9px;
+    background: var(--lime);
+    box-shadow: 0 0 8px var(--lime);
+    transition: left 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .reel__vo {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: 74px 1fr;
+    gap: 10px;
+    align-items: center;
+  }
+  .reel__vo-label {
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+  .reel__vo-lane { position: relative; height: 26px; }
+  .reel__vo-clip {
+    position: absolute;
+    top: 0;
+    height: 26px;
+    border-radius: 5px;
+    border: 1px solid rgba(200, 255, 0, 0.3);
+    background: rgba(200, 255, 0, 0.07);
+    display: grid;
+    place-content: center;
+    overflow: hidden;
+    transition: background 0.3s ease, border-color 0.3s ease;
+  }
+  .reel__vo-clip.is-on { background: rgba(200, 255, 0, 0.2); border-color: var(--lime); }
+  .reel__vo-line {
+    font-size: 10px;
+    white-space: nowrap;
+    padding: 0 6px;
+    color: rgba(231, 233, 236, 0.8);
+  }
+  .reel__track-note {
+    margin: 12px 0 0;
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--dim);
+    max-width: 76ch;
+    position: relative;
+  }
+  .reel__track-note strong { color: #e7e9ec; font-weight: 600; }
+  .reel__track-dur {
+    float: right;
+    font-variant-numeric: tabular-nums;
+    color: var(--lime);
+    font-size: 11px;
+  }
+
+  @media (max-width: 720px) {
+    .reel__body { grid-template-columns: 1fr; }
+    .reel__stage-wrap { position: static; max-width: 170px; }
+    .reel__fan { grid-template-columns: 1fr; justify-items: start; }
+    .reel__arrow { transform: rotate(90deg); min-width: 44px; margin-left: 30px; }
+    .reel__vo-line { font-size: 9px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reel__pips li, .reel__out-frame { animation: none; opacity: 1; }
+    .reel__scene, .reel__car, .reel__fact, .reel__cards li, .reel__play { transition: none; }
+    .is-scan .reel__wipe { animation: none; }
+  }
+</style>
+
+<script>
+  // Drive the stage from the real beat table. Loops so the shape of the video reads at a glance;
+  // pauses on hover/focus so you can actually read a beat; a click scrubs and holds.
+  const BEAT_FRAMES = [0, 104, 123, 161, 193, 360, 446, 488, 584];
+  const KEYS = ['open', 'power', 'scan', 'cards', 'count', 'lock', 'reveal', 'fact', 'cta'];
+  const VO_AT = { intro: [0, 104], count: [193, 348], outro: [584, 660] };
+  const TOTAL = 814;
+
+  document.querySelectorAll('[data-reel]').forEach((root) => {
+    const stage = root.querySelector('[data-stage]');
+    const play = root.querySelector('[data-play]');
+    const beats = [...root.querySelectorAll('[data-beat]')];
+    const scenes = [...root.querySelectorAll('[data-scene]')];
+    const ticks = [...root.querySelectorAll('[data-tick]')];
+    const vos = [...root.querySelectorAll('[data-vo]')];
+    const countEl = root.querySelector('[data-count]');
+    if (!stage || !play) return;
+
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let i = 0;
+    let timer = null;
+    let held = false;
+
+    function paint(n) {
+      i = n;
+      const key = KEYS[n];
+      const f = BEAT_FRAMES[n];
+
+      // The stage keys off a single class, so CSS owns every transition.
+      stage.className = 'reel__stage is-' + key;
+      scenes.forEach((s) => s.classList.toggle('is-on', s.dataset.scene.split(' ').includes(key)));
+      beats.forEach((b, bi) => b.setAttribute('aria-pressed', String(bi === n)));
+      ticks.forEach((t, ti) => t.classList.toggle('is-on', ti <= n));
+      play.style.left = (f / TOTAL) * 100 + '%';
+      vos.forEach((v) => {
+        const [from, to] = VO_AT[v.dataset.vo] ?? [0, 0];
+        v.classList.toggle('is-on', f >= from && f < to);
+      });
+      // The countdown is the one beat with a number worth animating.
+      if (countEl) countEl.textContent = key === 'count' ? '5' : key === 'lock' ? '0' : '5';
+    }
+
+    const next = () => paint((i + 1) % BEAT_FRAMES.length);
+    const start = () => {
+      if (timer || held || reduced.matches) return;
+      timer = window.setInterval(next, 1500);
+    };
+    const stop = () => {
+      window.clearInterval(timer);
+      timer = null;
+    };
+
+    beats.forEach((b, bi) =>
+      b.addEventListener('click', () => {
+        held = true; // an explicit pick wins over the loop
+        stop();
+        paint(bi);
+      }),
+    );
+
+    root.addEventListener('mouseenter', stop);
+    root.addEventListener('mouseleave', () => !held && start());
+    root.addEventListener('focusin', stop);
+
+    paint(0);
+
+    // Only animate while it's actually on screen.
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => (e.isIntersecting ? start() : stop())),
+      { threshold: 0.25 },
+    );
+    io.observe(root);
+  });
+</script>

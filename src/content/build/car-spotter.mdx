@@ -17,8 +17,8 @@ outcomes:
     value: Daily 5
   - label: Detail categories
     value: '12'
-  - label: Tests on the engine
-    value: '234'
+  - label: Tests across the build
+    value: '401'
   - label: Designed and built by
     value: One person
 stack:
@@ -37,7 +37,7 @@ placeholder:
   angle: 135
   labelTone: light
 coverImage: /images/car-spotter/poster.webp
-coverAlt: CarSpotter portfolio poster — tilted iPhone screenshots of the daily car-detail guessing game on a dark garage backdrop, lime accents, the line "Guess the car from the detail."
+coverAlt: CarSpotter portfolio poster — the headline "Guess the car from the detail" in lime and white over a near-black wall of car photographs, beside three tilted iPhones showing a clue, the full-car reveal, and the run result.
 featured: true
 order: 1
 ---
@@ -46,13 +46,21 @@ order: 1
 
 Every enthusiast has done it. A single headlight in traffic, a quarter of a grille, the shape of a wheel arch — and you already know the car. CarSpotter is that instinct turned into a daily game.
 
-Each day is a Daily 5: five cropped details of real cars, four answers each, ten seconds a clue. Same five for everyone. Score, rank up, hold a streak, and brag without spoiling it. It's a Wordle-shaped daily for the people who can name a chassis code from a single taillight.
+Each day is a Daily 5: five cropped details of real cars, four answers each, ten seconds a clue. Same five for everyone. Score, rank up, hold a streak, and brag without spoiling it. It's a Wordle-shaped daily for the people who already know the car before the badge shows up.
 
 ## The Daily 5
 
 The whole loop is built to be felt in under a minute. A detail locks into a lime viewfinder, a tachometer drains the ten seconds, four arcade buttons wait in the thumb zone. You pick, the crop blooms out to the whole car, and a one-line fact lands. Five times, then you're done until tomorrow.
 
-The constraints are the design. Everyone gets the same five, so bragging rights are earned, not bought. Practice is XP-capped, so the leaderboard can't be farmed. The answers are real model names and real chassis codes — no trick questions, no AI mush, no filler.
+The constraints are the design. Everyone gets the same five, so bragging rights are earned, not bought. Practice is XP-capped, so the leaderboard can't be farmed. And an answer is the name a person actually says — "GMC S-15", not "GMC C/K (3rd gen Squarebody · 1973-87)". No trick questions, no AI mush, no filler.
+
+## The answers used to be the hardest part — for the wrong reason
+
+For months the four buttons read like spreadsheet rows: chassis codes, generation numbers, year ranges. It felt rigorous. It was actually unfair, because none of it is visible in a headlight crop. Worse, the catalog held 431 rows across only 240 real nameplates — seven Corvettes, seven F-150s — so a third of the questions offered the same car twice under two spellings. One question asked you to choose between "GMC C/K (1967-1968)" and "GMC C/K (square-body)".
+
+The fix was one idea: **an answer is a name, and a name is the same name whoever badges it.** Generation and year still exist on every car — they're just metadata now, used to pick decoys from the right era and never shown. A decoy has to be a *different* nameplate a person could genuinely mistake for the answer — CR-V and Pilot, Forester and RAV4 — never another trim of the answer itself.
+
+The subtle half is what counts as "the same name". A Chevrolet C/K and a GMC C/K are one name on two badges: indistinguishable in a crop, and two near-identical buttons. But a Silverado and a Sierra are the same truck with *different* names — two things a player can learn apart, which makes them one of the best questions in the game. So the rule ignores the badge and keys on the name. One migration relabelled 376 cars and rebuilt 444 questions across the whole schedule — past, live, and future — and every one of the 703 now shows four different cars.
 
 ## Brag without spoiling
 
@@ -76,7 +84,15 @@ Around that sits a recovery pipeline and a set of gates:
 - **A bundler that fails loud.** The launch bundler used to silently skip any puzzle whose reveal wouldn't resolve. Now it ships complete crop-and-reveal pairs only, asserts every scheduled day is a full five, and exits non-zero on anything missing.
 - **Referential integrity gates.** A pure checker runs over the authored content for dangling photo references, half-built reveal pairs, and orphans — and the same gate guards the studio, the export, and the build.
 
-Exports are self-contained now: every crop and every reveal travels as bytes, so reinstalling a phone or moving to a new laptop can't orphan a thing. The engine carries 234 tests, and the parts that lose data when they're wrong carry the most of them.
+Exports are self-contained now: every crop and every reveal travels as bytes, so reinstalling a phone or moving to a new laptop can't orphan a thing. The build carries 401 tests, and the parts that lose data when they're wrong carry the most of them.
+
+## Every day authors itself into five videos
+
+A daily game lives or dies on being seen daily, and hand-cutting five vertical videos every morning is a job, not a feature. So the same authored day that feeds the app feeds a renderer: five clues in, five narrated 9:16 films out.
+
+Each one is the game's best second, isolated — a hook, a real five-count, the crop blooming to the whole car, the fact, the stamp. 814 frames, 27 seconds, one beat sheet. It works on social for the same reason it works in the app: you already think you know the answer, so you stay to find out whether you were right.
+
+The economics are the point. Rendering is headless Remotion, so a day's five come out of one command instead of an afternoon in an editor. The narration is three permanent voice takes — an intro, a countdown, a sign-off — recorded once and reused by every render, so the hundredth video costs exactly what the first did. Even the countdown is deliberate: it's one continuous read rather than five words spliced onto a frame grid, because a rigid grid is precisely what makes a countdown sound like a robot.
 
 ## One person, end to end
 

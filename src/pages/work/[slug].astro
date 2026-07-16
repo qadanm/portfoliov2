@@ -10,6 +10,7 @@ import ElmulatorArtifact from '@/components/artifacts/ElmulatorArtifact.astro';
 import ChatOBDFlow from '@/components/diagrams/ChatOBDFlow.astro';
 import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
 import AdvisorVisual from '@/components/diagrams/AdvisorVisual.astro';
+import ReelPipeline from '@/components/diagrams/ReelPipeline.astro';
 import ReadingProgress from '@/components/ReadingProgress.astro';
 import CaseStudyMobileBar from '@/components/work/CaseStudyMobileBar.astro';
 import AppStoreBadge from '@/components/AppStoreBadge.astro';
@@ -616,20 +617,20 @@ const categoryKey = data.category.toLowerCase();
             <figure class="cs__shot">
               <img
                 src="/images/car-spotter/clue.webp"
-                alt="CarSpotter clue screen: a tightly cropped car detail inside a lime viewfinder, a draining ten-second tachometer, and four answer buttons — Honda S2000, Toyota Supra, Mazda MX-5, Toyota MR2."
+                alt="CarSpotter clue screen: a tightly cropped grille inside a lime viewfinder, a draining ten-second tachometer, and four answer buttons — Chevrolet Aveo, Lincoln Aviator, Lincoln MKS, Chrysler 300."
                 width="1290"
                 height="2796"
                 loading="lazy"
               />
               <figcaption>
-                The clue: one cropped detail, a ten-second clock, four chassis
-                to choose from. Tap before the tach hits zero.
+                The clue: one cropped detail, a ten-second clock, four cars to
+                choose from. Tap before the tach hits zero.
               </figcaption>
             </figure>
             <figure class="cs__shot">
               <img
                 src="/images/car-spotter/reveal.webp"
-                alt="CarSpotter reveal screen: the cropped detail has zoomed out to the full car, with the model named and a one-line fact beneath it."
+                alt="CarSpotter reveal screen: the cropped grille has zoomed out to the full car — a silver Lincoln MKS — named simply 'Lincoln MKS', with a one-line fact about its split-wing grille."
                 width="1290"
                 height="2796"
                 loading="lazy"
@@ -642,27 +643,28 @@ const categoryKey = data.category.toLowerCase();
             <figure class="cs__shot">
               <img
                 src="/images/car-spotter/daily.webp"
-                alt="CarSpotter home: today's Daily 5 with the five clue slots and a streak counter."
+                alt="CarSpotter home: a faint wall of car photographs behind a one-day streak and today's finished Daily 5 — 833 points, graded A, 'Sharp eye' — with a countdown to tomorrow's set."
                 width="1290"
                 height="2796"
                 loading="lazy"
               />
               <figcaption>
-                A fresh Daily 5 every morning. Five clues, the same five for
-                everyone, and a streak to keep alive.
+                A fresh Daily 5 every morning, the same five for everyone, and a
+                streak to keep alive. Play it and the day resolves to a grade and
+                a countdown to the next one.
               </figcaption>
             </figure>
             <figure class="cs__shot">
               <img
                 src="/images/car-spotter/combo.webp"
-                alt="CarSpotter result screen: a run score with a combo multiplier and a rank."
+                alt="CarSpotter reveal: a correct answer on a Ford F-Series, the full truck shown with a one-line fact about the 1973-79 'Dentside' body crease, with the run score at 347."
                 width="1290"
                 height="2796"
                 loading="lazy"
               />
               <figcaption>
-                Consecutive hits stack a combo. The run resolves to a score, a
-                tier, and a rank you actually earned.
+                Get it and the score climbs — consecutive hits stack a combo, and
+                the fact lands while you're still pleased with yourself.
               </figcaption>
             </figure>
           </div>
@@ -687,7 +689,7 @@ const categoryKey = data.category.toLowerCase();
             <figure class="cs__shot">
               <img
                 src="/images/car-spotter/share.webp"
-                alt="CarSpotter share card: a grid of colored squares and a clock, with no car names — safe to drop in a group chat."
+                alt="CarSpotter result screen: 347 points, Learner level 2, and the spoiler-free share card — five coloured letter squares and a score, no car names — above a Share result button."
                 width="1290"
                 height="2796"
                 loading="lazy"
@@ -701,20 +703,20 @@ const categoryKey = data.category.toLowerCase();
             <figure class="cs__shot">
               <img
                 src="/images/car-spotter/learn.webp"
-                alt="CarSpotter miss state: the car you didn't get, with the detail to look for next time."
+                alt="CarSpotter miss state: a red 'Not quite' badge over a 1958 Oldsmobile 88, telling you that you picked Honda Accord, with a fact about the chrome trim that runs the length of the car."
                 width="1290"
                 height="2796"
                 loading="lazy"
               />
               <figcaption>
-                Miss one and it shows you the tell. The game is quietly building
-                detail literacy under the arcade.
+                Miss one and it names what you picked, then shows you the tell.
+                The game is quietly building detail literacy under the arcade.
               </figcaption>
             </figure>
             <figure class="cs__shot">
               <img
                 src="/images/car-spotter/clue2.webp"
-                alt="CarSpotter clue: a different cropped detail — a wheel — framed under the viewfinder with four answers."
+                alt="CarSpotter clue: a cropped headlight under the viewfinder with one second left, and four answers — Tesla Model Y, Ford Police Interceptor Utility, Cadillac XT6, Lincoln Aviator."
                 width="1290"
                 height="2796"
                 loading="lazy"
@@ -727,14 +729,14 @@ const categoryKey = data.category.toLowerCase();
             <figure class="cs__shot">
               <img
                 src="/images/car-spotter/reveal2.webp"
-                alt="CarSpotter reveal: a second full-car reveal with the model named and a fact."
+                alt="CarSpotter reveal after the clock ran out: an Infiniti QX60 shown whole, named simply 'Infiniti QX60', with a fact about its full-width light bar."
                 width="1290"
                 height="2796"
                 loading="lazy"
               />
               <figcaption>
-                Real cars, real chassis codes, real facts. No trick questions,
-                no AI mush, no filler.
+                Real cars, real facts, and answers named the way a person would
+                say them. No trick questions, no AI mush, no filler.
               </figcaption>
             </figure>
           </div>
@@ -749,6 +751,34 @@ const categoryKey = data.category.toLowerCase();
           <header class="cs__post-head">
             <div class="cs__post-sxn">
               <span class="cs__post-num">06</span>
+              <span class="cs__post-eyebrow">The social engine</span>
+              <span class="cs__post-rule" aria-hidden="true"></span>
+            </div>
+            <h2 class="cs__post-title">Every day authors itself into five videos.</h2>
+            <p class="cs__post-sub">
+              A daily game lives or dies on being seen daily — and hand-editing
+              five vertical videos a day is a job, not a feature. So the same
+              authored day that feeds the app feeds the renderer: five clues in,
+              five narrated 9:16 films out, cut to one beat sheet. No timeline,
+              no editor, no hand.
+            </p>
+          </header>
+          <ReelPipeline />
+          <p class="cs__post-closing">
+            The reel is the game's best second, isolated: a hook, a real
+            five-count, then the crop blooming to the whole car. It works on
+            social for the same reason it works in the app — you already think
+            you know the answer, and you have to stay to find out. Rendering is
+            headless Remotion, so a day's five come out of one command; the
+            narration is three permanent takes, so a hundred videos cost the
+            same as one.
+          </p>
+        </section>
+
+        <section class="container-site cs__post cs__post--alt">
+          <header class="cs__post-head">
+            <div class="cs__post-sxn">
+              <span class="cs__post-num">07</span>
               <span class="cs__post-eyebrow">The brand surface</span>
               <span class="cs__post-rule" aria-hidden="true"></span>
             </div>
@@ -765,15 +795,16 @@ const categoryKey = data.category.toLowerCase();
             <figure class="cs__shot">
               <img
                 src="/images/car-spotter/poster.webp"
-                alt="CarSpotter portfolio poster: a fan of tilted iPhone screenshots on a dark garage backdrop with lime accents and the line 'Guess the car from the detail.'"
+                alt="CarSpotter portfolio poster: the headline 'Guess the car from the detail' in lime and white over a near-black wall of car photographs, beside three tilted iPhones showing a clue, the full-car reveal, and the run result."
                 width="2560"
                 height="1600"
                 loading="lazy"
               />
               <figcaption>
-                The poster, the screenshots, and the brand are scripted artifacts
-                — reproducible, on-brand, and impossible to drift from the app
-                they sell.
+                The poster is a script, not a file: it composites the app's own
+                marquee wall and its real screens in the app's own typefaces. Reshoot
+                the screenshots, re-run it, and the poster can't drift from the
+                product it sells.
               </figcaption>
             </figure>
           </div>
