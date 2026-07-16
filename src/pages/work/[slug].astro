@@ -403,7 +403,8 @@ const categoryKey = data.category.toLowerCase();
       <>
         <section class="container-narrow cs__pull">
           <p class="cs__pull-text">
-            The model explains the number. It never picks it.
+            It would rather tell you it couldn't read the VIN than look up
+            the wrong car.
           </p>
           <span class="cs__pull-caption">Where the trust comes from</span>
         </section>
@@ -412,218 +413,153 @@ const categoryKey = data.category.toLowerCase();
           <header class="cs__post-head">
             <div class="cs__post-sxn">
               <span class="cs__post-num">04</span>
-              <span class="cs__post-eyebrow">The report</span>
+              <span class="cs__post-eyebrow">The record</span>
               <span class="cs__post-rule" aria-hidden="true"></span>
             </div>
-            <h2 class="cs__post-title">From a screenshot to a verdict.</h2>
+            <h2 class="cs__post-title">Scan the VIN. Read the record.</h2>
             <p class="cs__post-sub">
-              Up to a dozen listing screenshots in. About a hundred
-              seconds later, a buyer's report the shopper reads top to
-              bottom — verdict first, the reasoning under it, the
-              evidence attached.
+              Point the camera at a door jamb and the barcode decodes on
+              the phone. What comes back is the car's public safety file,
+              read in plain language, free.
             </p>
           </header>
-          <div class="cs__shot-grid">
-            <figure class="cs__shot">
-              <img
-                src="/images/vinly/listing-vs-report.webp"
-                alt="Side by side: a raw Facebook Marketplace listing for a 2017 Lexus GX 460 — $24,500, 155k miles, posted by a private seller and flagged with 4 red flags — next to the VINly report that reads it. The report returns an INSPECT verdict, a $20,825 opening offer marked −$3,675 versus asking, a WALK $20.3k to ASK $24.6k range, a 'Worth seeing, inspect hard' note about timing-cover and valley-plate leaks on the 1UR-FE engine, tiles for 4 known issues, $6.8–14k year-one cost, and 0 open recalls, and an index of what the full report contains."
-                width="1920"
-                height="1166"
-                loading="lazy"
-              />
-              <figcaption>
-                The whole product in one frame: a wall-of-optimism listing
-                on the left, the buyer's report it becomes on the right.
-                Same car, generated in about a hundred seconds — verdict,
-                opening offer, the distance to walk, and a receipt under
-                every claim.
-              </figcaption>
-            </figure>
-          </div>
           <div class="cs__shot-grid cs__shot-grid--phones">
             <figure class="cs__shot">
               <img
-                src="/images/vinly/ocr-loader.webp"
-                alt="VINly upload screen: a modal reads 'Picking out year, make, model — looking for vehicle details across every photo,' over a grid of listing screenshots. An optional listing-link field notes 'We never log in to Facebook.'"
+                src="/images/vinly/scan.webp"
+                alt="VINly App Store poster: the headline 'Scan any VIN.' over the app's home screen, showing a Scan a VIN button for the door jamb, dashboard or paperwork, a field to type the 17 characters instead, and a Recent list holding a 2024 Ford F-150 and a 2017 Lexus GX."
                 width="1080"
                 height="2341"
                 loading="lazy"
               />
               <figcaption>
-                You hand it screenshots, not a VIN. The first pass reads
-                every photo to pull year, make, and model — ten to twenty
-                seconds, and it never logs into Facebook. The listing link
-                is optional context.
+                The VIN is the front door, not a form field. Scan the
+                barcode, photograph the plate, or type it. Every route ends
+                at the same check-digit test before anything is looked up.
               </figcaption>
             </figure>
             <figure class="cs__shot">
               <img
-                src="/images/vinly/report-hero.webp"
-                alt="VINly buyer report for a 2010 Lexus RX 350: an INSPECT verdict, a $5,850 opening offer marked −$1,650 versus asking, and a WALK $5,400 to ASKING $7,500 range slider."
+                src="/images/vinly/report.webp"
+                alt="VINly App Store poster: the headline 'Research before you go.' over a report for a 2024 Ford F-150 Raptor, VIN 1FTFW1RG1RFA97847, with a dark hero card reading FREE PUBLIC RECORD · U.S. GOVERNMENT DATA, a 'Should you worry?' verdict of Look closer, and caution cards reading no open recalls and 10 injuries reported."
                 width="1080"
                 height="2341"
                 loading="lazy"
               />
               <figcaption>
-                The answer comes first. INSPECT, an opening offer of
-                $5,850, and the distance to a $7,500 asking price — with
-                the walk-away floor pinned at $5,400 before a line of
-                reasoning.
+                The answer comes first, in the buyer's words: should you
+                worry. Underneath it, the caution cards say what the
+                government actually published and what it doesn't prove.
               </figcaption>
             </figure>
             <figure class="cs__shot">
               <img
-                src="/images/vinly/verdict.webp"
-                alt="VINly report, scrolled: the $5,850 offer over YEAR 1 COST $4.2k–8.5k and ASKING $7,500 tiles, with Send message, Negotiate, and Inspect action buttons."
+                src="/images/vinly/owners.webp"
+                alt="VINly App Store poster: the headline 'See what owners report.' over the owners chapter for a 2024 Ford F-150, comparing complaint counts by model year (555 in 2022, 385 in 2023, 179 for this car in 2024, 100 in 2025), then 179 reports broken down into crash, fire and injury mentions and the parts named most often."
                 width="1080"
                 height="2341"
                 loading="lazy"
               />
               <figcaption>
-                Every report resolves to a next move — message the seller,
-                negotiate, or mark it to inspect. The cost and asking
-                figures sit right under the offer so the gap is never
-                abstract.
-              </figcaption>
-            </figure>
-            <figure class="cs__shot">
-              <img
-                src="/images/vinly/report-overview.webp"
-                alt="VINly report receipt: Identity normalized, Model knowledge with failure modes loaded, 7 sources cited, 'Generated in 100s · Anthropic Sonnet · NHTSA + web grounding,' above an index of listing details, red flags, service timeline, and known issues, each with a count."
-                width="1080"
-                height="2341"
-                loading="lazy"
-              />
-              <figcaption>
-                A receipt sits at the top: identity normalized, failure
-                modes loaded, seven sources cited, generated in 100 seconds
-                on Anthropic Sonnet over NHTSA and the web. Below it, an
-                index of everything flagged, each line with a count.
+                Complaints only mean something next to the years around
+                them. Counts are normalized against volume, so a popular
+                model isn't smeared for being popular.
               </figcaption>
             </figure>
           </div>
         </section>
 
-        <section class="container-site cs__post cs__post--alt">
+        <section class="container-site cs__post">
           <header class="cs__post-head">
             <div class="cs__post-sxn">
               <span class="cs__post-num">05</span>
-              <span class="cs__post-eyebrow">The takeaways</span>
+              <span class="cs__post-eyebrow">The rest of the file</span>
               <span class="cs__post-rule" aria-hidden="true"></span>
             </div>
-            <h2 class="cs__post-title">The work it hands you — and what it costs.</h2>
+            <h2 class="cs__post-title">Crash tests, fuel cost, and where to find one.</h2>
             <p class="cs__post-sub">
-              Three things a buyer can act on the same afternoon — a cost
-              forecast, an inspection checklist for the shop, and a
-              negotiation message — plus a price that matches how people
-              actually shop for a car.
+              Everything the federal government knows about the model, plus
+              real cars for sale near you once the research is done.
             </p>
           </header>
           <div class="cs__shot-grid cs__shot-grid--phones">
             <figure class="cs__shot">
               <img
-                src="/images/vinly/cost-forecast.webp"
-                alt="VINly Year 1 cost forecast: $4,200–$8,500 per year, split into fuel $2.6k, insurance $1.6k, maintenance $475, with line-item assumptions for a 205k-mile Lexus RX 350 in Long Beach."
+                src="/images/vinly/safety.webp"
+                alt="VINly App Store poster: the headline 'Check crash-test scores.' over the safety chapter for a 2024 Ford F-150, showing five out of five stars for overall, frontal, side and side pole, four out of five for rollover, the standard crash-avoidance features, and the NHTSA crash-test photograph."
                 width="1080"
                 height="2341"
                 loading="lazy"
               />
               <figcaption>
-                Year-one cost, itemized. Fuel modeled from real annual
-                mileage and local gas prices, insurance from the car's
-                class and city, and a repair budget sized to a 205k-mile
-                example — a range, never a falsely precise number.
+                Official NCAP scores, with the line that matters kept
+                visible: these rate the year and model, not the exact car
+                in front of you.
               </figcaption>
             </figure>
             <figure class="cs__shot">
               <img
-                src="/images/vinly/inspection-checklist.webp"
-                alt="VINly inspection checklist for a 2010 Lexus RX 350: scan for OBD-II codes P0010–P0020 and P0135/P0155, check valve cover gaskets, pressure-test the cooling system, listen for VVT-i rattle — printable for the shop."
+                src="/images/vinly/fuel.webp"
+                alt="VINly App Store poster: the headline 'Know what it costs to drive.' over the fuel chapter for a 2024 Ford F-150, comparing MPG across model years, then an estimated $3,100 a year in fuel at 15,000 miles, with city, highway and combined figures from the EPA."
                 width="1080"
                 height="2341"
                 loading="lazy"
               />
               <figcaption>
-                The inspection list is specific to this engine, down to
-                the OBD-II codes to scan for and the gaskets and actuators
-                known to fail. It prints, so it goes to the shop with the
-                buyer.
+                EPA economy turned into the number a buyer actually asks
+                for: what this costs to drive for a year.
               </figcaption>
             </figure>
             <figure class="cs__shot">
               <img
-                src="/images/vinly/negotiation-script.webp"
-                alt="VINly negotiation script: a copyable message opening at $5,850 for a 205,000-mile 2010 RX 350, holding a $5,400 floor, citing overdue water pump, valve cover gaskets, and transmission service."
+                src="/images/vinly/listings.webp"
+                alt="VINly App Store poster: the headline 'Find real nearby listings.' over live dealer listings for a 2024 Ford F-150, the first a blue XLT at $47,998 and $8,032 below MSRP with 9,667 miles in Inglewood, California from CarMax, with an Open listing link."
                 width="1080"
                 height="2341"
                 loading="lazy"
               />
               <figcaption>
-                A copyable opening message, anchored to the same math:
-                open at $5,850, hold at $5,400, walk below it. The computed
-                offer, turned into words a buyer can actually send.
-              </figcaption>
-            </figure>
-            <figure class="cs__shot">
-              <img
-                src="/images/vinly/paywall.webp"
-                alt="VINly pricing: a single report for $3.99 with free updates when the seller replies, or a $12.99 Shopping Pass of 10 reports over 30 days, no subscription. NHTSA recalls and complaints are free."
-                width="1080"
-                height="2341"
-                loading="lazy"
-              />
-              <figcaption>
-                $3.99 for a report, or $12.99 for ten — sized for someone
-                weighing several cars over a couple of weeks. No
-                subscription, credits expire, and NHTSA recalls come free
-                on every report.
+                Listings are a chapter of the research, not a marketplace
+                bolted on. Real dealer inventory, and the link goes to the
+                dealer.
               </figcaption>
             </figure>
           </div>
-          <p class="cs__post-closing">
-            The price reflects what a report costs to produce, not what a
-            subscription funnel can extract. A used-car shopper is in the
-            market for a few weeks, not forever — so the product is built
-            to be picked up, used hard, and put back down.
-          </p>
         </section>
 
         <section class="container-site cs__post">
           <header class="cs__post-head">
             <div class="cs__post-sxn">
               <span class="cs__post-num">06</span>
-              <span class="cs__post-eyebrow">The full spectrum</span>
+              <span class="cs__post-eyebrow">The promise</span>
               <span class="cs__post-rule" aria-hidden="true"></span>
             </div>
-            <h2 class="cs__post-title">Three listings. Three verdicts. The same $3.99.</h2>
+            <h2 class="cs__post-title">Free, and narrow about it.</h2>
             <p class="cs__post-sub">
-              VINly isn't a funnel that always says buy. A clean Civic gets
-              a green light, a high-mileage GX gets an inspect-hard, and a
-              salvage-title Mustang gets walked — and the price is identical,
-              because the verdict a buyer needs isn't for sale.
+              VINly charges nothing, holds no account, and shows no ads.
+              It is also plain about what it isn't.
             </p>
           </header>
           <div class="cs__shot-grid">
             <figure class="cs__shot">
               <img
-                src="/images/vinly/three-verdicts.webp"
-                alt="VINly's full-spectrum view: three side-by-side verdict cards at the same $3.99. WORTH SEEING in green — a 2014 Honda Civic LX in Oakland, $8,400, about $500 under asking, a clean 78k-mile car priced near the comp median. INSPECT in orange — a 2017 Lexus GX 460 Premium in Anaheim, $20,825, high-mileage with timing-cover and valley-plate work due-or-done. WALK AWAY in red — a 2018 Ford Mustang GT in Sacramento asking $14,000, salvage title, cash-only, no test drives, skip the drive."
-                width="1920"
-                height="956"
+                src="/images/vinly/free.webp"
+                alt="VINly App Store poster: the app icon over the headline '100% free.' and the line 'No subscription. No account.'"
+                width="1080"
+                height="2341"
                 loading="lazy"
               />
               <figcaption>
-                Three real listings, three different answers. The verdict
-                most reports land on is inspect, not buy — and some are a
-                flat walk. A tool that always says buy is one you can't
-                trust the one time it matters.
+                Not a vehicle-history report: no accident record, no title
+                or lien check, no odometer verification. It reports what
+                the government publishes, and says so rather than letting
+                the buyer assume otherwise.
               </figcaption>
             </figure>
           </div>
         </section>
 
-        <section class="container-site cs__post cs__post--alt">
+        <section class="container-site cs__post">
           <header class="cs__post-head">
             <div class="cs__post-sxn">
               <span class="cs__post-num">07</span>
@@ -631,26 +567,20 @@ const categoryKey = data.category.toLowerCase();
               <span class="cs__post-rule" aria-hidden="true"></span>
             </div>
             <h2 class="cs__post-title">And the site that frames it.</h2>
-            <p class="cs__post-sub">
-              The marketing site, the copy, the pricing, the live sample
-              report — same hand, same week. "Read the listing like a
-              mechanic" is the whole pitch in five words, shipping the same
-              buyer-report card the app returns.
-            </p>
           </header>
           <div class="cs__shot-grid">
             <figure class="cs__shot">
               <img
                 src="/images/vinly/site-hero.webp"
-                alt="The VINly marketing site: a bold headline 'Read the listing like a mechanic.' over a subhead about turning a Marketplace screenshot into a buyer's report in ninety seconds for four dollars, an App Store download button and a 'See a sample report' link, and a live sample buyer-report card for a 2017 Lexus GX 460 Premium in Anaheim showing an INSPECT verdict, a $20,825 opening offer, a WALK-to-ASKING range, and a $6.8k–14.5k year-one cost."
+                alt="The VINly marketing site: the headline 'Scan any VIN. Know the car.' over a line explaining the VIN sits on the door jamb, dashboard or paperwork, an App Store button and a Browse cars for sale link, next to a free research tool that takes a year, make and model or a 17-character VIN."
                 width="1920"
                 height="1125"
                 loading="lazy"
               />
               <figcaption>
-                Landing page, copy, pricing, and the sample report — also
-                one person's work. The same listing-to-verdict logic that
-                runs the app frames the pitch on the web.
+                Landing page, copy, and the free research tool are also one
+                person's work. The site and the phone import the same
+                engine, so they can't disagree about a car.
               </figcaption>
             </figure>
           </div>

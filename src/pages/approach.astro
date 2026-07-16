@@ -7,9 +7,9 @@ const projects = [
   {
     slug: 'vinly',
     title: 'VINly',
-    note: "A used-car listing in, a priced buyer's report out. Designed and engineered solo for iOS.",
+    note: "Scan a VIN, get the car's public safety record free. Designed and engineered solo for iOS.",
     src: '/images/vinly/site-hero.webp',
-    alt: 'VINly marketing hero, "Read the listing like a mechanic," beside a sample buyer report card.',
+    alt: 'VINly marketing hero, "Scan any VIN. Know the car," beside the free research tool.',
     category: 'flagship',
   },
   {
@@ -143,20 +143,8 @@ const projects = [
         </div>
 
         <p class="apr__para">
-          <strong>In the products.</strong> VINly is the shipped
-          example. The numbers that cost a buyer money — the opening
-          offer, the walk-away floor, the car's real annual mileage —
-          are computed by plain deterministic functions before any
-          model runs, then passed into the pipeline as fixed
-          constraints. The model explains an offer it is never allowed
-          to invent. A second model reads the draft back as a critic
-          and flags claims the evidence doesn't support. The money math
-          carries 133 tests.
-        </p>
-
-        <p class="apr__para">
-          <strong>The same discipline, scaled up in ChatOBD2.</strong>
-          Vehicle data flows through six deterministic reasoning layers
+          <strong>In the products.</strong> ChatOBD2 is the shipped
+          example. Vehicle data flows through six deterministic reasoning layers
           before any model call. The system prompt isn't a string; it's
           a module that assembles fragments by priority inside a
           38,000-token budget, keyed by verdict tier and code context.
@@ -165,6 +153,20 @@ const projects = [
           edit. The analytics taxonomy stays coherent because every
           fragment is tagged. Outputs are schema-bound, which means the
           rendering layer doesn't apologize for the model.
+        </p>
+
+        <p class="apr__para">
+          <strong>And knowing when to take it out.</strong> VINly is the
+          other half of the same discipline. Its VIN reader used to send a
+          photo to a server so a vision model could read the characters. It
+          worked, and it was still wrong: it cost money on every scan of a
+          free product, it needed a network round trip while the user stood
+          in a parking lot, and it forced a photo disclosure in App Privacy
+          for something the phone could do by itself. Apple's Vision
+          framework does the same job on-device, for nothing, offline. So
+          the model came out. What decides whether a VIN is real was never
+          a model anyway — it's the ISO 3779 check digit, arithmetic that
+          has been correct since 1981.
         </p>
 
         <p class="apr__para">

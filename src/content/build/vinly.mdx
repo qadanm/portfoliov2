@@ -1,40 +1,38 @@
 ---
 title: VINly
-short: A used-car listing in, a priced buyer's report out — verdict, opening offer, and walk-away floor. Designed and engineered solo for iOS.
+short: Scan a VIN, get the car's public safety record free — recalls, owner complaints, crash tests, fuel cost, and real listings nearby. Designed and engineered solo for iOS.
 category: Flagship
 keyFocus:
-  - AI buyer's report
-  - Deterministic offer math
+  - VIN-first research
+  - On-device VIN reading
   - End-to-end solo build
 role: Sole designer, engineer & founder
 period: '2026'
 status: Live on the App Store
-appStoreUrl: https://apps.apple.com/app/vinly-buyer-reports/id6774041303
+appStoreUrl: https://apps.apple.com/us/app/vinly-buyer-reports/id6774041303
 siteUrl: https://vinly.dev
-scope: iOS app, three-stage AI pipeline, Supabase backend, marketing site
+scope: iOS app, shared research engine, Supabase backend, marketing site
 outcomes:
-  - label: Price per report
-    value: '$3.99'
-  - label: Time to a full report
-    value: '~100s'
-  - label: AI models, one job each
-    value: '3'
+  - label: Price
+    value: Free
+  - label: Government sources
+    value: NHTSA + EPA
+  - label: VIN photos sent to a server
+    value: None
   - label: Designed and built by
     value: One person
 stack:
   - Expo / React Native
   - TypeScript
+  - Apple Vision (on-device OCR)
   - Supabase Edge (Deno)
-  - Anthropic Sonnet
-  - DeepSeek
-  - OpenAI vision
-  - RevenueCat
+  - NHTSA + EPA APIs
   - Astro
 placeholder:
   from: '#1A120B'
   to: '#EA580C'
   label: VINly
-  sublabel: AI Buyer's Report
+  sublabel: Free VIN research
   angle: 135
   labelTone: light
 featured: true
@@ -43,44 +41,42 @@ order: 2
 
 ## The premise
 
-Every used-car listing is a wall of optimism. A price, a few photos, three sentences from a stranger who wants to sell. The buyer is left to turn that into a decision: is this fair, what's going to break, what do I say to the seller, and when do I walk away.
+A used car is a stranger's optimism with a price on it. The buyer has to work out what's wrong with it, and most people guess: three tabs, half a forum thread, and an offer they can't defend.
 
-Most people guess. They open three tabs, half-read a forum thread, and make an offer they can't defend. The information needed to buy well exists — it's just scattered across the listing, the model's reputation, recall databases, and local cost-of-ownership math. Nobody assembles it in the ninety seconds before they message the seller.
+The strange part is that the information already exists and it is already free. Every recall, every owner complaint, every crash test is published by the federal government. It is just locked behind interfaces nobody wants to use, indexed by a VIN nobody wants to type, and scattered across agencies that do not talk to each other. Nobody assembles it in the ninety seconds before you message the seller.
 
 ## What VINly does
 
-Screenshot the listing and hand the photos to VINly. It reads them, identifies the exact vehicle, researches what's known to fail on it, prices the car against its mileage, and returns a buyer's report: a verdict, an opening offer, a walk-away floor, a year-one cost forecast, a model-specific inspection checklist, and a copyable message to send the seller.
+Point the camera at the VIN, on the door jamb or the dashboard or the paperwork, and VINly reads it. Then it returns that car's public record: open recalls, what owners have complained about, crash-test ratings, real yearly fuel cost, and how this model year compares to the ones on either side of it. When you are ready to shop, it shows real listings for that model near you, with photos, prices, and a link to the dealer.
 
-About a hundred seconds. $3.99 a report, or a ten-report pass for the way people actually shop — three to eight listings over a couple of weeks. No subscription.
+Free. No account, no subscription, no ads. The product is a bet that the fastest way to earn a car buyer's trust is to help with the car already in front of them and charge nothing for it.
 
-The report is the product, and every section answers a question the buyer was already going to ask. Should I see this in person. What's likely to break. What will the first year cost. What do I open the conversation with.
+## The VIN is the front door
 
-## The price is not the model's opinion
+The decision the whole app hangs on is that the VIN is the entry point, not a form field.
 
-The most important decision in the build is what the language model is *not* allowed to do. It never picks the number.
+A VIN is 17 characters. It deliberately excludes I, O and Q so they cannot be confused with 1 and 0, and it carries a check digit in the ninth position. That check digit is the spine of the product. Every VIN, however it arrives, is validated against ISO 3779 arithmetic on the device before a single request goes out. A misread fails closed. The app would rather say it could not read the VIN than look up the wrong car.
 
-The opening offer, the walk-away floor, and the car's real annual mileage are computed by plain deterministic functions before any model runs — `computeSuggestedAnchor`, `computeWalkFloor`, `computeAnnualMiles`, and a hard `isObviousWalkAway` guard for the listings that aren't worth a full report. Those numbers are passed into the pipeline as fixed constraints. The model's job is to *explain* the offer, not invent it.
-
-The reasoning is simple: a model that hallucinates a price is worse than no app at all. Arithmetic that's wrong is at least wrong the same way every time, which means it can be pinned down by tests. The money math carries 133 of them.
-
-## Two models, and one of them disagrees
-
-Once the numbers are fixed, the report gets written and then checked.
-
-A synthesis model — Anthropic's Sonnet — drafts the report grounded in real sources: NHTSA recall and complaint data for the exact year and model, plus a handful of live web lookups for known failure modes and ownership costs. A second model, DeepSeek, reads the draft back as a critic and looks for claims the evidence doesn't actually support. If it finds a contradiction, synthesis runs again with the objection in hand.
-
-The report keeps a small receipt of what happened — whether it was retried, which model wrote it, how many sources it cited. On the example throughout this page, a 205,000-mile Lexus RX 350, that reads: *generated in 100 seconds, Anthropic Sonnet, seven sources cited.* Showing the work is the feature. A buyer trusts a number they can see the basis for.
+Reading it happens two ways, both on the phone. The door-jamb barcode is decoded by the system scanner. When there is no barcode, the camera photographs the VIN text and Apple's Vision framework reads the characters. The recognizer hands back raw text and nothing else; a shared engine finds the 17-character windows in it, repairs a single OCR confusion only when the check digit proves the repair correct, and throws away the rest.
 
 ## What it refuses to claim
 
 VINly is deliberately narrow, and saying so out loud is part of the design.
 
-It is not a vehicle-history service. There's no VIN report, no accident records, no odometer-fraud check — it reasons from the listing and public knowledge, not a title database. It is not a mechanic; it tells you exactly what to inspect and hands you a checklist for the shop, but it doesn't pretend a phone can replace a lift. And it never logs into Facebook — the listing link is optional context, nothing more.
+It is not a vehicle-history report. There is no accident record, no title or lien check, no odometer verification. It reports what the government publishes, which is safety data, not provenance. It says so on the page rather than letting the buyer assume otherwise, and it keeps `carfax` and `history` out of its own keywords for the same reason, at a real cost in search traffic.
 
-The verdict it gives most often is *inspect*, not *buy*. The whole product is built to make someone a sharper buyer, not to make a risky purchase feel safer than it is.
+It also refuses to be alarming. Recall counts are read against calm thresholds, because two open recalls is ordinary and treating it as a warning would be dishonest. Injury and fire mentions are normalized against total complaint volume, so a popular model is not smeared for being popular. Where the data is missing the app says *Not rated*, rather than drawing a dash and letting the reader fill in the blank themselves.
+
+## Nothing leaves the phone
+
+An earlier version sent VIN photos to a server, where a vision model read the characters and handed back text.
+
+It worked, and it was wrong. It cost money on every scan of a free product. It needed a network round trip while the user was standing in a parking lot with one bar. And it forced a *Photos* disclosure in App Privacy for something the phone could do by itself. Apple's Vision framework does the same job on-device for nothing, offline, and privately. The photo path now never leaves the device, and the privacy answer went from a paragraph to a sentence.
+
+The same instinct governs the backend. The keys that cost money never ship in the app bundle; they live as Edge Function secrets. And the functions that no longer serve a purpose do not sit there quietly. They get deleted, because an unauthenticated endpoint holding an API key is a bill waiting to be run up by somebody else.
 
 ## One person, end to end
 
-The design, the iOS app, the three Supabase Edge Functions, the AI pipeline, the pricing, and the marketing site are one person's work.
+The design, the iOS app, the shared research engine, the Supabase backend, and the marketing site are one person's work.
 
-The security model is the part worth pointing at. The keys that cost money — OpenAI, Anthropic, DeepSeek — never ship inside the app bundle. They live as Edge Function secrets, and the phone holds only an anonymous Supabase key. An earlier version called the vision model directly from the device with a bundled key; moving optical character recognition server-side closed that hole and is the reason a screenshot can be read without trusting the client with anything it shouldn't have.
+The engine is the part worth pointing at. VIN validation, recall thresholds, complaint normalization, and year-over-year comparison live in one TypeScript package that both the app and vinly.dev import. The website and the phone reach the same verdict about the same car because they run the same code. Two surfaces that disagree about whether a car is safe are worse than one surface that does not exist.

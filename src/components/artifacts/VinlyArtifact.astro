@@ -1,7 +1,8 @@
 ---
-// VINly thumbnail. Recreates the buyer-report verdict hero: the screen a
-// shopper sees after VINly reads a Facebook Marketplace listing — an
-// INSPECT verdict, an opening-offer number, and the walk/ask range.
+// VINly thumbnail. Recreates the report hero: the screen a shopper sees
+// after VINly reads a VIN — the "should you worry" verdict, and the three
+// facts the public record actually answers (open recalls, crash rating,
+// yearly fuel cost).
 // Theme-aware: warm dark atmosphere in dark mode, cream in light mode,
 // both carrying VINly's red-orange accent so the project reads at a glance.
 ---
@@ -17,44 +18,40 @@
         <span class="vinart__brand-mark">✦</span>
         <span class="vinart__brand-name">VINly</span>
       </div>
-      <span class="vinart__head-mono">Buyer report</span>
+      <span class="vinart__head-mono">Free public record</span>
     </div>
 
     <div class="vinart__body">
       <div class="vinart__vehicle">
-        <span class="vinart__vehicle-name">2010 Lexus RX 350</span>
-        <span class="vinart__vehicle-meta">$7,500 · 205k mi · Long Beach</span>
+        <span class="vinart__vehicle-name">2024 Ford F-150</span>
+        <span class="vinart__vehicle-meta">Raptor · 1FTFW1RG1RFA97847</span>
       </div>
 
       <div class="vinart__verdict">
         <span class="vinart__verdict-tag">
           <span class="vinart__verdict-dot"></span>
-          Inspect
+          Look closer
         </span>
-        <span class="vinart__verdict-note">High mileage, inspect hard</span>
+        <span class="vinart__verdict-note">Something needs a closer look</span>
       </div>
 
       <div class="vinart__offer">
-        <span class="vinart__offer-value">$5,850</span>
-        <span class="vinart__offer-sub">Opening offer · −$1,650 vs asking</span>
+        <span class="vinart__offer-value">Should you worry?</span>
+        <span class="vinart__offer-sub">NHTSA + EPA · no account, no charge</span>
       </div>
 
-      <div class="vinart__range">
-        <div class="vinart__range-track">
-          <span class="vinart__range-fill"></span>
-          <span class="vinart__range-dot vinart__range-dot--walk"></span>
-          <span class="vinart__range-marker"></span>
-          <span class="vinart__range-dot vinart__range-dot--ask"></span>
+      <div class="vinart__facts">
+        <div class="vinart__fact">
+          <span class="vinart__fact-value">None</span>
+          <span class="vinart__fact-label">Open recalls</span>
         </div>
-        <div class="vinart__range-labels">
-          <span class="vinart__range-end">
-            <span class="vinart__range-tag">Walk</span>
-            <span class="vinart__range-num">$5,400</span>
-          </span>
-          <span class="vinart__range-end vinart__range-end--right">
-            <span class="vinart__range-tag">Asking</span>
-            <span class="vinart__range-num">$7,500</span>
-          </span>
+        <div class="vinart__fact">
+          <span class="vinart__fact-value">5<span class="vinart__fact-unit">/5</span></span>
+          <span class="vinart__fact-label">Crash test</span>
+        </div>
+        <div class="vinart__fact">
+          <span class="vinart__fact-value">$3,100</span>
+          <span class="vinart__fact-label">Fuel / yr</span>
         </div>
       </div>
     </div>
@@ -62,7 +59,7 @@
 
   <div class="vinart__caption">
     <span class="vinart__caption-line"></span>
-    <span>Buyer report · VINly</span>
+    <span>Free VIN research · VINly</span>
   </div>
 </div>
 
@@ -315,14 +312,14 @@
 
   .vinart__offer-value {
     font-family: 'Instrument Serif', Georgia, serif;
-    font-size: 34px;
-    line-height: 1;
+    font-size: 26px;
+    line-height: 1.05;
     letter-spacing: -0.01em;
     color: var(--vin-text);
   }
 
   @container (min-width: 360px) {
-    .vinart__offer-value { font-size: 44px; }
+    .vinart__offer-value { font-size: 32px; }
   }
 
   .vinart__offer-sub {
@@ -332,91 +329,50 @@
     letter-spacing: 0.01em;
   }
 
-  .vinart__range {
+  /* The public record answers three questions. No slider: there is no
+     price to negotiate here, only facts the government published. */
+  .vinart__facts {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 4px;
+    padding-top: 10px;
+    border-top: 1px solid var(--vin-divider);
+  }
+
+  .vinart__fact {
     display: flex;
     flex-direction: column;
-    gap: 7px;
-    margin-top: 2px;
+    gap: 2px;
+    min-width: 0;
   }
 
-  .vinart__range-track {
-    position: relative;
-    height: 4px;
-    border-radius: 9999px;
-    background-color: var(--vin-track);
+  .vinart__fact-value {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: 17px;
+    line-height: 1;
+    color: var(--vin-text);
+    white-space: nowrap;
   }
 
-  .vinart__range-fill {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 21%;
-    border-radius: inherit;
-    background: linear-gradient(to right, #EA580C, #F97316);
+  @container (min-width: 360px) {
+    .vinart__fact-value { font-size: 21px; }
   }
 
-  .vinart__range-dot {
-    position: absolute;
-    top: 50%;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-  }
-
-  .vinart__range-dot--walk {
-    left: 0;
-    background-color: #EA580C;
-  }
-
-  .vinart__range-dot--ask {
-    left: 100%;
-    background-color: transparent;
-    border: 1.5px solid var(--vin-ask-ring);
-  }
-
-  .vinart__range-marker {
-    position: absolute;
-    top: 50%;
-    left: 21%;
-    width: 11px;
-    height: 11px;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #F97316;
-    border: 2px solid var(--vin-plate-bg);
-    box-shadow: 0 0 0 1px rgba(234, 88, 12, 0.5), 0 2px 4px rgba(234, 88, 12, 0.4);
-  }
-
-  .vinart__range-labels {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-  }
-
-  .vinart__range-end {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-  }
-
-  .vinart__range-end--right { align-items: flex-end; }
-
-  .vinart__range-tag {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 8px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+  .vinart__fact-unit {
+    font-size: 0.62em;
     color: var(--vin-text-subtle);
   }
 
-  .vinart__range-num {
+  .vinart__fact-label {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--vin-text);
+    font-size: 8px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--vin-text-subtle);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .vinart__caption {
