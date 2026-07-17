@@ -1,6 +1,6 @@
 ---
 title: CarSpotter
-short: A daily car-spotting game — five cropped details, four answers, ten seconds. Designed, engineered, and shipped solo for iOS.
+short: 'A daily car-spotting game: five cropped details, four answers, ten seconds. Designed, engineered, and shipped solo for iOS.'
 category: Flagship
 keyFocus:
   - Daily game loop
@@ -37,14 +37,14 @@ placeholder:
   angle: 135
   labelTone: light
 coverImage: /images/car-spotter/poster.webp
-coverAlt: CarSpotter portfolio poster — the headline "Guess the car from the detail" in lime and white over a near-black wall of car photographs, beside three tilted iPhones showing a clue, the full-car reveal, and the run result.
+coverAlt: CarSpotter portfolio poster. The headline "Guess the car from the detail" in lime and white over a near-black wall of car photographs, beside three tilted iPhones showing a clue, the full-car reveal, and the run result.
 featured: true
 order: 1
 ---
 
 ## The premise
 
-Every enthusiast has done it. A single headlight in traffic, a quarter of a grille, the shape of a wheel arch — and you already know the car. CarSpotter is that instinct turned into a daily game.
+Every enthusiast has done it. A single headlight in traffic, a quarter of a grille, the shape of a wheel arch, and you already know the car. CarSpotter is that instinct turned into a daily game.
 
 Each day is a Daily 5: five cropped details of real cars, four answers each, ten seconds a clue. Same five for everyone. Score, rank up, hold a streak, and brag without spoiling it. It's a Wordle-shaped daily for the people who already know the car before the badge shows up.
 
@@ -52,37 +52,37 @@ Each day is a Daily 5: five cropped details of real cars, four answers each, ten
 
 The whole loop is built to be felt in under a minute. A detail locks into a lime viewfinder, a tachometer drains the ten seconds, four arcade buttons wait in the thumb zone. You pick, the crop blooms out to the whole car, and a one-line fact lands. Five times, then you're done until tomorrow.
 
-The constraints are the design. Everyone gets the same five, so bragging rights are earned, not bought. Practice is XP-capped, so the leaderboard can't be farmed. And an answer is the name a person actually says — "GMC S-15", not "GMC C/K (3rd gen Squarebody · 1973-87)". No trick questions, no AI mush, no filler.
+The constraints are the design. Everyone gets the same five, so bragging rights are earned, not bought. Practice is XP-capped, so the leaderboard can't be farmed. And an answer is the name a person actually says: "GMC S-15", not "GMC C/K (3rd gen Squarebody · 1973-87)". No trick questions, no AI mush, no filler.
 
-## The answers used to be the hardest part — for the wrong reason
+## The answers used to be the hardest part, for the wrong reason
 
-For months the four buttons read like spreadsheet rows: chassis codes, generation numbers, year ranges. It felt rigorous. It was actually unfair, because none of it is visible in a headlight crop. Worse, the catalog held 431 rows across only 240 real nameplates — seven Corvettes, seven F-150s — so a third of the questions offered the same car twice under two spellings. One question asked you to choose between "GMC C/K (1967-1968)" and "GMC C/K (square-body)".
+For months the four buttons read like spreadsheet rows: chassis codes, generation numbers, year ranges. It felt rigorous. It was actually unfair, because none of it is visible in a headlight crop. Worse, the catalog held 431 rows across only 240 real nameplates (seven Corvettes, seven F-150s), so a third of the questions offered the same car twice under two spellings. One question asked you to choose between "GMC C/K (1967-1968)" and "GMC C/K (square-body)".
 
-The fix was one idea: **an answer is a name, and a name is the same name whoever badges it.** Generation and year still exist on every car — they're just metadata now, used to pick decoys from the right era and never shown. A decoy has to be a *different* nameplate a person could genuinely mistake for the answer — CR-V and Pilot, Forester and RAV4 — never another trim of the answer itself.
+The fix was one idea: **an answer is a name, and a name is the same name whoever badges it.** Generation and year still exist on every car. They're just metadata now, used to pick decoys from the right era and never shown. A decoy has to be a *different* nameplate a person could genuinely mistake for the answer (CR-V and Pilot, Forester and RAV4), never another trim of the answer itself.
 
-The subtle half is what counts as "the same name". A Chevrolet C/K and a GMC C/K are one name on two badges: indistinguishable in a crop, and two near-identical buttons. But a Silverado and a Sierra are the same truck with *different* names — two things a player can learn apart, which makes them one of the best questions in the game. So the rule ignores the badge and keys on the name. One migration relabelled 376 cars and rebuilt 444 questions across the whole schedule — past, live, and future — and every one of the 703 now shows four different cars.
+The subtle half is what counts as "the same name". A Chevrolet C/K and a GMC C/K are one name on two badges: indistinguishable in a crop, and two near-identical buttons. But a Silverado and a Sierra are the same truck with *different* names, two things a player can learn apart, which makes them one of the best questions in the game. So the rule ignores the badge and keys on the name. One migration relabelled 376 cars and rebuilt 444 questions across the whole schedule (past, live, and future), and every one of the 703 now shows four different cars.
 
 ## Brag without spoiling
 
-Sharing is the growth loop, so it had to be spoiler-free by construction. One tap turns a run into a card of colored squares and a clock — no car names, no photos, nothing that ruins the round for the group chat. It mirrors the in-app result exactly, down to the per-clue letters and the run tier, so the flex is honest.
+Sharing is the growth loop, so it had to be spoiler-free by construction. One tap turns a run into a card of colored squares and a clock. No car names, no photos, nothing that ruins the round for the group chat. It mirrors the in-app result exactly, down to the per-clue letters and the run tier, so the flex is honest.
 
-## The reveal — and the bug that almost shipped
+## The reveal, and the bug that almost shipped
 
-The best second in the app is the reveal: the cropped detail zooms out to the whole car. Preparing the first App Store build, I found that second was broken for every authored day — the clue played, then the reveal bloomed to nothing.
+The best second in the app is the reveal: the cropped detail zooms out to the whole car. Preparing the first App Store build, I found that second was broken for every authored day: the clue played, then the reveal bloomed to nothing.
 
-The cause was quiet and dangerous. The studio I author puzzles in had stored each reveal photo as an absolute `file://…/Application/<container-UUID>/…` path. iOS regenerates that container UUID on every reinstall, so every stored path silently dangled. The crops had survived only by accident — the shipping export happened to inline them as base64 — while the reveal originals, stored the exact same way, were never captured anywhere. A whole schedule shipped with working clues and empty reveals.
+The cause was quiet and dangerous. The studio I author puzzles in had stored each reveal photo as an absolute `file://…/Application/<container-UUID>/…` path. iOS regenerates that container UUID on every reinstall, so every stored path silently dangled. The crops had survived only by accident (the shipping export happened to inline them as base64), while the reveal originals, stored the exact same way, were never captured anywhere. A whole schedule shipped with working clues and empty reveals.
 
 It was a data-loss *class* of bug, not a one-off. So I rebuilt the pipeline to make it impossible to repeat.
 
 ## A content pipeline that can't lose your work
 
-The rule now: never persist an absolute path. Media is content-addressed — every photo lives under the SHA-256 of its own bytes, the manifest holds stable keys, and the real URI is rebased against the document directory at runtime. The presence of a hash file *is* the integrity proof. Writes are atomic: download to a temp file, verify size and hash, then move into place.
+The rule now: never persist an absolute path. Media is content-addressed: every photo lives under the SHA-256 of its own bytes, the manifest holds stable keys, and the real URI is rebased against the document directory at runtime. The presence of a hash file *is* the integrity proof. Writes are atomic: download to a temp file, verify size and hash, then move into place.
 
 Around that sits a recovery pipeline and a set of gates:
 
-- **Recovery that runs on any machine.** Every reveal can be re-derived by priority — a committed in-repo bake first, then a local raw cache, then the original source fetched by ID and re-verified against its dimensions and hash. Run against the full schedule, it recovered 374 of 375 reveals.
+- **Recovery that runs on any machine.** Every reveal can be re-derived by priority: a committed in-repo bake first, then a local raw cache, then the original source fetched by ID and re-verified against its dimensions and hash. Run against the full schedule, it recovered 374 of 375 reveals.
 - **A bundler that fails loud.** The launch bundler used to silently skip any puzzle whose reveal wouldn't resolve. Now it ships complete crop-and-reveal pairs only, asserts every scheduled day is a full five, and exits non-zero on anything missing.
-- **Referential integrity gates.** A pure checker runs over the authored content for dangling photo references, half-built reveal pairs, and orphans — and the same gate guards the studio, the export, and the build.
+- **Referential integrity gates.** A pure checker runs over the authored content for dangling photo references, half-built reveal pairs, and orphans. The same gate guards the studio, the export, and the build.
 
 Exports are self-contained now: every crop and every reveal travels as bytes, so reinstalling a phone or moving to a new laptop can't orphan a thing. The build carries 401 tests, and the parts that lose data when they're wrong carry the most of them.
 
@@ -90,12 +90,12 @@ Exports are self-contained now: every crop and every reveal travels as bytes, so
 
 A daily game lives or dies on being seen daily, and hand-cutting five vertical videos every morning is a job, not a feature. So the same authored day that feeds the app feeds a renderer: five clues in, five narrated 9:16 films out.
 
-Each one is the game's best second, isolated — a hook, a real five-count, the crop blooming to the whole car, the fact, the stamp. 814 frames, 27 seconds, one beat sheet. It works on social for the same reason it works in the app: you already think you know the answer, so you stay to find out whether you were right.
+Each one is the game's best second, isolated: a hook, a real five-count, the crop blooming to the whole car, the fact, the stamp. 814 frames, 27 seconds, one beat sheet. It works on social for the same reason it works in the app: you already think you know the answer, so you stay to find out whether you were right.
 
-The economics are the point. Rendering is headless Remotion, so a day's five come out of one command instead of an afternoon in an editor. The narration is three permanent voice takes — an intro, a countdown, a sign-off — recorded once and reused by every render, so the hundredth video costs exactly what the first did. Even the countdown is deliberate: it's one continuous read rather than five words spliced onto a frame grid, because a rigid grid is precisely what makes a countdown sound like a robot.
+The economics are the point. Rendering is headless Remotion, so a day's five come out of one command instead of an afternoon in an editor. The narration is three permanent voice takes (an intro, a countdown, a sign-off), recorded once and reused by every render, so the hundredth video costs exactly what the first did. Even the countdown is deliberate: it's one continuous read rather than five words spliced onto a frame grid, because a rigid grid is precisely what makes a countdown sound like a robot.
 
 ## One person, end to end
 
 The design, the iOS app, the game engine, the content pipeline, and the marketing site are one person's work, in a Turborepo monorepo. The rules of the game live in a pure-TypeScript `game-core` package with no React anywhere near them, which makes them trivial to test. The design tokens are a shared package the app and the website both compile from, so the brand can't drift between the two. Even the App Store screenshots and the poster on this page come out of a scripted ImageMagick pipeline, versioned next to the code.
 
-A small game, built on a serious spine — so the fun part never breaks.
+A small game, built on a serious spine, so the fun part never breaks.
