@@ -36,15 +36,10 @@ const channels = [
   ]}
 >
   <div class="contact">
-    {/* Page atmosphere */}
-    <div class="contact__atmos" aria-hidden="true">
-      <span class="contact__atmos-glow"></span>
-    </div>
 
     <div class="container-site contact__inner">
       <header class="contact__head">
         <div class="contact__sxn">
-          <span class="contact__sxn-num">01</span>
           <span class="contact__sxn-label">Contact</span>
           <span class="contact__sxn-rule" aria-hidden="true"></span>
           <span class="contact__sxn-meta">Replies within a day</span>
@@ -71,7 +66,6 @@ const channels = [
           <span class="contact__form-glow" aria-hidden="true"></span>
 
           <header class="contact__form-head">
-            <span class="contact__form-num">02</span>
             <h2 id="contact-form-heading" class="contact__form-title">Send a message</h2>
             <span class="contact__form-rule" aria-hidden="true"></span>
           </header>
@@ -84,7 +78,6 @@ const channels = [
         {/* Direct channels */}
         <aside class="contact__channels-wrap" aria-labelledby="contact-channels-heading">
           <header class="contact__channels-head">
-            <span class="contact__channels-num">03</span>
             <h2 id="contact-channels-heading" class="contact__channels-title">Or reach me directly</h2>
             <span class="contact__channels-rule" aria-hidden="true"></span>
           </header>
@@ -149,28 +142,7 @@ const channels = [
     }
   }
 
-  /* Page atmosphere */
-  .contact__atmos {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 600px;
-    pointer-events: none;
-    overflow: hidden;
-  }
 
-  .contact__atmos-glow {
-    position: absolute;
-    top: -180px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 1100px;
-    height: 540px;
-    background: radial-gradient(ellipse 50% 50% at 50% 50%, var(--color-accent-muted), transparent 70%);
-    filter: blur(28px);
-    opacity: 0.7;
-  }
 
   .contact__inner {
     position: relative;
@@ -196,29 +168,11 @@ const channels = [
     flex-wrap: wrap;
   }
 
-  .contact__sxn-num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 22px;
-    padding: 0 7px;
-    border-radius: 4px;
-    border: 1px solid var(--color-border);
-    background-color: var(--color-bg-elevated);
-    color: var(--color-text);
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    line-height: 1;
-  }
 
   .contact__sxn-label {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
     color: var(--color-text);
   }
 
@@ -230,17 +184,16 @@ const channels = [
   }
 
   .contact__sxn-meta {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
     color: var(--color-text-subtle);
-    letter-spacing: 0.04em;
     white-space: nowrap;
   }
 
   .contact__title {
     font-family: var(--font-display);
     font-size: clamp(34px, 7vw, 60px);
-    font-weight: 400;
+    font-weight: 800;
     letter-spacing: -0.022em;
     line-height: 1.05;
     color: var(--color-text);
@@ -337,29 +290,11 @@ const channels = [
     z-index: 1;
   }
 
-  .contact__form-num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 22px;
-    padding: 0 7px;
-    border-radius: 4px;
-    border: 1px solid var(--color-border);
-    background-color: var(--color-bg-elevated);
-    color: var(--color-text);
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    line-height: 1;
-  }
 
   .contact__form-title {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    font-weight: 600;
     color: var(--color-text);
     margin: 0;
   }
@@ -418,29 +353,11 @@ const channels = [
     margin-bottom: var(--space-1);
   }
 
-  .contact__channels-num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 22px;
-    padding: 0 7px;
-    border-radius: 4px;
-    border: 1px solid var(--color-border);
-    background-color: var(--color-bg-elevated);
-    color: var(--color-text);
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    line-height: 1;
-  }
 
   .contact__channels-title {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    font-weight: 600;
     color: var(--color-text);
     margin: 0;
   }
@@ -463,8 +380,7 @@ const channels = [
   /* Per-channel accent: primary uses warm amber, others use steel */
   .contact__channel {
     --pc-accent: var(--color-text);
-    --pc-accent-rgb: 113, 113, 122;
-    position: relative;
+        position: relative;
     display: flex;
     align-items: center;
     gap: var(--space-4);
@@ -487,7 +403,6 @@ const channels = [
 
   .contact__channel--primary {
     --pc-accent: var(--color-accent);
-    --pc-accent-rgb: var(--project-flagship-rgb);
     border-color: var(--color-accent-muted);
     background:
       linear-gradient(180deg,
@@ -521,12 +436,10 @@ const channels = [
   }
 
   .contact__channel-label {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
     font-weight: 600;
     color: var(--color-text-subtle);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
     width: 80px;
     flex-shrink: 0;
   }
@@ -600,11 +513,10 @@ const channels = [
   }
 
   .contact__foot-text {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
     color: var(--color-text-subtle);
     line-height: 1.55;
-    letter-spacing: 0.02em;
     margin: 0;
   }
 </style>

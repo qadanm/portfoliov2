@@ -3,7 +3,6 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
 
 const sections = [
   {
-    num: '02',
     label: 'Editor & code',
     items: [
       { name: 'VS Code', note: 'Daily driver. JetBrains keymap, no theme overrides.' },
@@ -14,7 +13,6 @@ const sections = [
     ],
   },
   {
-    num: '03',
     label: 'Design',
     items: [
       { name: 'Figma', note: 'Precision design, component-system maintenance, handoff fidelity.' },
@@ -23,7 +21,6 @@ const sections = [
     ],
   },
   {
-    num: '04',
     label: 'Stack',
     items: [
       { name: 'TypeScript', note: 'Default for everything I author from scratch.' },
@@ -36,7 +33,6 @@ const sections = [
     ],
   },
   {
-    num: '05',
     label: 'AI workflow',
     items: [
       { name: 'Prompt modules in source', note: 'Typed, versioned, reviewed in PRs like any other code.' },
@@ -46,7 +42,6 @@ const sections = [
     ],
   },
   {
-    num: '06',
     label: 'Hardware',
     items: [
       { name: 'MacBook Pro 14"', note: 'M3 Pro, 36 GB. Daily.' },
@@ -55,12 +50,11 @@ const sections = [
     ],
   },
   {
-    num: '07',
     label: 'This site',
     items: [
       { name: 'Astro 4', note: 'Static-first, content collections for case studies, MDX.' },
       { name: 'Hand-written CSS', note: 'No CSS framework. ~12 KB of design tokens carry the system.' },
-      { name: 'Inter, Instrument Serif, JetBrains Mono', note: 'Loaded from Google Fonts via preconnect.' },
+      { name: 'Inter, Fraunces, JetBrains Mono', note: 'Loaded from Google Fonts via preconnect.' },
       { name: 'Plausible analytics', note: 'Privacy-respecting. No cookies, no fingerprinting.' },
       { name: 'Web3Forms', note: 'Static contact form, no backend required.' },
       { name: 'Cloudflare Pages', note: 'Static deploy, edge caching.' },
@@ -86,14 +80,10 @@ const sections = [
   ]}
 >
   <div class="uses">
-    <div class="uses__atmos" aria-hidden="true">
-      <span class="uses__atmos-glow"></span>
-    </div>
 
     <header class="uses__hero">
       <div class="container-site">
         <div class="uses__sxn">
-          <span class="uses__sxn-num">01</span>
           <span class="uses__sxn-label">Uses</span>
           <span class="uses__sxn-rule" aria-hidden="true"></span>
           <span class="uses__sxn-meta">A practical colophon</span>
@@ -108,12 +98,11 @@ const sections = [
 
     <div class="container-site uses__body">
       {sections.map(section => (
-        <section class="uses__section" data-reveal>
+        <section class="uses__section">
           <header class="uses__section-head">
-            <span class="uses__section-num">{section.num}</span>
             <h2 class="uses__section-label">{section.label}</h2>
             <span class="uses__section-rule" aria-hidden="true"></span>
-            <span class="uses__section-count">{String(section.items.length).padStart(2, '0')}</span>
+            <span class="uses__section-count">{section.items.length}</span>
           </header>
           <dl class="uses__list">
             {section.items.map(item => (
@@ -142,27 +131,7 @@ const sections = [
     position: relative;
   }
 
-  .uses__atmos {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 600px;
-    pointer-events: none;
-    overflow: hidden;
-  }
 
-  .uses__atmos-glow {
-    position: absolute;
-    top: -180px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 1100px;
-    height: 540px;
-    background: radial-gradient(ellipse 50% 50% at 50% 50%, var(--color-accent-muted), transparent 70%);
-    filter: blur(28px);
-    opacity: 0.7;
-  }
 
   .uses__hero {
     position: relative;
@@ -188,29 +157,11 @@ const sections = [
     flex-wrap: wrap;
   }
 
-  .uses__sxn-num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 22px;
-    padding: 0 7px;
-    border-radius: 4px;
-    border: 1px solid var(--color-border);
-    background-color: var(--color-bg-elevated);
-    color: var(--color-text);
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    line-height: 1;
-  }
 
   .uses__sxn-label {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
     color: var(--color-text);
   }
 
@@ -222,17 +173,16 @@ const sections = [
   }
 
   .uses__sxn-meta {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
     color: var(--color-text-subtle);
-    letter-spacing: 0.04em;
     white-space: nowrap;
   }
 
   .uses__title {
     font-family: var(--font-display);
     font-size: clamp(40px, 9vw, 80px);
-    font-weight: 400;
+    font-weight: 800;
     letter-spacing: -0.025em;
     line-height: 1.05;
     color: var(--color-text);
@@ -276,29 +226,11 @@ const sections = [
     gap: 12px;
   }
 
-  .uses__section-num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 22px;
-    padding: 0 7px;
-    border-radius: 4px;
-    border: 1px solid var(--color-border);
-    background-color: var(--color-bg-elevated);
-    color: var(--color-text);
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    line-height: 1;
-  }
 
   .uses__section-label {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    font-weight: 600;
     color: var(--color-text);
     margin: 0;
   }
@@ -310,10 +242,9 @@ const sections = [
   }
 
   .uses__section-count {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
     color: var(--color-text-subtle);
-    letter-spacing: 0.04em;
   }
 
   /* List */
@@ -349,7 +280,7 @@ const sections = [
     margin: 0;
     font-family: var(--font-display);
     font-size: 18px;
-    font-weight: 400;
+    font-weight: 600;
     letter-spacing: -0.01em;
     color: var(--color-text);
     line-height: 1.2;
@@ -379,11 +310,10 @@ const sections = [
   }
 
   .uses__foot-text {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
     color: var(--color-text-subtle);
     line-height: 1.55;
-    letter-spacing: 0.02em;
     margin: 0;
   }
 

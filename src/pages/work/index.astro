@@ -1,7 +1,31 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '@/components/layout/BaseLayout.astro';
-import GarageShowcase from '@/components/home/GarageShowcase.astro';
-import ExperienceWall from '@/components/home/ExperienceWall.astro';
+
+// Same ordering as the case-study template, so the index position a visitor
+// reads here is the same "04 / 06" the case study shows.
+const allProjects = (await getCollection('build', ({ data }) => !data.draft))
+  .sort((a, b) => a.data.order - b.data.order);
+
+const numberOf = (slug: string) =>
+  String(allProjects.findIndex(p => p.slug === slug) + 1).padStart(2, '0');
+
+// The lede promises two passes: "My own car apps first ... then the companies
+// where I've shipped inside their team." The schema already carries that split.
+const groups = [
+  {
+    key: 'mine',
+    label: 'My own',
+    meta: 'Designed and built end to end',
+    items: allProjects.filter(p => p.data.engagement === 'independent'),
+  },
+  {
+    key: 'team',
+    label: 'Inside a team',
+    meta: 'Shipped within someone else\'s platform',
+    items: allProjects.filter(p => p.data.engagement === 'work'),
+  },
+];
 ---
 
 <BaseLayout
@@ -21,144 +45,235 @@ import ExperienceWall from '@/components/home/ExperienceWall.astro';
     'InvestCloud',
   ]}
 >
-  <div class="work-index">
-    {/* Page atmosphere */}
-    <div class="work-index__atmos" aria-hidden="true">
-      <span class="work-index__atmos-glow"></span>
-    </div>
-
-    <header class="work-index__hero">
-      <div class="container-site">
-        <div class="work-index__sxn">
-          <span class="work-index__sxn-num">01</span>
-          <span class="work-index__sxn-label">Work</span>
-          <span class="work-index__sxn-rule" aria-hidden="true"></span>
-          <span class="work-index__sxn-meta">Case studies &amp; project notes</span>
-        </div>
-        <h1 class="work-index__title">
-          Selected work, in two passes.
-        </h1>
-        <p class="work-index__lede">
-          My own car apps first — designed and built end to end — then the
-          companies where I've shipped inside their team. Each one is a
-          different surface, a different platform, a different posture.
-        </p>
-      </div>
+  <div class="widx">
+    <header class="widx__hero container-site">
+      <h1 class="widx__title">Selected work, in two passes.</h1>
+      <p class="widx__lede">
+        My own car apps first — designed and built end to end — then the
+        companies where I've shipped inside their team. Each one is a
+        different surface, a different platform, a different posture.
+      </p>
     </header>
 
-    <GarageShowcase />
-    <ExperienceWall />
+    {groups.map(group => (
+      <section class="widx__group container-site" aria-labelledby={`widx-${group.key}`}>
+        <div class="widx__group-head">
+          <h2 class="widx__group-label" id={`widx-${group.key}`}>{group.label}</h2>
+          <span class="widx__group-meta">{group.meta}</span>
+          <span class="widx__group-count">{group.items.length}</span>
+        </div>
+
+        <ol class="widx__list">
+          {group.items.map(p => (
+            <li class="widx__row">
+              <a
+                href={`/work/${p.slug}`}
+                class="widx__link"
+                data-track="cta_click"
+                data-track-cta="work-index-row"
+                data-track-project={p.slug}
+              >
+                <span class="widx__num">{numberOf(p.slug)}</span>
+
+                <span class="widx__body">
+                  <span class="widx__head">
+                    <span class="widx__name">{p.data.title}</span>
+                    {p.data.company && <span class="widx__co">{p.data.company}</span>}
+                    {/* Period is prose ("Earlier", "2025, present"), not a figure —
+                        so it sits in the line, not in a column pretending to tabulate. */}
+                    <span class="widx__period">{p.data.period}</span>
+                  </span>
+                  <span class="widx__desc">{p.data.short}</span>
+                  {p.data.status && <span class="widx__status">{p.data.status}</span>}
+                </span>
+
+                <svg class="widx__arrow" width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </section>
+    ))}
   </div>
 </BaseLayout>
 
 <style>
-  .work-index {
-    position: relative;
+  /* The index is the counterweight to the homepage: dense where the homepage
+     is spacious, text-led where the homepage is posters. It borrows the
+     .hero__spec vocabulary — hairline rules, no cards, no radius, no shadow —
+     so it reads as the same hand without adding a new object class. */
+
+  .widx {
+    padding-top: var(--space-24);
+    padding-bottom: var(--space-24);
   }
 
-  /* Page atmosphere */
-  .work-index__atmos {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 600px;
-    pointer-events: none;
-    overflow: hidden;
+  .widx__hero {
+    margin-bottom: var(--space-16);
   }
 
-  .work-index__atmos-glow {
-    position: absolute;
-    top: -180px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 1100px;
-    height: 540px;
-    background: radial-gradient(ellipse 50% 50% at 50% 50%, var(--color-accent-muted), transparent 70%);
-    filter: blur(28px);
-    opacity: 0.7;
+  .widx__title {
+    font-family: var(--font-display);
+    font-size: clamp(38px, 6vw, 66px);
+    line-height: 1.02;
+    letter-spacing: -0.015em;
+    font-weight: 800;
+    color: var(--color-text);
+    max-width: 14ch;
   }
 
-  .work-index__hero {
-    position: relative;
-    padding-top: calc(60px + var(--space-10));
-    padding-bottom: var(--space-8);
+  .widx__lede {
+    margin-top: var(--space-5);
+    max-width: 56ch;
+    font-size: clamp(15px, 1.5vw, 17px);
+    line-height: 1.65;
+    color: var(--color-text-muted);
   }
 
-  @media (min-width: 768px) {
-    .work-index__hero {
-      padding-top: calc(64px + var(--space-16));
-      padding-bottom: var(--space-10);
-    }
+  /* ─── Group ─────────────────────────────────────────────────────────── */
+  .widx__group + .widx__group {
+    margin-top: var(--space-16);
   }
 
-  .work-index__sxn {
+  /* The index runs to a tighter measure than the homepage's 1200px column —
+     density is the whole point of this page existing separately. */
+  .widx__group-head,
+  .widx__list {
+    max-width: 940px;
+  }
+
+  .widx__group-head {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     gap: 12px;
-    margin-bottom: var(--space-5);
+    padding-bottom: var(--space-3);
+  }
+
+  .widx__group-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .widx__group-meta {
+    flex: 1;
+    font-size: 13px;
+    color: var(--color-text-subtle);
+  }
+
+  .widx__group-count {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-text-subtle);
+  }
+
+  /* ─── List ──────────────────────────────────────────────────────────── */
+  .widx__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .widx__row {
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .widx__link {
+    display: grid;
+    grid-template-columns: 56px 1fr 15px;
+    align-items: baseline;
+    gap: 16px;
+    padding: var(--space-5) 4px;
+    text-decoration: none;
+    color: inherit;
+    transition: background-color var(--duration-fast) var(--ease-out);
+  }
+
+  .widx__link:hover {
+    background-color: var(--color-bg-muted);
+  }
+
+  .widx__num {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-text-subtle);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .widx__body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .widx__head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
     flex-wrap: wrap;
   }
 
-  .work-index__sxn-num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 22px;
-    padding: 0 7px;
-    border-radius: 4px;
-    border: 1px solid var(--color-border);
-    background-color: var(--color-bg-elevated);
-    color: var(--color-text);
-    font-family: var(--font-mono);
-    font-size: 10px;
+  .widx__name {
+    font-family: var(--font-display);
     font-weight: 700;
-    letter-spacing: 0.06em;
-    line-height: 1;
-  }
-
-  .work-index__sxn-label {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    font-size: clamp(24px, 2.6vw, 32px);
+    line-height: 1.1;
     color: var(--color-text);
+    transition: color var(--duration-fast) var(--ease-out);
   }
 
-  .work-index__sxn-rule {
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(to right, var(--color-border), transparent);
-    min-width: 32px;
+  .widx__link:hover .widx__name {
+    color: var(--color-accent);
   }
 
-  .work-index__sxn-meta {
-    font-family: var(--font-mono);
-    font-size: 11px;
+  .widx__co {
+    font-size: 13px;
     color: var(--color-text-subtle);
-    letter-spacing: 0.04em;
+  }
+
+  .widx__desc {
+    max-width: 62ch;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+  }
+
+  .widx__status {
+    font-size: 13px;
+    color: var(--color-text-subtle);
+  }
+
+  .widx__period {
+    font-size: 13px;
+    color: var(--color-text-subtle);
     white-space: nowrap;
   }
 
-  .work-index__title {
-    font-family: var(--font-display);
-    font-size: clamp(38px, 9vw, 80px);
-    font-weight: 400;
-    letter-spacing: -0.025em;
-    line-height: 1.05;
-    color: var(--color-text);
-    margin-bottom: var(--space-5);
-    max-width: 18ch;
+  .widx__arrow {
+    color: var(--color-text-subtle);
+    align-self: center;
+    transition: transform var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out);
   }
 
-  .work-index__lede {
-    font-size: clamp(15px, 1.5vw, 17px);
-    line-height: 1.7;
-    color: var(--color-text-muted);
-    max-width: 62ch;
+  .widx__link:hover .widx__arrow {
+    color: var(--color-accent);
+    transform: translateX(3px);
   }
 
-  /* The two work sections (Garage + Experience) bring their own
-     container, spacing, and bottom padding. */
+  /* ─── Narrow ────────────────────────────────────────────────────────── */
+  @media (max-width: 720px) {
+    .widx__link {
+      grid-template-columns: 32px 1fr;
+      gap: 12px;
+    }
+
+    .widx__arrow {
+      display: none;
+    }
+  }
 </style>

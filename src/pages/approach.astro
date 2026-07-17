@@ -63,14 +63,10 @@ const projects = [
   ]}
 >
   <div class="apr">
-    <div class="apr__atmos" aria-hidden="true">
-      <span class="apr__atmos-glow"></span>
-    </div>
 
     <header class="apr__hero">
       <div class="container-site">
         <div class="apr__sxn">
-          <span class="apr__sxn-num">01</span>
           <span class="apr__sxn-label">Approach</span>
           <span class="apr__sxn-rule" aria-hidden="true"></span>
           <span class="apr__sxn-meta">A method, not a manifesto</span>
@@ -84,7 +80,7 @@ const projects = [
 
     <div class="container-site apr__body">
       {/* Lead — discursive, not symmetrical */}
-      <section class="apr__section apr__section--lead" data-reveal>
+      <section class="apr__section apr__section--lead">
         <p class="apr__lead">
           A lot of the work I take on looks like repair. A platform that
           grew without a system. A site that ranks well and converts
@@ -104,9 +100,8 @@ const projects = [
       </section>
 
       {/* What I actually do, day to day */}
-      <section class="apr__section" data-reveal>
+      <section class="apr__section">
         <header class="apr__sxn apr__sxn--inner">
-          <span class="apr__sxn-num">02</span>
           <span class="apr__sxn-label">A normal week</span>
           <span class="apr__sxn-rule" aria-hidden="true"></span>
         </header>
@@ -124,9 +119,8 @@ const projects = [
       </section>
 
       {/* AI in the work */}
-      <section class="apr__section" data-reveal>
+      <section class="apr__section">
         <header class="apr__sxn apr__sxn--inner">
-          <span class="apr__sxn-num">03</span>
           <span class="apr__sxn-label">How AI actually fits in</span>
           <span class="apr__sxn-rule" aria-hidden="true"></span>
         </header>
@@ -138,7 +132,7 @@ const projects = [
           fits best, ship reviewable output.
         </p>
 
-        <div class="apr__flow" data-reveal>
+        <div class="apr__flow">
           <AIFlow />
         </div>
 
@@ -178,7 +172,7 @@ const projects = [
           codebase.
         </p>
 
-        <div class="apr__art" data-reveal>
+        <div class="apr__art">
           <span class="apr__art-caption">ChatOBD2 verdict surface</span>
           <VerdictCardMock />
         </div>
@@ -200,9 +194,8 @@ const projects = [
       </section>
 
       {/* What I bring to a team */}
-      <section class="apr__section" data-reveal>
+      <section class="apr__section">
         <header class="apr__sxn apr__sxn--inner">
-          <span class="apr__sxn-num">04</span>
           <span class="apr__sxn-label">What I'm best at on a team</span>
           <span class="apr__sxn-rule" aria-hidden="true"></span>
         </header>
@@ -218,9 +211,8 @@ const projects = [
       </section>
 
       {/* Tools */}
-      <section class="apr__section" data-reveal>
+      <section class="apr__section">
         <header class="apr__sxn apr__sxn--inner">
-          <span class="apr__sxn-num">05</span>
           <span class="apr__sxn-label">Tools I reach for</span>
           <span class="apr__sxn-rule" aria-hidden="true"></span>
           <span class="apr__sxn-meta">The judgment is the constant</span>
@@ -236,7 +228,6 @@ const projects = [
             <span class="apr__tool-corner apr__tool-corner--tl" aria-hidden="true"></span>
             <span class="apr__tool-corner apr__tool-corner--br" aria-hidden="true"></span>
             <header class="apr__tool-head">
-              <span class="apr__tool-num">01</span>
               <span class="apr__tool-name">Claude</span>
             </header>
             <span class="apr__tool-role">Code work and reasoning. The default for non-trivial refactors and anything that needs to think across more than one file.</span>
@@ -245,7 +236,6 @@ const projects = [
             <span class="apr__tool-corner apr__tool-corner--tl" aria-hidden="true"></span>
             <span class="apr__tool-corner apr__tool-corner--br" aria-hidden="true"></span>
             <header class="apr__tool-head">
-              <span class="apr__tool-num">02</span>
               <span class="apr__tool-name">Cursor</span>
             </header>
             <span class="apr__tool-role">Local iteration. Same code work as Claude, different interaction model. Whichever is faster on the task at hand.</span>
@@ -254,7 +244,6 @@ const projects = [
             <span class="apr__tool-corner apr__tool-corner--tl" aria-hidden="true"></span>
             <span class="apr__tool-corner apr__tool-corner--br" aria-hidden="true"></span>
             <header class="apr__tool-head">
-              <span class="apr__tool-num">03</span>
               <span class="apr__tool-name">Figma</span>
             </header>
             <span class="apr__tool-role">Precision design, component-system maintenance, handoff fidelity, and the occasional client review.</span>
@@ -263,7 +252,6 @@ const projects = [
             <span class="apr__tool-corner apr__tool-corner--tl" aria-hidden="true"></span>
             <span class="apr__tool-corner apr__tool-corner--br" aria-hidden="true"></span>
             <header class="apr__tool-head">
-              <span class="apr__tool-num">04</span>
               <span class="apr__tool-name">Claude Design</span>
             </header>
             <span class="apr__tool-role">Visual exploration when a frame is faster to think in than code. Output lands back in the codebase.</span>
@@ -272,9 +260,8 @@ const projects = [
       </section>
 
       {/* Across the work */}
-      <section class="apr__section" data-reveal>
+      <section class="apr__section">
         <header class="apr__sxn apr__sxn--inner">
-          <span class="apr__sxn-num">06</span>
           <span class="apr__sxn-label">Across the work</span>
           <span class="apr__sxn-rule" aria-hidden="true"></span>
         </header>
@@ -320,7 +307,7 @@ const projects = [
       </section>
 
       {/* Closing CTA */}
-      <section class="apr__cta" data-reveal>
+      <section class="apr__cta">
         <span class="apr__cta-corner apr__cta-corner--tl" aria-hidden="true"></span>
         <span class="apr__cta-corner apr__cta-corner--tr" aria-hidden="true"></span>
         <span class="apr__cta-corner apr__cta-corner--bl" aria-hidden="true"></span>
@@ -356,27 +343,7 @@ const projects = [
     position: relative;
   }
 
-  .apr__atmos {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 600px;
-    pointer-events: none;
-    overflow: hidden;
-  }
 
-  .apr__atmos-glow {
-    position: absolute;
-    top: -180px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 1100px;
-    height: 540px;
-    background: radial-gradient(ellipse 50% 50% at 50% 50%, var(--color-accent-muted), transparent 70%);
-    filter: blur(28px);
-    opacity: 0.7;
-  }
 
   .apr__hero {
     position: relative;
@@ -407,29 +374,11 @@ const projects = [
     margin-bottom: var(--space-4);
   }
 
-  .apr__sxn-num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 22px;
-    padding: 0 7px;
-    border-radius: 4px;
-    border: 1px solid var(--color-border);
-    background-color: var(--color-bg-elevated);
-    color: var(--color-text);
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    line-height: 1;
-  }
 
   .apr__sxn-label {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
     color: var(--color-text);
   }
 
@@ -441,17 +390,16 @@ const projects = [
   }
 
   .apr__sxn-meta {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
     color: var(--color-text-subtle);
-    letter-spacing: 0.04em;
     white-space: nowrap;
   }
 
   .apr__title {
     font-family: var(--font-display);
     font-size: clamp(40px, 9vw, 80px);
-    font-weight: 400;
+    font-weight: 800;
     letter-spacing: -0.025em;
     line-height: 1.05;
     color: var(--color-text);
@@ -494,7 +442,7 @@ const projects = [
   .apr__h2 {
     font-family: var(--font-display);
     font-size: clamp(26px, 3.2vw, 40px);
-    font-weight: 400;
+    font-weight: 700;
     letter-spacing: -0.02em;
     line-height: 1.15;
     color: var(--color-text);
@@ -565,11 +513,9 @@ const projects = [
   }
 
   .apr__art-caption {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
     font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
     color: var(--color-text-subtle);
   }
 
@@ -647,28 +593,11 @@ const projects = [
     gap: 10px;
   }
 
-  .apr__tool-num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    border-radius: 5px;
-    background:
-      linear-gradient(180deg, var(--color-bg-elevated), var(--color-bg-deep));
-    border: 1px solid var(--color-border);
-    color: var(--color-text);
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    line-height: 1;
-  }
 
   .apr__tool-name {
     font-family: var(--font-display);
     font-size: 22px;
-    font-weight: 400;
+    font-weight: 600;
     color: var(--color-text);
     letter-spacing: -0.01em;
     line-height: 1;
@@ -697,7 +626,6 @@ const projects = [
 
   .apr__work {
     --pc-accent: var(--color-accent);
-    --pc-accent-rgb: var(--project-flagship-rgb);
     position: relative;
     display: flex;
     flex-direction: column;
@@ -712,12 +640,9 @@ const projects = [
     transition: border-color 320ms var(--ease-out), transform 320ms var(--ease-out), box-shadow 320ms var(--ease-out);
   }
 
-  .apr__work--platform { --pc-accent-rgb: var(--project-platform-rgb); --pc-accent: rgb(var(--project-platform-rgb)); }
-  .apr__work--product { --pc-accent-rgb: var(--project-product-rgb); --pc-accent: rgb(var(--project-product-rgb)); }
-  .apr__work--frontend { --pc-accent-rgb: var(--project-frontend-rgb); --pc-accent: rgb(var(--project-frontend-rgb)); }
 
   .apr__work:hover {
-    border-color: rgba(var(--pc-accent-rgb), 0.45);
+    border-color: var(--color-border-strong);
     transform: translateY(-3px);
     box-shadow: var(--shadow-card-hover);
   }
@@ -769,7 +694,7 @@ const projects = [
   .apr__work-title {
     font-family: var(--font-display);
     font-size: 22px;
-    font-weight: 400;
+    font-weight: 600;
     letter-spacing: -0.015em;
     color: var(--color-text);
     line-height: 1.1;
@@ -790,11 +715,9 @@ const projects = [
     margin-top: var(--space-2);
     padding-top: var(--space-3);
     border-top: 1px solid var(--color-border-subtle);
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
     font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
     color: var(--color-text-muted);
     transition: color 200ms;
   }
@@ -875,11 +798,9 @@ const projects = [
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    font-weight: 600;
     color: var(--color-accent);
     width: fit-content;
   }
@@ -904,7 +825,7 @@ const projects = [
   .apr__cta-title {
     font-family: var(--font-display);
     font-size: clamp(24px, 3vw, 36px);
-    font-weight: 400;
+    font-weight: 700;
     letter-spacing: -0.02em;
     line-height: 1.18;
     color: var(--color-text);
@@ -982,9 +903,8 @@ const projects = [
     background-color: transparent;
     color: var(--color-text);
     border: 1px solid var(--color-border);
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 13px;
-    letter-spacing: 0.02em;
   }
 
   .apr__cta-ghost:hover {

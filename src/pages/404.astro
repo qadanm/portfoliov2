@@ -8,13 +8,9 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
   noindex={true}
 >
   <div class="nf">
-    <div class="nf__atmos" aria-hidden="true">
-      <span class="nf__atmos-glow"></span>
-    </div>
 
     <div class="container-site nf__inner">
       <div class="nf__sxn">
-        <span class="nf__sxn-num">404</span>
         <span class="nf__sxn-label">Off the path</span>
         <span class="nf__sxn-rule" aria-hidden="true"></span>
         <span class="nf__sxn-meta">Page not found</span>
@@ -31,7 +27,6 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
 
       <div class="nf__links">
         <a href="/" class="nf__link">
-          <span class="nf__link-num">01</span>
           <span class="nf__link-body">
             <span class="nf__link-title">Home</span>
             <span class="nf__link-sub">Start at the beginning.</span>
@@ -39,7 +34,6 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
           <span class="nf__link-arrow" aria-hidden="true">→</span>
         </a>
         <a href="/work" class="nf__link">
-          <span class="nf__link-num">02</span>
           <span class="nf__link-body">
             <span class="nf__link-title">Work</span>
             <span class="nf__link-sub">Selected projects and case studies.</span>
@@ -47,7 +41,6 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
           <span class="nf__link-arrow" aria-hidden="true">→</span>
         </a>
         <a href="/approach" class="nf__link">
-          <span class="nf__link-num">03</span>
           <span class="nf__link-body">
             <span class="nf__link-title">Approach</span>
             <span class="nf__link-sub">How I design, build, and use AI in production.</span>
@@ -55,7 +48,6 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
           <span class="nf__link-arrow" aria-hidden="true">→</span>
         </a>
         <a href="/about" class="nf__link">
-          <span class="nf__link-num">04</span>
           <span class="nf__link-body">
             <span class="nf__link-title">About</span>
             <span class="nf__link-sub">Background and how I think.</span>
@@ -63,7 +55,6 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
           <span class="nf__link-arrow" aria-hidden="true">→</span>
         </a>
         <a href="/contact" class="nf__link">
-          <span class="nf__link-num">05</span>
           <span class="nf__link-body">
             <span class="nf__link-title">Contact</span>
             <span class="nf__link-sub">Send a message.</span>
@@ -90,28 +81,7 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     }
   }
 
-  /* Page atmosphere */
-  .nf__atmos {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 600px;
-    pointer-events: none;
-    overflow: hidden;
-  }
 
-  .nf__atmos-glow {
-    position: absolute;
-    top: -180px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 1100px;
-    height: 540px;
-    background: radial-gradient(ellipse 50% 50% at 50% 50%, var(--color-accent-muted), transparent 70%);
-    filter: blur(28px);
-    opacity: 0.6;
-  }
 
   .nf__inner {
     position: relative;
@@ -127,29 +97,11 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     flex-wrap: wrap;
   }
 
-  .nf__sxn-num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 22px;
-    padding: 0 8px;
-    border-radius: 4px;
-    border: 1px solid var(--color-border);
-    background-color: var(--color-bg-elevated);
-    color: var(--color-text);
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    line-height: 1;
-  }
 
   .nf__sxn-label {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
     color: var(--color-text);
   }
 
@@ -161,17 +113,16 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
   }
 
   .nf__sxn-meta {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
     color: var(--color-text-subtle);
-    letter-spacing: 0.04em;
     white-space: nowrap;
   }
 
   .nf__title {
     font-family: var(--font-display);
     font-size: clamp(38px, 9vw, 72px);
-    font-weight: 400;
+    font-weight: 800;
     letter-spacing: -0.025em;
     line-height: 1.05;
     color: var(--color-text);
@@ -179,8 +130,13 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     max-width: 18ch;
   }
 
+  /* "This page doesn't exist." — the phrase recedes instead of leaning.
+     No italic face is loaded, so italic here would be a synthesized oblique;
+     with a real weight axis, dropping to 400 inside an 800 headline says the
+     same thing and says it better. */
   .nf__title em {
-    font-style: italic;
+    font-style: normal;
+    font-weight: 400;
     color: var(--color-accent);
   }
 
@@ -225,18 +181,8 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     padding-left: 8px;
   }
 
-  .nf__link-num {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    color: var(--color-text-subtle);
-  }
 
-  .nf__link:hover .nf__link-num {
-    color: var(--color-accent);
-  }
-
+  .nf__link:hover
   .nf__link-body {
     display: flex;
     flex-direction: column;
@@ -246,7 +192,7 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
   .nf__link-title {
     font-family: var(--font-display);
     font-size: 20px;
-    font-weight: 400;
+    font-weight: 600;
     letter-spacing: -0.02em;
     color: var(--color-text);
   }
