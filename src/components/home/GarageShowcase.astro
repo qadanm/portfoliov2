@@ -83,7 +83,17 @@ const apps = {
 
       <div class="garage__hero-body">
         <div class="garage__hero-tags">
-          <span class="garage__chip garage__chip--flag">Flagship</span>
+          <a
+            class="garage__chip garage__chip--dl"
+            href={apps.carspotter.appStore}
+            target="_blank"
+            rel="noopener"
+            data-track="cta_click"
+            data-track-cta="garage-chip-download"
+            data-track-project="car-spotter"
+          >
+            Download now
+          </a>
           <span class="garage__hero-kind">iOS · daily game</span>
         </div>
         <h3 class="garage__hero-name">CarSpotter</h3>
@@ -141,7 +151,17 @@ const apps = {
         </div>
         <div class="garage__app-body">
           <div class="garage__app-tags">
-            <span class="garage__chip garage__chip--flag">Flagship</span>
+            <a
+              class="garage__chip garage__chip--dl"
+              href={apps.vinly.appStore}
+              target="_blank"
+              rel="noopener"
+              data-track="cta_click"
+              data-track-cta="garage-chip-download"
+              data-track-project="vinly"
+            >
+              Download now
+            </a>
             <span class="garage__app-kind">iOS · Free VIN research</span>
           </div>
           <h3 class="garage__app-name">VINly</h3>
@@ -446,6 +466,26 @@ const apps = {
     background: var(--lime);
     box-shadow: 0 0 14px rgba(var(--lime-rgb), 0.35);
   }
+  /* "Download now" — a real anchor, so it must clear the stretched case-study
+     link (::after, z-index 1) the same way the store row does, or the card
+     would swallow the click and send you to the case study instead. */
+  .garage__chip--dl {
+    position: relative;
+    z-index: 2;
+    color: #0B0C0E;
+    background: var(--lime);
+    box-shadow: 0 0 14px rgba(var(--lime-rgb), 0.35);
+    text-decoration: none;
+    transition: transform 0.16s ease, box-shadow 0.16s ease;
+  }
+  .garage__chip--dl:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 18px rgba(var(--lime-rgb), 0.55);
+  }
+  .garage__chip--dl:focus-visible {
+    outline: 2px solid var(--lime);
+    outline-offset: 2px;
+  }
   .garage__chip--soon {
     color: var(--color-text);
     background: var(--color-bg-subtle);
@@ -702,7 +742,10 @@ const apps = {
     text-transform: uppercase;
     color: var(--color-text-subtle);
   }
-  .garage__app--vinly .garage__app-tags .garage__chip--flag { background: #EA580C; color: #FFF7ED; box-shadow: 0 0 14px rgba(234, 88, 12, 0.35); }
+  .garage__app--vinly .garage__app-tags .garage__chip--flag,
+  .garage__app--vinly .garage__app-tags .garage__chip--dl { background: #EA580C; color: #FFF7ED; box-shadow: 0 0 14px rgba(234, 88, 12, 0.35); }
+  .garage__app--vinly .garage__app-tags .garage__chip--dl:hover { box-shadow: 0 0 18px rgba(234, 88, 12, 0.55); }
+  .garage__app--vinly .garage__app-tags .garage__chip--dl:focus-visible { outline-color: #EA580C; }
   .garage__app-name {
     font-family: var(--font-display);
     font-size: clamp(26px, 3.4vw, 34px);
