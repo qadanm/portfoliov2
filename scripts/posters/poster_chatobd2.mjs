@@ -59,17 +59,24 @@ mkdirSync(path.dirname(OUT), { recursive: true });
 // ── 1. Surface: ink + an engineering grid ────────────────────────────────────
 // A real grid, not a dot field. Fine minor rule every 40px, a heavier major every 200 — the visual
 // language of a measuring instrument. Low enough alpha that you feel it rather than read it.
+//
+// Draw with a SOLID stroke and scale the layer's alpha channel afterwards. Passing the alpha inline
+// (`-stroke 'rgba(242,244,248,0.028)'`) does not survive here: it gets premultiplied into the colour
+// (242 × 0.028 ≈ rgb(7,7,7)) and stamped opaque, which on this ink produced a 1/255 difference — a
+// grid that measured as present and read as absent. Same bug the MagTek poster had, opposite symptom:
+// there it was near-black on white and screamed; here it was near-black on near-black and vanished.
 m(['-size', `${W}x${H}`, `xc:${INK}`, `${T}_ink.png`]);
 
-const minor = [];
-for (let x = 0; x <= W; x += 40) minor.push('-draw', `line ${x},0 ${x},${H}`);
-for (let y = 0; y <= H; y += 40) minor.push('-draw', `line 0,${y} ${W},${y}`);
-m(['-size', `${W}x${H}`, 'xc:none', '-stroke', 'rgba(242,244,248,0.028)', '-strokewidth', '1', ...minor, `${T}_grid_minor.png`]);
-
-const major = [];
-for (let x = 0; x <= W; x += 200) major.push('-draw', `line ${x},0 ${x},${H}`);
-for (let y = 0; y <= H; y += 200) major.push('-draw', `line 0,${y} ${W},${y}`);
-m(['-size', `${W}x${H}`, 'xc:none', '-stroke', 'rgba(242,244,248,0.055)', '-strokewidth', '1', ...major, `${T}_grid_major.png`]);
+const gridLines = (step) => {
+  const a = [];
+  for (let x = 0; x <= W; x += step) a.push('-draw', `line ${x},0 ${x},${H}`);
+  for (let y = 0; y <= H; y += step) a.push('-draw', `line 0,${y} ${W},${y}`);
+  return a;
+};
+m(['-size', `${W}x${H}`, 'xc:none', '-stroke', WHITE, '-strokewidth', '1', ...gridLines(40),
+   '-alpha', 'set', '-channel', 'A', '-evaluate', 'multiply', '0.035', '+channel', `${T}_grid_minor.png`]);
+m(['-size', `${W}x${H}`, 'xc:none', '-stroke', WHITE, '-strokewidth', '1', ...gridLines(200),
+   '-alpha', 'set', '-channel', 'A', '-evaluate', 'multiply', '0.075', '+channel', `${T}_grid_major.png`]);
 
 m([`${T}_ink.png`, `${T}_grid_minor.png`, '-composite', `${T}_grid_major.png`, '-composite', `${T}_surface.png`]);
 

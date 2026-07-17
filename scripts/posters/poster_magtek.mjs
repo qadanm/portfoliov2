@@ -9,9 +9,15 @@ const F = {
   r: `${FROOT}/400Regular/Inter_400Regular.ttf`,
 };
 const IMG = '/Users/muhammedqadan/Documents/dev/portfoliov2/public/images/magtek';
-const OUT = '/tmp/poster_magtek_out.png';
+// Writes the real poster. This used to emit to /tmp only, so re-running it changed nothing on the site
+// and the committed poster silently drifted from the script that supposedly produced it.
+const argOut = process.argv.indexOf('--out');
+const OUT = argOut > -1 ? process.argv[argOut + 1] : `${IMG}/poster.webp`;
 const T = '/tmp/mtk';
 const W = 2560, H = 1600;
+// Drops the whole composition so its optical centre matches the canvas. It rode ~90px high, which left
+// a dead band across the bottom edge.
+const DY = 78;
 
 // Corporate light palette — steel-blue accent, graphite ink, generous whitespace.
 const INK = '#14181F', BODY = '#48515E', MUTE = '#8A94A3', STEEL = '#1E50A8', STEELD = '#0F3A86';
@@ -48,16 +54,37 @@ function thumb(src, w, h, tag) {
 
 // ---------------- BACKGROUND (soft light, restrained) ----------------
 m(['-size', `${W}x${H}`, 'radial-gradient:#FFFFFF-#ECF1F7', `${T}_grad.png`]);
-// faint engineering grid, very low opacity (corporate texture)
-m(['-size', '84x84', 'xc:none', '-stroke', '#1E50A807', '-strokewidth', '1', '-draw', 'line 0,0 0,84', '-draw', 'line 0,0 84,0', '-write', 'mpr:cell', '+delete',
-   '-size', `${W}x${H}`, 'tile:mpr:cell', `${T}_gridraw.png`]);
-m([`${T}_grad.png`, `${T}_gridraw.png`, '-compose', 'over', '-composite',
-   '-fill', STEEL, '-draw', `rectangle 0,0 ${W},7`,            // top accent bar
+// Blueprint grid.
+//
+// This was `-stroke '#1E50A807'` drawn into an 84px cell, written to an mpr: register and tiled. The
+// intent was a 3%-alpha blue whisper; the result was OPAQUE NEAR-BLACK lines. The alpha did not
+// survive the draw/mpr/tile round-trip — it was premultiplied into the colour (#1E50A8 × 0.027 ≈
+// rgb(1,2,5)) and stamped at full opacity. That is the heavy lattice: not a texture, a cage. It fought
+// the type and read as graph paper.
+//
+// Draw at full size instead of tiling, with a SOLID stroke, then scale the layer's alpha channel —
+// the form ImageMagick applies faithfully here. Two weights, so the grid has structure rather than
+// noise: a fine minor rule, and a major every fourth line to imply a column system.
+const gridLines = (step) => {
+  const a = [];
+  for (let x = 0; x <= W; x += step) a.push('-draw', `line ${x},0 ${x},${H}`);
+  for (let y = 0; y <= H; y += step) a.push('-draw', `line 0,${y} ${W},${y}`);
+  return a;
+};
+m(['-size', `${W}x${H}`, 'xc:none', '-stroke', STEEL, '-strokewidth', '1', ...gridLines(84),
+   '-alpha', 'set', '-channel', 'A', '-evaluate', 'multiply', '0.05', '+channel', `${T}_grid_minor.png`]);
+m(['-size', `${W}x${H}`, 'xc:none', '-stroke', STEEL, '-strokewidth', '1', ...gridLines(336),
+   '-alpha', 'set', '-channel', 'A', '-evaluate', 'multiply', '0.10', '+channel', `${T}_grid_major.png`]);
+
+m([`${T}_grad.png`, `${T}_grid_minor.png`, '-compose', 'over', '-composite',
+   `${T}_grid_major.png`, '-composite',
+   // Masthead rule, not a stripe — 7px full-bleed read as a stray bar across the top edge.
+   '-fill', STEEL, '-draw', `rectangle 0,0 ${W},4`,
    `${T}_bg.png`]);
 
 // ---------------- RIGHT VISUAL: homepage browser window + hardware strip ----------------
 const win = browserWindow(`${IMG}/homepage.webp`, 1120, 760, 'home');
-const winX = 1300, winY = 372;
+const winX = 1300, winY = 372 + DY;
 // soft shadow
 m(['-size', `${W}x${H}`, 'xc:none', '-fill', 'rgba(20,34,64,0.18)',
    '-draw', `roundrectangle ${winX + 14},${winY + 26},${winX + win.w + 14},${winY + win.h + 26},22,22`, '-blur', '0x34', `${T}_winshadow.png`]);
@@ -76,20 +103,20 @@ m([`${T}_bg.png`, '-compose', 'over',
 const X = 140;
 m([`${T}_wp.png`, '-gravity', 'northwest',
    // letterhead
-   '-font', F.x, '-fill', INK, '-pointsize', '40', '-kerning', '-1', '-annotate', `+${X}+120`, 'MAGTEK',
-   '-font', F.sb, '-fill', STEEL, '-pointsize', '21', '-kerning', '3', '-annotate', `+${X + 2}+188`, 'UX ENGINEERING & FRONTEND SYSTEMS',
+   '-font', F.x, '-fill', INK, '-pointsize', '40', '-kerning', '-1', '-annotate', `+${X}+${120 + DY}`, 'MAGTEK',
+   '-font', F.sb, '-fill', STEEL, '-pointsize', '21', '-kerning', '3', '-annotate', `+${X + 2}+${188 + DY}`, 'UX ENGINEERING & FRONTEND SYSTEMS',
    // period chip (right of text column)
-   '-font', F.sb, '-fill', MUTE, '-pointsize', '20', '-kerning', '3', '-annotate', `+${X + 760}+128`, 'CURRENT · LIVE',
-   '-fill', '#22B45E', '-draw', `circle ${X + 742},137 ${X + 742},131`,
+   '-font', F.sb, '-fill', MUTE, '-pointsize', '20', '-kerning', '3', '-annotate', `+${X + 760}+${128 + DY}`, 'CURRENT · LIVE',
+   '-fill', '#22B45E', '-draw', `circle ${X + 742},${137 + DY} ${X + 742},${131 + DY}`,
    // letterhead rule
-   '-stroke', LINE, '-strokewidth', '2', '-draw', `line ${X},244 ${X + 1010},244`, '-stroke', 'none',
+   '-stroke', LINE, '-strokewidth', '2', '-draw', `line ${X},${244 + DY} ${X + 1010},${244 + DY}`, '-stroke', 'none',
    // headline
-   '-font', F.b, '-fill', INK, '-pointsize', '108', '-kerning', '-3', '-annotate', `+${X}+392`, 'Eleven sites.',
-   '-fill', STEEL, '-annotate', `+${X}+520`, 'One system.',
+   '-font', F.b, '-fill', INK, '-pointsize', '108', '-kerning', '-3', '-annotate', `+${X}+${392 + DY}`, 'Eleven sites.',
+   '-fill', STEEL, '-annotate', `+${X}+${520 + DY}`, 'One system.',
    // paragraph
-   '-font', F.r, '-fill', BODY, '-pointsize', '28', '-annotate', `+${X}+632`, 'A shared component library on Razor partials — 100+',
-   '-annotate', `+${X}+674`, 'strongly-typed components, built, owned, and migrated',
-   '-annotate', `+${X}+716`, 'in place across MagTek’s web platform.',
+   '-font', F.r, '-fill', BODY, '-pointsize', '28', '-annotate', `+${X}+${632 + DY}`, 'A shared component library on Razor partials — 100+',
+   '-annotate', `+${X}+${674 + DY}`, 'strongly-typed components, built, owned, and migrated',
+   '-annotate', `+${X}+${716 + DY}`, 'in place across MagTek’s web platform.',
    `${T}_txt.png`]);
 
 // ---------------- METRIC BAND ----------------
@@ -99,7 +126,7 @@ const band = [
   ['11', 'SITES', 'OWNED'],
   ['100+', 'SHARED', 'COMPONENTS'],
 ];
-const bx = X, bw = 1010, cw = Math.round(bw / 4), bTop = 880, vY = 940, l1 = 1010, l2 = 1036;
+const bx = X, bw = 1010, cw = Math.round(bw / 4), bTop = 880 + DY, vY = 940 + DY, l1 = 1010 + DY, l2 = 1036 + DY;
 const bandArgs = [`${T}_txt.png`, '-gravity', 'northwest',
   '-stroke', LINE, '-strokewidth', '2', '-draw', `line ${bx},${bTop} ${bx + bw},${bTop}`, '-stroke', 'none'];
 band.forEach(([v, la, lb], i) => {
