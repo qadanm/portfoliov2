@@ -1,5 +1,26 @@
-/* ─── Google Fonts ──────────────────────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+/* ─── Google Fonts ──────────────────────────────────────────────────────────────
+   Fraunces carries two axes and both are load-bearing:
+
+   wght 400..900 — Instrument Serif shipped ONE weight (verified: the css2 API
+     serves `font-weight: 400` and nothing else). That is why 42 of 46 display
+     blocks said font-weight: 400 and none said more: hierarchy by weight was
+     not a choice this site declined, it was physically unavailable.
+
+   opsz 9..144 — and it is why there were 34 distinct display sizes. A headline
+     at 84px and a stat value at 24px are not one typographic problem; opsz
+     redraws the letterforms for each instead of scaling one outline across
+     both. font-optical-sizing is `auto` by default, so this costs no CSS.
+
+   Not requesting SOFT/WONK is deliberate: asking for them returns a different,
+   larger binary (120,800 B vs 67,388 B) and with it the twee, retro Fraunces.
+   The sober cut is the one that ships.
+
+   No `ital` axis: it doubles the faces and would pull a second ~67 KB binary on
+   every case study to serve pull-quotes. With a real weight axis, weight does
+   that job.
+
+   The families are linked from BaseLayout.astro's <head>, not @imported here —
+   an @import cannot be seen by the preload scanner. */
 
 @tailwind base;
 @tailwind components;
@@ -8,7 +29,7 @@
 /* ─── Design Tokens ─────────────────────────────────────────────────────────── */
 :root {
   /* Typography */
-  --font-display: 'Instrument Serif', Georgia, serif;
+  --font-display: 'Fraunces', Georgia, serif;
   --font-body: 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 

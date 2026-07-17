@@ -158,6 +158,14 @@ const websiteSchema = {
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  {/* Loaded here rather than via @import in global.css: an @import is only
+      discovered once the stylesheet has been fetched and parsed, which serialises
+      the request and left the preconnects above doing half their job. As a <link>
+      the preload scanner sees it in the initial HTML. */}
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+  />
 
   <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
   <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
