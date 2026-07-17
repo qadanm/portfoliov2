@@ -47,13 +47,6 @@
   --duration-slow: 420ms;
   --duration-reveal: 720ms;
 
-  /* Per-project accent tokens — used on cards, hover halos, and tags.
-     Each project gets a distinct color signature so the work grid
-     reads as a curated set instead of identical templates. */
-  --project-flagship-rgb: 245, 158, 11;     /* amber */
-  --project-platform-rgb: 96, 165, 250;     /* steel blue */
-  --project-product-rgb: 167, 139, 250;     /* violet */
-  --project-frontend-rgb: 52, 211, 153;     /* emerald */
 }
 
 /* ─── Light Mode ─────────────────────────────────────────────────────────────── */
@@ -87,13 +80,6 @@
   --viz-node-border: #E4E4E7;
   --viz-line: #D4D4D8;
   --viz-accent-line: rgba(217, 119, 6, 0.4);
-
-  /* Atmosphere — light mode keeps it whisper-soft */
-  --atmos-noise-opacity: 0.025;
-  --atmos-glow-1: rgba(217, 119, 6, 0.05);
-  --atmos-glow-2: rgba(15, 15, 20, 0.025);
-  --atmos-grid-opacity: 0.6;
-  --atmos-vignette: 0;
 }
 
 /* ─── Dark Mode ──────────────────────────────────────────────────────────────── */
@@ -132,13 +118,6 @@
   --viz-node-border: #27272A;
   --viz-line: #3F3F46;
   --viz-accent-line: rgba(245, 158, 11, 0.35);
-
-  /* Atmosphere — dark mode carries the layered light treatment */
-  --atmos-noise-opacity: 0.05;
-  --atmos-glow-1: rgba(245, 158, 11, 0.07);
-  --atmos-glow-2: rgba(96, 165, 250, 0.035);
-  --atmos-grid-opacity: 0.7;
-  --atmos-vignette: 0.55;
 }
 
 /* ─── Base Styles ────────────────────────────────────────────────────────────── */
@@ -166,58 +145,6 @@ body {
   /* Prevent horizontal scroll caused by overflowing decorative elements */
   overflow-x: clip;
   position: relative;
-}
-
-/* ─── Background atmosphere ──────────────────────────────────────────────────
-   Two fixed pseudo-layers behind everything: a low-opacity grid and two
-   directional ambient glows. Together they give the dark surface a sense
-   of depth and direction without making it noisy. Light mode keeps both
-   nearly invisible. */
-
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background-image:
-    radial-gradient(
-      ellipse 80% 50% at 18% 0%,
-      var(--atmos-glow-1) 0%,
-      transparent 55%
-    ),
-    radial-gradient(
-      ellipse 60% 40% at 95% 12%,
-      var(--atmos-glow-2) 0%,
-      transparent 60%
-    ),
-    radial-gradient(
-      ellipse 100% 60% at 50% 110%,
-      rgba(0, 0, 0, var(--atmos-vignette)) 0%,
-      transparent 60%
-    );
-}
-
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background-image:
-    linear-gradient(to right, var(--viz-grid) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--viz-grid) 1px, transparent 1px);
-  background-size: 64px 64px;
-  background-position: -1px -1px;
-  opacity: var(--atmos-grid-opacity);
-  mask-image: radial-gradient(ellipse 70% 80% at 50% 30%, #000 0%, transparent 90%);
-  -webkit-mask-image: radial-gradient(ellipse 70% 80% at 50% 30%, #000 0%, transparent 90%);
-}
-
-/* Lift all real content above the atmosphere layers. */
-body > * {
-  position: relative;
-  z-index: 1;
 }
 
 /* Stop iOS Safari from zooming when a small input gets focus.
@@ -350,38 +277,12 @@ html[data-theme-transitioning] body * {
 }
 
 /* ─── Mobile section-head polish ─────────────────────────────────────
-   Numbered section-head labels (mono uppercase + 0.18em letter-spacing)
-   look ugly when they word-wrap on narrow viewports. Force nowrap and
-   drop the supplementary meta text — the label + numeric chip already
-   carries the section identity. */
+   The label carries the section identity on its own; the supplementary
+   meta text is the first thing to go when the row gets tight. */
 
 @media (max-width: 600px) {
-  .home-work__sxn-label,
-  .home-approach__sxn-label,
-  .home-contact__sxn-label,
-  .about__sxn-label,
-  .apr__sxn-label,
-  .contact__sxn-label,
-  .contact__form-title,
-  .contact__channels-title,
-  .work-index__sxn-label,
-  .nf__sxn-label,
-  .uses__sxn-label,
-  .uses__section-label,
-  .cs__sxn-tag,
-  .cs__post-eyebrow,
-  .cs__outcomes-eyebrow,
-  .cs__content-label,
-  .cs__next-eyebrow,
-  .pg__eyebrow,
-  .verdict-mock__sxn-label {
-    white-space: nowrap;
-  }
-
-  .home-work__sxn-meta,
   .home-approach__sxn-meta,
   .contact__sxn-meta,
-  .work-index__sxn-meta,
   .nf__sxn-meta,
   .uses__sxn-meta,
   .cs__sxn-meta,
@@ -402,83 +303,10 @@ h1, h2, h3, h4 {
 }
 
 /* ─── Animation Utilities ────────────────────────────────────────────────────── */
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes drawLine {
-  from { stroke-dashoffset: 1000; }
-  to { stroke-dashoffset: 0; }
-}
-
 @keyframes pulse-dot {
   0%, 100% { opacity: 0.4; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.2); }
 }
-
-@keyframes flow {
-  0% { stroke-dashoffset: 24; }
-  100% { stroke-dashoffset: 0; }
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-.animate-fade-up {
-  animation: fadeUp var(--duration-reveal) var(--ease-out) both;
-}
-
-.animate-fade-in {
-  animation: fadeIn var(--duration-slow) var(--ease-out) both;
-}
-
-.animate-delay-100 { animation-delay: 100ms; }
-.animate-delay-200 { animation-delay: 200ms; }
-.animate-delay-300 { animation-delay: 300ms; }
-.animate-delay-400 { animation-delay: 400ms; }
-.animate-delay-500 { animation-delay: 500ms; }
-.animate-delay-600 { animation-delay: 600ms; }
-.animate-delay-700 { animation-delay: 700ms; }
-.animate-delay-800 { animation-delay: 800ms; }
-
-/* ─── Scroll Reveal ──────────────────────────────────────────────────────────── */
-[data-reveal] {
-  opacity: 0;
-  transform: translateY(24px);
-  transition:
-    opacity 720ms var(--ease-out),
-    transform 720ms var(--ease-out);
-  will-change: opacity, transform;
-}
-
-[data-reveal].is-revealed {
-  opacity: 1;
-  transform: none;
-}
-
-[data-reveal-delay="1"] { transition-delay: 80ms; }
-[data-reveal-delay="2"] { transition-delay: 160ms; }
-[data-reveal-delay="3"] { transition-delay: 240ms; }
-[data-reveal-delay="4"] { transition-delay: 320ms; }
-[data-reveal-delay="5"] { transition-delay: 400ms; }
-
-[data-reveal="fade"] { transform: none; }
-[data-reveal="rise"] { transform: translateY(32px); }
-[data-reveal="slide-left"] { transform: translateX(24px); }
 
 /* ─── Reduced Motion ─────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
@@ -490,118 +318,6 @@ h1, h2, h3, h4 {
   html {
     scroll-behavior: auto;
   }
-
-  [data-reveal] {
-    opacity: 1 !important;
-    transform: none !important;
-  }
-}
-
-/* ─── Card Styles ────────────────────────────────────────────────────────────── */
-.card {
-  background-color: var(--color-bg-elevated);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  transition: border-color var(--duration-base) var(--ease-out),
-              box-shadow var(--duration-base) var(--ease-out),
-              transform var(--duration-base) var(--ease-out);
-}
-
-.card:hover {
-  border-color: var(--color-accent);
-  box-shadow: var(--shadow-md), 0 0 0 1px var(--color-accent-muted);
-  transform: translateY(-2px);
-}
-
-/* ─── Badge Styles ───────────────────────────────────────────────────────────── */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 3px 10px;
-  border-radius: var(--radius-full);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  font-family: var(--font-body);
-  line-height: 1;
-}
-
-.badge-accent {
-  background-color: var(--color-accent-muted);
-  color: var(--color-accent);
-  border: 1px solid var(--color-accent-muted);
-}
-
-.badge-muted {
-  background-color: var(--color-bg-muted);
-  color: var(--color-text-muted);
-  border: 1px solid var(--color-border);
-}
-
-.badge-success {
-  background-color: rgba(16, 185, 129, 0.1);
-  color: var(--color-success);
-  border: 1px solid rgba(16, 185, 129, 0.2);
-}
-
-/* ─── Dot Grid Background ────────────────────────────────────────────────────── */
-.dot-grid {
-  background-image: radial-gradient(var(--viz-grid) 1px, transparent 1px);
-  background-size: 24px 24px;
-}
-
-/* ─── Section header (numbered eyebrow + rule) ───────────────────────────────
-   Used in homepage section heads and grid sub-section heads.
-   Pattern: small index pill, eyebrow text, fine rule running into the gutter. */
-.sxnhead {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.sxnhead__index {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 22px;
-  padding: 0 7px;
-  border-radius: 4px;
-  border: 1px solid var(--color-border);
-  background-color: var(--color-bg-elevated);
-  color: var(--color-text-muted);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  line-height: 1;
-}
-
-.sxnhead__label {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--color-text-subtle);
-}
-
-.sxnhead__rule {
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(to right, var(--color-border) 0%, transparent 100%);
-  min-width: 40px;
-}
-
-.sxnhead__meta {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  color: var(--color-text-subtle);
-  white-space: nowrap;
 }
 
 /* ─── Prose Overrides ────────────────────────────────────────────────────────── */
@@ -653,79 +369,3 @@ h1, h2, h3, h4 {
   border-color: var(--color-border);
 }
 
-/* ─── Link Underline Style ───────────────────────────────────────────────────── */
-.link-underline {
-  text-decoration: underline;
-  text-decoration-color: var(--color-accent-muted);
-  text-underline-offset: 3px;
-  transition: text-decoration-color var(--duration-fast);
-}
-
-.link-underline:hover {
-  text-decoration-color: var(--color-accent);
-}
-
-/* ─── Gradient Text ──────────────────────────────────────────────────────────── */
-.text-gradient {
-  background: linear-gradient(135deg, var(--color-text) 0%, var(--color-text-muted) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* ─── Divider ────────────────────────────────────────────────────────────────── */
-.divider {
-  width: 100%;
-  height: 1px;
-  background-color: var(--color-border);
-}
-
-/* ─── Eyebrow with Section Index ─────────────────────────────────────────────── */
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-text-subtle);
-}
-
-.eyebrow__index {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 28px;
-  height: 22px;
-  padding: 0 7px;
-  border-radius: 6px;
-  border: 1px solid var(--color-border);
-  background-color: var(--color-bg-elevated);
-  color: var(--color-accent);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  line-height: 1;
-}
-
-/* ─── Skill Chip ─────────────────────────────────────────────────────────────── */
-.skill-chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 6px 12px;
-  border-radius: var(--radius-full);
-  font-size: 13px;
-  font-weight: 500;
-  background-color: var(--color-bg-muted);
-  color: var(--color-text-muted);
-  border: 1px solid var(--color-border);
-  transition: all var(--duration-fast);
-}
-
-.skill-chip:hover {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
-  background-color: var(--color-accent-dim);
-}

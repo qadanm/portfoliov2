@@ -44,13 +44,9 @@ const apps = {
 ---
 
 <section class="garage" id="garage" aria-labelledby="garage-title">
-  <span class="garage__atmos" aria-hidden="true"></span>
-  <span class="garage__scan" aria-hidden="true"></span>
-
   <div class="container-site garage__inner">
-    <header class="garage__head" data-reveal>
+    <header class="garage__head">
       <div class="garage__sxn">
-        <span class="garage__sxn-num">02</span>
         <span class="garage__sxn-label">The Garage</span>
         <span class="garage__sxn-rule" aria-hidden="true"></span>
         <span class="garage__sxn-meta">Built by a car enthusiast</span>
@@ -68,8 +64,6 @@ const apps = {
     {/* ── Hero: CarSpotter ─────────────────────────────────────────── */}
     <article
       class="garage__hero"
-      data-reveal
-      data-reveal-delay="2"
     >
       <span class="garage__hero-corner garage__hero-corner--tl" aria-hidden="true"></span>
       <span class="garage__hero-corner garage__hero-corner--tr" aria-hidden="true"></span>
@@ -143,8 +137,6 @@ const apps = {
     <div class="garage__pair">
       <article
         class="garage__app garage__app--vinly"
-        data-reveal
-        data-reveal-delay="3"
       >
         <div class="garage__app-media">
           <img src={apps.vinly.poster} alt={apps.vinly.alt} width="2560" height="1600" loading="lazy" decoding="async" />
@@ -205,8 +197,6 @@ const apps = {
       <a
         href={apps.chatobd2.href}
         class="garage__app garage__app--chatobd"
-        data-reveal
-        data-reveal-delay="4"
         data-track="cta_click"
         data-track-cta="garage-app"
         data-track-project="chatobd2"
@@ -237,8 +227,6 @@ const apps = {
     {/* ── Open source: elmulator ───────────────────────────────────── */}
     <article
       class="garage__oss"
-      data-reveal
-      data-reveal-delay="5"
     >
       <span class="garage__hero-corner garage__hero-corner--tl garage__oss-corner" aria-hidden="true"></span>
       <span class="garage__hero-corner garage__hero-corner--tr garage__oss-corner" aria-hidden="true"></span>
@@ -345,38 +333,6 @@ const apps = {
     }
   }
 
-  /* A deeper, warmer wash than the page — the "garage" atmosphere. */
-  .garage__atmos {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background:
-      radial-gradient(ellipse 60% 50% at 82% 8%, rgba(var(--lime-rgb), 0.10), transparent 60%),
-      radial-gradient(ellipse 70% 60% at 8% 100%, rgba(234, 88, 12, 0.06), transparent 62%);
-  }
-  :global([data-theme="light"]) .garage__atmos {
-    background:
-      radial-gradient(ellipse 60% 50% at 82% 8%, rgba(146, 184, 0, 0.10), transparent 60%),
-      radial-gradient(ellipse 70% 60% at 8% 100%, rgba(234, 88, 12, 0.05), transparent 62%);
-  }
-
-  .garage__scan {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.5;
-    background-image: repeating-linear-gradient(
-      to bottom,
-      transparent 0,
-      transparent 3px,
-      rgba(255, 255, 255, 0.014) 3px,
-      rgba(255, 255, 255, 0.014) 4px
-    );
-    mask-image: radial-gradient(ellipse 90% 70% at 70% 30%, #000, transparent 75%);
-    -webkit-mask-image: radial-gradient(ellipse 90% 70% at 70% 30%, #000, transparent 75%);
-  }
-  :global([data-theme="light"]) .garage__scan { display: none; }
-
   .garage__inner { position: relative; z-index: 1; }
 
   /* ─── Section head ──────────────────────────────────────────────── */
@@ -386,28 +342,10 @@ const apps = {
     gap: 12px;
     margin-bottom: var(--space-5);
   }
-  .garage__sxn-num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 22px;
-    padding: 0 7px;
-    border-radius: 4px;
-    border: 1px solid rgba(var(--lime-rgb), 0.4);
-    background-color: rgba(var(--lime-rgb), 0.08);
-    color: var(--color-text);
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    line-height: 1;
-  }
   .garage__sxn-label {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
     color: var(--color-text);
   }
   .garage__sxn-rule {
@@ -418,10 +356,9 @@ const apps = {
     max-width: 520px;
   }
   .garage__sxn-meta {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
     color: var(--color-text-subtle);
-    letter-spacing: 0.04em;
     white-space: nowrap;
   }
 
@@ -452,11 +389,9 @@ const apps = {
   .garage__chip {
     display: inline-flex;
     align-items: center;
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    font-weight: 600;
     padding: 4px 9px;
     border-radius: 9999px;
     line-height: 1;
@@ -577,11 +512,9 @@ const apps = {
 
   .garage__hero-tags { display: flex; align-items: center; gap: 10px; }
   .garage__hero-kind {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
-    letter-spacing: 0.06em;
     color: var(--color-text-subtle);
-    text-transform: uppercase;
   }
   .garage__hero-name {
     font-family: var(--font-display);
@@ -663,9 +596,8 @@ const apps = {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
-    letter-spacing: 0.04em;
     color: var(--color-text-subtle);
     text-decoration: none;
     transition: color 240ms var(--ease-out);
@@ -736,10 +668,8 @@ const apps = {
   }
   .garage__app-tags { display: flex; align-items: center; gap: 9px; }
   .garage__app-kind {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 10px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
     color: var(--color-text-subtle);
   }
   .garage__app--vinly .garage__app-tags .garage__chip--flag,
@@ -765,11 +695,9 @@ const apps = {
     align-items: center;
     gap: 7px;
     margin-top: var(--space-1);
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
     font-weight: 600;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
     color: var(--color-text-subtle);
     transition: color 240ms var(--ease-out);
   }

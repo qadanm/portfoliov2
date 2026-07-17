@@ -89,7 +89,6 @@ function isActive(href: string) {
               aria-current={isActive(item.href) ? 'page' : undefined}
               style={`--i: ${i}`}
             >
-              <span class="nav-mobile-link__num">{String(i + 1).padStart(2, '0')}</span>
               <span class="nav-mobile-link__body">
                 <span class="nav-mobile-link__label">{item.label}</span>
                 <span class="nav-mobile-link__sub">{item.sub}</span>
@@ -396,10 +395,9 @@ function isActive(href: string) {
     gap: 7px;
     padding: 6px 12px 6px 11px;
     border-radius: 9999px;
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
     font-weight: 600;
-    letter-spacing: 0.04em;
     color: var(--color-text);
     background-color: var(--color-bg-elevated);
     border: 1px solid var(--color-border);
@@ -593,10 +591,9 @@ function isActive(href: string) {
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
     font-weight: 600;
-    letter-spacing: 0.04em;
     color: var(--color-text-muted);
   }
 
@@ -648,15 +645,6 @@ function isActive(href: string) {
     }
   }
 
-  .nav-mobile-link__num {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    color: var(--color-text-subtle);
-    width: 22px;
-    line-height: 1;
-  }
 
   .nav-mobile-link__body {
     display: flex;
@@ -698,7 +686,6 @@ function isActive(href: string) {
     transform: translateX(4px);
   }
 
-  .nav-mobile-link--active .nav-mobile-link__num,
   .nav-mobile-link--active .nav-mobile-link__arrow {
     color: var(--color-accent);
   }
@@ -741,10 +728,9 @@ function isActive(href: string) {
   }
 
   .nav-mobile__sig {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
     color: var(--color-text-subtle);
-    letter-spacing: 0.06em;
   }
 
   @media (prefers-reduced-motion: reduce) {

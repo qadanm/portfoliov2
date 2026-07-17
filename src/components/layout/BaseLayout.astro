@@ -179,40 +179,9 @@ const websiteSchema = {
       if (window.__siteInit) {
         // Theme is the only thing that needs re-applying after each swap;
         // the listener attached on first init handles it via astro:after-swap.
-        // We still need to run reveals for the new page's elements.
-        if (typeof window.__siteBindReveals === 'function') {
-          window.__siteBindReveals();
-        }
         return;
       }
       window.__siteInit = true;
-
-      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      let activeIO = null;
-
-      function bindReveals() {
-        const els = document.querySelectorAll('[data-reveal]:not(.is-revealed)');
-        if (prefersReduced) {
-          els.forEach(el => el.classList.add('is-revealed'));
-          return;
-        }
-        if (!('IntersectionObserver' in window) || els.length === 0) {
-          els.forEach(el => el.classList.add('is-revealed'));
-          return;
-        }
-        // Disconnect previous observer to avoid orphaned bindings to swapped DOM.
-        if (activeIO) activeIO.disconnect();
-        activeIO = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('is-revealed');
-              activeIO.unobserve(entry.target);
-            }
-          });
-        }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
-        els.forEach(el => activeIO.observe(el));
-      }
-      window.__siteBindReveals = bindReveals;
 
       function smoothThemeToggle() {
         const html = document.documentElement;
@@ -260,11 +229,9 @@ const websiteSchema = {
         }
       }
 
-      bindReveals();
       smoothThemeToggle();
       applyStoredTheme();
       bindSystemSchemeListener();
-      document.addEventListener('astro:page-load', bindReveals);
       document.addEventListener('astro:after-swap', applyStoredTheme);
     })();
   </script>

@@ -34,9 +34,8 @@ import ExperienceWall from '@/components/home/ExperienceWall.astro';
       version is preserved across the lead and the third card. */}
   <section class="home-approach" id="approach-teaser">
     <div class="container-site">
-      <div class="home-approach__head" data-reveal>
+      <div class="home-approach__head">
         <div class="home-approach__sxn">
-          <span class="home-approach__sxn-num">04</span>
           <span class="home-approach__sxn-label">How I work</span>
           <span class="home-approach__sxn-rule" aria-hidden="true"></span>
           <span class="home-approach__sxn-meta">A method, not a manifesto</span>
@@ -50,7 +49,7 @@ import ExperienceWall from '@/components/home/ExperienceWall.astro';
         </p>
       </div>
 
-      <div class="home-approach__strip" data-reveal data-reveal-delay="2">
+      <div class="home-approach__strip">
         <article class="home-approach__step">
           <header class="home-approach__step-head">
             <span class="home-approach__step-num">01</span>
@@ -95,7 +94,7 @@ import ExperienceWall from '@/components/home/ExperienceWall.astro';
         </article>
       </div>
 
-      <div class="home-approach__foot" data-reveal data-reveal-delay="3">
+      <div class="home-approach__foot">
         <a
           href="/approach"
           class="home-approach__link"
@@ -116,7 +115,7 @@ import ExperienceWall from '@/components/home/ExperienceWall.astro';
       strong email/CTA pair. Sits as a finished closing object. */}
   <section class="home-contact" id="contact-cta">
     <div class="container-site">
-      <div class="home-contact__card" data-reveal>
+      <div class="home-contact__card">
         <span class="home-contact__card-glow" aria-hidden="true"></span>
         <span class="home-contact__card-grid" aria-hidden="true"></span>
         <span class="home-contact__card-corner home-contact__card-corner--tl" aria-hidden="true"></span>
@@ -127,7 +126,6 @@ import ExperienceWall from '@/components/home/ExperienceWall.astro';
         <div class="home-contact__card-text">
           <div class="home-contact__sxn">
             <span class="home-contact__sxn-dot"></span>
-            <span class="home-contact__sxn-num">05</span>
             <span class="home-contact__sxn-label">Contact</span>
           </div>
           <h2 class="home-contact__title">
@@ -179,29 +177,11 @@ import ExperienceWall from '@/components/home/ExperienceWall.astro';
     margin-bottom: var(--space-5);
   }
 
-  .home-approach__sxn-num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 22px;
-    padding: 0 7px;
-    border-radius: 4px;
-    border: 1px solid var(--color-border);
-    background-color: var(--color-bg-elevated);
-    color: var(--color-text);
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    line-height: 1;
-  }
 
   .home-approach__sxn-label {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
     color: var(--color-text);
   }
 
@@ -214,10 +194,9 @@ import ExperienceWall from '@/components/home/ExperienceWall.astro';
   }
 
   .home-approach__sxn-meta {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
     color: var(--color-text-subtle);
-    letter-spacing: 0.04em;
     white-space: nowrap;
   }
 
@@ -345,9 +324,9 @@ import ExperienceWall from '@/components/home/ExperienceWall.astro';
       linear-gradient(180deg, var(--color-bg-elevated), var(--color-bg-deep));
     border: 1px solid var(--color-border);
     color: var(--color-text);
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
-    font-weight: 700;
+    font-weight: 600;
     letter-spacing: 0.04em;
     line-height: 1;
   }
@@ -360,11 +339,9 @@ import ExperienceWall from '@/components/home/ExperienceWall.astro';
   }
 
   .home-approach__step-tag {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
+    font-weight: 600;
     color: var(--color-text-subtle);
   }
 
@@ -549,26 +526,12 @@ import ExperienceWall from '@/components/home/ExperienceWall.astro';
     box-shadow: 0 0 6px var(--color-accent);
   }
 
-  .home-contact__sxn-num {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    color: var(--color-text);
-    padding: 2px 6px;
-    border-radius: 3px;
-    border: 1px solid var(--color-border);
-    background-color: var(--color-bg-elevated);
-    line-height: 1;
-  }
 
   .home-contact__sxn-label {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--color-text-subtle);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text);
   }
 
   .home-contact__title {
@@ -667,9 +630,8 @@ import ExperienceWall from '@/components/home/ExperienceWall.astro';
     background-color: transparent;
     color: var(--color-text);
     border: 1px solid var(--color-border);
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 13px;
-    letter-spacing: 0.02em;
   }
 
   .home-contact__cta--ghost:hover {

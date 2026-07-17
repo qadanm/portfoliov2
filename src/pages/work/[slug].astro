@@ -86,13 +86,7 @@ const categoryKey = data.category.toLowerCase();
 
   <ReadingProgress />
 
-  <article class:list={['cs', `cs--${categoryKey}`, { 'cs--flagship': data.category === 'Flagship' }]}>
-    {/* Page-level accent glow that picks up the project's color signature.
-        Sits behind the header and fades out as the user scrolls. */}
-    <div class="cs__atmos" aria-hidden="true">
-      <span class="cs__atmos-glow"></span>
-    </div>
-
+  <article class:list={['cs', `cs--${project.slug}`, `cs--${categoryKey}`, { 'cs--flagship': data.category === 'Flagship' }]}>
     <header class="cs__header">
       <div class="container-site">
         <a href="/work" class="cs__back">
@@ -107,7 +101,6 @@ const categoryKey = data.category.toLowerCase();
         <div class="cs__sxn">
           <span class="cs__sxn-num">{currentNumber} / {totalNumber}</span>
           <span class:list={['cs__sxn-tag', `cs__sxn-tag--${categoryKey}`]}>
-            <span class="cs__sxn-tag-dot" aria-hidden="true"></span>
             {data.category}
           </span>
           {data.engagement === 'work' && data.company && (
@@ -201,7 +194,6 @@ const categoryKey = data.category.toLowerCase();
       <div class="container-site cs__outcomes-wrap">
         <section class="cs__outcomes" aria-label="Outcomes">
           <header class="cs__outcomes-head">
-            <span class="cs__outcomes-num">02</span>
             <span class="cs__outcomes-eyebrow">Outcomes</span>
             <span class="cs__outcomes-rule" aria-hidden="true"></span>
             <span class="cs__outcomes-meta">at a glance</span>
@@ -253,7 +245,6 @@ const categoryKey = data.category.toLowerCase();
 
     <div class="container-narrow cs__content">
       <div class="cs__content-head">
-        <span class="cs__content-num">03</span>
         <span class="cs__content-label">Notes</span>
         <span class="cs__content-rule" aria-hidden="true"></span>
       </div>
@@ -306,7 +297,6 @@ const categoryKey = data.category.toLowerCase();
         <section class="container-site cs__post">
           <header class="cs__post-head">
             <div class="cs__post-sxn">
-              <span class="cs__post-num">04</span>
               <span class="cs__post-eyebrow">Marketing surface</span>
               <span class="cs__post-rule" aria-hidden="true"></span>
             </div>
@@ -353,7 +343,6 @@ const categoryKey = data.category.toLowerCase();
         <section class="container-site cs__post cs__post--alt">
           <header class="cs__post-head">
             <div class="cs__post-sxn">
-              <span class="cs__post-num">05</span>
               <span class="cs__post-eyebrow">Technical depth</span>
               <span class="cs__post-rule" aria-hidden="true"></span>
             </div>
@@ -413,7 +402,6 @@ const categoryKey = data.category.toLowerCase();
         <section class="container-site cs__post">
           <header class="cs__post-head">
             <div class="cs__post-sxn">
-              <span class="cs__post-num">04</span>
               <span class="cs__post-eyebrow">The record</span>
               <span class="cs__post-rule" aria-hidden="true"></span>
             </div>
@@ -473,7 +461,6 @@ const categoryKey = data.category.toLowerCase();
         <section class="container-site cs__post">
           <header class="cs__post-head">
             <div class="cs__post-sxn">
-              <span class="cs__post-num">05</span>
               <span class="cs__post-eyebrow">The rest of the file</span>
               <span class="cs__post-rule" aria-hidden="true"></span>
             </div>
@@ -531,7 +518,6 @@ const categoryKey = data.category.toLowerCase();
         <section class="container-site cs__post">
           <header class="cs__post-head">
             <div class="cs__post-sxn">
-              <span class="cs__post-num">06</span>
               <span class="cs__post-eyebrow">The promise</span>
               <span class="cs__post-rule" aria-hidden="true"></span>
             </div>
@@ -563,7 +549,6 @@ const categoryKey = data.category.toLowerCase();
         <section class="container-site cs__post">
           <header class="cs__post-head">
             <div class="cs__post-sxn">
-              <span class="cs__post-num">07</span>
               <span class="cs__post-eyebrow">The surface</span>
               <span class="cs__post-rule" aria-hidden="true"></span>
             </div>
@@ -601,7 +586,6 @@ const categoryKey = data.category.toLowerCase();
         <section class="container-site cs__post">
           <header class="cs__post-head">
             <div class="cs__post-sxn">
-              <span class="cs__post-num">04</span>
               <span class="cs__post-eyebrow">The Daily 5</span>
               <span class="cs__post-rule" aria-hidden="true"></span>
             </div>
@@ -673,7 +657,6 @@ const categoryKey = data.category.toLowerCase();
         <section class="container-site cs__post cs__post--alt">
           <header class="cs__post-head">
             <div class="cs__post-sxn">
-              <span class="cs__post-num">05</span>
               <span class="cs__post-eyebrow">The flex, and the teach</span>
               <span class="cs__post-rule" aria-hidden="true"></span>
             </div>
@@ -750,7 +733,6 @@ const categoryKey = data.category.toLowerCase();
         <section class="container-site cs__post">
           <header class="cs__post-head">
             <div class="cs__post-sxn">
-              <span class="cs__post-num">06</span>
               <span class="cs__post-eyebrow">The social engine</span>
               <span class="cs__post-rule" aria-hidden="true"></span>
             </div>
@@ -778,7 +760,6 @@ const categoryKey = data.category.toLowerCase();
         <section class="container-site cs__post cs__post--alt">
           <header class="cs__post-head">
             <div class="cs__post-sxn">
-              <span class="cs__post-num">07</span>
               <span class="cs__post-eyebrow">The brand surface</span>
               <span class="cs__post-rule" aria-hidden="true"></span>
             </div>
@@ -817,7 +798,6 @@ const categoryKey = data.category.toLowerCase();
         <section class="container-site cs__post">
           <header class="cs__post-head">
             <div class="cs__post-sxn">
-              <span class="cs__post-num">04</span>
               <span class="cs__post-eyebrow">Hardware experience</span>
               <span class="cs__post-rule" aria-hidden="true"></span>
             </div>
@@ -888,7 +868,6 @@ const categoryKey = data.category.toLowerCase();
         <section class="container-site cs__post cs__post--alt">
           <header class="cs__post-head">
             <div class="cs__post-sxn">
-              <span class="cs__post-num">05</span>
               <span class="cs__post-eyebrow">Magensa, a MagTek company</span>
               <span class="cs__post-rule" aria-hidden="true"></span>
             </div>
@@ -951,7 +930,6 @@ const categoryKey = data.category.toLowerCase();
         <section class="container-site cs__post">
           <header class="cs__post-head">
             <div class="cs__post-sxn">
-              <span class="cs__post-num">04</span>
               <span class="cs__post-eyebrow">Client portals</span>
               <span class="cs__post-rule" aria-hidden="true"></span>
             </div>
@@ -1005,7 +983,6 @@ const categoryKey = data.category.toLowerCase();
         <section class="container-site cs__post">
           <header class="cs__post-head">
             <div class="cs__post-sxn">
-              <span class="cs__post-num">04</span>
               <span class="cs__post-eyebrow">The pitch in one image</span>
               <span class="cs__post-rule" aria-hidden="true"></span>
             </div>
@@ -1037,7 +1014,6 @@ const categoryKey = data.category.toLowerCase();
         <section class="container-site cs__post cs__post--alt">
           <header class="cs__post-head">
             <div class="cs__post-sxn">
-              <span class="cs__post-num">05</span>
               <span class="cs__post-eyebrow">One engine, every surface</span>
               <span class="cs__post-rule" aria-hidden="true"></span>
             </div>
@@ -1071,7 +1047,6 @@ const categoryKey = data.category.toLowerCase();
         <section class="container-site cs__post">
           <header class="cs__post-head">
             <div class="cs__post-sxn">
-              <span class="cs__post-num">06</span>
               <span class="cs__post-eyebrow">The receipt</span>
               <span class="cs__post-rule" aria-hidden="true"></span>
             </div>
@@ -1113,14 +1088,13 @@ const categoryKey = data.category.toLowerCase();
     <footer class="cs__footer">
       <div class="container-site">
         <div class="cs__next-head">
-          <span class="cs__next-num">→</span>
           <span class="cs__next-eyebrow">Next case study</span>
           <span class="cs__next-rule" aria-hidden="true"></span>
         </div>
 
         <a
           href={`/work/${next.slug}`}
-          class:list={['cs__next', `cs__next--${next.data.category.toLowerCase()}`]}
+          class="cs__next"
           data-track="cta_click"
           data-track-cta="next-project"
           data-track-project={next.slug}
@@ -1133,7 +1107,6 @@ const categoryKey = data.category.toLowerCase();
 
           <div class="cs__next-meta">
             <span class="cs__next-tag">
-              <span class="cs__next-tag-dot" aria-hidden="true"></span>
               {next.data.category}
             </span>
             <span class="cs__next-title">{next.data.title}</span>
@@ -1177,40 +1150,33 @@ const categoryKey = data.category.toLowerCase();
 </BaseLayout>
 
 <style>
-  /* Per-project accent (mirrors ProjectCard token routing). Each case
-     study inherits its color signature from this single class chain. */
+  /* ─── The project's own colour ────────────────────────────────────────
+     Keyed on the SLUG, not the category — category is a filing label, it
+     was never a design fact. Every value below is lifted from the artifact
+     component for that project (src/components/artifacts/), which was drawn
+     against the shipped product. Nothing here is invented, and nothing is
+     sampled: --plane is the product's colour and --ink is the pairing the
+     product itself uses (CarSpotter sets black on lime on its own button;
+     VINly's ink is its own placeholder.from).
+
+     It is spent as a PLANE and nowhere else. A plane carries its own field,
+     so it reads identically in both themes and needs no light/dark fork —
+     which is exactly what an accent used as text could not do: #C8FF00 is
+     16.9:1 on the dark page and 1.13:1 on the light one. */
   .cs {
-    --pc-accent: var(--color-accent);
-    --pc-accent-rgb: var(--project-flagship-rgb);
+    --plane: var(--color-accent);
+    --ink: #1F1408;
     position: relative;
   }
-  .cs--platform { --pc-accent-rgb: var(--project-platform-rgb); --pc-accent: rgb(var(--project-platform-rgb)); }
-  .cs--product { --pc-accent-rgb: var(--project-product-rgb); --pc-accent: rgb(var(--project-product-rgb)); }
-  .cs--frontend { --pc-accent-rgb: var(--project-frontend-rgb); --pc-accent: rgb(var(--project-frontend-rgb)); }
-  .cs--flagship { --pc-accent-rgb: var(--project-flagship-rgb); --pc-accent: var(--color-accent); }
+
+  .cs--car-spotter         { --plane: #C8FF00; --ink: #0B0C0E; }  /* CarSpotterArtifact */
+  .cs--vinly               { --plane: #EA580C; --ink: #1A120B; }  /* VinlyArtifact */
+  .cs--chatobd2            { --plane: #F59E0B; --ink: #1F1408; }  /* VerdictArtifact — check-engine amber */
+  .cs--elmulator           { --plane: #0969DA; --ink: #FFFFFF; }  /* ElmulatorArtifact — GitHub blue; it ships on the Marketplace */
+  .cs--magtek-platform     { --plane: #1E40AF; --ink: #FFFFFF; }  /* PlatformArtifact */
+  .cs--financial-platforms { --plane: #0E1A33; --ink: #FFFFFF; }  /* AdvisorArtifact */
 
   /* Page-level accent atmosphere — sits behind the header. */
-  .cs__atmos {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 600px;
-    pointer-events: none;
-    overflow: hidden;
-  }
-
-  .cs__atmos-glow {
-    position: absolute;
-    top: -200px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 1200px;
-    height: 600px;
-    background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(var(--pc-accent-rgb), 0.10), transparent 70%);
-    filter: blur(20px);
-  }
-
   .cs__header {
     position: relative;
     padding-top: calc(60px + var(--space-8));
@@ -1239,7 +1205,7 @@ const categoryKey = data.category.toLowerCase();
   }
 
   .cs__back:hover {
-    color: var(--pc-accent);
+    color: var(--color-accent);
     transform: translateX(-2px);
   }
 
@@ -1262,9 +1228,9 @@ const categoryKey = data.category.toLowerCase();
     border: 1px solid var(--color-border);
     background-color: var(--color-bg-elevated);
     color: var(--color-text);
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 10px;
-    font-weight: 700;
+    font-weight: 600;
     letter-spacing: 0.06em;
     line-height: 1;
   }
@@ -1273,11 +1239,9 @@ const categoryKey = data.category.toLowerCase();
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    font-weight: 600;
     color: var(--color-text-muted);
     padding: 4px 10px;
     border-radius: 9999px;
@@ -1286,13 +1250,6 @@ const categoryKey = data.category.toLowerCase();
     line-height: 1;
   }
 
-  .cs__sxn-tag-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background-color: var(--pc-accent);
-    box-shadow: 0 0 6px var(--pc-accent);
-  }
 
   .cs__sxn-tag--flagship {
     color: var(--color-accent);
@@ -1304,11 +1261,9 @@ const categoryKey = data.category.toLowerCase();
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 10px;
     font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
     color: var(--color-text-subtle);
     padding: 4px 10px;
     border-radius: 9999px;
@@ -1324,10 +1279,9 @@ const categoryKey = data.category.toLowerCase();
   }
 
   .cs__sxn-meta {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
     color: var(--color-text-subtle);
-    letter-spacing: 0.06em;
   }
 
   .cs__title {
@@ -1342,23 +1296,12 @@ const categoryKey = data.category.toLowerCase();
   }
 
   /* Accent rule under the headline — picks up the project color */
-  .cs__title::after {
-    content: '';
-    display: block;
-    width: 36px;
-    height: 2px;
-    margin-top: var(--space-5);
-    background-color: var(--pc-accent);
-    opacity: 0.7;
-    border-radius: 2px;
-  }
 
   @media (min-width: 768px) {
     .cs__title {
       line-height: 1.02;
       margin-bottom: var(--space-5);
     }
-    .cs__title::after { margin-top: var(--space-6); }
   }
 
   .cs__short {
@@ -1398,11 +1341,9 @@ const categoryKey = data.category.toLowerCase();
   }
 
   .cs__meta dt {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
     font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
     color: var(--color-text-subtle);
   }
 
@@ -1439,9 +1380,8 @@ const categoryKey = data.category.toLowerCase();
 
   .cs__meta-text--status {
     color: var(--color-success);
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 12px;
-    letter-spacing: 0.04em;
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -1484,9 +1424,8 @@ const categoryKey = data.category.toLowerCase();
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 12px;
-    letter-spacing: 0.04em;
     color: var(--color-text-muted);
     transition: color 200ms var(--ease-out);
   }
@@ -1540,34 +1479,23 @@ const categoryKey = data.category.toLowerCase();
     }
   }
 
+  /* The one place the project's colour is spent, and it is spent as a field.
+     These are the measurements the work actually produced — they were being
+     served as the same elevated stats card every SaaS site ships. The card
+     is gone: no border, no radius, no shadow, no gradient, no glow. */
   .cs__outcomes {
     display: flex;
     flex-direction: column;
     gap: var(--space-5);
     padding: var(--space-6);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-2xl);
-    background:
-      linear-gradient(180deg, var(--color-bg-elevated), var(--color-bg-muted));
-    box-shadow: var(--shadow-card);
+    background: var(--plane);
+    color: var(--ink);
     position: relative;
-    overflow: hidden;
-  }
-
-  .cs__outcomes::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 80%;
-    background: radial-gradient(ellipse 60% 80% at 0% 0%, rgba(var(--pc-accent-rgb), 0.08), transparent 60%);
-    pointer-events: none;
   }
 
   @media (min-width: 720px) {
     .cs__outcomes {
-      padding: var(--space-7) var(--space-8);
+      padding: var(--space-8);
     }
   }
 
@@ -1579,43 +1507,25 @@ const categoryKey = data.category.toLowerCase();
     z-index: 1;
   }
 
-  .cs__outcomes-num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 22px;
-    padding: 0 7px;
-    border-radius: 4px;
-    border: 1px solid var(--color-border);
-    background-color: var(--color-bg-elevated);
-    color: var(--color-text);
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    line-height: 1;
-  }
 
   .cs__outcomes-eyebrow {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--color-text);
+    font-weight: 600;
+    color: var(--ink);
   }
 
   .cs__outcomes-rule {
     flex: 1;
     height: 1px;
-    background: linear-gradient(to right, var(--color-border), transparent);
+    background: currentColor;
+    opacity: 0.25;
   }
 
   .cs__outcomes-meta {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
-    color: var(--color-text-subtle);
-    letter-spacing: 0.04em;
+    color: var(--ink);
   }
 
   .cs__outcomes-list {
@@ -1642,13 +1552,13 @@ const categoryKey = data.category.toLowerCase();
     font-weight: 400;
     letter-spacing: -0.015em;
     line-height: 1.1;
-    color: var(--color-text);
+    color: var(--ink);
   }
 
   .cs__outcome-label {
     font-size: 13px;
     line-height: 1.4;
-    color: var(--color-text-muted);
+    color: var(--ink);
   }
 
   .cs__meta .cs__stack {
@@ -1695,7 +1605,7 @@ const categoryKey = data.category.toLowerCase();
   }
 
   .cs__cover:hover {
-    border-color: rgba(var(--pc-accent-rgb), 0.4);
+    border-color: var(--color-border-strong);
     box-shadow: var(--shadow-card-hover);
   }
 
@@ -1712,7 +1622,7 @@ const categoryKey = data.category.toLowerCase();
 
   .cs__cover:hover .cs__cover-corner {
     opacity: 1;
-    border-color: var(--pc-accent);
+    border-color: var(--color-accent);
   }
 
   .cs__cover-corner--tl { top: 10px; left: 10px; border-right: none; border-bottom: none; }
@@ -1757,29 +1667,11 @@ const categoryKey = data.category.toLowerCase();
     margin-bottom: var(--space-6);
   }
 
-  .cs__content-num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 22px;
-    padding: 0 7px;
-    border-radius: 4px;
-    border: 1px solid var(--color-border);
-    background-color: var(--color-bg-elevated);
-    color: var(--color-text);
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    line-height: 1;
-  }
 
   .cs__content-label {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    font-weight: 600;
     color: var(--color-text);
   }
 
@@ -1817,7 +1709,7 @@ const categoryKey = data.category.toLowerCase();
     content: '';
     width: 1px;
     min-height: 64px;
-    background: linear-gradient(to bottom, var(--pc-accent), transparent 80%);
+    background: linear-gradient(to bottom, var(--color-border-strong), transparent 80%);
   }
 
   .cs__pull-text {
@@ -1835,11 +1727,9 @@ const categoryKey = data.category.toLowerCase();
   .cs__pull-caption {
     grid-column: 2;
     margin-top: var(--space-3);
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
     font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
     color: var(--color-text-subtle);
   }
 
@@ -1877,29 +1767,11 @@ const categoryKey = data.category.toLowerCase();
     margin-bottom: var(--space-4);
   }
 
-  .cs__post-num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 22px;
-    padding: 0 7px;
-    border-radius: 4px;
-    border: 1px solid var(--color-border);
-    background-color: var(--color-bg-elevated);
-    color: var(--color-text);
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    line-height: 1;
-  }
 
   .cs__post-eyebrow {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
+    font-weight: 600;
     color: var(--color-text);
   }
 
@@ -1997,7 +1869,7 @@ const categoryKey = data.category.toLowerCase();
   }
 
   .cs__shot:hover img {
-    border-color: rgba(var(--pc-accent-rgb), 0.4);
+    border-color: var(--color-border-strong);
     transform: translateY(-2px);
     box-shadow: var(--shadow-card-hover);
   }
@@ -2093,28 +1965,11 @@ const categoryKey = data.category.toLowerCase();
     margin-bottom: var(--space-5);
   }
 
-  .cs__next-num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 22px;
-    width: 22px;
-    border-radius: 4px;
-    border: 1px solid var(--color-border);
-    background-color: var(--color-bg-elevated);
-    color: var(--color-text);
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 700;
-    line-height: 1;
-  }
 
   .cs__next-eyebrow {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
+    font-weight: 600;
     color: var(--color-text);
   }
 
@@ -2126,13 +1981,7 @@ const categoryKey = data.category.toLowerCase();
 
   /* Per-category accent for the next-project card */
   .cs__next {
-    --pc-accent: var(--color-accent);
-    --pc-accent-rgb: var(--project-flagship-rgb);
   }
-  .cs__next--platform { --pc-accent-rgb: var(--project-platform-rgb); --pc-accent: rgb(var(--project-platform-rgb)); }
-  .cs__next--product { --pc-accent-rgb: var(--project-product-rgb); --pc-accent: rgb(var(--project-product-rgb)); }
-  .cs__next--frontend { --pc-accent-rgb: var(--project-frontend-rgb); --pc-accent: rgb(var(--project-frontend-rgb)); }
-  .cs__next--flagship { --pc-accent-rgb: var(--project-flagship-rgb); --pc-accent: var(--color-accent); }
 
   .cs__next {
     position: relative;
@@ -2157,15 +2006,6 @@ const categoryKey = data.category.toLowerCase();
     -webkit-tap-highlight-color: transparent;
   }
 
-  .cs__next::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse 80% 100% at 100% 50%, rgba(var(--pc-accent-rgb), 0.12), transparent 55%);
-    opacity: 0;
-    transition: opacity 320ms var(--ease-out);
-    pointer-events: none;
-  }
 
   @media (min-width: 600px) {
     .cs__next {
@@ -2174,7 +2014,7 @@ const categoryKey = data.category.toLowerCase();
   }
 
   .cs__next:hover {
-    border-color: rgba(var(--pc-accent-rgb), 0.45);
+    border-color: var(--color-border-strong);
     transform: translateY(-3px);
     box-shadow: var(--shadow-card-hover);
   }
@@ -2195,7 +2035,7 @@ const categoryKey = data.category.toLowerCase();
 
   .cs__next:hover .cs__next-corner {
     opacity: 1;
-    border-color: var(--pc-accent);
+    border-color: var(--color-accent);
   }
 
   .cs__next-corner--tl { top: 8px; left: 8px; border-right: none; border-bottom: none; }
@@ -2215,11 +2055,9 @@ const categoryKey = data.category.toLowerCase();
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 10px;
     font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
     color: var(--color-text-muted);
     padding: 4px 10px;
     border-radius: 9999px;
@@ -2229,13 +2067,6 @@ const categoryKey = data.category.toLowerCase();
     width: fit-content;
   }
 
-  .cs__next-tag-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background-color: var(--pc-accent);
-    box-shadow: 0 0 6px var(--pc-accent);
-  }
 
   .cs__next-title {
     font-family: var(--font-display);
@@ -2261,7 +2092,7 @@ const categoryKey = data.category.toLowerCase();
   }
 
   .cs__next:hover .cs__next-arrow {
-    color: var(--pc-accent);
+    color: var(--color-accent);
     transform: translateX(6px);
   }
 

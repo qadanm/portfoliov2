@@ -150,23 +150,7 @@ const categoryKey = data.category.toLowerCase();
      amber accent if a category isn't mapped. */
   .pcard {
     --pc-accent: var(--color-accent);
-    --pc-accent-rgb: var(--project-flagship-rgb);
-  }
-  .pcard--platform {
-    --pc-accent-rgb: var(--project-platform-rgb);
-    --pc-accent: rgb(var(--project-platform-rgb));
-  }
-  .pcard--product {
-    --pc-accent-rgb: var(--project-product-rgb);
-    --pc-accent: rgb(var(--project-product-rgb));
-  }
-  .pcard--frontend {
-    --pc-accent-rgb: var(--project-frontend-rgb);
-    --pc-accent: rgb(var(--project-frontend-rgb));
-  }
-  .pcard--flagship {
-    --pc-accent-rgb: var(--project-flagship-rgb);
-    --pc-accent: var(--color-accent);
+    --pc-accent-rgb: 245, 158, 11;
   }
 
   .pcard {
@@ -309,7 +293,7 @@ const categoryKey = data.category.toLowerCase();
   }
 
   .pcard__seq {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 10px;
     font-weight: 600;
     letter-spacing: 0.08em;
@@ -397,11 +381,9 @@ const categoryKey = data.category.toLowerCase();
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 10px;
     font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
     color: var(--color-text-muted);
     padding: 4px 10px;
     border-radius: 9999px;
@@ -414,11 +396,9 @@ const categoryKey = data.category.toLowerCase();
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 10px;
     font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
     color: var(--color-text-subtle);
     padding: 4px 10px;
     border-radius: 9999px;
@@ -498,11 +478,9 @@ const categoryKey = data.category.toLowerCase();
   }
 
   .pcard__details dt {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 10px;
     font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
     color: var(--color-text-subtle);
   }
 

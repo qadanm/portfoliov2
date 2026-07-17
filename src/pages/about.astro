@@ -19,17 +19,12 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
   ]}
 >
   <div class="about">
-    {/* Page atmosphere — soft accent glow at the top */}
-    <div class="about__atmos" aria-hidden="true">
-      <span class="about__atmos-glow"></span>
-    </div>
 
     <header class="about__hero">
       <div class="container-site">
         <div class="about__hero-grid">
           <div class="about__hero-copy">
             <div class="about__sxn">
-              <span class="about__sxn-num">01</span>
               <span class="about__sxn-label">Profile</span>
               <span class="about__sxn-rule" aria-hidden="true"></span>
               <span class="about__sxn-meta">Independent senior generalist</span>
@@ -89,9 +84,8 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     <div class="container-site about__body">
       <div class="about__main">
         {/* What I'm best at */}
-        <section class="about__section" data-reveal>
+        <section class="about__section">
           <header class="about__sxn about__sxn--inner">
-            <span class="about__sxn-num">02</span>
             <span class="about__sxn-label">What I'm best at</span>
             <span class="about__sxn-rule" aria-hidden="true"></span>
           </header>
@@ -106,9 +100,8 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
         </section>
 
         {/* Background */}
-        <section class="about__section" data-reveal>
+        <section class="about__section">
           <header class="about__sxn about__sxn--inner">
-            <span class="about__sxn-num">03</span>
             <span class="about__sxn-label">Background</span>
             <span class="about__sxn-rule" aria-hidden="true"></span>
             <span class="about__sxn-meta">2018 to present</span>
@@ -271,9 +264,8 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
         </section>
 
         {/* How I think */}
-        <section class="about__section" data-reveal>
+        <section class="about__section">
           <header class="about__sxn about__sxn--inner">
-            <span class="about__sxn-num">04</span>
             <span class="about__sxn-label">How I think about the work</span>
             <span class="about__sxn-rule" aria-hidden="true"></span>
           </header>
@@ -315,7 +307,6 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
           <span class="about__card-corner about__card-corner--br" aria-hidden="true"></span>
 
           <header class="about__card-head">
-            <span class="about__card-num">05</span>
             <h3 class="about__card-title">Currently</h3>
           </header>
 
@@ -363,7 +354,6 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
           <span class="about__card-corner about__card-corner--br" aria-hidden="true"></span>
 
           <header class="about__card-head">
-            <span class="about__card-num">06</span>
             <h3 class="about__card-title">Reach out</h3>
           </header>
           <p class="about__card-note">
@@ -386,28 +376,7 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     position: relative;
   }
 
-  /* Atmospheric glow at top of page */
-  .about__atmos {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 600px;
-    pointer-events: none;
-    overflow: hidden;
-  }
 
-  .about__atmos-glow {
-    position: absolute;
-    top: -180px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 1100px;
-    height: 540px;
-    background: radial-gradient(ellipse 50% 50% at 50% 50%, var(--color-accent-muted), transparent 70%);
-    filter: blur(28px);
-    opacity: 0.7;
-  }
 
   .about__hero {
     position: relative;
@@ -438,29 +407,11 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     margin-bottom: var(--space-5);
   }
 
-  .about__sxn-num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 22px;
-    padding: 0 7px;
-    border-radius: 4px;
-    border: 1px solid var(--color-border);
-    background-color: var(--color-bg-elevated);
-    color: var(--color-text);
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    line-height: 1;
-  }
 
   .about__sxn-label {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
     color: var(--color-text);
   }
 
@@ -472,10 +423,9 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
   }
 
   .about__sxn-meta {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
     color: var(--color-text-subtle);
-    letter-spacing: 0.04em;
     white-space: nowrap;
   }
 
@@ -517,10 +467,9 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     gap: 7px;
     padding: 4px 11px 4px 10px;
     border-radius: 9999px;
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
     font-weight: 600;
-    letter-spacing: 0.04em;
     color: var(--color-text);
     background-color: var(--color-bg-elevated);
     border: 1px solid var(--color-border);
@@ -557,20 +506,19 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
 
   .about__id-sep {
     color: var(--color-border-strong);
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
   }
 
   .about__id-loc {
     color: var(--color-text-muted);
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 12px;
-    letter-spacing: 0.02em;
   }
 
   .about__id-mail {
     color: var(--color-text);
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 12px;
     text-decoration: underline;
     text-decoration-color: var(--color-border);
@@ -895,8 +843,7 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
 
   .about__career-item {
     --pc-accent: var(--color-text-subtle);
-    --pc-accent-rgb: 113, 113, 122;
-    position: relative;
+        position: relative;
     padding: var(--space-6);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-2xl);
@@ -910,24 +857,12 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     transition: border-color 280ms, box-shadow 280ms, transform 280ms var(--ease-out);
   }
 
-  .about__career-item--flagship {
-    --pc-accent: var(--color-accent);
-    --pc-accent-rgb: var(--project-flagship-rgb);
-  }
-  .about__career-item--platform {
-    --pc-accent-rgb: var(--project-platform-rgb);
-    --pc-accent: rgb(var(--project-platform-rgb));
-  }
-  .about__career-item--product {
-    --pc-accent-rgb: var(--project-product-rgb);
-    --pc-accent: rgb(var(--project-product-rgb));
-  }
 
   .about__career-item::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse 70% 80% at 100% 0%, rgba(var(--pc-accent-rgb), 0.10), transparent 55%);
+    background: radial-gradient(ellipse 70% 80% at 100% 0%, var(--color-accent-dim), transparent 55%);
     pointer-events: none;
     opacity: 0;
     transition: opacity 320ms var(--ease-out);
@@ -938,7 +873,7 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
   }
 
   .about__career-item:hover {
-    border-color: rgba(var(--pc-accent-rgb), 0.4);
+    border-color: var(--color-border-strong);
     transform: translateY(-2px);
     box-shadow: var(--shadow-card-hover);
   }
@@ -948,7 +883,7 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
   }
 
   .about__career-item--current {
-    border-color: rgba(var(--pc-accent-rgb), 0.35);
+    border-color: var(--color-border-strong);
   }
 
   @media (min-width: 600px) {
@@ -992,16 +927,14 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    font-weight: 600;
     color: var(--pc-accent);
     padding: 4px 10px;
     border-radius: 9999px;
-    background-color: rgba(var(--pc-accent-rgb), 0.12);
-    border: 1px solid rgba(var(--pc-accent-rgb), 0.4);
+    background-color: var(--color-accent-muted);
+    border: 1px solid var(--color-accent-muted);
     line-height: 1;
   }
 
@@ -1061,9 +994,8 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     align-items: center;
     gap: 10px;
     flex-wrap: wrap;
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
-    letter-spacing: 0.04em;
     margin: var(--space-3) 0 0;
   }
   .about__career-links span { color: var(--color-text-subtle); }
@@ -1182,29 +1114,11 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     z-index: 2;
   }
 
-  .about__card-num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 22px;
-    padding: 0 7px;
-    border-radius: 4px;
-    border: 1px solid var(--color-border);
-    background-color: var(--color-bg-elevated);
-    color: var(--color-text);
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    line-height: 1;
-  }
 
   .about__card-title {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    font-weight: 600;
     color: var(--color-text);
     margin: 0;
   }
@@ -1226,12 +1140,10 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
   }
 
   .about__card-key {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 10px;
     font-weight: 600;
     color: var(--color-text-subtle);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
   }
 
   .about__card-val {
@@ -1252,10 +1164,9 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     gap: 5px;
     padding: 4px 10px;
     border-radius: 9999px;
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 11px;
     font-weight: 600;
-    letter-spacing: 0.02em;
     color: var(--color-text);
     text-decoration: none;
     background-color: var(--color-bg-deep);
@@ -1286,14 +1197,13 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
   }
 
   .about__card-pill--platform {
-    color: rgb(var(--project-platform-rgb));
+    color: var(--color-text-muted);
   }
   .about__card-pill--platform .about__card-pill-dot {
-    background-color: rgb(var(--project-platform-rgb));
-    box-shadow: 0 0 6px rgb(var(--project-platform-rgb));
+    background-color: var(--color-text-subtle);
   }
   .about__card-pill--platform:hover {
-    border-color: rgb(var(--project-platform-rgb));
+    border-color: var(--color-border-strong);
   }
 
   .about__card--reach {
