@@ -42,7 +42,7 @@ const pageUrl = new URL(Astro.url.pathname, Astro.site);
 // portfolio's design system. Falls back to default site OG if missing.
 const ogImagePath = `/og/${project.slug}.jpg`;
 const ogImage = new URL(ogImagePath, Astro.site).toString();
-const ogAlt = `${data.title} — case study by Moe Qadan.`;
+const ogAlt = `${data.title}: case study by Moe Qadan.`;
 
 // Map slugs to bespoke artifact components for the hero preview frame.
 const artifactMap: Record<string, any> = {
@@ -594,14 +594,14 @@ const categoryKey = data.category.toLowerCase();
               The loop is built to be felt in under a minute. A cropped detail
               locks into a lime viewfinder, the tachometer drains ten seconds,
               and four arcade buttons wait in the thumb zone. Pick, and the crop
-              blooms out to the whole car — same five for everyone, every day.
+              blooms out to the whole car. Same five for everyone, every day.
             </p>
           </header>
           <div class="cs__shot-grid cs__shot-grid--phones">
             <figure class="cs__shot">
               <img
                 src="/images/car-spotter/clue.webp"
-                alt="CarSpotter clue screen: a tightly cropped grille inside a lime viewfinder, a draining ten-second tachometer, and four answer buttons — Chevrolet Aveo, Lincoln Aviator, Lincoln MKS, Chrysler 300."
+                alt="CarSpotter clue screen: a tightly cropped grille inside a lime viewfinder, a draining ten-second tachometer, and four answer buttons: Chevrolet Aveo, Lincoln Aviator, Lincoln MKS, Chrysler 300."
                 width="1290"
                 height="2796"
                 loading="lazy"
@@ -614,20 +614,20 @@ const categoryKey = data.category.toLowerCase();
             <figure class="cs__shot">
               <img
                 src="/images/car-spotter/reveal.webp"
-                alt="CarSpotter reveal screen: the cropped grille has zoomed out to the full car — a silver Lincoln MKS — named simply 'Lincoln MKS', with a one-line fact about its split-wing grille."
+                alt="CarSpotter reveal screen: the cropped grille has zoomed out to the full car, a silver Lincoln MKS, named simply 'Lincoln MKS', with a one-line fact about its split-wing grille."
                 width="1290"
                 height="2796"
                 loading="lazy"
               />
               <figcaption>
                 The reveal. The crop zooms out to the whole car and the fact
-                lands — the one second the entire app is built around.
+                lands. It's the one second the entire app is built around.
               </figcaption>
             </figure>
             <figure class="cs__shot">
               <img
                 src="/images/car-spotter/daily.webp"
-                alt="CarSpotter home: a faint wall of car photographs behind a one-day streak and today's finished Daily 5 — 833 points, graded A, 'Sharp eye' — with a countdown to tomorrow's set."
+                alt="CarSpotter home: a faint wall of car photographs behind a one-day streak and today's finished Daily 5 (833 points, graded A, 'Sharp eye'), with a countdown to tomorrow's set."
                 width="1290"
                 height="2796"
                 loading="lazy"
@@ -647,7 +647,7 @@ const categoryKey = data.category.toLowerCase();
                 loading="lazy"
               />
               <figcaption>
-                Get it and the score climbs — consecutive hits stack a combo, and
+                Get it and the score climbs: consecutive hits stack a combo, and
                 the fact lands while you're still pleased with yourself.
               </figcaption>
             </figure>
@@ -662,7 +662,7 @@ const categoryKey = data.category.toLowerCase();
             </div>
             <h2 class="cs__post-title">Brag without spoiling. Miss without losing.</h2>
             <p class="cs__post-sub">
-              Sharing is the growth loop, so it's spoiler-free by construction —
+              Sharing is the growth loop, so it's spoiler-free by construction:
               colored squares and a clock, never a car name. And every miss
               teaches the tell, so the detail you blow today is the one you nail
               on sight tomorrow.
@@ -672,14 +672,14 @@ const categoryKey = data.category.toLowerCase();
             <figure class="cs__shot">
               <img
                 src="/images/car-spotter/share.webp"
-                alt="CarSpotter result screen: 347 points, Learner level 2, and the spoiler-free share card — five coloured letter squares and a score, no car names — above a Share result button."
+                alt="CarSpotter result screen: 347 points, Learner level 2, and the spoiler-free share card (five coloured letter squares and a score, no car names), above a Share result button."
                 width="1290"
                 height="2796"
                 loading="lazy"
               />
               <figcaption>
-                The share card mirrors the in-app result exactly — squares,
-                letters, a clock, a tier — but never a car name. The flex is
+                The share card mirrors the in-app result exactly: squares,
+                letters, a clock, a tier, but never a car name. The flex is
                 honest and the round stays unspoiled.
               </figcaption>
             </figure>
@@ -699,13 +699,13 @@ const categoryKey = data.category.toLowerCase();
             <figure class="cs__shot">
               <img
                 src="/images/car-spotter/clue2.webp"
-                alt="CarSpotter clue: a cropped headlight under the viewfinder with one second left, and four answers — Tesla Model Y, Ford Police Interceptor Utility, Cadillac XT6, Lincoln Aviator."
+                alt="CarSpotter clue: a cropped headlight under the viewfinder with one second left, and four answers: Tesla Model Y, Ford Police Interceptor Utility, Cadillac XT6, Lincoln Aviator."
                 width="1290"
                 height="2796"
                 loading="lazy"
               />
               <figcaption>
-                Twelve detail categories — headlight, taillight, grille, wheel,
+                Twelve detail categories: headlight, taillight, grille, wheel,
                 badge, and more. The crop is the whole puzzle.
               </figcaption>
             </figure>
@@ -738,7 +738,7 @@ const categoryKey = data.category.toLowerCase();
             </div>
             <h2 class="cs__post-title">Every day authors itself into five videos.</h2>
             <p class="cs__post-sub">
-              A daily game lives or dies on being seen daily — and hand-editing
+              A daily game lives or dies on being seen daily, and hand-editing
               five vertical videos a day is a job, not a feature. So the same
               authored day that feeds the app feeds the renderer: five clues in,
               five narrated 9:16 films out, cut to one beat sheet. No timeline,
@@ -749,7 +749,7 @@ const categoryKey = data.category.toLowerCase();
           <p class="cs__post-closing">
             The reel is the game's best second, isolated: a hook, a real
             five-count, then the crop blooming to the whole car. It works on
-            social for the same reason it works in the app — you already think
+            social for the same reason it works in the app: you already think
             you know the answer, and you have to stay to find out. Rendering is
             headless Remotion, so a day's five come out of one command; the
             narration is three permanent takes, so a hundred videos cost the
@@ -767,7 +767,7 @@ const categoryKey = data.category.toLowerCase();
             <p class="cs__post-sub">
               The marketing poster, the App Store screenshots, and the game all
               speak the same midnight-arcade language. The design tokens are a
-              shared package the app and the website both compile from — and the
+              shared package the app and the website both compile from, and the
               promo art comes out of a scripted ImageMagick pipeline, versioned
               next to the code.
             </p>

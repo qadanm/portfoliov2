@@ -15,7 +15,7 @@ const secs = (f: number) => f / FPS;
 
 // f → the beat, straight from DailyReveal.tsx's header table.
 const BEATS = [
-  { f: 0, key: 'open', label: 'Cold open', note: 'Title card alone. No panel, no HUD — one hook.' },
+  { f: 0, key: 'open', label: 'Cold open', note: 'Title card alone. No panel, no HUD. One hook.' },
   { f: 104, key: 'power', label: 'Power on', note: 'Panel and reticles strike together.' },
   { f: 123, key: 'scan', label: 'Scan', note: 'Scan-wipe reveals the crop; detection markers land.' },
   { f: 161, key: 'cards', label: 'Four answers', note: 'The cards deal in. Now you’re playing.' },
@@ -39,7 +39,7 @@ const pct = (f: number) => (f / TOTAL_FRAMES) * 100;
 <figure
   class="reel"
   data-reel
-  aria-label={`How one authored day becomes five vertical videos: ${BEATS.map((b) => b.label).join(', ')} — a ${secs(TOTAL_FRAMES).toFixed(1)}-second reel at 1080×1920, narrated by three reused voice takes.`}
+  aria-label={`How one authored day becomes five vertical videos: ${BEATS.map((b) => b.label).join(', ')}. A ${secs(TOTAL_FRAMES).toFixed(1)}-second reel at 1080×1920, narrated by three reused voice takes.`}
 >
   <!-- Fan-out: the day → the five reels -->
   <div class="reel__fan">
@@ -65,7 +65,7 @@ const pct = (f: number) => (f / TOTAL_FRAMES) * 100;
     </ol>
 
     <p class="reel__fan-note">
-      Five clues in, five 9:16 videos out — <strong>one per clue</strong>, every one narrated,
+      Five clues in, five 9:16 videos out: <strong>one per clue</strong>, every one narrated,
       animated, and cut to the same beat sheet. No timeline, no editor, no hand.
     </p>
   </div>
@@ -150,7 +150,7 @@ const pct = (f: number) => (f / TOTAL_FRAMES) * 100;
       </div>
     </div>
     <p class="reel__track-note">
-      Three voice takes, recorded once and reused by every render — a trailer-narrator read, not
+      Three voice takes, recorded once and reused by every render: a trailer-narrator read, not
       per-video TTS. The countdown is <strong>one continuous take</strong>: five words spliced onto a
       rigid frame grid is exactly what makes a countdown sound robotic.
       <span class="reel__track-dur">{secs(TOTAL_FRAMES).toFixed(1)}s</span>
