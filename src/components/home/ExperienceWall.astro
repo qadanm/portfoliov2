@@ -250,7 +250,13 @@ const jobs = [
     border-radius: 50%;
     background: var(--color-text-subtle);
   }
-  .xp__status--current { color: var(--color-success); }
+  .xp__status--current {
+    /* --color-success is 3.77:1 as 10px text on the light surface. */
+    color: #047857;
+  }
+  :global([data-theme="dark"]) .xp__status--current {
+    color: #34D399;
+  }
   .xp__status--current .xp__status-dot {
     background: var(--color-success);
     box-shadow: 0 0 6px var(--color-success);

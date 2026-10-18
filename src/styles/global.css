@@ -83,7 +83,12 @@
   --color-border-strong: #D4D4D8;
   --color-text: #09090B;
   --color-text-muted: #52525B;
-  --color-text-subtle: #A1A1AA;
+  /* Was #A1A1AA — 2.45:1 on the page background, which failed WCAG AA for
+     every small label that uses it (facts labels, captions, footer lines).
+     #6B6B75 clears 4.5:1 on the lightest surface it lands on (--color-bg-muted,
+     not just --color-bg) while staying clearly quieter than --color-text-muted,
+     so the hierarchy the design relies on is intact. */
+  --color-text-subtle: #6B6B75;
   --color-accent: #D97706;
   --color-accent-hover: #B45309;
   --color-accent-muted: rgba(217, 119, 6, 0.14);
@@ -115,7 +120,9 @@
   --color-border-strong: #3A3A40;
   --color-text: #FAFAFA;
   --color-text-muted: #A1A1AA;
-  --color-text-subtle: #71717A;
+  /* Was #71717A — 4.14:1 on #08080B, just under AA. #84848D clears 4.5:1 on
+     every dark surface including --color-bg-muted. */
+  --color-text-subtle: #84848D;
   --color-accent: #F59E0B;
   --color-accent-hover: #FBBF24;
   --color-accent-muted: rgba(245, 158, 11, 0.14);
@@ -273,6 +280,21 @@ html[data-theme-transitioning] body * {
 .text-accent { color: var(--color-accent); }
 .border-site { border-color: var(--color-border); }
 .border-subtle { border-color: var(--color-border-subtle); }
+
+/* ─── Visually hidden ──────────────────────────────────────────────────────────
+   For text a screen reader needs and the eye does not: the "(opens in a new
+   tab)" qualifier on image links, and skip-link scaffolding. */
+.vhidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 /* ─── Section Spacing ────────────────────────────────────────────────────────── */
 .section-gap {

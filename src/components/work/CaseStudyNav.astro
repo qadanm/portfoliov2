@@ -1,0 +1,84 @@
+---
+/**
+ * In-page section nav for the CarSpotter case study.
+ *
+ * The piece is long enough that a reader scanning for "what did he actually
+ * decide" needs a jump list. It borrows the site's hairline vocabulary and
+ * adds no state: plain anchors, real targets, no scroll spy.
+ */
+export interface Item {
+  href: string;
+  label: string;
+}
+
+export interface Props {
+  items: Item[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav class="csnav" aria-label="Case study sections">
+  <ul class="csnav__list">
+    {items.map((item, i) => (
+      <li class="csnav__item">
+        <a class="csnav__link" href={item.href}>
+          <span class="csnav__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+          <span class="csnav__label">{item.label}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  .csnav {
+    border-block: 1px solid var(--color-border);
+    padding-block: var(--space-4);
+  }
+
+  .csnav__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 22px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .csnav__link {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color 160ms var(--ease-out);
+  }
+
+  .csnav__link:hover,
+  .csnav__link:focus-visible {
+    color: var(--color-text);
+  }
+
+  .csnav__num {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--color-text-muted);
+  }
+
+  @media (max-width: 600px) {
+    .csnav__list {
+      gap: 4px 14px;
+    }
+
+    .csnav__link {
+      font-size: 12px;
+      /* Vertical padding is a desktop affordance, but it cannot go below the
+         24px minimum target height (WCAG 2.5.8): 4px + a 17px line box. */
+      padding: 4px 0;
+    }
+  }
+</style>

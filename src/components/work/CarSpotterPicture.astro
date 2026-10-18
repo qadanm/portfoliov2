@@ -1,0 +1,103 @@
+---
+/**
+ * Responsive <picture> for the CarSpotter 2026-10 artwork.
+ *
+ * The supplied WebP derivatives live in public/ — Astro does not optimise
+ * public files, and it does not need to here: the 640/960/1600/2560 set is
+ * already the responsive ladder. Masters (PNG/SVG) stay out of the page
+ * payload entirely.
+ *
+ * `mobileBase` is art direction, not a crop. The desktop cover is 16:10 and
+ * the portrait companion is 4:5, so the source swaps at 640px and the
+ * container takes the portrait ratio for the same range. Without that, a
+ * 4:5 image inside a 16:10 box would either letterbox or crop the poster.
+ */
+export interface Props {
+  /** Path without the `-<width>.webp` suffix. */
+  base: string;
+  alt: string;
+  width: number;
+  height: number;
+  widths?: number[];
+  mobileBase?: string;
+  mobileWidths?: number[];
+  mobileWidth?: number;
+  mobileHeight?: number;
+  /** Above-the-fold only: the case-study cover. Everything else stays lazy. */
+  eager?: boolean;
+  sizes?: string;
+  class?: string;
+}
+
+const {
+  base,
+  alt,
+  width,
+  height,
+  widths = [640, 960, 1600, 2560],
+  mobileBase,
+  mobileWidths = [640, 960, 1600],
+  mobileWidth = 1600,
+  mobileHeight = 2000,
+  eager = false,
+  sizes = '(min-width: 1280px) 1120px, calc(100vw - 40px)',
+  class: className,
+} = Astro.props;
+
+const srcset = (path: string, list: number[]) =>
+  list.map(w => `${path}-${w}.webp ${w}w`).join(', ');
+
+const ratio = `${mobileWidth} / ${mobileHeight}`;
+---
+
+<picture
+  class:list={['cpic', className]}
+  data-mobile={mobileBase ? '' : undefined}
+  style={mobileBase ? `--cpic-mobile-ratio: ${ratio}` : undefined}
+>
+  {mobileBase && (
+    <source
+      media="(max-width: 639px)"
+      type="image/webp"
+      srcset={srcset(mobileBase, mobileWidths)}
+      sizes={sizes}
+    />
+  )}
+  <source type="image/webp" srcset={srcset(base, widths)} sizes={sizes} />
+  <img
+    src={`${base}-${widths[widths.length - 1]}.webp`}
+    alt={alt}
+    width={width}
+    height={height}
+    loading={eager ? 'eager' : 'lazy'}
+    fetchpriority={eager ? 'high' : 'auto'}
+    decoding="async"
+  />
+</picture>
+
+<style>
+  .cpic {
+    display: block;
+  }
+
+  .cpic img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Portrait companion: the container takes the portrait ratio so the
+     intrinsic 16:10 attributes cannot reserve the wrong height. */
+  @media (max-width: 639px) {
+    .cpic[data-mobile] {
+      aspect-ratio: var(--cpic-mobile-ratio, 4 / 5);
+    }
+
+    .cpic[data-mobile] img {
+      height: 100%;
+      /* Source and box share the same ratio, so this never crops — it only
+         keeps the selected portrait image from letterboxing. */
+      object-fit: contain;
+    }
+  }
+</style>

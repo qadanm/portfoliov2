@@ -1,5 +1,15 @@
 ---
 import BaseLayout from '@/components/layout/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+// The CarSpotter timeline entry reads the project record rather than keeping
+// its own paragraph, so About cannot drift from the home card, the case study
+// header or the metadata. Source of truth: src/content/build/car-spotter.mdx.
+const carSpotter = (await getCollection('build')).find(p => p.slug === 'car-spotter');
+const cs = carSpotter?.data;
+const carSpotterAbout =
+  cs?.secondaryCopy?.about ??
+  'CarSpotter is my independent iPhone game, designed and engineered end to end.';
 ---
 
 <BaseLayout
@@ -119,18 +129,10 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
                   <span class="about__career-status-dot"></span>
                   Current
                 </span>
-                <h3 class="about__career-title">CarSpotter</h3>
-                <span class="about__career-period">2026</span>
+                <h3 class="about__career-title">{cs?.title ?? 'CarSpotter'}</h3>
+                <span class="about__career-period">{cs?.period ?? '2026–present'}</span>
               </header>
-              <p class="about__career-desc">
-                Founder, sole designer and engineer. A daily car-spotting
-                game for iOS: five cropped details, four answers, ten
-                seconds. The interesting part is the spine: a content-addressed
-                media pipeline that can't orphan a photo, a fail-loud content
-                bundler, and a pure-TypeScript game engine carrying 234 tests.
-                Designed, built, branded, and shipped end to end, now on
-                the App Store.
-              </p>
+              <p class="about__career-desc">{carSpotterAbout}</p>
               <p class="about__career-stack">
                 Expo / React Native · TypeScript · Zustand · MMKV ·
                 Turborepo · Astro · ImageMagick pipeline
@@ -930,7 +932,12 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     font-family: var(--font-body);
     font-size: 10px;
     font-weight: 600;
+    /* The per-category accent is a fill colour, not a text colour: at 10px it
+       measured 4.26:1. Mixing it toward the body ink darkens it in light mode
+       and lightens it in dark mode, so the hue survives and the label passes.
+       Browsers without color-mix fall back to the accent itself. */
     color: var(--pc-accent);
+    color: color-mix(in srgb, var(--pc-accent) 72%, var(--color-text));
     padding: 4px 10px;
     border-radius: 9999px;
     background-color: var(--color-accent-muted);
@@ -1163,6 +1170,7 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     align-items: center;
     gap: 5px;
     padding: 4px 10px;
+    min-height: 24px;
     border-radius: 9999px;
     font-family: var(--font-body);
     font-size: 11px;
@@ -1186,7 +1194,10 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
   }
 
   .about__card-pill--flagship {
-    color: var(--color-accent);
+    /* The label is 11px on --color-bg-deep; every accent shade lands between
+       2.8:1 and 4.4:1 there. The pill keeps its category signal in the dot and
+       its glow, and the name reads at full body contrast. */
+    color: var(--color-text);
   }
   .about__card-pill--flagship .about__card-pill-dot {
     background-color: var(--color-accent);

@@ -5,6 +5,20 @@ const build = defineCollection({
   schema: z.object({
     title: z.string(),
     short: z.string(),
+    // Optional long-form hero copy. `short` stays the one-line summary that
+    // cards, the work index and next-project links all read.
+    headline: z.string().optional(),
+    summary: z.string().optional(),
+    // Home-card line, when it differs from the work-index line.
+    cardDescription: z.string().optional(),
+    // Per-surface copy for surfaces that cannot read `short` verbatim:
+    // the About timeline entry, the Approach example card, and the
+    // "next case study" card on the previous project's page.
+    secondaryCopy: z.object({
+      about: z.string().optional(),
+      approach: z.string().optional(),
+      related: z.string().optional(),
+    }).optional(),
     category: z.enum(['Flagship', 'Platform', 'Product', 'Frontend']),
     keyFocus: z.array(z.string()),
     placeholder: z.object({
@@ -36,6 +50,19 @@ const build = defineCollection({
     stack: z.array(z.string()).optional(),
     coverImage: z.string().optional(),
     coverAlt: z.string().optional(),
+    // Portrait companion for mobile art direction — a separate composition,
+    // never a centre crop of the desktop cover.
+    coverMobileImage: z.string().optional(),
+    coverMobileAlt: z.string().optional(),
+    // Release state. `candidate` means the screenshots come from a build that
+    // is not proven to be public yet; the page must say so.
+    releaseStatus: z.enum(['candidate', 'verified-live']).optional(),
+    releaseNote: z.string().optional(),
+    // Per-project SEO overrides. Defaults stay title/short + /og/<slug>.jpg.
+    seoTitle: z.string().optional(),
+    seoDescription: z.string().optional(),
+    ogImage: z.string().optional(),
+    ogAlt: z.string().optional(),
   }),
 });
 

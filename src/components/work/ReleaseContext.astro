@@ -1,0 +1,84 @@
+---
+/**
+ * One release-state sentence, rendered once per page.
+ *
+ * The supplied captures come from local Release 1.2.3 (1); the public App
+ * Store listing was observed at 1.2.2. Until a matching public build is
+ * verified, the page says "release candidate" — it never implies Apple has
+ * shipped what the screenshots show. Promotion to `verified-live` happens in
+ * the project record (src/content/build/car-spotter.mdx), not here.
+ */
+export interface Props {
+  status?: 'candidate' | 'verified-live';
+  note?: string;
+}
+
+const { status = 'candidate', note } = Astro.props;
+const text =
+  note ??
+  (status === 'verified-live'
+    ? 'Screens from the October 2026 CarSpotter update.'
+    : 'CarSpotter is available on the App Store. Shown here: the October 2026 design iteration, captured from the 1.2.3 release candidate.');
+---
+
+<p class="release">
+  <span class="release__tag">
+    {status === 'verified-live' ? 'Released' : 'Release candidate'}
+  </span>
+  <span class="release__text">{text}</span>
+</p>
+
+<style>
+  .release {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 0;
+    padding-inline-start: 16px;
+    border-inline-start: 3px solid #92b800;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    max-width: 78ch;
+  }
+
+  .release__tag {
+    flex: none;
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text);
+  }
+
+  .release__text {
+    flex: 1 1 20ch;
+    min-width: 0;
+  }
+
+  @media (max-width: 520px) {
+    /* The tag is a fixed-width block; beside the sentence it steals a third
+       of a phone's line length and turns one sentence into five short lines.
+       Stack them instead. */
+    .release {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    /* flex: 1 1 20ch is a horizontal-layout assumption. Along a column axis
+       the 20ch basis becomes a *height*, which left the note's rule running
+       ~70px past the sentence. */
+    .release__text {
+      flex: 0 0 auto;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .release {
+      font-size: 13px;
+    }
+  }
+</style>

@@ -10,9 +10,11 @@ import ElmulatorArtifact from '@/components/artifacts/ElmulatorArtifact.astro';
 import ChatOBDFlow from '@/components/diagrams/ChatOBDFlow.astro';
 import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
 import AdvisorVisual from '@/components/diagrams/AdvisorVisual.astro';
-import ReelPipeline from '@/components/diagrams/ReelPipeline.astro';
 import ReadingProgress from '@/components/ReadingProgress.astro';
 import CaseStudyMobileBar from '@/components/work/CaseStudyMobileBar.astro';
+import CarSpotterPicture from '@/components/work/CarSpotterPicture.astro';
+import ReleaseContext from '@/components/work/ReleaseContext.astro';
+import CaseStudyNav from '@/components/work/CaseStudyNav.astro';
 import AppStoreBadge from '@/components/AppStoreBadge.astro';
 import SchemaArticle from '@/components/seo/SchemaArticle.astro';
 import SchemaBreadcrumb from '@/components/seo/SchemaBreadcrumb.astro';
@@ -39,10 +41,33 @@ const next = allProjects[(currentIndex + 1) % allProjects.length];
 
 const pageUrl = new URL(Astro.url.pathname, Astro.site);
 // Per-case-study OG card — bespoke 1200×630 PNG generated from the
-// portfolio's design system. Falls back to default site OG if missing.
-const ogImagePath = `/og/${project.slug}.jpg`;
+// portfolio's design system. A project can override the path (CarSpotter's
+// card was redesigned for the 2026-10 iteration and is versioned so social
+// caches can't serve the retired artwork). Falls back to /og/<slug>.jpg.
+const ogImagePath = data.ogImage ?? `/og/${project.slug}.jpg`;
 const ogImage = new URL(ogImagePath, Astro.site).toString();
-const ogAlt = `${data.title}: case study by Moe Qadan.`;
+const ogAlt = data.ogAlt ?? `${data.title}: case study by Moe Qadan.`;
+
+// Long-form hero copy is optional; without it the page keeps the original
+// one-line `short` as both dek and summary.
+const dek = data.headline ?? data.short;
+const summary = data.summary;
+const pageTitle = data.seoTitle ?? `${data.title} Case Study`;
+const pageDescription = data.seoDescription ?? data.short;
+
+// The responsive ladder is addressed by base path (`…-640.webp`, `…-960.webp`).
+const coverBase = data.coverImage?.replace(/-\d+\.webp$/, '');
+const coverMobileBase = data.coverMobileImage?.replace(/-\d+\.webp$/, '');
+
+const carSpotterSections = [
+  { href: '#premise', label: 'The product decision' },
+  { href: '#loop', label: 'Interaction' },
+  { href: '#identity', label: 'Identity' },
+  { href: '#results', label: 'A clearer result' },
+  { href: '#engineering', label: 'Engineering judgement' },
+  { href: '#marketing', label: 'The product outside the app' },
+  { href: '#reflection', label: 'What this work taught me' },
+];
 
 // Map slugs to bespoke artifact components for the hero preview frame.
 const artifactMap: Record<string, any> = {
@@ -58,8 +83,8 @@ const categoryKey = data.category.toLowerCase();
 ---
 
 <BaseLayout
-  title={`${data.title} Case Study`}
-  description={data.short}
+  title={pageTitle}
+  description={pageDescription}
   article={true}
   image={ogImagePath}
   imageAlt={ogAlt}
@@ -68,7 +93,7 @@ const categoryKey = data.category.toLowerCase();
   <Fragment slot="head">
     <SchemaArticle
       title={data.title}
-      description={data.short}
+      description={pageDescription}
       url={pageUrl}
       image={ogImage}
       imageAlt={ogAlt}
@@ -117,7 +142,10 @@ const categoryKey = data.category.toLowerCase();
         </div>
 
         <h1 class="cs__title">{data.title}</h1>
-        <p class="cs__short">{data.short}</p>
+        <div class="cs__lede">
+          <p class="cs__short">{dek}</p>
+          {summary && <p class="cs__summary">{summary}</p>}
+        </div>
 
         <dl class="cs__meta">
           {data.role && (
@@ -217,7 +245,17 @@ const categoryKey = data.category.toLowerCase();
         <span class="cs__cover-corner cs__cover-corner--bl" aria-hidden="true"></span>
         <span class="cs__cover-corner cs__cover-corner--br" aria-hidden="true"></span>
 
-        {data.coverImage ? (
+        {project.slug === 'car-spotter' && coverBase ? (
+          <CarSpotterPicture
+            base={coverBase}
+            mobileBase={coverMobileBase}
+            alt={data.coverAlt ?? data.title}
+            width={2560}
+            height={1600}
+            sizes="(min-width: 1280px) 1120px, calc(100vw - 40px)"
+            eager
+          />
+        ) : data.coverImage ? (
           <img
             src={data.coverImage}
             alt={data.coverAlt ?? data.title}
@@ -243,16 +281,31 @@ const categoryKey = data.category.toLowerCase();
       </div>
     </div>
 
-    <div class="container-narrow cs__content">
-      <div class="cs__content-head">
-        <span class="cs__content-label">Notes</span>
-        <span class="cs__content-rule" aria-hidden="true"></span>
-      </div>
-      <div class="prose cs__prose">
-        <Content />
-      </div>
+    {project.slug === 'car-spotter' && (
+      <>
+        <div class="container-site cs__context">
+          <ReleaseContext status={data.releaseStatus} note={data.releaseNote} />
+        </div>
+        <div class="container-site cs__navwrap">
+          <CaseStudyNav items={carSpotterSections} />
+        </div>
+      </>
+    )}
 
-      {data.appStoreUrl && (
+    {project.slug !== 'car-spotter' && (
+      <div class="container-narrow cs__content">
+        <div class="cs__content-head">
+          <span class="cs__content-label">Notes</span>
+          <span class="cs__content-rule" aria-hidden="true"></span>
+        </div>
+        <div class="prose cs__prose">
+          <Content />
+        </div>
+      </div>
+    )}
+
+    {data.appStoreUrl && project.slug !== 'car-spotter' && (
+      <div class="container-narrow">
         <aside class="cs__download" aria-label={`Get ${data.title}`}>
           <div class="cs__download-copy">
             <h2 class="cs__download-title">{data.title} is on the App Store.</h2>
@@ -278,8 +331,8 @@ const categoryKey = data.category.toLowerCase();
             )}
           </div>
         </aside>
-      )}
-    </div>
+      </div>
+    )}
 
     {project.slug === 'chatobd2' && (
       <>
@@ -576,218 +629,436 @@ const categoryKey = data.category.toLowerCase();
 
     {project.slug === 'car-spotter' && (
       <>
-        <section class="container-narrow cs__pull">
-          <p class="cs__pull-text">
-            One detail. Ten seconds. Then the whole car.
-          </p>
-          <span class="cs__pull-caption">The moment that hooks you</span>
-        </section>
-
-        <section class="container-site cs__post">
+        <section id="premise" class="container-site cs__post cs__post--first" aria-labelledby="premise-title">
           <header class="cs__post-head">
             <div class="cs__post-sxn">
-              <span class="cs__post-eyebrow">The Daily 5</span>
+              <span class="cs__post-eyebrow">01 / The product decision</span>
               <span class="cs__post-rule" aria-hidden="true"></span>
             </div>
-            <h2 class="cs__post-title">A clue, a clock, and four ways to be wrong.</h2>
-            <p class="cs__post-sub">
-              The loop is built to be felt in under a minute. A cropped detail
-              locks into a lime viewfinder, the tachometer drains ten seconds,
-              and four arcade buttons wait in the thumb zone. Pick, and the crop
-              blooms out to the whole car. Same five for everyone, every day.
-            </p>
+            <h2 class="cs__post-title" id="premise-title">Keep the challenge small. Make the reveal worth it.</h2>
           </header>
-          <div class="cs__shot-grid cs__shot-grid--phones">
+          <div class="cs__post-body">
+            <p>
+              The premise is simple: recognise a real car from a small
+              photographic detail. I kept the daily challenge to five cars and
+              the answer set to four choices. A player gets the full-car reveal
+              and a fact whether the answer is right or wrong.
+            </p>
+            <p>
+              That gives the game a clear endpoint without ending the
+              experience. Quick Practice offers more guessing, while progress
+              and streaks give returning players a record of their play. The
+              Daily timer is configurable, so I describe the game by its
+              decisions and cadence rather than promising one fixed time limit.
+            </p>
+          </div>
+          <div class="cs__shot-grid cs__shot-grid--duo">
             <figure class="cs__shot">
-              <img
-                src="/images/car-spotter/clue.webp"
-                alt="CarSpotter clue screen: a tightly cropped grille inside a lime viewfinder, a draining ten-second tachometer, and four answer buttons: Chevrolet Aveo, Lincoln Aviator, Lincoln MKS, Chrysler 300."
-                width="1290"
-                height="2796"
-                loading="lazy"
-              />
+              <a
+                class="cs__shot-link"
+                href="/images/car-spotter/2026-10/screens/home-720.webp"
+                target="_blank"
+                rel="noopener"
+              >
+                <img
+                  src="/images/car-spotter/2026-10/screens/home-720.webp"
+                  srcset="/images/car-spotter/2026-10/screens/home-480.webp 480w, /images/car-spotter/2026-10/screens/home-720.webp 720w"
+                  sizes="(min-width: 720px) 42vw, 88vw"
+                  alt="CarSpotter home screen with the Saturn identity, today's Daily 5 action and Quick Practice."
+                  width="1320"
+                  height="2868"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <span class="vhidden"> (opens in a new tab)</span>
+              </a>
               <figcaption>
-                The clue: one cropped detail, a ten-second clock, four cars to
-                choose from. Tap before the tach hits zero.
+                The October 2026 home: the wordmark and the Saturn have room,
+                the Daily 5 is still the clearest thing to tap, and the streak
+                sits underneath as the reason to come back.
               </figcaption>
             </figure>
             <figure class="cs__shot">
-              <img
-                src="/images/car-spotter/reveal.webp"
-                alt="CarSpotter reveal screen: the cropped grille has zoomed out to the full car, a silver Lincoln MKS, named simply 'Lincoln MKS', with a one-line fact about its split-wing grille."
-                width="1290"
-                height="2796"
-                loading="lazy"
-              />
+              <a
+                class="cs__shot-link"
+                href="/images/car-spotter/2026-10/screens/practice-reveal-720.webp"
+                target="_blank"
+                rel="noopener"
+              >
+                <img
+                  src="/images/car-spotter/2026-10/screens/practice-reveal-720.webp"
+                  srcset="/images/car-spotter/2026-10/screens/practice-reveal-480.webp 480w, /images/car-spotter/2026-10/screens/practice-reveal-720.webp 720w"
+                  sizes="(min-width: 720px) 42vw, 88vw"
+                  alt="A Ferrari 296 GTB reveal in Quick Practice."
+                  width="1320"
+                  height="2868"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <span class="vhidden"> (opens in a new tab)</span>
+              </a>
               <figcaption>
-                The reveal. The crop zooms out to the whole car and the fact
-                lands. It's the one second the entire app is built around.
-              </figcaption>
-            </figure>
-            <figure class="cs__shot">
-              <img
-                src="/images/car-spotter/daily.webp"
-                alt="CarSpotter home: a faint wall of car photographs behind a one-day streak and today's finished Daily 5 (833 points, graded A, 'Sharp eye'), with a countdown to tomorrow's set."
-                width="1290"
-                height="2796"
-                loading="lazy"
-              />
-              <figcaption>
-                A fresh Daily 5 every morning, the same five for everyone, and a
-                streak to keep alive. Play it and the day resolves to a grade and
-                a countdown to the next one.
-              </figcaption>
-            </figure>
-            <figure class="cs__shot">
-              <img
-                src="/images/car-spotter/combo.webp"
-                alt="CarSpotter reveal: a correct answer on a Ford F-Series, the full truck shown with a one-line fact about the 1973-79 'Dentside' body crease, with the run score at 347."
-                width="1290"
-                height="2796"
-                loading="lazy"
-              />
-              <figcaption>
-                Get it and the score climbs: consecutive hits stack a combo, and
-                the fact lands while you're still pleased with yourself.
+                Quick Practice is the second mode: the same answering language
+                and the same reveal, without the pressure of the daily set. The
+                capture is from the same build as the Daily screens below.
               </figcaption>
             </figure>
           </div>
         </section>
 
-        <section class="container-site cs__post cs__post--alt">
+        <section id="loop" class="container-site cs__post" aria-labelledby="loop-title">
           <header class="cs__post-head">
             <div class="cs__post-sxn">
-              <span class="cs__post-eyebrow">The flex, and the teach</span>
+              <span class="cs__post-eyebrow">02 / Interaction</span>
               <span class="cs__post-rule" aria-hidden="true"></span>
             </div>
-            <h2 class="cs__post-title">Brag without spoiling. Miss without losing.</h2>
-            <p class="cs__post-sub">
-              Sharing is the growth loop, so it's spoiler-free by construction:
-              colored squares and a clock, never a car name. And every miss
-              teaches the tell, so the detail you blow today is the one you nail
-              on sight tomorrow.
-            </p>
+            <h2 class="cs__post-title" id="loop-title">The photo asks the question. The reveal answers it.</h2>
           </header>
-          <div class="cs__shot-grid cs__shot-grid--phones">
+          <div class="cs__post-body">
+            <p>
+              The clue is the primary object on the play screen. The choices
+              need to stay readable, and the reveal needs to lead clearly to the
+              next car. I treat those as connected states of one round, rather
+              than separate screens to decorate.
+            </p>
+            <p>
+              The sequence below is taken from one recorded Daily. The question
+              and reveal belong to the same Toyota Camry round; the result is
+              the completed five-car run. Scores and car images are preserved
+              from the capture.
+            </p>
+          </div>
+          <div class="cs__shot-grid cs__shot-grid--screens">
             <figure class="cs__shot">
-              <img
-                src="/images/car-spotter/share.webp"
-                alt="CarSpotter result screen: 347 points, Learner level 2, and the spoiler-free share card (five coloured letter squares and a score, no car names), above a Share result button."
-                width="1290"
-                height="2796"
-                loading="lazy"
-              />
+              <a
+                class="cs__shot-link"
+                href="/images/car-spotter/2026-10/screens/question-720.webp"
+                target="_blank"
+                rel="noopener"
+              >
+                <img
+                  src="/images/car-spotter/2026-10/screens/question-720.webp"
+                  srcset="/images/car-spotter/2026-10/screens/question-480.webp 480w, /images/car-spotter/2026-10/screens/question-720.webp 720w"
+                  sizes="(min-width: 900px) 30vw, (min-width: 600px) 44vw, 88vw"
+                  alt="A Toyota Camry photographic clue with four real answer choices."
+                  width="1320"
+                  height="2868"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <span class="vhidden"> (opens in a new tab)</span>
+              </a>
               <figcaption>
-                The share card mirrors the in-app result exactly: squares,
-                letters, a clock, a tier, but never a car name. The flex is
-                honest and the round stays unspoiled.
+                Question: the photographed detail and all four choices, from the
+                recorded Camry round.
               </figcaption>
             </figure>
             <figure class="cs__shot">
-              <img
-                src="/images/car-spotter/learn.webp"
-                alt="CarSpotter miss state: a red 'Not quite' badge over a 1958 Oldsmobile 88, telling you that you picked Honda Accord, with a fact about the chrome trim that runs the length of the car."
-                width="1290"
-                height="2796"
-                loading="lazy"
-              />
+              <a
+                class="cs__shot-link"
+                href="/images/car-spotter/2026-10/screens/reveal-720.webp"
+                target="_blank"
+                rel="noopener"
+              >
+                <img
+                  src="/images/car-spotter/2026-10/screens/reveal-720.webp"
+                  srcset="/images/car-spotter/2026-10/screens/reveal-480.webp 480w, /images/car-spotter/2026-10/screens/reveal-720.webp 720w"
+                  sizes="(min-width: 900px) 30vw, (min-width: 600px) 44vw, 88vw"
+                  alt="The matching Toyota Camry reveal, marked correct, with a fact and Next action."
+                  width="1320"
+                  height="2868"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <span class="vhidden"> (opens in a new tab)</span>
+              </a>
               <figcaption>
-                Miss one and it names what you picked, then shows you the tell.
-                The game is quietly building detail literacy under the arcade.
+                Reveal: the same car shown whole, with its recorded verdict and
+                fact.
               </figcaption>
             </figure>
             <figure class="cs__shot">
-              <img
-                src="/images/car-spotter/clue2.webp"
-                alt="CarSpotter clue: a cropped headlight under the viewfinder with one second left, and four answers: Tesla Model Y, Ford Police Interceptor Utility, Cadillac XT6, Lincoln Aviator."
-                width="1290"
-                height="2796"
-                loading="lazy"
-              />
+              <a
+                class="cs__shot-link"
+                href="/images/car-spotter/2026-10/screens/results-720.webp"
+                target="_blank"
+                rel="noopener"
+              >
+                <img
+                  src="/images/car-spotter/2026-10/screens/results-720.webp"
+                  srcset="/images/car-spotter/2026-10/screens/results-480.webp 480w, /images/car-spotter/2026-10/screens/results-720.webp 720w"
+                  sizes="(min-width: 900px) 30vw, (min-width: 600px) 44vw, 88vw"
+                  alt="The completed Daily 5 result: 1,645 points, 5/5 and Q1–Q5 outcome marks."
+                  width="1320"
+                  height="2868"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <span class="vhidden"> (opens in a new tab)</span>
+              </a>
               <figcaption>
-                Twelve detail categories: headlight, taillight, grille, wheel,
-                badge, and more. The crop is the whole puzzle.
-              </figcaption>
-            </figure>
-            <figure class="cs__shot">
-              <img
-                src="/images/car-spotter/reveal2.webp"
-                alt="CarSpotter reveal after the clock ran out: an Infiniti QX60 shown whole, named simply 'Infiniti QX60', with a fact about its full-width light bar."
-                width="1290"
-                height="2796"
-                loading="lazy"
-              />
-              <figcaption>
-                Real cars, real facts, and answers named the way a person would
-                say them. No trick questions, no AI mush, no filler.
+                Results: one completed recorded run, with round outcomes and the
+                share action. This is not a business metric.
               </figcaption>
             </figure>
           </div>
-          <p class="cs__post-closing">
-            The clue stays secret, the reveal is the payoff, and the share card
-            protects both. Every surface is designed around one rule: never spoil
-            the round you want someone else to play.
+        </section>
+
+        <section id="identity" class="container-site cs__post" aria-labelledby="identity-title">
+          <header class="cs__post-head">
+            <div class="cs__post-sxn">
+              <span class="cs__post-eyebrow">03 / Identity</span>
+              <span class="cs__post-rule" aria-hidden="true"></span>
+            </div>
+            <h2 class="cs__post-title" id="identity-title">An ordinary Saturn, made unmistakably CarSpotter.</h2>
+          </header>
+          <div class="cs__post-body">
+            <p>
+              A Saturn wagon is a more personal signal for this game than a
+              generic sports-car silhouette. It reflects the kind of enthusiasm
+              behind CarSpotter: everyday cars can be recognisable and
+              interesting too.
+            </p>
+            <p>
+              The cream wagon, electric lime and dark grey surfaces give the
+              identity continuity across the home screen and marketing artwork.
+              I kept the photographic game content distinct from the illustrated
+              brand character, so the identity does not suggest a driving or
+              racing mode.
+            </p>
+          </div>
+          <figure class="cs__board">
+            <CarSpotterPicture
+              base="/images/car-spotter/2026-10/artwork/04-carspotter-brand-system"
+              alt="Approved Saturn illustration, CarSpotter wordmark, the lime, asphalt and chalk palette, and the candidate home screen."
+              width={2560}
+              height={1500}
+              class="cs__board-pic"
+            />
+            <figcaption>
+              The brand system as applied to the October 2026 home iteration.
+            </figcaption>
+          </figure>
+        </section>
+
+        <section id="results" class="container-site cs__post" aria-labelledby="results-title">
+          <header class="cs__post-head">
+            <div class="cs__post-sxn">
+              <span class="cs__post-eyebrow">04 / A clearer result</span>
+              <span class="cs__post-rule" aria-hidden="true"></span>
+            </div>
+            <h2 class="cs__post-title" id="results-title">Show the round outcome, not an internal category.</h2>
+          </header>
+          <div class="cs__post-body">
+            <p>
+              The earlier result card used letters tied to types of detail. That
+              made the summary depend on a category the player did not need to
+              know, and that the production content could not consistently
+              support.
+            </p>
+            <p>
+              The redesign uses Q1–Q5 with explicit check and miss symbols. It
+              answers a more useful question: what happened in each round? The
+              same outcome language carries into the exported card, while the car
+              names and clue photos stay out of it.
+            </p>
+            <p>
+              These are different recorded runs; the comparison documents the
+              change in visual language. Comprehension and conversion remain
+              questions for further testing.
+            </p>
+          </div>
+          <div class="cs__compare">
+            <div class="cs__compare-col">
+              <h3 class="cs__compare-label">Earlier interface</h3>
+              <figure class="cs__shot">
+                <a
+                  class="cs__shot-link"
+                  href="/images/car-spotter/2026-10/screens/earlier-share-card.webp"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  <img
+                    src="/images/car-spotter/2026-10/screens/earlier-share-card.webp"
+                    alt="Earlier result card with the geometric mark and letter-coded round tiles."
+                    width="905"
+                    height="675"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <span class="vhidden"> (opens in a new tab)</span>
+                </a>
+                <figcaption>
+                  Earlier interface. Its old mark is intentionally preserved as
+                  historical evidence.
+                </figcaption>
+              </figure>
+            </div>
+            <div class="cs__compare-col">
+              <h3 class="cs__compare-label">October 2026 candidate</h3>
+              <figure class="cs__shot">
+                <a
+                  class="cs__shot-link"
+                  href="/images/car-spotter/2026-10/screens/share-card-720.webp"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  <img
+                    src="/images/car-spotter/2026-10/screens/share-card-720.webp"
+                    srcset="/images/car-spotter/2026-10/screens/share-card-480.webp 480w, /images/car-spotter/2026-10/screens/share-card-720.webp 720w"
+                    sizes="(min-width: 720px) 42vw, 88vw"
+                    alt="Exported result for Daily 136: 5/5, 1,645 points and numbered round outcomes, with no car names."
+                    width="900"
+                    height="879"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <span class="vhidden"> (opens in a new tab)</span>
+                </a>
+                <figcaption>
+                  Candidate exported card: the result stays readable without
+                  revealing the cars.
+                </figcaption>
+              </figure>
+            </div>
+          </div>
+          <p class="cs__note">
+            Different recorded runs. This is a visual comparison, not a measured
+            performance result.
           </p>
         </section>
 
-        <section class="container-site cs__post">
+        <section id="engineering" class="container-site cs__post" aria-labelledby="engineering-title">
           <header class="cs__post-head">
             <div class="cs__post-sxn">
-              <span class="cs__post-eyebrow">The social engine</span>
+              <span class="cs__post-eyebrow">05 / Engineering judgement</span>
               <span class="cs__post-rule" aria-hidden="true"></span>
             </div>
-            <h2 class="cs__post-title">Every day authors itself into five videos.</h2>
-            <p class="cs__post-sub">
-              A daily game lives or dies on being seen daily, and hand-editing
-              five vertical videos a day is a job, not a feature. So the same
-              authored day that feeds the app feeds the renderer: five clues in,
-              five narrated 9:16 films out, cut to one beat sheet. No timeline,
-              no editor, no hand.
-            </p>
+            <h2 class="cs__post-title" id="engineering-title">Keep the game state and its content dependable.</h2>
           </header>
-          <ReelPipeline />
-          <p class="cs__post-closing">
-            The reel is the game's best second, isolated: a hook, a real
-            five-count, then the crop blooming to the whole car. It works on
-            social for the same reason it works in the app: you already think
-            you know the answer, and you have to stay to find out. Rendering is
-            headless Remotion, so a day's five come out of one command; the
-            narration is three permanent takes, so a hundred videos cost the
-            same as one.
-          </p>
+          <div class="cs__post-body">
+            <p>
+              The work extends beyond the visible screens. Game rules, saved
+              progress and media references need to remain dependable across
+              interruptions and updates. I separate game logic from presentation
+              so changes to the interface can be checked without rewriting the
+              scoring rules.
+            </p>
+            <p>
+              One earlier failure involved media references tied to an
+              installation-specific file location. The design response was to use
+              stable references and validate media before trusting it. A file
+              existing at a hash-shaped path is not enough: the bytes must be
+              checked against the expected identity.
+            </p>
+            <p>
+              For the latest interface work, the practical checks are concrete:
+              complete answer labels at larger text sizes, reachable reveal
+              actions, a usable static state with Reduce Motion, and a run that
+              can resume without losing its score. Simulator evidence and device
+              checks need to be reported separately.
+            </p>
+          </div>
         </section>
 
-        <section class="container-site cs__post cs__post--alt">
+        <section id="marketing" class="container-site cs__post cs__post--alt" aria-labelledby="marketing-title">
           <header class="cs__post-head">
             <div class="cs__post-sxn">
-              <span class="cs__post-eyebrow">The brand surface</span>
+              <span class="cs__post-eyebrow">06 / The product outside the app</span>
               <span class="cs__post-rule" aria-hidden="true"></span>
             </div>
-            <h2 class="cs__post-title">One brand, generated end to end.</h2>
-            <p class="cs__post-sub">
-              The marketing poster, the App Store screenshots, and the game all
-              speak the same midnight-arcade language. The design tokens are a
-              shared package the app and the website both compile from, and the
-              promo art comes out of a scripted ImageMagick pipeline, versioned
-              next to the code.
-            </p>
+            <h2 class="cs__post-title" id="marketing-title">Give the store artwork the same clarity as the game.</h2>
           </header>
-          <div class="cs__shot-grid">
-            <figure class="cs__shot">
-              <img
-                src="/images/car-spotter/poster.webp"
-                alt="CarSpotter portfolio poster: the headline 'Guess the car from the detail' in lime and white over a near-black wall of car photographs, beside three tilted iPhones showing a clue, the full-car reveal, and the run result."
-                width="2560"
-                height="1600"
-                loading="lazy"
-              />
-              <figcaption>
-                The poster is a script, not a file: it composites the app's own
-                marquee wall and its real screens in the app's own typefaces. Reshoot
-                the screenshots, re-run it, and the poster can't drift from the
-                product it sells.
-              </figcaption>
-            </figure>
+          <div class="cs__post-body">
+            <p>
+              I developed new store artwork around the experience itself:
+              identify a detail, see the whole car, then finish a run. The
+              Saturn-led brand artwork and the gameplay-led creative have
+              different jobs, but use the same visual system.
+            </p>
+            <p>
+              The screenshot experiment is a separate piece of work. I keep
+              visual design decisions separate from claims about acquisition: a
+              new asset is a hypothesis, and an early percentage change is not a
+              proven win. The creative examples here are not presented as
+              evidence of conversion lift.
+            </p>
+          </div>
+          <figure class="cs__board">
+            <CarSpotterPicture
+              base="/images/car-spotter/2026-10/artwork/05-carspotter-store-studies"
+              alt="Three CarSpotter creative studies showing a question, a reveal and a recorded result."
+              width={2560}
+              height={1520}
+              class="cs__board-pic"
+            />
+            <figcaption>
+              Creative studies based on real captures. No conversion lift is
+              attributed to these images.
+            </figcaption>
+          </figure>
+        </section>
+
+        <section id="reflection" class="container-site cs__post cs__post--last" aria-labelledby="reflection-title">
+          <header class="cs__post-head">
+            <div class="cs__post-sxn">
+              <span class="cs__post-eyebrow">07 / What this work taught me</span>
+              <span class="cs__post-rule" aria-hidden="true"></span>
+            </div>
+            <h2 class="cs__post-title" id="reflection-title">Simplification has to reach the data as well as the screen.</h2>
+          </header>
+          <div class="cs__post-body">
+            <p>
+              Removing category letters from the result card was useful because
+              it removed a dependency, not just because the new marks looked
+              cleaner. Preserving answer text at larger sizes matters because it
+              keeps the decision fair, not because it satisfies a screenshot
+              checklist.
+            </p>
+            <p>
+              CarSpotter remains an ongoing product. Next I want to understand
+              how people read the result, whether they return to play, and which
+              store presentation earns meaningful downloads. Those findings will
+              guide the next iteration.
+            </p>
+          </div>
+
+          <div class="cs__closing">
+            <aside class="cs__download" aria-label="Get CarSpotter">
+              <div class="cs__download-copy">
+                <h2 class="cs__download-title">Try the product.</h2>
+                <p class="cs__download-sub">
+                  The case study explains the decisions. The app lets you judge
+                  the experience.
+                </p>
+              </div>
+              <div class="cs__download-actions">
+                <AppStoreBadge href={data.appStoreUrl!} height={48} project={project.slug} cta="case-study-download-cta" />
+                {data.siteUrl && (
+                  <a
+                    class="cs__get-site"
+                    href={data.siteUrl}
+                    target="_blank"
+                    rel="noopener"
+                    data-track="cta_click"
+                    data-track-cta="case-study-download-site"
+                    data-track-project={project.slug}
+                  >
+                    {new URL(data.siteUrl).hostname}
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <path d="M3 13L13 3M13 3H5M13 3v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </a>
+                )}
+              </div>
+            </aside>
+
+            <p class="cs__credits">
+              Product decisions, design direction and implementation: Moe Qadan.
+              Coding assistants supported implementation and QA. Artwork on this
+              page combines existing approved brand art with genuine app
+              captures.
+            </p>
           </div>
         </section>
       </>
@@ -1110,7 +1381,7 @@ const categoryKey = data.category.toLowerCase();
               {next.data.category}
             </span>
             <span class="cs__next-title">{next.data.title}</span>
-            <span class="cs__next-short">{next.data.short}</span>
+            <span class="cs__next-short">{next.data.secondaryCopy?.related ?? next.data.short}</span>
           </div>
           <span class="cs__next-arrow" aria-hidden="true">
             <svg width="20" height="20" viewBox="0 0 16 16" fill="none">
@@ -1252,7 +1523,10 @@ const categoryKey = data.category.toLowerCase();
 
 
   .cs__sxn-tag--flagship {
-    color: var(--color-accent);
+    /* --color-accent is 3.05:1 on the light page — fine as a fill, not as 10px
+       text. The hover shade is the same hue at 4.83:1 and is already in the
+       token set, so no new colour enters the system. */
+    color: var(--color-accent-hover);
     background-color: var(--color-accent-dim);
     border-color: var(--color-accent-muted);
   }
@@ -1281,7 +1555,7 @@ const categoryKey = data.category.toLowerCase();
   .cs__sxn-meta {
     font-family: var(--font-body);
     font-size: 11px;
-    color: var(--color-text-subtle);
+    color: var(--color-text-muted);
   }
 
   .cs__title {
@@ -1304,18 +1578,36 @@ const categoryKey = data.category.toLowerCase();
     }
   }
 
+  /* Dek and the optional summary are one block. The gap lives here so neither
+     paragraph carries a negative margin to cancel the other's. */
+  .cs__lede {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+  }
+
+  @media (min-width: 768px) {
+    .cs__lede {
+      gap: var(--space-5);
+      margin-bottom: var(--space-10);
+    }
+  }
+
   .cs__short {
     font-size: clamp(16px, 1.8vw, 21px);
     line-height: 1.55;
     color: var(--color-text-muted);
     max-width: 56ch;
-    margin-bottom: var(--space-8);
   }
 
-  @media (min-width: 768px) {
-    .cs__short {
-      margin-bottom: var(--space-10);
-    }
+  /* Long-form hero summary — optional, and only rendered when the project
+     record carries one. Sits under the dek, above the facts. */
+  .cs__summary {
+    font-size: clamp(15px, 1.4vw, 17px);
+    line-height: 1.7;
+    color: var(--color-text-muted);
+    max-width: 66ch;
   }
 
   .cs__meta {
@@ -1323,13 +1615,18 @@ const categoryKey = data.category.toLowerCase();
     padding-top: var(--space-6);
     border-top: 1px solid var(--color-border);
     display: flex;
-    gap: var(--space-6);
     flex-wrap: wrap;
+    /* Wrapped fact rows need a tighter row rhythm than the column rhythm:
+       48px between two facts on one row is air, 48px between stacked rows
+       is a gap that reads as missing content. */
+    row-gap: var(--space-4);
+    column-gap: var(--space-6);
   }
 
   @media (min-width: 768px) {
     .cs__meta {
-      gap: var(--space-12);
+      row-gap: var(--space-6);
+      column-gap: var(--space-12);
       padding-top: var(--space-8);
     }
   }
@@ -1344,7 +1641,10 @@ const categoryKey = data.category.toLowerCase();
     font-family: var(--font-body);
     font-size: 11px;
     font-weight: 600;
-    color: var(--color-text-subtle);
+    /* Was --color-text-subtle: 2.45:1 on the light page, 4.14:1 on the dark
+       one. These are the labels for Role / Period / Scope — informational
+       text, not decoration, so they have to clear 4.5:1. */
+    color: var(--color-text-muted);
   }
 
   .cs__meta dd { margin: 0; }
@@ -1366,9 +1666,10 @@ const categoryKey = data.category.toLowerCase();
   }
 
   .cs__meta li + li::before {
-    content: '·';
-    margin-right: 14px;
-    color: var(--color-border);
+    /* No separator glyph: the list already has a 14px column gap, and a
+       ::before lives inside the <li>, so when an item wrapped the dot and its
+       margin started the new line and indented the label. */
+    content: none;
   }
 
   .cs__meta-text {
@@ -1379,12 +1680,18 @@ const categoryKey = data.category.toLowerCase();
   }
 
   .cs__meta-text--status {
-    color: var(--color-success);
+    /* --color-success (#059669) is 3.60:1 on the light page — fine for the dot,
+       not for 12px text. #047857 is the same green at 5.20:1. */
+    color: #047857;
     font-family: var(--font-body);
     font-size: 12px;
     display: inline-flex;
     align-items: center;
     gap: 6px;
+  }
+
+  :global([data-theme="dark"]) .cs__meta-text--status {
+    color: #34D399;
   }
 
   .cs__status-dot {
@@ -1424,6 +1731,9 @@ const categoryKey = data.category.toLowerCase();
     display: inline-flex;
     align-items: center;
     gap: 7px;
+    /* 24px minimum tap height — the label is 12px, so the padding carries it. */
+    min-height: 24px;
+    padding-block: 4px;
     font-family: var(--font-body);
     font-size: 12px;
     color: var(--color-text-muted);
@@ -1590,6 +1900,23 @@ const categoryKey = data.category.toLowerCase();
   @media (min-width: 768px) {
     .cs__cover-wrap {
       padding-top: var(--space-10);
+      padding-bottom: var(--space-12);
+    }
+  }
+
+  /* Release state + jump list, immediately under the cover. The note earns
+     its own row so it reads before the reader starts scrolling; the nav is a
+     hairline rule, not a card. */
+  .cs__context {
+    padding-bottom: var(--space-6);
+  }
+
+  .cs__navwrap {
+    padding-bottom: var(--space-10);
+  }
+
+  @media (min-width: 768px) {
+    .cs__navwrap {
       padding-bottom: var(--space-12);
     }
   }
@@ -1883,6 +2210,174 @@ const categoryKey = data.category.toLowerCase();
   .cs__shot--full {
     max-width: 1100px;
     margin-inline: auto;
+  }
+
+  /* ─── CarSpotter 2026-10 narrative ───────────────────────────────────
+     Everything below is scoped to the case-study body and reuses the
+     existing plate vocabulary (.cs__shot, .cs__post). No new type sizes, no
+     new colour: the only addition is layout for sequences and comparisons
+     that the other case studies never needed. */
+
+  /* Anchor targets have to clear the fixed site header. */
+  .cs__post[id] {
+    scroll-margin-top: calc(64px + var(--space-6));
+  }
+
+  /* The first section follows the jump list, so it does not open with a
+     second rule directly under one. */
+  .cs__post--first {
+    border-top: none;
+    padding-top: var(--space-8);
+  }
+
+  @media (min-width: 768px) {
+    .cs__post--first {
+      padding-top: var(--space-12);
+    }
+  }
+
+  .cs__post--last {
+    padding-bottom: var(--space-16);
+  }
+
+  /* Multi-paragraph body copy. 66ch holds the measure inside the site's
+     <80ch line while matching .cs__post-sub. */
+  .cs__post-body {
+    max-width: 66ch;
+  }
+
+  .cs__post-body p {
+    font-size: clamp(15px, 1.5vw, 17px);
+    line-height: 1.75;
+    color: var(--color-text-muted);
+    margin: 0 0 var(--space-4);
+  }
+
+  .cs__post-body p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* The plate is the link, so the whole screenshot is the target and the
+     focus ring hugs the plate instead of the glyph. */
+  .cs__shot-link {
+    display: block;
+    border-radius: var(--radius-lg);
+  }
+
+  .cs__shot-link:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+  }
+
+  /* Two phones side by side once there is room for both at a readable size. */
+  .cs__shot-grid--duo {
+    max-width: 720px;
+    margin-top: var(--space-10);
+  }
+
+  @media (min-width: 720px) {
+    .cs__shot-grid--duo {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-8);
+    }
+  }
+
+  /* One recorded round in three states. Below 640 it stacks to a single
+     readable column; from 640 it goes three-up rather than two-up, so the
+     third screen is never orphaned on its own row. */
+  .cs__shot-grid--screens {
+    margin-top: var(--space-10);
+  }
+
+  @media (min-width: 640px) {
+    .cs__shot-grid--screens {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-4);
+    }
+  }
+
+  @media (min-width: 900px) {
+    .cs__shot-grid--screens {
+      gap: var(--space-6);
+    }
+  }
+
+  /* Full-width artwork board. */
+  .cs__board {
+    margin: var(--space-10) 0 0;
+  }
+
+  .cs__board .cs__board-pic {
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-elevated);
+    box-shadow: var(--shadow-card);
+  }
+
+  .cs__board figcaption {
+    margin-top: var(--space-3);
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--color-text-muted);
+    max-width: 60ch;
+  }
+
+  /* Historical versus candidate. Two labelled figures, not a slider: the
+     labels carry the comparison and both plates stay full-size and legible. */
+  .cs__compare {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+    margin-top: var(--space-10);
+  }
+
+  @media (min-width: 760px) {
+    .cs__compare {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-12);
+    }
+  }
+
+  .cs__compare-col {
+    min-width: 0;
+  }
+
+  .cs__compare-label {
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    /* Informational label, so --color-text-subtle's 2.45:1 does not clear AA. */
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-4);
+  }
+
+  .cs__note {
+    margin-top: var(--space-6);
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    max-width: 62ch;
+  }
+
+  .cs__closing {
+    margin-top: var(--space-12);
+    max-width: 720px;
+  }
+
+  .cs__closing .cs__download {
+    margin-top: 0;
+  }
+
+  .cs__credits {
+    margin-top: var(--space-8);
+    font-size: 12px;
+    line-height: 1.7;
+    /* 2.45:1 at --color-text-subtle was too faint to read as a credit line. */
+    color: var(--color-text-muted);
+    max-width: 70ch;
   }
 
   /* Prose */

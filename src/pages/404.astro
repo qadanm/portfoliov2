@@ -157,7 +157,10 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
 
   .nf__link {
     display: grid;
-    grid-template-columns: 28px 1fr auto;
+    /* Two children: the body (title + sub) and the arrow. The leading 28px
+       number column had no element in it, so the body was laid into 28px and
+       every description wrapped to one word per line. */
+    grid-template-columns: 1fr auto;
     gap: var(--space-3);
     align-items: center;
     padding: var(--space-4) 0;
@@ -171,7 +174,7 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
 
   @media (min-width: 600px) {
     .nf__link {
-      grid-template-columns: 36px 1fr auto;
+      grid-template-columns: 1fr auto;
       gap: var(--space-4);
       padding: var(--space-5) 0;
     }
@@ -181,8 +184,10 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
     padding-left: 8px;
   }
 
-
-  .nf__link:hover
+  /* This rule was written as `.nf__link:hover` <newline> `.nf__link-body`,
+     which CSS parses as a descendant selector — so the body only became a
+     flex column while the row was hovered, and the title and description
+     ran together on one line the rest of the time. */
   .nf__link-body {
     display: flex;
     flex-direction: column;

@@ -2,6 +2,14 @@
 import BaseLayout from '@/components/layout/BaseLayout.astro';
 import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
 import AIFlow from '@/components/diagrams/AIFlow.astro';
+import { getCollection } from 'astro:content';
+
+// The CarSpotter example card reads the project record — image, alt and note —
+// so the Approach page and the case study cannot tell different stories.
+const carSpotter = (await getCollection('build')).find(p => p.slug === 'car-spotter');
+const cs = carSpotter?.data;
+// The grid wants the 1600px rung of the cover ladder, not the 2560 master.
+const carSpotterCard = cs?.coverImage?.replace(/-\d+\.webp$/, '-1600.webp');
 
 const projects = [
   {
@@ -30,10 +38,10 @@ const projects = [
   },
   {
     slug: 'car-spotter',
-    title: 'CarSpotter',
-    note: 'A daily car-spotting game for enthusiasts: five details, four answers, ten seconds. Designed and engineered solo for iOS.',
-    src: '/images/car-spotter/poster.webp',
-    alt: 'CarSpotter portfolio poster: tilted iPhone screenshots of the daily car-detail guessing game on a dark garage backdrop.',
+    title: cs?.title ?? 'CarSpotter',
+    note: cs?.secondaryCopy?.approach ?? 'An independent iPhone game where I connect product decisions, interface design, game state and content tooling.',
+    src: carSpotterCard ?? '/images/car-spotter/2026-10/artwork/01-carspotter-portfolio-hero-1600.webp',
+    alt: cs?.coverAlt ?? 'CarSpotter’s Saturn identity beside a genuine car-detail question and the matching reveal.',
     category: 'flagship',
   },
   {

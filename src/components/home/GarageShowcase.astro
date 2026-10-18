@@ -9,15 +9,34 @@
 // (::after covers the card) so the App Store badge and site link can be
 // real anchors without nesting <a> inside <a>.
 import AppStoreBadge from '@/components/AppStoreBadge.astro';
+import { getCollection } from 'astro:content';
+
+// One record. The CarSpotter card reads the content collection rather than
+// keeping its own copy of the name, the summary, the feature chips, the cover
+// art, the release state or the outbound links — those all live in
+// src/content/build/car-spotter.mdx, which is also what the case study, the
+// work index, About, Approach and the next-project link read. Change it there
+// or not at all.
+const carSpotter = (await getCollection('build')).find(p => p.slug === 'car-spotter');
+const cs = carSpotter?.data;
+
+// The responsive ladder is addressed by base path (`…-640.webp`, `…-960.webp`).
+const stripWidth = (path?: string) => path?.replace(/-\d+\.webp$/, '');
 
 const apps = {
   carspotter: {
     href: '/work/car-spotter',
-    appStore: 'https://apps.apple.com/app/carspotter-daily-car-game/id6777868215',
-    site: 'https://carspottergame.com',
-    siteLabel: 'carspottergame.com',
-    poster: '/images/car-spotter/poster.webp',
-    alt: 'CarSpotter portfolio poster. The headline "Guess the car from the detail" in lime and white over a near-black wall of car photographs, beside three tilted iPhones showing a clue, the full-car reveal, and the run result.',
+    appStore: cs?.appStoreUrl ?? 'https://apps.apple.com/app/carspotter-daily-car-game/id6777868215',
+    site: cs?.siteUrl ?? 'https://carspottergame.com',
+    siteLabel: new URL(cs?.siteUrl ?? 'https://carspottergame.com').hostname,
+    base: stripWidth(cs?.coverImage) ?? '/images/car-spotter/2026-10/artwork/01-carspotter-portfolio-hero',
+    mobileBase: stripWidth(cs?.coverMobileImage) ?? '/images/car-spotter/2026-10/artwork/01-carspotter-portfolio-hero-mobile',
+    alt: cs?.coverAlt ?? 'CarSpotter’s Saturn identity beside a genuine car-detail question and the matching reveal.',
+    name: cs?.title ?? 'CarSpotter',
+    description: cs?.cardDescription ?? cs?.short ?? 'A daily car-identification game, designed and built end to end.',
+    chips: cs?.keyFocus ?? ['Daily 5', 'Quick Practice', 'Spoiler-free results'],
+    release: cs?.releaseNote ?? '',
+    releaseTag: cs?.releaseStatus === 'verified-live' ? 'Released' : 'Release candidate',
   },
   vinly: {
     href: '/work/vinly',
@@ -71,7 +90,27 @@ const apps = {
       <span class="garage__hero-corner garage__hero-corner--br" aria-hidden="true"></span>
 
       <div class="garage__hero-media">
-        <img src={apps.carspotter.poster} alt={apps.carspotter.alt} width="2560" height="1600" loading="lazy" decoding="async" />
+        <picture class="garage__hero-picture">
+          <source
+            media="(max-width: 639px)"
+            type="image/webp"
+            srcset={`${apps.carspotter.mobileBase}-640.webp 640w, ${apps.carspotter.mobileBase}-960.webp 960w, ${apps.carspotter.mobileBase}-1600.webp 1600w`}
+            sizes="calc(100vw - 40px)"
+          />
+          <source
+            type="image/webp"
+            srcset={`${apps.carspotter.base}-640.webp 640w, ${apps.carspotter.base}-960.webp 960w, ${apps.carspotter.base}-1600.webp 1600w, ${apps.carspotter.base}-2560.webp 2560w`}
+            sizes="(min-width: 880px) 55vw, calc(100vw - 40px)"
+          />
+          <img
+            src={`${apps.carspotter.base}-1600.webp`}
+            alt={apps.carspotter.alt}
+            width="2560"
+            height="1600"
+            loading="lazy"
+            decoding="async"
+          />
+        </picture>
         <span class="garage__hero-redline" aria-hidden="true"></span>
       </div>
 
@@ -90,16 +129,12 @@ const apps = {
           </a>
           <span class="garage__hero-kind">iOS · daily game</span>
         </div>
-        <h3 class="garage__hero-name">CarSpotter</h3>
-        <p class="garage__hero-desc">
-          The daily car-spotting game. Five cropped details, four answers,
-          ten seconds, for the people who know the car before the badge
-          shows up.
-        </p>
+        <h3 class="garage__hero-name">{apps.carspotter.name}</h3>
+        <p class="garage__hero-desc">{apps.carspotter.description}</p>
         <ul class="garage__spec">
-          <li><span>Daily 5</span></li>
-          <li><span>12 detail types</span></li>
-          <li><span>Spoiler-free share</span></li>
+          {apps.carspotter.chips.map(chip => (
+            <li><span>{chip}</span></li>
+          ))}
         </ul>
         <a
           href={apps.carspotter.href}
@@ -132,6 +167,16 @@ const apps = {
         </div>
       </div>
     </article>
+
+    {/* The cover contains captures from a build that is not proven public
+        yet. One sentence, under the card, so the image is never presented as
+        the shipped version. */}
+    {apps.carspotter.release && (
+      <p class="garage__release">
+        <span class="garage__release-tag">{apps.carspotter.releaseTag}</span>
+        <span class="garage__release-text">{apps.carspotter.release}</span>
+      </p>
+    )}
 
     {/* ── 2-up: VINly + ChatOBD2 ───────────────────────────────────── */}
     <div class="garage__pair">
@@ -392,7 +437,9 @@ const apps = {
     font-family: var(--font-body);
     font-size: 10px;
     font-weight: 600;
-    padding: 4px 9px;
+    padding: 5px 10px;
+    /* 24px minimum touch height (WCAG 2.5.8); the 10px label cannot carry it. */
+    min-height: 24px;
     border-radius: 9999px;
     line-height: 1;
   }
@@ -456,12 +503,22 @@ const apps = {
   .garage__hero-media {
     position: relative;
     overflow: hidden;
-    aspect-ratio: 16 / 10;
+    /* The portrait companion is 4:5, so the phone keeps a portrait frame
+       instead of cropping the desktop poster. */
+    aspect-ratio: 4 / 5;
     background: #0B0C0E;
     border-bottom: 1px solid var(--color-border);
   }
+  @media (min-width: 640px) {
+    .garage__hero-media { aspect-ratio: 16 / 10; }
+  }
   @media (min-width: 880px) {
     .garage__hero-media { border-bottom: none; border-right: 1px solid var(--color-border); aspect-ratio: auto; }
+  }
+  .garage__hero-picture {
+    position: absolute;
+    inset: 0;
+    display: block;
   }
   .garage__hero-media img {
     position: absolute;
@@ -474,6 +531,14 @@ const apps = {
     will-change: transform;
   }
   .garage__hero:hover .garage__hero-media img { transform: scale(1.035); }
+
+  /* Two columns means the image no longer owns the row height, and this cover
+     is a composed board: cropping it to fill would cut into the Saturn and the
+     phone stack. Contain keeps the whole poster; the artwork's own near-black
+     edge means the letterbox reads as breathing room, not a band. */
+  @media (min-width: 880px) {
+    .garage__hero-media img { object-fit: contain; object-position: center; }
+  }
 
   /* redline sweep that flares on hover */
   .garage__hero-redline {
@@ -596,6 +661,8 @@ const apps = {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    min-height: 24px;
+    padding-block: 4px;
     font-family: var(--font-body);
     font-size: 11px;
     color: var(--color-text-subtle);
@@ -605,6 +672,35 @@ const apps = {
   .garage__site:hover { color: var(--color-text); }
   .garage__site svg { transition: transform 240ms var(--ease-out); }
   .garage__site:hover svg { transform: translate(2px, -2px); }
+
+  /* Release context under the hero card. The tag carries the qualifier so the
+     sentence itself can stay plain. */
+  .garage__release {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 0 0 var(--space-8);
+    padding-inline-start: 14px;
+    border-inline-start: 3px solid var(--lime);
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    max-width: 76ch;
+  }
+  @media (min-width: 880px) {
+    .garage__release { margin-bottom: var(--space-10); }
+  }
+  .garage__release-tag {
+    flex: none;
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text);
+  }
+  .garage__release-text { flex: 1 1 20ch; min-width: 0; }
 
   /* ─── 2-up: VINly + ChatOBD2 ────────────────────────────────────── */
   .garage__pair {
@@ -673,7 +769,7 @@ const apps = {
     color: var(--color-text-subtle);
   }
   .garage__app--vinly .garage__app-tags .garage__chip--flag,
-  .garage__app--vinly .garage__app-tags .garage__chip--dl { background: #EA580C; color: #FFF7ED; box-shadow: 0 0 14px rgba(234, 88, 12, 0.35); }
+  .garage__app--vinly .garage__app-tags .garage__chip--dl { background: #C2410C; color: #FFF7ED; box-shadow: 0 0 14px rgba(194, 65, 12, 0.35); }
   .garage__app--vinly .garage__app-tags .garage__chip--dl:hover { box-shadow: 0 0 18px rgba(234, 88, 12, 0.55); }
   .garage__app--vinly .garage__app-tags .garage__chip--dl:focus-visible { outline-color: #EA580C; }
   .garage__app-name {
@@ -715,9 +811,11 @@ const apps = {
 
   /* ─── Open-source band: elmulator ───────────────────────────────── */
   .garage__chip--oss {
-    color: #EAF2FF;
-    background: #2f81f7;
-    box-shadow: 0 0 14px rgba(47, 129, 247, 0.4);
+    /* #EAF2FF on #1F6FEB is 4.11:1 at 10px; pure white on the same fill is
+       4.63:1, so the chip keeps GitHub's blue and only the label brightens. */
+    color: #FFFFFF;
+    background: #1F6FEB;
+    box-shadow: 0 0 14px rgba(31, 111, 235, 0.4);
   }
 
   .garage__oss {
