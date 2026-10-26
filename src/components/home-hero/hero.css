@@ -115,13 +115,13 @@
 }
 /* Duo's 594x368 and other narrow landscape frames need their own compaction. */
 @media (orientation: landscape) and (max-height: 500px) and (max-width: 759px) {
-  .qh { padding-block: calc(var(--qh-header-offset, 52px) + 16px) 32px; }
-  .qh__grid { gap: 24px; }
-  .qh__identity { margin-bottom: 16px; }
-  .qh__title { font-size: clamp(32px, 7.2vw, 48px); }
-  .qh__title-finish { font-size: clamp(52px, 12vw, 80px); }
-  .qh__lead { margin-top: 16px; }
-  .qh__actions { margin-top: 16px; }
+  .qh { padding-block: calc(var(--qh-header-offset, 52px) + 8px) 28px; }
+  .qh__grid { gap: 20px; }
+  .qh__identity { margin-bottom: 8px; }
+  .qh__title { font-size: clamp(30px, 6.4vw, 40px); }
+  .qh__title-finish { font-size: clamp(48px, 10.8vw, 64px); }
+  .qh__lead { margin-top: 10px; font-size: 15px; line-height: 1.45; }
+  .qh__actions { margin-top: 10px; }
 }
 @media (forced-colors: active) {
   .qh__title-finish, .qh__control svg { color: LinkText; }
