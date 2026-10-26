@@ -1,20 +1,20 @@
 ---
 title: MagTek Platform
-short: UX and frontend systems across a multi-site enterprise platform built on a long-running ASP.NET MVC stack
+short: 100% full-stack ownership across a multi-site enterprise platform built on a long-running ASP.NET MVC stack
 category: Platform work
 keyFocus:
-  - Platform-level UX
-  - Frontend systems
+  - Full-stack platform ownership
+  - Razor component systems
   - System evolution under constraints
-role: UX engineering & frontend systems
+role: Full-stack Platform Ownership
 period: Current
 status: Live, ongoing
-scope: ~11 sites on shared platform, ~85% of frontend ownership
+scope: All 11 sites on the shared platform, 100% full-stack ownership
 facts:
   - label: Sites on shared platform
     value: '11'
-  - label: Frontend ownership
-    value: '~85%'
+  - label: Full-stack ownership
+    value: '100%'
   - label: Shared components built
     value: '100+'
   - label: Component substrate
@@ -40,7 +40,7 @@ stack:
   - JavaScript / jQuery
   - Bootstrap
   - Component-based design systems
-roleShort: UX engineering & frontend systems
+roleShort: Full-stack Platform Ownership
 coverCaption: MagTek · multi-site platform homepage and metric story.
 coverWidth: 3434
 coverHeight: 2166
@@ -51,11 +51,17 @@ ogAlt: MagTek Platform / Moe Qadan
 
 ## The setting
 
-I operate across most of MagTek's web platform: MagTek.com and a network of related sites built on the same architecture. The platform is a long-running ASP.NET MVC system that can't be rewritten. It has to be understood, stabilized, and evolved in place. That's the actual job.
+I own 100% of the full stack across all eleven MagTek sites on the shared platform: MagTek.com, Magensa, the hardware product line, the support portal, and the related properties. The platform is a long-running ASP.NET MVC system that can't be rewritten. It has to be understood, stabilized, and evolved in place. That's the actual job.
+
+## The full stack
+
+The ownership is not a frontend layer sitting on someone else's application code. The sites run on ASP.NET MVC and C#; I work across the application layer, Razor views and typed partials, Entity Framework data access, the CSS and design-token layer, front-end behavior, and production migrations. A change that needs a controller, a view model, a query, a template, or a stylesheet stays in the same workstream.
+
+That matters because the platform is production-critical. The job is not to replace the stack with a new one. It is to keep the existing stack coherent while it changes underneath live traffic.
 
 ## What "platform-level" actually means
 
-A single change has to land across more than one product surface without breaking the others. The design problem is rarely "this page". It's "this pattern, applied to every page that already exists, and every page that doesn't yet."
+A single change has to land across more than one product surface, and often across the application and presentation layers at once, without breaking the others. The design problem is rarely "this page". It's "this pattern, applied to every page that already exists, and every page that doesn't yet."
 
 In practice that means:
 
@@ -85,7 +91,7 @@ Most of the work was less about authoring new components and more about extracti
 
 ## Modernization at the system level
 
-Every public surface across MagTek and the related sites runs on the components, tokens, layout primitives, and conventions I built and own. A change at the system level propagates everywhere at once. A new visual treatment lands across the whole platform without a single per-page edit. A renamed prop is a compile-time error in every consumer until it's fixed.
+Every public surface across MagTek and the related sites runs on the application layer, components, tokens, layout primitives, and conventions I built and own. A change at the system level propagates everywhere at once. A new visual treatment lands across the whole platform without a single per-page edit. A renamed prop is a compile-time error in every consumer until it's fixed.
 
 Mechanically:
 
