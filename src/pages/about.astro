@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@/components/layout/BaseLayout.astro';
+import CarSpotterWall from '@/components/carspotter/CarSpotterWall.astro';
 import { getCollection } from 'astro:content';
 
 // The CarSpotter timeline entry reads the project record rather than keeping
@@ -119,6 +120,8 @@ const carSpotterAbout =
 
           <ol class="about__career">
             <li class="about__career-item about__career-item--current about__career-item--flagship">
+              <CarSpotterWall rows={10} tile={64} mobileTile={48} />
+              <span class="about__career-scrim" aria-hidden="true"></span>
               <span class="about__career-corner about__career-corner--tl" aria-hidden="true"></span>
               <span class="about__career-corner about__career-corner--tr" aria-hidden="true"></span>
               <span class="about__career-corner about__career-corner--bl" aria-hidden="true"></span>
@@ -1012,6 +1015,24 @@ const carSpotterAbout =
     transition: color 200ms var(--ease-out);
   }
   .about__career-links a:hover { color: var(--color-text); }
+
+  .about__career-item > header,
+  .about__career-item > p {
+    position: relative;
+    z-index: 1;
+  }
+
+  .about__career-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: rgba(250, 250, 249, 0.90);
+  }
+
+  :global([data-theme="dark"]) .about__career-scrim {
+    background: rgba(12, 12, 14, 0.86);
+  }
 
   .about__career-stack {
     position: relative;
