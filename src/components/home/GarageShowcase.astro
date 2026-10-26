@@ -10,6 +10,7 @@
 // real anchors without nesting <a> inside <a>.
 import AppStoreBadge from '@/components/AppStoreBadge.astro';
 import VinplainPoster from '@/components/artifacts/VinplainPoster.astro';
+import CarSpotterWall from '@/components/carspotter/CarSpotterWall.astro';
 import { getCollection } from 'astro:content';
 
 // One record. The CarSpotter card reads the content collection rather than
@@ -123,6 +124,9 @@ const apps = {
       </div>
 
       <div class="garage__hero-body">
+        <CarSpotterWall rows={7} tile={96} mobileTile={64} />
+        <span class="garage__hero-scrim" aria-hidden="true"></span>
+        <div class="garage__hero-copy">
         <div class="garage__hero-tags">
           <a
             class="garage__chip garage__chip--dl"
@@ -172,6 +176,7 @@ const apps = {
               <path d="M3 13L13 3M13 3H5M13 3v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </a>
+        </div>
         </div>
       </div>
     </article>
@@ -662,13 +667,32 @@ const apps = {
   .garage__hero-corner--br { bottom: 12px; right: 12px; border-left: none; border-top: none; }
 
   .garage__hero-body {
+    position: relative;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
     padding: var(--space-7) var(--space-6);
   }
   @media (min-width: 880px) {
     .garage__hero-body { padding: var(--space-10) var(--space-8); justify-content: center; }
+  }
+  .garage__hero-copy {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+  .garage__hero-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: rgba(250, 250, 249, 0.90);
+    transition: background-color 320ms var(--ease-out);
+  }
+  :global([data-theme="dark"]) .garage__hero-scrim {
+    background: rgba(12, 12, 14, 0.86);
   }
 
   .garage__hero-tags { display: flex; align-items: center; gap: 10px; }
@@ -907,15 +931,15 @@ const apps = {
 
   /* ─── Open-source band: elmulator ───────────────────────────────── */
   .garage__chip--oss {
-    /* #EAF2FF on #1F6FEB is 4.11:1 at 10px; pure white on the same fill is
-       4.63:1, so the chip keeps GitHub's blue and only the label brightens. */
     color: #FFFFFF;
-    background: #1F6FEB;
-    box-shadow: 0 0 14px rgba(31, 111, 235, 0.4);
+    background: var(--oss-accent);
+    box-shadow: 0 0 14px rgba(var(--oss-rgb), 0.4);
   }
 
   .garage__oss {
     --oss-rgb: 47, 129, 247;
+    --oss-accent: #2f81f7;
+    --oss-cta: #66a6ff;
     position: relative;
     display: grid;
     grid-template-columns: 1fr;
@@ -928,6 +952,16 @@ const apps = {
     transition: border-color 360ms var(--ease-out), box-shadow 360ms var(--ease-out), transform 360ms var(--ease-out);
     will-change: transform;
   }
+
+  /* vinplain carries its own red, not elmulator's GitHub blue. */
+  .garage__oss--vinplain {
+    --oss-rgb: 215, 38, 30;
+    --oss-accent: #D7261E;
+    --oss-cta: #FF6B5A;
+  }
+
+  :global([data-theme="light"]) .garage__oss { --oss-cta: #0969da; }
+  :global([data-theme="light"]) .garage__oss--vinplain { --oss-cta: #B91C1C; }
   @media (min-width: 880px) {
     .garage__oss { grid-template-columns: 1.32fr 1fr; }
   }
@@ -946,8 +980,8 @@ const apps = {
   }
   .garage__oss:hover .garage__oss-poster { transform: scale(1.03); }
 
-  .garage__oss-corner { border-color: rgba(47, 129, 247, 0); }
-  .garage__oss:hover .garage__oss-corner { border-color: #2f81f7; }
+  .garage__oss-corner { border-color: rgba(var(--oss-rgb), 0); }
+  .garage__oss:hover .garage__oss-corner { border-color: var(--oss-accent); }
 
   .garage__oss-media {
     position: relative;
@@ -991,12 +1025,11 @@ const apps = {
   }
 
   .garage__spec--oss li::before {
-    background: #2f81f7;
-    box-shadow: 0 0 6px rgba(47, 129, 247, 0.6);
+    background: var(--oss-accent);
+    box-shadow: 0 0 6px rgba(var(--oss-rgb), 0.6);
   }
 
-  .garage__oss:hover .garage__cta { color: #66a6ff; }
-  :global([data-theme="light"]) .garage__oss:hover .garage__cta { color: #0969da; }
+  .garage__oss:hover .garage__cta { color: var(--oss-cta); }
   .garage__oss:hover .garage__cta svg { transform: translate(3px, -3px); }
 
   .garage__site--strong {

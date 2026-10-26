@@ -14,6 +14,7 @@ import AdvisorVisual from '@/components/diagrams/AdvisorVisual.astro';
 import ReadingProgress from '@/components/ReadingProgress.astro';
 import CaseStudyMobileBar from '@/components/work/CaseStudyMobileBar.astro';
 import CarSpotterPicture from '@/components/work/CarSpotterPicture.astro';
+import CarSpotterWall from '@/components/carspotter/CarSpotterWall.astro';
 import ReleaseContext from '@/components/work/ReleaseContext.astro';
 import CaseStudyNav from '@/components/work/CaseStudyNav.astro';
 import AppStoreBadge from '@/components/AppStoreBadge.astro';
@@ -63,6 +64,7 @@ const coverMobileBase = data.coverMobileImage?.replace(/-\d+\.webp$/, '');
 const carSpotterSections = [
   { href: '#premise', label: 'The product decision' },
   { href: '#loop', label: 'Interaction' },
+  { href: '#wall', label: 'The wall' },
   { href: '#identity', label: 'Identity' },
   { href: '#results', label: 'A clearer result' },
   { href: '#engineering', label: 'Engineering judgement' },
@@ -841,6 +843,21 @@ const categoryKey = data.category.toLowerCase();
           </div>
         </section>
 
+        <section id="wall" class="cs__wall" aria-labelledby="wall-title">
+          <CarSpotterWall rows={7} tile={112} mobileTile={72} />
+          <span class="cs__wall-scrim" aria-hidden="true"></span>
+          <div class="container-site cs__wall-copy">
+            <div class="cs__wall-top">
+              <span class="cs__wall-eyebrow">The wall</span>
+              <span class="cs__wall-meta">43 photos / always moving</span>
+            </div>
+            <div class="cs__wall-bottom">
+              <h2 class="cs__wall-title" id="wall-title">The question is a crop. The wall is the whole car.</h2>
+              <p class="cs__wall-caption">Real car photography, tiled and always moving behind the game. The daily question is a crop; the reveal gives the car back.</p>
+            </div>
+          </div>
+        </section>
+
         <section id="identity" class="container-site cs__post" aria-labelledby="identity-title">
           <header class="cs__post-head">
             <div class="cs__post-sxn">
@@ -1402,12 +1419,18 @@ const categoryKey = data.category.toLowerCase();
 
         <a
           href={`/work/${next.slug}`}
-          class="cs__next"
+          class:list={['cs__next', next.slug === 'car-spotter' && 'cs__next--carspotter']}
           data-track="cta_click"
           data-track-cta="next-project"
           data-track-project={next.slug}
           data-track-from={project.slug}
         >
+          {next.slug === 'car-spotter' && (
+            <>
+              <CarSpotterWall rows={7} tile={56} mobileTile={40} />
+              <span class="cs__next-scrim" aria-hidden="true"></span>
+            </>
+          )}
           <span class="cs__next-corner cs__next-corner--tl" aria-hidden="true"></span>
           <span class="cs__next-corner cs__next-corner--tr" aria-hidden="true"></span>
           <span class="cs__next-corner cs__next-corner--bl" aria-hidden="true"></span>
@@ -1481,6 +1504,7 @@ const categoryKey = data.category.toLowerCase();
   .cs--vinly               { --plane: #EA580C; --ink: #1A120B; }  /* VinlyArtifact */
   .cs--chatobd2            { --plane: #F59E0B; --ink: #1F1408; }  /* VerdictArtifact — check-engine amber */
   .cs--elmulator           { --plane: #0969DA; --ink: #FFFFFF; }  /* ElmulatorArtifact — GitHub blue; it ships on the Marketplace */
+  .cs--vinplain            { --plane: #D7261E; --ink: #FFFFFF; }  /* vinplain — the public-record red */
   .cs--magtek-platform     { --plane: #1E40AF; --ink: #FFFFFF; }  /* PlatformArtifact */
   .cs--financial-platforms { --plane: #0E1A33; --ink: #FFFFFF; }  /* AdvisorArtifact */
 
@@ -2558,6 +2582,24 @@ const categoryKey = data.category.toLowerCase();
     opacity: 1;
   }
 
+  .cs__next-meta,
+  .cs__next-arrow {
+    position: relative;
+    z-index: 1;
+  }
+
+  .cs__next-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: rgba(250, 250, 249, 0.90);
+  }
+
+  :global([data-theme="dark"]) .cs__next-scrim {
+    background: rgba(12, 12, 14, 0.86);
+  }
+
   .cs__next-corner {
     position: absolute;
     width: 10px;
@@ -2703,5 +2745,116 @@ const categoryKey = data.category.toLowerCase();
 
   .cs__btn-primary:hover svg {
     transform: translateX(2px);
+  }
+
+  /* ── CarSpotter wall interlude ─────────────────────────────────────── */
+  .cs__wall {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: stretch;
+    min-height: 600px;
+    padding-block: var(--space-16);
+    background: #08090B;
+    color: #F5F3EC;
+  }
+
+  .cs__wall-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(90deg, rgba(8, 9, 11, 0.94) 0%, rgba(8, 9, 11, 0.72) 55%, rgba(8, 9, 11, 0.38) 100%),
+      linear-gradient(180deg, rgba(8, 9, 11, 0.2), rgba(8, 9, 11, 0.55));
+  }
+
+  .cs__wall-copy {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-16);
+    min-height: 100%;
+  }
+
+  .cs__wall-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .cs__wall-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #C8FF00;
+  }
+
+  .cs__wall-top::after {
+    content: '';
+    flex: 1;
+    max-width: 160px;
+    height: 1px;
+    background: rgba(245, 243, 236, 0.24);
+  }
+
+  .cs__wall-meta {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(245, 243, 236, 0.55);
+    white-space: nowrap;
+  }
+
+  .cs__wall-bottom {
+    max-width: 760px;
+  }
+
+  .cs__wall-title {
+    font-family: var(--font-display);
+    font-size: clamp(38px, 6vw, 68px);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.025em;
+    color: #F5F3EC;
+    max-width: 15ch;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .cs__wall-caption {
+    max-width: 46ch;
+    margin: var(--space-5) 0 0;
+    font-size: 15px;
+    line-height: 1.65;
+    color: rgba(245, 243, 236, 0.72);
+  }
+
+  @media (max-width: 640px) {
+    .cs__wall {
+      min-height: 520px;
+      padding-block: var(--space-12);
+    }
+
+    .cs__wall-scrim {
+      background: linear-gradient(180deg, rgba(8, 9, 11, 0.86) 0%, rgba(8, 9, 11, 0.64) 100%);
+    }
+
+    .cs__wall-copy {
+      gap: var(--space-12);
+    }
+
+    .cs__wall-title {
+      font-size: clamp(36px, 10vw, 48px);
+    }
+
+    .cs__wall-caption {
+      font-size: 14px;
+    }
   }
 </style>
