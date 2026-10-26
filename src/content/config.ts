@@ -45,6 +45,7 @@ const build = defineCollection({
     siteUrl: z.string().url().optional(),
     siteLabel: z.string().optional(),
     npmUrl: z.string().url().optional(),
+    repoUrl: z.string().url().optional(),
     outcomes: z.array(z.object({
       label: z.string(),
       value: z.string(),
