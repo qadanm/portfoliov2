@@ -15,7 +15,7 @@ import { getCollection } from 'astro:content';
 
 // One record. The CarSpotter card reads the content collection rather than
 // keeping its own copy of the name, the summary, the feature chips, the cover
-// art, the release state or the outbound links — those all live in
+// art or the outbound links — those all live in
 // src/content/build/car-spotter.mdx, which is also what the case study, the
 // work index, About, Approach and the next-project link read. Change it there
 // or not at all.
@@ -37,8 +37,6 @@ const apps = {
     name: cs?.title ?? 'CarSpotter',
     description: cs?.cardDescription ?? cs?.short ?? 'A daily car-identification game, designed and built end to end.',
     chips: cs?.keyFocus ?? ['Daily 5', 'Quick Practice', 'Spoiler-free results'],
-    release: cs?.releaseNote ?? '',
-    releaseTag: cs?.releaseStatus === 'verified-live' ? 'Released' : 'Release candidate',
   },
   vinly: {
     href: '/work/vinly',
@@ -180,16 +178,6 @@ const apps = {
         </div>
       </div>
     </article>
-
-    {/* The cover contains captures from a build that is not proven public
-        yet. One sentence, under the card, so the image is never presented as
-        the shipped version. */}
-    {apps.carspotter.release && (
-      <p class="garage__release">
-        <span class="garage__release-tag">{apps.carspotter.releaseTag}</span>
-        <span class="garage__release-text">{apps.carspotter.release}</span>
-      </p>
-    )}
 
     {/* ── 2-up: VINly + ChatOBD2 ───────────────────────────────────── */}
     <div class="garage__pair">
@@ -793,43 +781,18 @@ const apps = {
   .garage__site svg { transition: transform 240ms var(--ease-out); }
   .garage__site:hover svg { transform: translate(2px, -2px); }
 
-  /* Release context under the hero card. The tag carries the qualifier so the
-     sentence itself can stay plain. */
-  .garage__release {
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin: 0 0 var(--space-8);
-    padding-inline-start: 14px;
-    border-inline-start: 3px solid var(--lime);
-    font-size: 12px;
-    line-height: 1.6;
-    color: var(--color-text-muted);
-    max-width: 76ch;
-  }
-  @media (min-width: 880px) {
-    .garage__release { margin-bottom: var(--space-10); }
-  }
-  .garage__release-tag {
-    flex: none;
-    font-family: var(--font-body);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--color-text);
-  }
-  .garage__release-text { flex: 1 1 20ch; min-width: 0; }
-
   /* ─── 2-up: VINly + ChatOBD2 ────────────────────────────────────── */
   .garage__pair {
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--space-5);
+    margin-top: var(--space-5);
   }
   @media (min-width: 720px) {
     .garage__pair { grid-template-columns: 1fr 1fr; }
+  }
+  @media (min-width: 880px) {
+    .garage__pair { margin-top: var(--space-8); }
   }
 
   .garage__app {

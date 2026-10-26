@@ -15,7 +15,6 @@ import ReadingProgress from '@/components/ReadingProgress.astro';
 import CaseStudyMobileBar from '@/components/work/CaseStudyMobileBar.astro';
 import CarSpotterPicture from '@/components/work/CarSpotterPicture.astro';
 import CarSpotterWall from '@/components/carspotter/CarSpotterWall.astro';
-import ReleaseContext from '@/components/work/ReleaseContext.astro';
 import CaseStudyNav from '@/components/work/CaseStudyNav.astro';
 import AppStoreBadge from '@/components/AppStoreBadge.astro';
 import SchemaArticle from '@/components/seo/SchemaArticle.astro';
@@ -64,7 +63,6 @@ const coverMobileBase = data.coverMobileImage?.replace(/-\d+\.webp$/, '');
 const carSpotterSections = [
   { href: '#premise', label: 'The product decision' },
   { href: '#loop', label: 'Interaction' },
-  { href: '#wall', label: 'The wall' },
   { href: '#identity', label: 'Identity' },
   { href: '#results', label: 'A clearer result' },
   { href: '#engineering', label: 'Engineering judgement' },
@@ -321,14 +319,9 @@ const categoryKey = data.category.toLowerCase();
     </div>
 
     {project.slug === 'car-spotter' && (
-      <>
-        <div class="container-site cs__context">
-          <ReleaseContext status={data.releaseStatus} note={data.releaseNote} />
-        </div>
-        <div class="container-site cs__navwrap">
-          <CaseStudyNav items={carSpotterSections} />
-        </div>
-      </>
+      <div class="container-site cs__navwrap">
+        <CaseStudyNav items={carSpotterSections} />
+      </div>
     )}
 
     {project.slug !== 'car-spotter' && (
@@ -884,7 +877,7 @@ const categoryKey = data.category.toLowerCase();
           <figure class="cs__board">
             <CarSpotterPicture
               base="/images/car-spotter/2026-10/artwork/04-carspotter-brand-system"
-              alt="Approved Saturn illustration, CarSpotter wordmark, the lime, asphalt and chalk palette, and the candidate home screen."
+              alt="Approved Saturn illustration, CarSpotter wordmark, the lime, asphalt and chalk palette, and the October 2026 home screen."
               width={2560}
               height={1500}
               class="cs__board-pic"
@@ -949,7 +942,7 @@ const categoryKey = data.category.toLowerCase();
               </figure>
             </div>
             <div class="cs__compare-col">
-              <h3 class="cs__compare-label">October 2026 candidate</h3>
+              <h3 class="cs__compare-label">October 2026 update</h3>
               <figure class="cs__shot">
                 <a
                   class="cs__shot-link"
@@ -970,7 +963,7 @@ const categoryKey = data.category.toLowerCase();
                   <span class="vhidden"> (opens in a new tab)</span>
                 </a>
                 <figcaption>
-                  Candidate exported card: the result stays readable without
+                  The exported result card: the result stays readable without
                   revealing the cars.
                 </figcaption>
               </figure>
@@ -1965,13 +1958,8 @@ const categoryKey = data.category.toLowerCase();
     }
   }
 
-  /* Release state + jump list, immediately under the cover. The note earns
-     its own row so it reads before the reader starts scrolling; the nav is a
-     hairline rule, not a card. */
-  .cs__context {
-    padding-bottom: var(--space-6);
-  }
-
+  /* Jump list, immediately under the cover. The nav is a hairline rule, not
+     a card. */
   .cs__navwrap {
     padding-bottom: var(--space-10);
   }
@@ -2388,7 +2376,7 @@ const categoryKey = data.category.toLowerCase();
     max-width: 60ch;
   }
 
-  /* Historical versus candidate. Two labelled figures, not a slider: the
+  /* Historical versus the October 2026 update. Two labelled figures, not a slider: the
      labels carry the comparison and both plates stay full-size and legible. */
   .cs__compare {
     display: grid;
