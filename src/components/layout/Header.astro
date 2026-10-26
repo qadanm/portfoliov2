@@ -75,9 +75,45 @@ function isActive(href: string) {
     </div>
   </div>
 
+  <noscript is:raw>
+    <style>
+      .site-header { position: static !important; }
+      .nav-mobile-toggle, .theme-toggle { display: none !important; }
+      .nav-noscript {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        padding: 2px 12px 8px;
+        overflow-x: auto;
+        border-bottom: 1px solid var(--color-border-subtle);
+        background: var(--color-bg);
+      }
+      .nav-noscript a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        padding: 0 10px;
+        font-family: var(--font-body);
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--color-text-muted);
+        text-decoration: none;
+        white-space: nowrap;
+      }
+      .nav-noscript a:hover { color: var(--color-text); }
+      @media (min-width: 768px) { .nav-noscript { display: none !important; } }
+    </style>
+    <nav class="nav-noscript" aria-label="Primary navigation">
+      <a href="/work">Work</a>
+      <a href="/approach">Approach</a>
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
+    </nav>
+  </noscript>
+
   <!-- Mobile Nav -->
   <div class="nav-mobile-backdrop" id="mobile-nav-backdrop" aria-hidden="true"></div>
-  <div class="nav-mobile" id="mobile-nav" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Site navigation">
+  <div class="nav-mobile" id="mobile-nav" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Site navigation" inert>
     <nav class="nav-mobile__inner" aria-label="Mobile navigation">
       <span class="nav-mobile__eyebrow">
         <span class="nav-mobile__status">
@@ -177,33 +213,39 @@ function isActive(href: string) {
     mobileToggle?.setAttribute('aria-expanded', 'true');
     mobileToggle?.setAttribute('aria-label', 'Close menu');
     mobileNav?.setAttribute('aria-hidden', 'false');
+    mobileNav?.removeAttribute('inert');
     mobileBackdrop?.setAttribute('aria-hidden', 'false');
     mobileNav?.classList.add('nav-mobile--open');
     mobileBackdrop?.classList.add('nav-mobile-backdrop--open');
     mobileToggle?.classList.add('is-open');
     lockScroll();
+    requestAnimationFrame(() => {
+      mobileNav?.querySelector<HTMLAnchorElement>('.nav-mobile-link')?.focus();
+    });
     if (typeof window.plausible === 'function') {
       window.plausible('nav_open', { props: { page: location.pathname } });
     }
   }
 
-  function closeMenu() {
+  function closeMenu(returnFocus = false) {
     if (!isMenuOpen()) return;
     mobileToggle?.setAttribute('aria-expanded', 'false');
     mobileToggle?.setAttribute('aria-label', 'Open menu');
     mobileNav?.setAttribute('aria-hidden', 'true');
+    mobileNav?.setAttribute('inert', '');
     mobileBackdrop?.setAttribute('aria-hidden', 'true');
     mobileNav?.classList.remove('nav-mobile--open');
     mobileBackdrop?.classList.remove('nav-mobile-backdrop--open');
     mobileToggle?.classList.remove('is-open');
     unlockScroll();
+    if (returnFocus) mobileToggle?.focus();
   }
 
   mobileToggle?.addEventListener('click', () => {
     if (isMenuOpen()) closeMenu(); else openMenu();
   });
 
-  mobileBackdrop?.addEventListener('click', closeMenu);
+  mobileBackdrop?.addEventListener('click', () => closeMenu(true));
 
   mobileNav?.querySelectorAll('a').forEach(link => {
     link.addEventListener('click', closeMenu);
@@ -211,8 +253,22 @@ function isActive(href: string) {
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && isMenuOpen()) {
-      closeMenu();
-      mobileToggle?.focus();
+      closeMenu(true);
+      return;
+    }
+    if (e.key === 'Tab' && isMenuOpen() && mobileNav) {
+      const focusables = [...mobileNav.querySelectorAll<HTMLElement>('a[href]')]
+        .filter(el => el.getClientRects().length > 0);
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     }
   });
 
@@ -226,7 +282,7 @@ function isActive(href: string) {
     desktopMQ.addListener(onMQChange);
   }
 
-  document.addEventListener('astro:before-swap', closeMenu);
+  document.addEventListener('astro:before-swap', () => closeMenu());
 
   const header = document.getElementById('site-header');
 
@@ -310,6 +366,31 @@ function isActive(href: string) {
     }
   }
 
+  .nav-noscript {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 2px 12px 8px;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--color-border-subtle);
+    background: var(--color-bg);
+  }
+
+  .nav-noscript a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 10px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .nav-noscript a:hover { color: var(--color-text); }
+
   .nav-desktop {
     display: none;
     align-items: center;
@@ -324,6 +405,9 @@ function isActive(href: string) {
 
   .nav-link {
     position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
     padding: 8px 14px;
     border-radius: 9999px;
     font-size: 14px;
@@ -375,7 +459,8 @@ function isActive(href: string) {
     display: none;
     align-items: center;
     gap: 7px;
-    padding: 6px 12px 6px 11px;
+    min-height: 44px;
+    padding: 8px 12px 8px 11px;
     border-radius: 9999px;
     font-family: var(--font-body);
     font-size: 11px;
@@ -413,21 +498,12 @@ function isActive(href: string) {
     background-color: var(--color-accent);
   }
 
-  @keyframes status-pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.7; transform: scale(0.85); }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .status-pill__dot { animation: none; }
-  }
-
   .theme-toggle {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 38px;
-    height: 38px;
+    width: 44px;
+    height: 44px;
     border-radius: 9999px;
     border: 1px solid var(--color-border);
     background: linear-gradient(180deg, var(--color-bg-elevated), var(--color-bg-muted));

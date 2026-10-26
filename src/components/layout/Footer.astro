@@ -158,15 +158,16 @@ const sitemap = [
     align-items: center;
     gap: 8px;
     width: fit-content;
-    padding: 8px 14px;
-    border-radius: 9999px;
-    border: 1px solid var(--color-border);
-    background-color: var(--color-bg-elevated);
+    min-height: 44px;
+    padding: 6px 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
     color: var(--color-text);
     text-decoration: none;
     font-family: var(--font-body);
-    font-size: 13px;
-    transition: border-color 200ms, color 200ms, background-color 200ms, transform 200ms var(--ease-out);
+    font-size: 14px;
+    transition: color 150ms;
   }
 
   .footer-email svg {
@@ -174,10 +175,7 @@ const sitemap = [
   }
 
   .footer-email:hover {
-    border-color: var(--color-accent);
     color: var(--color-accent);
-    background-color: var(--color-accent-dim);
-    transform: translateY(-1px);
   }
 
   .footer-email:hover svg {
@@ -232,18 +230,19 @@ const sitemap = [
   .footer-col-list {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 0;
   }
 
   .footer-col-link {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    min-height: 44px;
     font-size: 14px;
     font-weight: 500;
     color: var(--color-text-muted);
     text-decoration: none;
-    padding: 4px 0;
+    padding: 8px 0;
     transition: color 150ms, transform 150ms var(--ease-out);
     -webkit-tap-highlight-color: transparent;
     width: fit-content;

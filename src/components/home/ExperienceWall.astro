@@ -12,7 +12,9 @@ const jobs = [
     status: 'Current',
     role: 'UX Engineering & Frontend Systems',
     period: '2022 to present',
-    metrics: ['$11B processed', '99.9% uptime', '11 sites', '100+ components'],
+    context: ['$11B processed annually', '99.9% uptime', '11 sites on the shared platform'],
+    contribution: ['~85% frontend ownership', '100+ shared components'],
+    note: 'Platform figures are company-reported.',
     clients: null,
     project: 'magtek-platform',
   },
@@ -24,7 +26,9 @@ const jobs = [
     status: 'Earlier',
     role: 'Frontend Implementation & Design Translation',
     period: 'Earlier',
-    metrics: ['50+ institutions', '0 → production', 'Hand-written CSS'],
+    context: ['50+ institutions on the platform'],
+    contribution: ['0 → production portals', 'Hand-written CSS systems'],
+    note: null,
     clients: 'Chase · Cetera · Northwestern Mutual · Voya · SVB · East West',
     project: 'financial-platforms',
   },
@@ -34,6 +38,10 @@ const jobs = [
 <section class="xp" id="experience" aria-labelledby="xp-title">
   <div class="container-site">
     <header class="xp__head">
+      <div class="xp__sxn">
+        <span class="q-cut" aria-hidden="true"></span>
+        <span class="q-eyebrow">Platform work</span>
+      </div>
       <h2 class="xp__title" id="xp-title">And the platform work.</h2>
       <p class="xp__lede">
         Two companies, two postures. A long-running multi-site platform where I
@@ -56,7 +64,7 @@ const jobs = [
           </div>
           <div class="xp__card-body">
             <div class="xp__card-row">
-              <span class="xp__company">{job.company}</span>
+              <h3 class="xp__company">{job.company}</h3>
               <span class:list={['xp__status', { 'xp__status--current': job.status === 'Current' }]}>
                 <span class="xp__status-dot" aria-hidden="true"></span>
                 {job.status}
@@ -65,9 +73,22 @@ const jobs = [
             <p class="xp__role">{job.role}</p>
             <span class="xp__period">{job.period}</span>
 
-            <ul class="xp__metrics">
-              {job.metrics.map((m) => <li>{m}</li>)}
-            </ul>
+            <div class="xp__facts">
+              <div class="xp__fact-group">
+                <span class="xp__fact-label">Platform context</span>
+                <ul>
+                  {job.context.map((m) => <li>{m}</li>)}
+                </ul>
+              </div>
+              <div class="xp__fact-group">
+                <span class="xp__fact-label">My contribution</span>
+                <ul>
+                  {job.contribution.map((m) => <li>{m}</li>)}
+                </ul>
+              </div>
+            </div>
+
+            {job.note && <p class="xp__fact-note">{job.note}</p>}
 
             {job.clients && (
               <p class="xp__clients">
@@ -208,7 +229,8 @@ const jobs = [
     inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
+    background: var(--color-bg);
   }
 
   .xp__card-body {
@@ -226,6 +248,7 @@ const jobs = [
     gap: var(--space-3);
   }
   .xp__company {
+    margin: 0;
     font-size: 21px;
     font-weight: 600;
     letter-spacing: -0.01em;
@@ -254,7 +277,6 @@ const jobs = [
   }
   .xp__status--current .xp__status-dot {
     background: var(--color-success);
-    box-shadow: 0 0 6px var(--color-success);
   }
 
   .xp__role {
@@ -269,26 +291,47 @@ const jobs = [
     color: var(--color-text-subtle);
   }
 
-  .xp__metrics {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px 0;
-    list-style: none;
+  .xp__facts {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
     margin: var(--space-2) 0 0;
     padding: var(--space-4) 0 0;
     border-top: 1px solid var(--color-border-subtle);
   }
-  .xp__metrics li {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.02em;
-    color: var(--color-text);
-    padding: 0 12px;
-    border-right: 1px solid var(--color-border);
-    line-height: 1.1;
+  @media (min-width: 600px) {
+    .xp__facts { grid-template-columns: 1fr 1fr; }
   }
-  .xp__metrics li:first-child { padding-left: 0; }
-  .xp__metrics li:last-child { border-right: none; }
+  .xp__fact-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: .05em;
+    color: var(--color-text-subtle);
+    margin-bottom: 6px;
+  }
+  .xp__fact-group ul {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .xp__fact-group li {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.01em;
+    color: var(--color-text);
+    line-height: 1.45;
+  }
+  .xp__fact-note {
+    font-size: 10px;
+    line-height: 1.5;
+    color: var(--color-text-subtle);
+    margin-top: 8px;
+  }
 
   .xp__clients {
     font-size: 12px;

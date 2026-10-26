@@ -1,9 +1,10 @@
 ---
 import BaseLayout from '@/components/layout/BaseLayout.astro';
-import CarSpotterWall from '@/components/carspotter/CarSpotterWall.astro';
 import VerdictCardMock from '@/components/diagrams/VerdictCardMock.astro';
 import AIFlow from '@/components/diagrams/AIFlow.astro';
+import MethodSequence from '@/components/ui/MethodSequence.astro';
 import { getCollection } from 'astro:content';
+import { projectCategoryKey } from '@/lib/project';
 
 // The CarSpotter example card reads the project record — image, alt and note —
 // so the Approach page and the case study cannot tell different stories.
@@ -19,15 +20,15 @@ const projects = [
     note: "Scan a VIN, get the car's public safety record free. Designed and engineered solo for iOS.",
     src: '/images/vinly/site-hero.webp',
     alt: 'VINly marketing hero, "Scan any VIN. Know the car," beside the free research tool.',
-    category: 'flagship',
+    category: 'Independent product',
   },
   {
     slug: 'chatobd2',
     title: 'ChatOBD2',
-    note: 'AI-native diagnostics, designed and engineered solo.',
+    note: 'AI-native diagnostics, designed and engineered solo. In QA and field testing.',
     src: '/images/chatobd2/hero.webp',
     alt: 'ChatOBD2 marketing hero with phone mockup of a live diagnostic chat.',
-    category: 'flagship',
+    category: 'Independent product',
   },
   {
     slug: 'magtek-platform',
@@ -35,7 +36,7 @@ const projects = [
     note: 'Web experience across a multi-site platform on a long-running ASP.NET MVC stack.',
     src: '/images/magtek/homepage.webp',
     alt: 'MagTek homepage with metric story and team photography.',
-    category: 'platform',
+    category: 'Platform work',
   },
   {
     slug: 'car-spotter',
@@ -43,7 +44,7 @@ const projects = [
     note: cs?.secondaryCopy?.approach ?? 'An independent iPhone game where I connect product decisions, interface design, game state and content tooling.',
     src: carSpotterCard ?? '/images/car-spotter/2026-10/artwork/01-carspotter-portfolio-hero-1600.webp',
     alt: cs?.coverAlt ?? 'CarSpotter’s Saturn identity beside a genuine car-detail question and the matching reveal.',
-    category: 'flagship',
+    category: 'Independent product',
   },
   {
     slug: 'financial-platforms',
@@ -51,7 +52,7 @@ const projects = [
     note: 'Multi-tenant frontend across 50+ wealth and banking institutions at InvestCloud.',
     src: '/images/financial-platforms/chase.webp',
     alt: 'Chase homepage built on the InvestCloud framework.',
-    category: 'product',
+    category: 'Platform work',
   },
 ];
 ---
@@ -70,12 +71,15 @@ const projects = [
     'design systems',
     'product design process',
   ]}
+  image="/brand-system/open_graph/approach_light.png"
+  imageAlt="How I work. / Moe Qadan"
 >
   <div class="apr">
 
     <header class="apr__hero">
       <div class="container-site">
         <div class="apr__sxn">
+          <span class="q-cut" aria-hidden="true"></span>
           <span class="apr__sxn-label">Approach</span>
         </div>
         <h1 class="apr__title">How I work.</h1>
@@ -104,6 +108,20 @@ const projects = [
           platform the company runs on. The skills sit in one head, so
           the tradeoffs between them get made in one head.
         </p>
+      </section>
+
+      {/* The method, with a real artifact per step */}
+      <section class="apr__section apr__section--method">
+        <header class="apr__sxn apr__sxn--inner">
+          <span class="apr__sxn-label">Read / Pick / Use</span>
+        </header>
+        <h2 class="apr__h2">The method, with the receipts.</h2>
+        <p class="apr__para">
+          The same three moves show up in every project: read what the
+          system already knows, choose the structure that can carry it,
+          then put the result in front of a real review.
+        </p>
+        <MethodSequence class="apr__method" headingLevel="h3" />
       </section>
 
       {/* What I actually do, day to day */}
@@ -142,8 +160,8 @@ const projects = [
         </div>
 
         <p class="apr__para">
-          <strong>In the products.</strong> ChatOBD2 is the shipped
-          example. Vehicle data flows through six deterministic reasoning layers
+          <strong>In the products.</strong> <a href="/work/chatobd2">ChatOBD2</a> is the product
+          example, currently in QA and field testing. Vehicle data flows through six deterministic reasoning layers
           before any model call. The system prompt isn't a string; it's
           a module that assembles fragments by priority inside a
           38,000-token budget, keyed by verdict tier and code context.
@@ -155,7 +173,7 @@ const projects = [
         </p>
 
         <p class="apr__para">
-          <strong>And knowing when to take it out.</strong> VINly is the
+          <strong>And knowing when to take it out.</strong> <a href="/work/vinly">VINly</a> is the
           other half of the same discipline. Its VIN reader used to send a
           photo to a server so a vision model could read the characters. It
           worked, and it was still wrong: it cost money on every scan of a
@@ -210,7 +228,7 @@ const projects = [
           <li><strong>Modernizing a platform that can't be rewritten.</strong> Long-running stacks have opinions. I read those first, plan around them, and ship in increments that don't require a flag day.</li>
           <li><strong>Building systems engineers actually use.</strong> Typed components. Tokens. Layout primitives. Real consumers from day one. No big-bang library that ships into a vacuum.</li>
           <li><strong>Sitting between design and engineering and unblocking both.</strong> I read intent, not just specs. Most production breakage lives in the gap a handoff doesn't see.</li>
-          <li><strong>Building AI features as engineering.</strong> Prompt modules in source. Schema-bound outputs. Deterministic logic in front of the model, not behind it. In VINly the offer price is computed before any model runs; in ChatOBD2 six reasoning layers and a 38,000-token prompt budget sit in front of every call.</li>
+          <li><strong>Building AI features as engineering.</strong> Prompt modules in source. Schema-bound outputs. Deterministic logic in front of the model, not behind it. In <a href="/work/vinly">VINly</a>, the VIN is read and check-digit validated on the device before a lookup. In <a href="/work/chatobd2">ChatOBD2</a>, deterministic reasoning and a budgeted prompt assembly structure the model's input.</li>
         </ul>
       </section>
 
@@ -269,7 +287,7 @@ const projects = [
           {projects.map(p => (
             <a
               href={`/work/${p.slug}`}
-              class:list={['apr__work', `apr__work--${p.category}`]}
+              class:list={['apr__work', `apr__work--${projectCategoryKey(p.category)}`]}
             >
 
               <div class="apr__work-shot">
@@ -282,13 +300,8 @@ const projects = [
                 />
               </div>
               <div class="apr__work-meta">
-                {p.slug === 'car-spotter' && (
-                  <>
-                    <CarSpotterWall rows={6} tile={56} mobileTile={40} />
-                    <span class="apr__work-scrim" aria-hidden="true"></span>
-                  </>
-                )}
                 <div class="apr__work-copy">
+                <span class="apr__work-cat">{p.category}</span>
                 <h3 class="apr__work-title">{p.title}</h3>
                 <p class="apr__work-note">{p.note}</p>
                 <span class="apr__work-cta">
@@ -315,7 +328,7 @@ const projects = [
           </div>
           <h2 class="apr__cta-title">Working on something on the web?</h2>
           <p class="apr__cta-sub">
-            Send a few sentences. Replies within a day.
+            Send a few sentences. Email works too.
           </p>
         </div>
         <div class="apr__cta-actions">
@@ -605,6 +618,30 @@ const projects = [
   }
 
   /* Work grid — across-the-work */
+  .apr__method {
+    margin-top: var(--space-6);
+  }
+
+  .apr__work-cat {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: .04em;
+    color: var(--color-accent);
+    margin-bottom: 4px;
+  }
+
+  .apr__work-cat::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    background: var(--color-accent);
+    clip-path: polygon(0 0, 4px 0, 5px 1px, 1px 1px);
+  }
+
   .apr__work-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -828,15 +865,6 @@ const projects = [
     border-radius: 50%;
     background-color: var(--color-accent);
     box-shadow: 0 0 8px color-mix(in srgb, var(--color-accent) 60%, transparent);
-  }
-
-  @keyframes cs-status-pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.7; transform: scale(0.85); }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .apr__cta-dot { animation: none; }
   }
 
   .apr__cta-title {

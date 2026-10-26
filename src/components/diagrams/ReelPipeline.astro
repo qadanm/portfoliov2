@@ -213,12 +213,7 @@ const pct = (f: number) => (f / TOTAL_FRAMES) * 100;
     height: 4px;
     border-radius: 2px;
     background: var(--lime);
-    opacity: 0.35;
-    animation: reel-pip 5s calc(var(--i) * 0.28s) infinite;
-  }
-  @keyframes reel-pip {
-    0%, 60%, 100% { opacity: 0.3; }
-    12%, 40% { opacity: 1; }
+    opacity: 1;
   }
 
   .reel__arrow {
@@ -263,11 +258,7 @@ const pct = (f: number) => (f / TOTAL_FRAMES) * 100;
     border-radius: 4px;
     border: 1px solid rgba(200, 255, 0, 0.4);
     background: linear-gradient(170deg, rgba(200, 255, 0, 0.14), rgba(200, 255, 0, 0.03));
-    animation: reel-out 5s calc(var(--i) * 0.28s + 0.5s) infinite;
-  }
-  @keyframes reel-out {
-    0%, 55%, 100% { opacity: 0.28; transform: translateY(2px); }
-    16%, 44% { opacity: 1; transform: translateY(0); }
+    opacity: 1;
   }
   .reel__fan-note {
     grid-column: 1 / -1;
@@ -576,7 +567,7 @@ const pct = (f: number) => (f / TOTAL_FRAMES) * 100;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .reel__pips li, .reel__out-frame { animation: none; opacity: 1; }
+    .reel__pips li, .reel__out-frame { opacity: 1; }
     .reel__scene, .reel__car, .reel__fact, .reel__cards li, .reel__play { transition: none; }
     .is-scan .reel__wipe { animation: none; }
   }

@@ -1,0 +1,8 @@
+---
+interface Props { light: string; dark: string; width: number; height: number; alt?: string; class?: string; }
+const { light, dark, width, height, alt, class: className = '' } = Astro.props;
+---
+<span class:list={['q-theme-art', className]} role={alt ? 'img' : undefined} aria-label={alt} aria-hidden={alt ? undefined : 'true'}>
+  <img class="q-theme-art__light" src={light} width={width} height={height} alt="" loading="lazy" decoding="async" />
+  <img class="q-theme-art__dark" src={dark} width={width} height={height} alt="" loading="lazy" decoding="async" />
+</span>

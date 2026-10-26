@@ -74,6 +74,13 @@ const projectTypes = [
     </>
   )}
 
+  <noscript>
+    <p class="cf__noscript">
+      This form needs JavaScript. Email
+      <a href="mailto:moe@qadan.co">moe@qadan.co</a> instead.
+    </p>
+  </noscript>
+
   <div class="cf__footer">
     <button type="submit" class="cf__submit" data-cf-submit>
       <span class="cf__submit-label">Send message</span>
@@ -86,20 +93,20 @@ const projectTypes = [
         </svg>
       </span>
     </button>
-    <p class="cf__hint">No tracking. Replies usually within a day.</p>
+    <p class="cf__hint">No tracking. Email works too.</p>
   </div>
 
-  <div class="cf__status" data-cf-status role="status" aria-live="polite"></div>
+  <div class="cf__status" data-cf-status role="status" aria-live="polite" aria-atomic="true"></div>
 </form>
 
 <template data-cf-success>
-  <div class="cf__done">
+  <div class="cf__done" role="status" aria-live="polite" tabindex="-1">
     <svg class="cf__done-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
       <path d="M8 12.5l3 3 5-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
     <h3 class="cf__done-title">Message sent.</h3>
-    <p class="cf__done-text">I'll reply soon, usually within a day. <span aria-hidden="true">🫡</span></p>
+    <p class="cf__done-text">Thanks for reaching out.</p>
   </div>
 </template>
 
@@ -148,9 +155,16 @@ const projectTypes = [
         if (json.botcheck) return;
 
         form.classList.add('cf--submitting');
-        if (submitBtn) submitBtn.disabled = true;
+        const submitLabel = submitBtn?.querySelector<HTMLElement>('.cf__submit-label');
+        const originalLabel = submitLabel?.textContent ?? '';
+        if (submitLabel) submitLabel.textContent = 'Sending…';
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.setAttribute('aria-busy', 'true');
+        }
         if (statusEl) {
           statusEl.classList.remove('cf__status--error');
+          statusEl.setAttribute('role', 'status');
           statusEl.textContent = '';
         }
         emit('form_submit_attempt');
@@ -171,7 +185,9 @@ const projectTypes = [
             emit('form_submit_success');
             if (successTpl) {
               const cloned = successTpl.content.cloneNode(true);
+              const successNode = (cloned as DocumentFragment).firstElementChild as HTMLElement | null;
               form.replaceWith(cloned as Node);
+              successNode?.focus();
             } else {
               form.reset();
               if (statusEl) statusEl.textContent = 'Message sent.';
@@ -180,6 +196,7 @@ const projectTypes = [
             emit('form_submit_error', { reason: 'api_error' });
             if (statusEl) {
               statusEl.classList.add('cf__status--error');
+              statusEl.setAttribute('role', 'alert');
               statusEl.textContent = data.message || 'Something went wrong. Try email instead?';
             }
           }
@@ -187,11 +204,16 @@ const projectTypes = [
           emit('form_submit_error', { reason: 'network' });
           if (statusEl) {
             statusEl.classList.add('cf__status--error');
+            statusEl.setAttribute('role', 'alert');
             statusEl.textContent = 'Network issue. Try email instead?';
           }
         } finally {
           form.classList.remove('cf--submitting');
-          if (submitBtn) submitBtn.disabled = false;
+          if (submitLabel) submitLabel.textContent = originalLabel;
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.removeAttribute('aria-busy');
+          }
         }
       });
     });
@@ -341,13 +363,13 @@ const projectTypes = [
     gap: 8px;
     padding: 14px 24px;
     min-height: 48px;
-    border-radius: 9999px;
+    border-radius: 9px;
     font-family: var(--font-body);
     font-size: 15px;
     font-weight: 600;
     letter-spacing: -0.01em;
-    color: var(--color-bg);
-    background-color: var(--color-text);
+    color: var(--q-accent-ink, #FFFFFF);
+    background-color: var(--color-accent);
     border: none;
     cursor: pointer;
     transition: transform 200ms var(--ease-out), box-shadow 200ms;
@@ -362,8 +384,7 @@ const projectTypes = [
   }
 
   .cf__submit:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    background-color: var(--color-accent-hover);
   }
 
   .cf__submit:disabled {
@@ -383,13 +404,27 @@ const projectTypes = [
 
   .cf--submitting .cf__submit-icon { display: none; }
   .cf--submitting .cf__submit-spinner { display: inline-flex; }
-  .cf--submitting .cf__submit-label::after { content: 'ing…'; }
 
   .cf__hint {
     font-family: var(--font-body);
     font-size: 11px;
     color: var(--color-text-subtle);
     line-height: 1.4;
+  }
+
+  .cf__noscript {
+    padding: var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-muted);
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .cf__noscript a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: .15em;
   }
 
   .cf__status {

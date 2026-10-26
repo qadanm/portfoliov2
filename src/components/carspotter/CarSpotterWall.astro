@@ -31,23 +31,17 @@ const sequences = Array.from({ length: rows }, (_, row) => {
   );
 });
 
-const paces = [1, 0.82, 1.12, 0.92];
 const zooms = [1, 1.04, 1.09, 1.02, 1.07, 1.03];
-const baseDuration = 40;
 ---
 
 <div
   class:list={['cwall', className]}
   aria-hidden="true"
-  data-cwall
   style={`--cwall-tile-desktop:${tile}px;--cwall-tile-mobile:${mobileTile}px;`}
 >
   <div class="cwall__viewport">
     {sequences.map((sequence, row) => (
-      <div
-        class="cwall__row"
-        style={`--cwall-duration:${(baseDuration / paces[row % paces.length]).toFixed(2)}s;--cwall-direction:${row % 2 === 0 ? 'normal' : 'reverse'}`}
-      >
+      <div class="cwall__row">
         <div class="cwall__track" style={`--cwall-shift:${shift}`}>
           {Array.from({ length: copies }, () => (
             <div class="cwall__seq">
@@ -67,20 +61,6 @@ const baseDuration = 40;
   </div>
 </div>
 
-<script>
-  const walls = document.querySelectorAll('[data-cwall]');
-  if (walls.length) {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          entry.target.toggleAttribute('data-cwall-paused', !entry.isIntersecting);
-        }
-      },
-      { rootMargin: '200px 0px' },
-    );
-    walls.forEach((wall) => observer.observe(wall));
-  }
-</script>
 
 <style>
   .cwall {
@@ -113,13 +93,6 @@ const baseDuration = 40;
   .cwall__track {
     display: flex;
     width: max-content;
-    animation: cwall-scroll var(--cwall-duration, 40s) linear infinite;
-    animation-direction: var(--cwall-direction, normal);
-    will-change: transform;
-  }
-
-  .cwall[data-cwall-paused] .cwall__track {
-    animation-play-state: paused;
   }
 
   .cwall__seq {
@@ -146,20 +119,10 @@ const baseDuration = 40;
     transform: scale(var(--cwall-zoom, 1));
   }
 
-  @keyframes cwall-scroll {
-    from { transform: translate3d(0, 0, 0); }
-    to { transform: translate3d(var(--cwall-shift, -33.3333%), 0, 0); }
-  }
-
   @media (max-width: 640px) {
     .cwall {
       --cwall-tile: var(--cwall-tile-mobile, 72px);
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .cwall__track {
-      animation: none;
-    }
-  }
 </style>

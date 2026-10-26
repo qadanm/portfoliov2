@@ -1,0 +1,9 @@
+---
+interface Fact { label: string; value: string; sourceNote?: string; }
+interface Props { facts: Fact[]; label?: string; note?: string; class?: string; }
+const { facts, label = 'Project facts', note, class: className = '' } = Astro.props;
+---
+<section class:list={['q-facts', className]} aria-label={label}>
+  <dl>{facts.map(f => <div><dt>{f.label}</dt><dd>{f.value}{f.sourceNote && <span class="q-facts__source">{f.sourceNote}</span>}</dd></div>)}</dl>
+  {note && <p class="q-facts__note">{note}</p>}
+</section>

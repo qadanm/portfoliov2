@@ -19,7 +19,9 @@ import CaseStudyNav from '@/components/work/CaseStudyNav.astro';
 import AppStoreBadge from '@/components/AppStoreBadge.astro';
 import SchemaArticle from '@/components/seo/SchemaArticle.astro';
 import SchemaBreadcrumb from '@/components/seo/SchemaBreadcrumb.astro';
+import ProjectFacts from '@/components/ui/ProjectFacts.astro';
 import { getCollection } from 'astro:content';
+import { projectCategoryKey } from '@/lib/project';
 
 export async function getStaticPaths() {
   const projects = await getCollection('build', ({ data }) => !data.draft);
@@ -80,7 +82,7 @@ const artifactMap: Record<string, any> = {
   'elmulator': ElmulatorArtifact,
 };
 const Artifact = artifactMap[project.slug] ?? null;
-const categoryKey = data.category.toLowerCase();
+const categoryKey = projectCategoryKey(data.category);
 ---
 
 <BaseLayout
@@ -112,7 +114,7 @@ const categoryKey = data.category.toLowerCase();
 
   <ReadingProgress />
 
-  <article class:list={['cs', `cs--${project.slug}`, `cs--${categoryKey}`, { 'cs--flagship': data.category === 'Flagship' }]}>
+  <article class:list={['cs', `cs--${project.slug}`, `cs--${categoryKey}`]}>
     <header class="cs__header">
       <div class="container-site">
         <a href="/work" class="cs__back">
@@ -125,6 +127,7 @@ const categoryKey = data.category.toLowerCase();
         {/* Numbered editorial head: project index + category. Mirrors the
             section-head pattern from the homepage grid. */}
         <div class="cs__sxn">
+          <span class="q-cut" aria-hidden="true"></span>
           <span class="cs__sxn-num">{currentNumber} / {totalNumber}</span>
           <span class:list={['cs__sxn-tag', `cs__sxn-tag--${categoryKey}`]}>
             {data.category}
@@ -154,40 +157,16 @@ const categoryKey = data.category.toLowerCase();
               <dd><span class="cs__meta-text">{data.role}</span></dd>
             </div>
           )}
+          {data.status && (
+            <div>
+              <dt>Status</dt>
+              <dd><span class:list={['cs__meta-text', 'cs__meta-text--status', { 'cs__meta-text--inprogress': data.inProgress }]}><span class:list={['cs__status-dot', { 'cs__status-dot--inprogress': data.inProgress }]} aria-hidden="true"></span>{data.status}</span></dd>
+            </div>
+          )}
           {data.period && (
             <div>
               <dt>Period</dt>
               <dd><span class="cs__meta-text">{data.period}</span></dd>
-            </div>
-          )}
-          {data.scope && (
-            <div>
-              <dt>Scope</dt>
-              <dd><span class="cs__meta-text">{data.scope}</span></dd>
-            </div>
-          )}
-          {data.status && (
-            <div>
-              <dt>Status</dt>
-              <dd><span class:list={['cs__meta-text', 'cs__meta-text--status', { 'cs__meta-text--coming': data.comingSoon }]}><span class:list={['cs__status-dot', { 'cs__status-dot--coming': data.comingSoon }]} aria-hidden="true"></span>{data.status}</span></dd>
-            </div>
-          )}
-          <div>
-            <dt>Focus</dt>
-            <dd>
-              <ul>
-                {data.keyFocus.map(item => <li>{item}</li>)}
-              </ul>
-            </dd>
-          </div>
-          {data.stack && data.stack.length > 0 && (
-            <div>
-              <dt>Stack</dt>
-              <dd>
-                <ul class="cs__stack">
-                  {data.stack.map(item => <li>{item}</li>)}
-                </ul>
-              </dd>
             </div>
           )}
         </dl>
@@ -250,27 +229,9 @@ const categoryKey = data.category.toLowerCase();
       </div>
     </header>
 
-    {data.outcomes && data.outcomes.length > 0 && (
-      <div class="container-site cs__outcomes-wrap">
-        <section class="cs__outcomes" aria-label="Outcomes">
-          <header class="cs__outcomes-head">
-            <span class="cs__outcomes-eyebrow">Outcomes</span>
-            <span class="cs__outcomes-meta">at a glance</span>
-          </header>
-          <ul class="cs__outcomes-list">
-            {data.outcomes.map(o => (
-              <li class="cs__outcome">
-                <span class="cs__outcome-value">{o.value}</span>
-                <span class="cs__outcome-label">{o.label}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      </div>
-    )}
-
     <div class="container-site cs__cover-wrap">
-      <div class="cs__cover">
+      <figure class="q-evidence cs__evidence">
+        <div class="q-evidence__media cs__cover">
 
         {project.slug === 'vinplain' ? (
           <div class="cs__cover-poster">
@@ -291,8 +252,8 @@ const categoryKey = data.category.toLowerCase();
             src={data.coverImage}
             alt={data.coverAlt ?? data.title}
             class="cs__cover-image"
-            width="1440"
-            height="900"
+            width={data.coverWidth ?? 1440}
+            height={data.coverHeight ?? 900}
             loading="eager"
           />
         ) : Artifact ? (
@@ -309,7 +270,27 @@ const categoryKey = data.category.toLowerCase();
             labelTone={data.placeholder.labelTone}
           />
         )}
+        </div>
+        <figcaption>
+          <span class="q-evidence__index" aria-hidden="true">{currentNumber} / {totalNumber}</span>
+          <span>{data.coverCaption ?? `${data.title} · project evidence.`}</span>
+        </figcaption>
+      </figure>
+    </div>
+
+    <div class="container-site cs__facts-wrap">
+      <div class="cs__facts-head">
+        <span class="q-cut" aria-hidden="true"></span>
+        <span class="q-eyebrow">Project facts</span>
       </div>
+      <ProjectFacts
+        facts={[
+          ...(data.facts ?? []).map(f => ({ label: f.label, value: f.value })),
+          ...(data.scope ? [{ label: 'Scope', value: data.scope }] : []),
+          ...(data.keyFocus?.length ? [{ label: 'Focus', value: data.keyFocus.join(' · ') }] : []),
+          ...(data.stack?.length ? [{ label: 'Stack', value: data.stack.join(' · ') }] : []),
+        ]}
+      />
     </div>
 
     {project.slug === 'car-spotter' && (
@@ -321,7 +302,7 @@ const categoryKey = data.category.toLowerCase();
     {project.slug !== 'car-spotter' && (
       <div class="container-narrow cs__content">
         <div class="cs__content-head">
-          <span class="cs__content-label">Notes</span>
+          <span class="cs__content-label">The work</span>
         </div>
         <div class="prose cs__prose">
           <Content />
@@ -1391,12 +1372,15 @@ const categoryKey = data.category.toLowerCase();
           data-track-project={next.slug}
           data-track-from={project.slug}
         >
-          {next.slug === 'car-spotter' && (
-            <>
-              <CarSpotterWall rows={7} tile={56} mobileTile={40} />
-              <span class="cs__next-scrim" aria-hidden="true"></span>
-            </>
-          )}
+          <img
+            class="cs__next-thumb"
+            src={`/images/work-thumbs/${next.slug}.webp`}
+            alt=""
+            width="480"
+            height="300"
+            loading="lazy"
+            decoding="async"
+          />
 
           <div class="cs__next-meta">
             <span class="cs__next-tag">
@@ -1533,24 +1517,23 @@ const categoryKey = data.category.toLowerCase();
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-family: var(--font-body);
+    font-family: var(--font-mono);
     font-size: 10px;
-    font-weight: 600;
-    color: var(--color-text-muted);
-    padding: 4px 10px;
-    border-radius: 9999px;
-    background-color: var(--color-bg-deep);
-    border: 1px solid var(--color-border);
+    font-weight: 500;
+    color: var(--color-accent);
+    padding: 0;
+    border: 0;
+    background: none;
     line-height: 1;
+    letter-spacing: .015em;
   }
 
-
-  .cs__sxn-tag--flagship {
-    /* The 10px label keeps the deeper hover shade on a dim fill so it stays
-       crisp on the light page without introducing another colour. */
-    color: var(--color-accent-hover);
-    background-color: var(--color-accent-dim);
-    border-color: var(--color-accent-muted);
+  .cs__sxn-tag::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--color-accent);
+    clip-path: polygon(0 0, 4px 0, 6px 2px, 2px 2px);
   }
 
   .cs__sxn-company {
@@ -1722,24 +1705,15 @@ const categoryKey = data.category.toLowerCase();
     height: 6px;
     border-radius: 50%;
     background-color: var(--color-success);
-    box-shadow: 0 0 6px color-mix(in srgb, var(--color-success) 65%, transparent);
-    animation: cs-status-pulse 2.4s ease-in-out infinite;
-  }
-
-  @keyframes cs-status-pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.6; transform: scale(0.85); }
   }
 
   /* Coming-soon status — muted, not the live green, and no pulse. */
-  .cs__meta-text--coming {
+  .cs__meta-text--inprogress {
     color: var(--color-text-muted);
   }
 
-  .cs__status-dot--coming {
+  .cs__status-dot--inprogress {
     background-color: var(--color-text-subtle);
-    box-shadow: none;
-    animation: none;
   }
 
   /* ── Live-product links: header badge row + closing download band ──── */
@@ -1928,6 +1902,17 @@ const categoryKey = data.category.toLowerCase();
     }
   }
 
+  .cs__facts-wrap {
+    padding-bottom: var(--space-12);
+  }
+
+  .cs__facts-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
   /* Jump list, immediately under the cover. The nav is a hairline rule, not
      a card. */
   .cs__navwrap {
@@ -1942,39 +1927,8 @@ const categoryKey = data.category.toLowerCase();
 
   .cs__cover {
     position: relative;
-    border-radius: var(--radius-2xl);
-    border: 1px solid var(--color-border);
     background-color: var(--color-bg-elevated);
-    overflow: hidden;
-    box-shadow: var(--shadow-card);
-    transition: border-color 320ms var(--ease-out), box-shadow 320ms var(--ease-out);
   }
-
-  .cs__cover:hover {
-    border-color: var(--color-border-strong);
-    box-shadow: var(--shadow-card-hover);
-  }
-
-  .cs__cover-corner {
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    border: 1px solid var(--color-text-subtle);
-    pointer-events: none;
-    opacity: 0.4;
-    z-index: 4;
-    transition: opacity 240ms, border-color 240ms;
-  }
-
-  .cs__cover:hover .cs__cover-corner {
-    opacity: 1;
-    border-color: var(--color-accent);
-  }
-
-  .cs__cover-corner--tl { top: 10px; left: 10px; border-right: none; border-bottom: none; }
-  .cs__cover-corner--tr { top: 10px; right: 10px; border-left: none; border-bottom: none; }
-  .cs__cover-corner--bl { bottom: 10px; left: 10px; border-right: none; border-top: none; }
-  .cs__cover-corner--br { bottom: 10px; right: 10px; border-left: none; border-top: none; }
 
   .cs__cover :global(.placeholder) {
     border-radius: 0;
@@ -1988,6 +1942,7 @@ const categoryKey = data.category.toLowerCase();
     display: block;
     width: 100%;
     height: auto;
+    object-fit: contain;
   }
 
   .cs__cover-artifact {
@@ -2509,17 +2464,12 @@ const categoryKey = data.category.toLowerCase();
     padding: var(--space-6);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-2xl);
-    background:
-      linear-gradient(180deg, var(--color-bg-elevated), var(--color-bg-muted));
+    background: var(--color-bg-elevated);
     text-decoration: none;
     color: var(--color-text);
     margin-bottom: var(--space-8);
-    box-shadow: var(--shadow-card);
     overflow: hidden;
-    transition:
-      border-color 280ms var(--ease-out),
-      transform 280ms var(--ease-out),
-      box-shadow 280ms var(--ease-out);
+    transition: border-color 280ms var(--ease-out);
     -webkit-tap-highlight-color: transparent;
   }
 
@@ -2531,13 +2481,24 @@ const categoryKey = data.category.toLowerCase();
   }
 
   .cs__next:hover {
-    border-color: var(--color-border-strong);
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-card-hover);
+    border-color: var(--color-accent-muted);
   }
 
   .cs__next:hover::before {
     opacity: 1;
+  }
+
+  .cs__next-thumb {
+    width: 164px;
+    height: 112px;
+    object-fit: contain;
+    flex: none;
+    padding: 4px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-bg);
+    position: relative;
+    z-index: 1;
   }
 
   .cs__next-meta,
@@ -2590,16 +2551,29 @@ const categoryKey = data.category.toLowerCase();
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-family: var(--font-body);
+    font-family: var(--font-mono);
     font-size: 10px;
-    font-weight: 600;
-    color: var(--color-text-muted);
-    padding: 4px 10px;
-    border-radius: 9999px;
-    background-color: var(--color-bg-deep);
-    border: 1px solid var(--color-border);
+    font-weight: 500;
+    color: var(--color-accent);
+    padding: 0;
+    border: 0;
+    background: none;
     line-height: 1;
     width: fit-content;
+    letter-spacing: .015em;
+  }
+
+  .cs__next-tag::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--color-accent);
+    clip-path: polygon(0 0, 4px 0, 6px 2px, 2px 2px);
+  }
+
+  @media (max-width: 600px) {
+    .cs__next { align-items: flex-start; }
+    .cs__next-thumb { width: 84px; height: 84px; }
   }
 
 
