@@ -59,6 +59,14 @@ const apps = {
     poster: '/images/elmulator/poster.svg',
     alt: 'elmulator portfolio poster. A dark blue terminal showing a green iOS OBD2 test run against a scripted ELM327, beside the elmulator wordmark.',
   },
+  vinplain: {
+    href: '/work/vinplain',
+    npm: 'https://www.npmjs.com/package/vinplain',
+    github: 'https://github.com/qadanm/vinplain',
+    site: 'https://qadanm.github.io/vinplain/',
+    poster: '/images/vinplain/poster.webp',
+    alt: 'vinplain poster: the 17-character VIN 1HGCM82633A004352 with the check digit in red, and the decoded 2003 Honda Accord record below it.',
+  },
 };
 ---
 
@@ -75,8 +83,9 @@ const apps = {
         I'm a car guy who ships car apps, three of them, designed and
         engineered solo. A daily spotting game and a free VIN scanner,
         both on the App Store today, and an AI mechanic in your pocket on
-        the way. And under them, an open-source ELM327 emulator I pulled
-        out and shipped so anyone's car app can be tested in CI.
+        the way. Under them, two open-source libraries I pulled out and
+        shipped: an ELM327 emulator that puts Bluetooth code under test in
+        CI, and a typed client for US vehicle records.
       </p>
     </header>
 
@@ -349,6 +358,92 @@ const apps = {
             data-track-project="elmulator"
           >
             PyPI
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M3 13L13 3M13 3H5M13 3v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </article>
+
+    {/* ── Open source: vinplain ────────────────────────────────────── */}
+    <article class="garage__oss garage__oss--vinplain">
+      <span class="garage__hero-corner garage__hero-corner--tl garage__oss-corner" aria-hidden="true"></span>
+      <span class="garage__hero-corner garage__hero-corner--tr garage__oss-corner" aria-hidden="true"></span>
+      <span class="garage__hero-corner garage__hero-corner--bl garage__oss-corner" aria-hidden="true"></span>
+      <span class="garage__hero-corner garage__hero-corner--br garage__oss-corner" aria-hidden="true"></span>
+
+      <div class="garage__oss-media">
+        <img src={apps.vinplain.poster} alt={apps.vinplain.alt} width="1440" height="900" loading="lazy" decoding="async" />
+      </div>
+
+      <div class="garage__oss-body">
+        <div class="garage__hero-tags">
+          <span class="garage__chip garage__chip--oss">Open source</span>
+          <span class="garage__hero-kind">TypeScript · npm</span>
+        </div>
+        <h3 class="garage__oss-name">vinplain</h3>
+        <p class="garage__hero-desc">
+          The public record for a VIN in one typed call: recalls,
+          complaints, crash ratings, fuel economy. No API key, no runtime
+          dependencies.
+        </p>
+        <ul class="garage__spec garage__spec--oss">
+          <li><span>TypeScript</span></li>
+          <li><span>0 runtime deps</span></li>
+          <li><span>npm</span></li>
+        </ul>
+        <a
+          href={apps.vinplain.href}
+          class="garage__cta garage__cta--stretch"
+          data-track="cta_click"
+          data-track-cta="garage-oss"
+          data-track-project="vinplain"
+        >
+          Open the case study
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M3 13L13 3M13 3H5M13 3v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        <div class="garage__store garage__store--oss">
+          <a
+            class="garage__site garage__site--strong"
+            href={apps.vinplain.npm}
+            target="_blank"
+            rel="noopener"
+            data-track="cta_click"
+            data-track-cta="garage-npm"
+            data-track-project="vinplain"
+          >
+            npm
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M3 13L13 3M13 3H5M13 3v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+          <a
+            class="garage__site"
+            href={apps.vinplain.github}
+            target="_blank"
+            rel="noopener"
+            data-track="cta_click"
+            data-track-cta="garage-github"
+            data-track-project="vinplain"
+          >
+            GitHub
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M3 13L13 3M13 3H5M13 3v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+          <a
+            class="garage__site"
+            href={apps.vinplain.site}
+            target="_blank"
+            rel="noopener"
+            data-track="cta_click"
+            data-track-cta="garage-vinplain-site"
+            data-track-project="vinplain"
+          >
+            Website
             <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <path d="M3 13L13 3M13 3H5M13 3v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
@@ -840,6 +935,10 @@ const apps = {
     border-color: rgba(var(--oss-rgb), 0.5);
     box-shadow: var(--shadow-card-hover), 0 0 0 1px rgba(var(--oss-rgb), 0.22), 0 24px 60px rgba(var(--oss-rgb), 0.10);
   }
+
+  /* The vinplain poster is a document, not a scene. Keep the whole sheet. */
+  .garage__oss--vinplain .garage__oss-media { background: #F3F3EF; }
+  .garage__oss--vinplain .garage__oss-media img { object-fit: contain; }
 
   .garage__oss-corner { border-color: rgba(47, 129, 247, 0); }
   .garage__oss:hover .garage__oss-corner { border-color: #2f81f7; }

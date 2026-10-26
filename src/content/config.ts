@@ -43,6 +43,8 @@ const build = defineCollection({
     // badge + marketing-site link in the header and a closing download CTA.
     appStoreUrl: z.string().url().optional(),
     siteUrl: z.string().url().optional(),
+    siteLabel: z.string().optional(),
+    npmUrl: z.string().url().optional(),
     outcomes: z.array(z.object({
       label: z.string(),
       value: z.string(),
