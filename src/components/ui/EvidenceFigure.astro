@@ -1,0 +1,21 @@
+---
+interface Props {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  caption: string;
+  index?: string;
+  srcset?: string;
+  sizes?: string;
+  priority?: boolean;
+  class?: string;
+}
+const { src, alt, width, height, caption, index, srcset, sizes = '(min-width: 1280px) 1200px, 100vw', priority = false, class: className = '' } = Astro.props;
+---
+<figure class:list={['q-evidence', className]}>
+  <div class="q-evidence__media">
+    <img src={src} alt={alt} width={width} height={height} srcset={srcset} sizes={srcset ? sizes : undefined} loading={priority ? 'eager' : 'lazy'} fetchpriority={priority ? 'high' : 'auto'} decoding="async" />
+  </div>
+  <figcaption>{index && <span class="q-evidence__index" aria-hidden="true">{index}</span>}<span>{caption}</span></figcaption>
+</figure>

@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '@/components/layout/BaseLayout.astro';
-import CarSpotterWall from '@/components/carspotter/CarSpotterWall.astro';
 import QadanSignature from '@/components/brand/QadanSignature.astro';
 import { getCollection } from 'astro:content';
 
@@ -29,6 +28,8 @@ const carSpotterAbout =
     'creative technologist',
     'Los Angeles',
   ]}
+  image="/brand-system/open_graph/about_light.png"
+  imageAlt="Moe Qadan. / Moe Qadan"
 >
   <div class="about">
 
@@ -37,6 +38,7 @@ const carSpotterAbout =
         <div class="about__hero-grid">
           <div class="about__hero-copy">
             <div class="about__sxn">
+              <span class="q-cut" aria-hidden="true"></span>
               <span class="about__sxn-label">Profile</span>
               <span class="about__sxn-meta">Independent senior generalist</span>
             </div>
@@ -100,26 +102,21 @@ const carSpotterAbout =
           </header>
           <h2 class="about__h2">A few shapes the work tends to take.</h2>
           <ul class="about__bullets">
-            <li><strong>Owning the whole web experience for an organization that doesn't have a department for it.</strong> UX, design system, frontend, content architecture, SEO, performance, accessibility, all on one person.</li>
-            <li><strong>Modernizing platforms that can't be rewritten.</strong> Long-running systems with traffic on them, opinions baked in, integrations the business depends on. The win is incremental, sequenced, and invisible when it lands.</li>
-            <li><strong>Building component systems engineers actually use.</strong> Typed, documented, scoped, migrated to without flag days. Right now it's a 100+ component Razor partial library at MagTek; previously it was per-tenant CSS systems on InvestCloud's framework across more than 50 institutions.</li>
-            <li><strong>Translating design intent into code at fidelity.</strong> Reading what the file is asking for, not just what it specifies, and closing the gaps a handoff doesn't see. Most production breakage lives in those gaps.</li>
-            <li><strong>Shipping AI-assisted features without the buzzword tax.</strong> Prompts as system rather than scattered components. Schema-bound outputs. The model held as one stage in a pipeline. VINly is the shipped example: its offer price is computed by deterministic functions the model never overrides, and ChatOBD2 holds the same line in diagnostics.</li>
+            <li><strong>Own the whole web surface.</strong> UX, design system, frontend, content model, SEO, performance and accessibility on one person. The current example is <a href="/work/magtek-platform">MagTek's multi-site platform</a>.</li>
+            <li><strong>Modernize systems that can't be rewritten.</strong> Long-running stacks, live traffic, integrations the business depends on. The work is incremental and invisible when it lands. See <a href="/work/financial-platforms">Advisor Platforms</a>.</li>
+            <li><strong>Build AI features as engineering.</strong> Prompts in source, schema-bound outputs, deterministic logic in front of the model. <a href="/work/vinly">VINly</a> reads and validates the VIN on the device with no model in the loop; <a href="/work/chatobd2">ChatOBD2</a> is in QA and field testing.</li>
           </ul>
         </section>
 
         {/* Background */}
         <section class="about__section">
           <header class="about__sxn about__sxn--inner">
-            <span class="about__sxn-label">Background</span>
+            <h2 class="about__sxn-label">Background</h2>
             <span class="about__sxn-meta">2018 to present</span>
           </header>
 
           <ol class="about__career">
             <li class="about__career-item about__career-item--current about__career-item--flagship">
-              <CarSpotterWall rows={10} tile={64} mobileTile={48} />
-              <span class="about__career-scrim" aria-hidden="true"></span>
-
               <header class="about__career-head">
                 <span class="about__career-status">
                   <span class="about__career-status-dot"></span>
@@ -129,10 +126,6 @@ const carSpotterAbout =
                 <span class="about__career-period">{cs?.period ?? '2026–present'}</span>
               </header>
               <p class="about__career-desc">{carSpotterAbout}</p>
-              <p class="about__career-stack">
-                Expo / React Native · TypeScript · Zustand · MMKV ·
-                Turborepo · Astro · ImageMagick pipeline
-              </p>
               <p class="about__career-links">
                 <a href="https://apps.apple.com/app/carspotter-daily-car-game/id6777868215" target="_blank" rel="noopener" data-track="cta_click" data-track-cta="about-appstore" data-track-project="car-spotter">App Store ↗</a>
                 <span aria-hidden="true">·</span>
@@ -159,10 +152,6 @@ const carSpotterAbout =
                 lookup, and the photo never leaves the phone. Live on the
                 App Store.
               </p>
-              <p class="about__career-stack">
-                Expo / React Native · TypeScript · Apple Vision (on-device
-                OCR) · Supabase Edge (Deno) · NHTSA + EPA · Astro
-              </p>
               <p class="about__career-links">
                 <a href="https://apps.apple.com/us/app/vinly-buyer-reports/id6774041303" target="_blank" rel="noopener" data-track="cta_click" data-track-cta="about-appstore" data-track-project="vinly">App Store ↗</a>
                 <span aria-hidden="true">·</span>
@@ -186,13 +175,8 @@ const carSpotterAbout =
                 marketing site, developer portal, prompt pipeline. The
                 design problem was translation. Vehicle data is messy and
                 technical; the verdict has to be a single sentence the
-                driver can act on. Now in QA and field testing ahead of
-                release.
-              </p>
-              <p class="about__career-stack">
-                React Native (Expo) · TypeScript · Supabase · BLE ·
-                Structured prompt pipeline · Next.js + Tailwind for the
-                marketing site
+                driver can act on. Now in QA and field testing. Not yet publicly
+                released.
               </p>
             </li>
 
@@ -215,10 +199,6 @@ const carSpotterAbout =
                 tokens, navigation grammar that travels, sequenced
                 migrations that don't break production.
               </p>
-              <p class="about__career-stack">
-                ASP.NET MVC · C# · Razor · hand-authored CSS ·
-                JavaScript · Bootstrap
-              </p>
             </li>
 
             <li class="about__career-item about__career-item--product">
@@ -237,46 +217,10 @@ const carSpotterAbout =
                 dense data layouts, and the discipline that comes from
                 fifty deploys against the same substrate.
               </p>
-              <p class="about__career-stack">
-                CSS · proprietary CMS / component framework · Figma
-                handoff translation
-              </p>
             </li>
           </ol>
         </section>
 
-        {/* How I think */}
-        <section class="about__section">
-          <header class="about__sxn about__sxn--inner">
-            <span class="about__sxn-label">How I think about the work</span>
-          </header>
-
-          <ol class="about__list">
-            <li>
-              <strong>Read the constraints first.</strong> Long-running platforms
-              have opinions about how they want to be changed. Listening
-              to them is how the work survives.
-            </li>
-            <li>
-              <strong>Get the structure right early.</strong> Components,
-              tokens, layout primitives, content models. When those are
-              sound most decisions become cheap. When they aren't every
-              decision is expensive.
-            </li>
-            <li>
-              <strong>Use AI where it earns its place.</strong> Code in
-              Claude or Cursor when it's faster than typing. Visual
-              exploration in Claude Design when a frame is faster than
-              markup. Figma when precision matters.
-            </li>
-          </ol>
-
-          <p class="about__para about__para--note">
-            More on the workflow itself, including how AI fits into the
-            build pipeline, lives on the
-            <a href="/approach" class="about__inline-link">approach</a> page.
-          </p>
-        </section>
       </div>
 
       {/* Right column aside */}
@@ -295,27 +239,11 @@ const carSpotterAbout =
             <li>
               <span class="about__card-key">Building</span>
               <span class="about__card-val about__card-val--building">
-                <a href="/work/car-spotter" class="about__card-pill about__card-pill--flagship">
-                  <span class="about__card-pill-dot"></span>
-                  CarSpotter
-                </a>
-                <a href="/work/vinly" class="about__card-pill about__card-pill--flagship">
-                  <span class="about__card-pill-dot"></span>
-                  VINly
-                </a>
-                <a href="/work/chatobd2" class="about__card-pill about__card-pill--flagship">
-                  <span class="about__card-pill-dot"></span>
-                  ChatOBD2
-                </a>
-                <a href="/work/magtek-platform" class="about__card-pill about__card-pill--platform">
-                  <span class="about__card-pill-dot"></span>
-                  MagTek
-                </a>
+                <a href="/work/car-spotter">CarSpotter</a>,
+                <a href="/work/vinly">VINly</a>,
+                <a href="/work/chatobd2">ChatOBD2</a>,
+                <a href="/work/magtek-platform">MagTek</a>
               </span>
-            </li>
-            <li>
-              <span class="about__card-key">Stack</span>
-              <span class="about__card-val">TypeScript · React · React Native · Astro · ASP.NET MVC · C# · Razor · hand-authored CSS</span>
             </li>
             <li>
               <span class="about__card-key">Based in</span>
@@ -330,7 +258,7 @@ const carSpotterAbout =
             <h3 class="about__card-title">Reach out</h3>
           </header>
           <p class="about__card-note">
-            Project questions, design or engineering conversations. Replies within a day.
+            Project questions, design or engineering conversations. Email works too.
           </p>
           <a href="/contact" class="about__card-cta">
             Get in touch
@@ -467,15 +395,6 @@ const carSpotterAbout =
 
   .about__id-status:hover .about__id-status-dot {
     background-color: var(--color-accent);
-  }
-
-  @keyframes about-status-pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.7; transform: scale(0.85); }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .about__career-status-dot { animation: none; }
   }
 
   .about__id-sep {
@@ -816,23 +735,21 @@ const carSpotterAbout =
   }
 
   .about__career-item {
-    --pc-accent: var(--color-text-subtle);
-        position: relative;
-    padding: var(--space-6);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-2xl);
-    background:
-      linear-gradient(180deg, var(--color-bg-elevated), var(--color-bg-muted));
-    box-shadow: var(--shadow-card);
+    position: relative;
+    padding: var(--space-7) 0;
+    border-top: 1px solid var(--color-border);
+    background: none;
+    border-radius: 0;
+    box-shadow: none;
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
-    overflow: hidden;
-    transition: border-color 280ms, box-shadow 280ms, transform 280ms var(--ease-out);
+    overflow: visible;
   }
 
 
   .about__career-item::before {
+    display: none;
     content: '';
     position: absolute;
     inset: 0;
@@ -843,13 +760,11 @@ const carSpotterAbout =
   }
 
   .about__career-item--current::before {
-    opacity: 0.85;
+    display: none;
   }
 
   .about__career-item:hover {
-    border-color: var(--color-border-strong);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-card-hover);
+    border-color: var(--color-border);
   }
 
   .about__career-item:hover::before {
@@ -857,7 +772,7 @@ const carSpotterAbout =
   }
 
   .about__career-item--current {
-    border-color: var(--color-border-strong);
+    border-color: var(--color-border);
   }
 
   @media (min-width: 600px) {
@@ -901,35 +816,25 @@ const carSpotterAbout =
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    font-family: var(--font-body);
+    font-family: var(--font-mono);
     font-size: 10px;
-    font-weight: 600;
-    /* The per-category accent is a fill colour, not a text colour: at 10px it
-       measured 4.26:1. Mixing it toward the body ink darkens it in light mode
-       and lightens it in dark mode, so the hue survives and the label passes.
-       Browsers without color-mix fall back to the accent itself. */
-    color: var(--pc-accent);
-    color: color-mix(in srgb, var(--pc-accent) 72%, var(--color-text));
-    padding: 4px 10px;
-    border-radius: 9999px;
-    background-color: var(--color-accent-muted);
-    border: 1px solid var(--color-accent-muted);
+    font-weight: 500;
+    color: var(--color-accent);
+    padding: 0;
+    border: 0;
+    background: none;
     line-height: 1;
   }
 
   .about__career-status--past {
     color: var(--color-text-subtle);
-    background-color: var(--color-bg-deep);
-    border-color: var(--color-border);
   }
 
   .about__career-status-dot {
     width: 5px;
     height: 5px;
     border-radius: 50%;
-    background-color: var(--pc-accent);
-    box-shadow: 0 0 6px var(--pc-accent);
-    animation: about-status-pulse 2.4s ease-in-out infinite;
+    background-color: var(--color-accent);
   }
 
   .about__career-title {
@@ -1003,55 +908,6 @@ const carSpotterAbout =
     background: rgba(12, 12, 14, 0.86);
   }
 
-  .about__career-stack {
-    position: relative;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--color-text-subtle);
-    line-height: 1.55;
-    margin: 0;
-    padding-top: var(--space-3);
-    border-top: 1px solid var(--color-border-subtle);
-    z-index: 1;
-  }
-
-  /* Numbered list (How I think) */
-  .about__list {
-    counter-reset: about-list;
-    list-style: none;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-    margin-bottom: var(--space-6);
-  }
-
-  .about__list li {
-    counter-increment: about-list;
-    position: relative;
-    padding-left: 36px;
-    font-size: clamp(15px, 1.5vw, 17px);
-    line-height: 1.7;
-    color: var(--color-text-muted);
-    max-width: 62ch;
-  }
-
-  .about__list li::before {
-    content: counter(about-list, decimal-leading-zero);
-    position: absolute;
-    left: 0;
-    top: 4px;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--color-accent);
-    letter-spacing: 0.04em;
-  }
-
-  .about__list strong {
-    color: var(--color-text);
-    font-weight: 600;
-  }
 
   /* Sidebar cards */
   .about__aside {

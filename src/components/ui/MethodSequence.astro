@@ -1,0 +1,164 @@
+---
+import ThemeArtwork from './ThemeArtwork.astro';
+
+const steps = [
+  {
+    num: '01',
+    tag: 'Read',
+    title: 'The constraints first.',
+    body: "Every long-running platform has opinions. The wireframes don't capture what the system has already been through. The first job is reading what's already true before drawing anything.",
+    href: '/work/magtek-platform',
+    link: 'MagTek platform',
+    art: 'read_constraints',
+  },
+  {
+    num: '02',
+    tag: 'Pick',
+    title: 'The structure carefully.',
+    body: 'Most production breakage lives in the gap between intent and structure. Pick the right substrate (typed components, shared partials, prompt modules) once, ship for years.',
+    href: '/work/vinplain',
+    link: 'vinplain',
+    art: 'shared_system',
+  },
+  {
+    num: '03',
+    tag: 'Use',
+    title: 'AI where it earns its place.',
+    body: 'Prompts as production code. Schema-bound outputs. Deterministic layers in front of every model call. AI in the build, and in the product only where it is structured enough to ship.',
+    href: '/work/chatobd2',
+    link: 'ChatOBD2, in QA',
+    art: 'reviewed_output',
+  },
+];
+
+interface Props {
+  class?: string;
+  headingLevel?: 'h2' | 'h3';
+}
+const { class: className = '', headingLevel = 'h2' } = Astro.props;
+const Heading = headingLevel;
+---
+<ol class:list={['method-list', className]}>
+  {steps.map(step => (
+    <li class="method-step">
+      <div class="method-copy">
+        <div class="method-step-head">
+          <span class="method-num">{step.num}</span>
+          <span class="method-tag">{step.tag}</span>
+        </div>
+        <Heading class="method-title">{step.title}</Heading>
+        <p class="method-body">{step.body}</p>
+        <a class="method-link" href={step.href} data-track="cta_click" data-track-cta="method-project">
+          {step.link}
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M3 13L13 3M13 3H5M13 3v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+      <ThemeArtwork
+        class="method-art"
+        light={`/brand-system/illustrations/${step.art}_light.svg`}
+        dark={`/brand-system/illustrations/${step.art}_dark.svg`}
+        width={400}
+        height={320}
+      />
+    </li>
+  ))}
+</ol>
+
+<style>
+  .method-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .method-step {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    align-items: center;
+    padding-block: var(--space-8);
+    border-top: 1px solid var(--color-border);
+  }
+
+  @media (min-width: 860px) {
+    .method-step {
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 400px);
+      gap: var(--space-16);
+      padding-block: var(--space-10);
+    }
+    .method-step:nth-child(even) .method-copy { order: 2; }
+    .method-step:nth-child(even) .method-art { order: 1; }
+  }
+
+  .method-copy {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    max-width: 62ch;
+  }
+
+  .method-step-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .method-num {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  .method-tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    letter-spacing: .04em;
+  }
+
+  .method-title {
+    font-family: var(--font-display);
+    font-size: clamp(26px, 3.2vw, 38px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.08;
+    color: var(--color-text);
+  }
+
+  .method-body {
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--color-text-muted);
+    max-width: 58ch;
+  }
+
+  .method-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    width: fit-content;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-accent);
+    text-decoration: none;
+    border-bottom: 1px solid var(--color-accent-muted);
+    padding-bottom: 2px;
+  }
+
+  .method-link:hover { border-color: var(--color-accent); }
+
+  .method-art {
+    justify-self: center;
+    width: min(100%, 400px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .method-link { transition: none; }
+  }
+</style>

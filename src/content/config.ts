@@ -19,7 +19,7 @@ const build = defineCollection({
       approach: z.string().optional(),
       related: z.string().optional(),
     }).optional(),
-    category: z.enum(['Flagship', 'Platform', 'Product', 'Frontend']),
+    category: z.enum(['Independent product', 'Open source', 'Platform work']),
     keyFocus: z.array(z.string()),
     placeholder: z.object({
       from: z.string(),
@@ -30,13 +30,14 @@ const build = defineCollection({
       labelTone: z.enum(['light', 'dark']).default('light'),
     }),
     featured: z.boolean().default(false),
-    comingSoon: z.boolean().default(false),
+    inProgress: z.boolean().default(false),
     order: z.number().default(99),
     draft: z.boolean().default(false),
     engagement: z.enum(['independent', 'work']).default('independent'),
     company: z.string().optional(),
     period: z.string().optional(),
     role: z.string().optional(),
+    roleShort: z.string().optional(),
     scope: z.string().optional(),
     status: z.string().optional(),
     // Live-product links: when present, the case study renders an App Store
@@ -46,13 +47,16 @@ const build = defineCollection({
     siteLabel: z.string().optional(),
     npmUrl: z.string().url().optional(),
     repoUrl: z.string().url().optional(),
-    outcomes: z.array(z.object({
+    facts: z.array(z.object({
       label: z.string(),
       value: z.string(),
     })).optional(),
     stack: z.array(z.string()).optional(),
     coverImage: z.string().optional(),
     coverAlt: z.string().optional(),
+    coverCaption: z.string().optional(),
+    coverWidth: z.number().optional(),
+    coverHeight: z.number().optional(),
     // Portrait companion for mobile art direction — a separate composition,
     // never a centre crop of the desktop cover.
     coverMobileImage: z.string().optional(),

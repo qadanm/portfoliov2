@@ -26,7 +26,7 @@ const channels = [
 
 <BaseLayout
   title="Contact"
-  description="Get in touch with Moe Qadan. Project questions, design and engineering conversations, speaking and writing inquiries. Replies within a day."
+  description="Get in touch with Moe Qadan. Project questions, design and engineering conversations, speaking and writing inquiries."
   keywords={[
     'contact Moe Qadan',
     'UX engineer Los Angeles',
@@ -34,14 +34,17 @@ const channels = [
     'design engineer',
     'creative technologist',
   ]}
+  image="/brand-system/open_graph/contact_light.png"
+  imageAlt="Tell me what you are working on. / Moe Qadan"
 >
   <div class="contact">
 
     <div class="container-site contact__inner">
       <header class="contact__head">
         <div class="contact__sxn">
+          <span class="q-cut" aria-hidden="true"></span>
           <span class="contact__sxn-label">Contact</span>
-          <span class="contact__sxn-meta">Replies within a day</span>
+          <span class="contact__sxn-meta">Los Angeles, CA</span>
         </div>
 
         <h1 class="contact__title">
@@ -49,17 +52,14 @@ const channels = [
         </h1>
 
         <p class="contact__lede">
-          For project questions, design or engineering conversations,
-          or anything related to the work below. The form works, or
-          email me directly. Either way you'll hear back.
+          For project questions and design or engineering conversations.
+          Use the form or email me directly.
         </p>
       </header>
 
       <div class="contact__grid">
         {/* Form card */}
         <section class="contact__form-card" aria-labelledby="contact-form-heading">
-          <span class="contact__form-glow" aria-hidden="true"></span>
-
           <header class="contact__form-head">
             <h2 id="contact-form-heading" class="contact__form-title">Send a message</h2>
           </header>
@@ -107,7 +107,6 @@ const channels = [
           </ul>
 
           <footer class="contact__foot">
-            <span class="contact__foot-line" aria-hidden="true"></span>
             <p class="contact__foot-text">
               Based in Los Angeles. Working PT/CST/EST hours, but flexible.
             </p>
@@ -222,15 +221,8 @@ const channels = [
   /* ─── Form card ───────────────────────────────────────────────────── */
   .contact__form-card {
     position: relative;
-    padding: var(--space-6);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-2xl);
-    background:
-      linear-gradient(180deg, var(--color-bg-elevated), var(--color-bg-muted));
-    box-shadow:
-      var(--shadow-card),
-      inset 0 1px 0 rgba(255, 255, 255, 0.04);
-    overflow: hidden;
+    padding: var(--space-6) 0 0;
+    border-top: 1px solid var(--color-border);
   }
 
   @media (min-width: 600px) {
@@ -245,16 +237,6 @@ const channels = [
     }
   }
 
-  .contact__form-glow {
-    position: absolute;
-    top: -30%;
-    right: -10%;
-    width: 60%;
-    height: 80%;
-    background: radial-gradient(circle, var(--color-accent-muted), transparent 65%);
-    filter: blur(40px);
-    pointer-events: none;
-  }
 
   .contact__form-corner {
     position: absolute;
@@ -303,26 +285,8 @@ const channels = [
   }
 
   /* Style overrides on the form for the new submit treatment */
-  .contact__form-wrap :global(.cf__submit) {
-    box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.5) inset,
-      0 1px 2px rgba(0, 0, 0, 0.2),
-      0 6px 18px rgba(0, 0, 0, 0.18);
-  }
 
-  :global([data-theme="dark"]) .contact__form-wrap :global(.cf__submit) {
-    box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.6) inset,
-      0 1px 2px rgba(0, 0, 0, 0.4),
-      0 8px 22px rgba(0, 0, 0, 0.35);
-  }
 
-  .contact__form-wrap :global(.cf__submit:hover:not(:disabled)) {
-    box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.5) inset,
-      0 12px 28px rgba(0, 0, 0, 0.18),
-      0 0 0 4px var(--color-accent-dim);
-  }
 
   /* ─── Channels ────────────────────────────────────────────────────── */
   .contact__channels-wrap {
@@ -366,66 +330,38 @@ const channels = [
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
+    gap: 0;
   }
 
-  /* Per-channel accent: primary uses candy pink, others use steel */
   .contact__channel {
-    --pc-accent: var(--color-text);
-        position: relative;
+    position: relative;
     display: flex;
     align-items: center;
     gap: var(--space-4);
-    padding: var(--space-4) var(--space-5);
-    min-height: 64px;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl);
-    background:
-      linear-gradient(180deg, var(--color-bg-elevated), var(--color-bg-muted));
+    padding: var(--space-4) 0;
+    min-height: 56px;
+    border-top: 1px solid var(--color-border);
+    background: none;
     text-decoration: none;
     color: var(--color-text);
-    box-shadow: var(--shadow-card);
-    overflow: hidden;
-    transition:
-      border-color 280ms,
-      transform 280ms var(--ease-out),
-      box-shadow 280ms;
     -webkit-tap-highlight-color: transparent;
   }
 
-  .contact__channel--primary {
-    --pc-accent: var(--color-accent);
-    border-color: var(--color-accent-muted);
-    background:
-      linear-gradient(180deg,
-        color-mix(in srgb, var(--color-accent) 6%, var(--color-bg-elevated)),
-        var(--color-bg-muted)
-      );
+  .contact__channel:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
   }
 
-  .contact__channel:hover {
-    border-color: var(--pc-accent);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-card-hover);
+  .contact__channel--primary .contact__channel-value {
+    color: var(--color-accent);
   }
 
-  .contact__channel-corner {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    border: 1px solid var(--color-text-subtle);
-    opacity: 0.4;
-    pointer-events: none;
-    transition: opacity 240ms, border-color 240ms;
+  .contact__channel:hover .contact__channel-value {
+    color: var(--color-accent);
   }
 
-  .contact__channel-corner--tl { top: 8px; left: 8px; border-right: none; border-bottom: none; }
-  .contact__channel-corner--br { bottom: 8px; right: 8px; border-left: none; border-top: none; }
 
-  .contact__channel:hover .contact__channel-corner {
-    opacity: 1;
-    border-color: var(--pc-accent);
-  }
+
 
   .contact__channel-label {
     font-family: var(--font-body);
@@ -496,13 +432,6 @@ const channels = [
     padding-top: var(--space-3);
   }
 
-  .contact__foot-line {
-    flex-shrink: 0;
-    width: 18px;
-    height: 1px;
-    margin-top: 9px;
-    background-color: var(--color-text-subtle);
-  }
 
   .contact__foot-text {
     font-family: var(--font-body);

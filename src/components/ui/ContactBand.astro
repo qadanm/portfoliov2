@@ -1,0 +1,15 @@
+---
+interface Props { id?: string; title?: string; email?: string; class?: string; }
+const { id = 'q-contact', title = 'Tell me what you are working on.', email = 'moe@qadan.co', class: className = '' } = Astro.props;
+---
+<section class:list={['q-contact', className]} aria-labelledby={`${id}-heading`}>
+  <div class="container-site">
+    <div class="q-sxn">
+      <span class="q-cut" aria-hidden="true"></span>
+      <span class="q-eyebrow">Contact</span>
+    </div>
+    <h2 class="q-title" id={`${id}-heading`}>{title}</h2>
+    <a class="q-contact__email" href={`mailto:${email}`} data-track="contact_click" data-track-channel="email" data-track-loc="home-contact">{email}</a>
+    <div class="q-contact__links"><slot /></div>
+  </div>
+</section>

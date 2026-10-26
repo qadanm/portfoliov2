@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '@/components/layout/BaseLayout.astro';
-import CarSpotterWall from '@/components/carspotter/CarSpotterWall.astro';
+import ProjectIndexRow from '@/components/ui/ProjectIndexRow.astro';
 
 // Same ordering as the case-study template, so the index position a visitor
 // reads here is the same "04 / 06" the case study shows.
@@ -11,11 +11,12 @@ const allProjects = (await getCollection('build', ({ data }) => !data.draft))
 const numberOf = (slug: string) =>
   String(allProjects.findIndex(p => p.slug === slug) + 1).padStart(2, '0');
 
+const thumbnail = (slug: string) => `/images/work-thumbs/${slug}.webp`;
 ---
 
 <BaseLayout
   title="Selected Work"
-  description="Selected case studies by Moe Qadan. CarSpotter, a daily car-identification game for iPhone; VINly, free VIN research for used-car buyers; vinplain, an open-source TypeScript client for US vehicle records; ChatOBD2 AI-native diagnostics; MagTek's multi-site platform; and advisor portals deployed across more than 50 wealth and banking institutions at InvestCloud."
+  description="Selected case studies by Moe Qadan. CarSpotter, a daily car-identification game for iPhone; VINly, free VIN research for used-car buyers; vinplain, an open-source TypeScript client for US vehicle records; ChatOBD2, an AI-native diagnostics product in QA; MagTek's multi-site platform; and advisor portals deployed across more than 50 wealth and banking institutions at InvestCloud."
   keywords={[
     'Moe Qadan',
     'portfolio',
@@ -30,51 +31,35 @@ const numberOf = (slug: string) =>
     'MagTek',
     'InvestCloud',
   ]}
+  image="/brand-system/open_graph/work_light.png"
+  imageAlt="Selected work. / Moe Qadan"
 >
   <div class="widx">
     <header class="widx__hero container-site">
+      <span class="q-cut widx__cut" aria-hidden="true"></span>
       <h1 class="widx__title">Selected work.</h1>
       <p class="widx__lede">
-        Case studies across my own products and the platforms I've worked on.
+        Seven projects across my own products, open-source tools, and the
+        platforms I've worked on.
       </p>
     </header>
 
     <section class="widx__group container-site" aria-label="Case studies">
       <ol class="widx__list">
         {allProjects.map(p => (
-            <li class="widx__row">
-              <a
-                href={`/work/${p.slug}`}
-                class:list={['widx__link', p.slug === 'car-spotter' && 'widx__link--wall']}
-                data-track="cta_click"
-                data-track-cta="work-index-row"
-                data-track-project={p.slug}
-              >
-                {p.slug === 'car-spotter' && (
-                  <>
-                    <CarSpotterWall rows={6} tile={56} mobileTile={40} />
-                    <span class="widx__wall-scrim" aria-hidden="true"></span>
-                  </>
-                )}
-                <span class="widx__num">{numberOf(p.slug)}</span>
-
-                <div class="widx__body">
-                  <span class="widx__head">
-                    <span class="widx__name">{p.data.title}</span>
-                    {p.data.company && <span class="widx__co">{p.data.company}</span>}
-                    {/* Period is prose ("Earlier", "2025, present"), not a figure —
-                        so it sits in the line, not in a column pretending to tabulate. */}
-                    <span class="widx__period">{p.data.period}</span>
-                  </span>
-                  <span class="widx__desc">{p.data.short}</span>
-                  {p.data.status && <span class="widx__status">{p.data.status}</span>}
-                </div>
-
-                <svg class="widx__arrow" width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </a>
-            </li>
+          <li>
+            <ProjectIndexRow
+              href={`/work/${p.slug}`}
+              name={p.data.title}
+              index={numberOf(p.slug)}
+              summary={p.data.short}
+              category={p.data.category}
+              thumbnail={thumbnail(p.slug)}
+              meta={p.data.roleShort ?? p.data.role}
+              status={p.data.inProgress ? 'In QA & field testing' : undefined}
+              project={p.slug}
+            />
+          </li>
         ))}
       </ol>
     </section>
@@ -87,12 +72,22 @@ const numberOf = (slug: string) =>
      object: hairline row rules, no cards, no radius, no shadow. */
 
   .widx {
-    padding-top: var(--space-24);
+    padding-top: calc(60px + var(--space-10));
     padding-bottom: var(--space-24);
   }
 
+  @media (min-width: 768px) {
+    .widx {
+      padding-top: calc(64px + var(--space-16));
+    }
+  }
+
   .widx__hero {
-    margin-bottom: var(--space-16);
+    margin-bottom: var(--space-12);
+  }
+
+  .widx__cut {
+    margin-bottom: var(--space-5);
   }
 
   .widx__title {
@@ -107,188 +102,19 @@ const numberOf = (slug: string) =>
 
   .widx__lede {
     margin-top: var(--space-5);
-    max-width: 56ch;
+    max-width: 58ch;
     font-size: clamp(15px, 1.5vw, 17px);
     line-height: 1.65;
     color: var(--color-text-muted);
   }
 
-  /* ─── Group ─────────────────────────────────────────────────────────── */
-  .widx__group + .widx__group {
-    margin-top: var(--space-16);
-  }
-
-  /* The index runs to a tighter measure than the homepage's 1200px column —
-     density is the whole point of this page existing separately. */
-  .widx__group-head,
   .widx__list {
-    max-width: 940px;
-  }
-
-  .widx__group-head {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-    padding-bottom: var(--space-3);
-  }
-
-  .widx__group-label {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--color-text);
-  }
-
-  .widx__group-meta {
-    flex: 1;
-    font-size: 13px;
-    color: var(--color-text-subtle);
-  }
-
-  .widx__group-count {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--color-text-subtle);
-  }
-
-  /* ─── List ──────────────────────────────────────────────────────────── */
-  .widx__list {
-    list-style: none;
     margin: 0;
     padding: 0;
-    border-top: 1px solid var(--color-border);
+    list-style: none;
   }
 
-  .widx__row {
-    border-bottom: 1px solid var(--color-border-subtle);
-  }
-
-  .widx__link {
-    position: relative;
-    overflow: hidden;
-    display: grid;
-    grid-template-columns: 56px 1fr 15px;
-    align-items: baseline;
-    gap: 16px;
-    padding: var(--space-5) 4px;
-    text-decoration: none;
-    color: inherit;
-    transition: background-color var(--duration-fast) var(--ease-out);
-  }
-
-  .widx__num,
-  .widx__body,
-  .widx__arrow {
-    position: relative;
-    z-index: 1;
-  }
-
-  .widx__link:hover {
-    background-color: var(--color-bg-muted);
-  }
-
-  .widx__link--wall:hover {
-    background-color: transparent;
-  }
-
-  .widx__wall-scrim {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    background: rgba(250, 250, 249, 0.90);
-    transition: background-color 240ms var(--ease-out);
-  }
-
-  :global([data-theme="dark"]) .widx__wall-scrim {
-    background: rgba(12, 12, 14, 0.86);
-  }
-
-  .widx__link--wall:hover .widx__wall-scrim {
-    background-color: rgba(250, 250, 249, 0.82);
-  }
-
-  :global([data-theme="dark"]) .widx__link--wall:hover .widx__wall-scrim {
-    background-color: rgba(12, 12, 14, 0.78);
-  }
-
-  .widx__num {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--color-text-subtle);
-    font-variant-numeric: tabular-nums;
-  }
-
-  .widx__body {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    min-width: 0;
-  }
-
-  .widx__head {
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-
-  .widx__name {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: clamp(24px, 2.6vw, 32px);
-    line-height: 1.1;
-    color: var(--color-text);
-    transition: color var(--duration-fast) var(--ease-out);
-  }
-
-  .widx__link:hover .widx__name {
-    color: var(--color-accent);
-  }
-
-  .widx__co {
-    font-size: 13px;
-    color: var(--color-text-subtle);
-  }
-
-  .widx__desc {
-    max-width: 62ch;
-    font-size: 15px;
-    line-height: 1.6;
-    color: var(--color-text-muted);
-  }
-
-  .widx__status {
-    font-size: 13px;
-    color: var(--color-text-subtle);
-  }
-
-  .widx__period {
-    font-size: 13px;
-    color: var(--color-text-subtle);
-    white-space: nowrap;
-  }
-
-  .widx__arrow {
-    color: var(--color-text-subtle);
-    align-self: center;
-    transition: transform var(--duration-fast) var(--ease-out),
-                color var(--duration-fast) var(--ease-out);
-  }
-
-  .widx__link:hover .widx__arrow {
-    color: var(--color-accent);
-    transform: translateX(3px);
-  }
-
-  /* ─── Narrow ────────────────────────────────────────────────────────── */
-  @media (max-width: 720px) {
-    .widx__link {
-      grid-template-columns: 32px 1fr;
-      gap: 12px;
-    }
-
-    .widx__arrow {
-      display: none;
-    }
+  .widx__list > li:last-child :global(.q-index-row) {
+    border-bottom: 1px solid var(--q-line);
   }
 </style>
