@@ -50,47 +50,26 @@ import QadanMark from '@/components/brand/QadanMark.astro';
 
     {/* Portrait stage. One transparent portrait, designed backdrop. */}
     <aside class="hero__portrait">
-      <div class="hero__portrait-frame">
-        {/* Stage layers — sit BEHIND the transparent portrait */}
-        <div class="hero__portrait-stage" aria-hidden="true">
-          <span class="hero__portrait-grid"></span>
-          <span class="hero__portrait-rules">
-            <span></span>
-            <span></span>
-            <span></span>
-          </span>
-          <span class="hero__portrait-glow"></span>
-          <span class="hero__portrait-plinth"></span>
+      <div class="hero__portrait-frame-wrap">
+        <div class="hero__portrait-frame">
+          <div class="hero__portrait-stage" aria-hidden="true">
+            <span class="hero__portrait-glow"></span>
+          </div>
+
+          <img
+            src="/images/portrait/qadan-portrait.webp"
+            alt="Portrait of Muhammed Qadan"
+            width="1122"
+            height="1402"
+            fetchpriority="high"
+            decoding="async"
+            class="hero__portrait-img"
+          />
         </div>
 
-        {/* The figure */}
-        <img
-          src="/images/portrait/qadan-portrait.webp"
-          alt="Portrait of Muhammed Qadan"
-          width="1122"
-          height="1402"
-          fetchpriority="high"
-          decoding="async"
-          class="hero__portrait-img"
-        />
-
-        {/* Frame corner crosshairs — same fingerprint as project cards */}
-        <span class="hero__portrait-corner hero__portrait-corner--tl" aria-hidden="true"></span>
-        <span class="hero__portrait-corner hero__portrait-corner--tr" aria-hidden="true"></span>
-        <span class="hero__portrait-corner hero__portrait-corner--bl" aria-hidden="true"></span>
-        <span class="hero__portrait-corner hero__portrait-corner--br" aria-hidden="true"></span>
-
-        {/* Floating UI in front of the figure */}
-        <div class="hero__portrait-mark">
-          <QadanMark />
-          <span class="hero__portrait-mark-rule"></span>
-          <span class="hero__portrait-mark-year">'26</span>
+        <div class="hero__portrait-q" aria-hidden="true">
+          <QadanMark size="var(--hero-q-size)" />
         </div>
-
-        <a href="/contact" class="hero__portrait-pulse" aria-label="Contact">
-          <span class="hero__portrait-pulse-dot" aria-hidden="true"></span>
-          <span class="hero__portrait-pulse-text">Contact</span>
-        </a>
       </div>
 
       {/* Spec panel below the frame — a designed signature object that
@@ -126,10 +105,6 @@ import QadanMark from '@/components/brand/QadanMark.astro';
     </aside>
   </div>
 
-  <div class="hero__scroll" aria-hidden="true">
-    <span class="hero__scroll-text">Scroll</span>
-    <span class="hero__scroll-line"></span>
-  </div>
 </section>
 
 <style>
@@ -183,10 +158,6 @@ import QadanMark from '@/components/brand/QadanMark.astro';
       grid-template-columns: minmax(0, 1.55fr) 400px;
       gap: 96px;
     }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .hero__portrait-pulse-dot { animation: none; }
   }
 
   .hero__headline {
@@ -330,9 +301,8 @@ import QadanMark from '@/components/brand/QadanMark.astro';
   }
 
   /* ─── Portrait stage ──────────────────────────────────────────────────
-     One transparent portrait sits inside a designed backdrop. The stage
-     does the work of grounding the figure: ambient backlight + subtle
-     grid + horizontal editorial rules + tonal plinth at the bottom. */
+     One transparent portrait, one Q that breaks the frame at the
+     bottom-left. No floating UI, brackets, grid, rules, or plinth. */
 
   .hero__portrait {
     --portrait-max: 380px;
@@ -391,6 +361,36 @@ import QadanMark from '@/components/brand/QadanMark.astro';
     border-color: var(--color-accent-muted);
   }
 
+  .hero__portrait-frame-wrap {
+    position: relative;
+  }
+
+  /* The Q is half inside the photo, half in the gutter. Its bottom edge
+     sits on the frame's bottom edge, so it reads as a corner mark rather
+     than another floating control. */
+  .hero__portrait-q {
+    --hero-q-size: 48px;
+    position: absolute;
+    left: calc(var(--hero-q-size) / -2);
+    bottom: 0;
+    z-index: 4;
+    width: var(--hero-q-size);
+    height: var(--hero-q-size);
+    pointer-events: none;
+  }
+
+  @media (min-width: 1024px) {
+    .hero__portrait-q {
+      --hero-q-size: clamp(72px, 8vw, 96px);
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .hero__portrait-q {
+      --hero-q-size: clamp(120px, 11vw, 160px);
+    }
+  }
+
   /* ─── Stage layers — sit behind the figure ────────────────────────── */
 
   .hero__portrait-stage {
@@ -399,46 +399,6 @@ import QadanMark from '@/components/brand/QadanMark.astro';
     pointer-events: none;
     z-index: 1;
   }
-
-  /* Subtle grid behind the figure. Masked to the upper half so it doesn't
-     fight the plinth below. Acts as a quiet editorial substrate. */
-  .hero__portrait-grid {
-    position: absolute;
-    inset: 0;
-    background-image:
-      linear-gradient(to right, var(--viz-grid) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--viz-grid) 1px, transparent 1px);
-    background-size: 40px 40px;
-    background-position: -1px -1px;
-    opacity: 0.7;
-    mask-image: radial-gradient(ellipse 100% 80% at 50% 30%, #000 0%, transparent 75%);
-    -webkit-mask-image: radial-gradient(ellipse 100% 80% at 50% 30%, #000 0%, transparent 75%);
-  }
-
-  /* Three thin horizontal rules at fixed heights — fine editorial scaffold
-     visible only where the portrait's transparency reveals them. */
-  .hero__portrait-rules {
-    position: absolute;
-    inset: 0;
-  }
-
-  .hero__portrait-rules span {
-    position: absolute;
-    left: 8%;
-    right: 8%;
-    height: 1px;
-    background: linear-gradient(to right,
-      transparent 0%,
-      color-mix(in srgb, var(--color-border-strong) 70%, transparent) 30%,
-      color-mix(in srgb, var(--color-border-strong) 70%, transparent) 70%,
-      transparent 100%
-    );
-    opacity: 0.35;
-  }
-
-  .hero__portrait-rules span:nth-child(1) { top: 22%; }
-  .hero__portrait-rules span:nth-child(2) { top: 46%; }
-  .hero__portrait-rules span:nth-child(3) { top: 68%; }
 
   /* Ambient backlight — a soft warm radial that catches the upper torso.
      This is the most important visual layer: it gives the figure a sense
@@ -468,46 +428,6 @@ import QadanMark from '@/components/brand/QadanMark.astro';
         transparent 70%
       );
     opacity: 0.7;
-  }
-
-  /* Plinth — a tonal panel that the lower torso visually lands on.
-     Provides grounding so the figure doesn't feel like a floating cutout.
-     Has a soft top edge that catches a hint of light. */
-  .hero__portrait-plinth {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 30%;
-    background:
-      linear-gradient(180deg,
-        transparent 0%,
-        color-mix(in srgb, var(--color-bg-deep) 40%, transparent) 35%,
-        color-mix(in srgb, var(--color-bg-deep) 80%, transparent) 100%
-      );
-  }
-
-  .hero__portrait-plinth::before {
-    content: '';
-    position: absolute;
-    top: 35%;
-    left: 12%;
-    right: 12%;
-    height: 1px;
-    background: linear-gradient(to right,
-      transparent,
-      color-mix(in srgb, var(--color-text-subtle) 50%, transparent) 50%,
-      transparent
-    );
-  }
-
-  :global([data-theme="light"]) .hero__portrait-plinth {
-    background:
-      linear-gradient(180deg,
-        transparent 0%,
-        color-mix(in srgb, #1F1408 5%, transparent) 35%,
-        color-mix(in srgb, #1F1408 9%, transparent) 100%
-      );
   }
 
   /* ─── The figure ──────────────────────────────────────────────────── */
@@ -559,123 +479,6 @@ import QadanMark from '@/components/brand/QadanMark.astro';
 
   .hero__portrait-frame:hover .hero__portrait-img {
     transform: scale(1.015);
-  }
-
-  /* ─── Corner crosshairs ───────────────────────────────────────────── */
-
-  .hero__portrait-corner {
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    border: 1px solid var(--color-text-subtle);
-    pointer-events: none;
-    z-index: 3;
-    opacity: 0.55;
-    transition: opacity 240ms, border-color 240ms;
-  }
-
-  .hero__portrait-frame:hover .hero__portrait-corner {
-    opacity: 1;
-    border-color: var(--color-accent);
-  }
-
-  .hero__portrait-corner--tl { top: 10px; left: 10px; border-right: none; border-bottom: none; }
-  .hero__portrait-corner--tr { top: 10px; right: 10px; border-left: none; border-bottom: none; }
-  .hero__portrait-corner--bl { bottom: 10px; left: 10px; border-right: none; border-top: none; }
-  .hero__portrait-corner--br { bottom: 10px; right: 10px; border-left: none; border-top: none; }
-
-  /* ─── Floating UI in front ────────────────────────────────────────── */
-
-  .hero__portrait-mark {
-    position: absolute;
-    top: 16px;
-    left: 16px;
-    z-index: 4;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 10px;
-    border-radius: 6px;
-    background-color: rgba(8, 8, 12, 0.55);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(10px) saturate(140%);
-    -webkit-backdrop-filter: blur(10px) saturate(140%);
-  }
-
-  :global([data-theme="light"]) .hero__portrait-mark {
-    background-color: rgba(255, 255, 255, 0.78);
-    border-color: rgba(15, 15, 20, 0.08);
-  }
-
-  .hero__portrait-mark-rule {
-    width: 12px;
-    height: 1px;
-    background-color: rgba(255, 255, 255, 0.3);
-  }
-
-  :global([data-theme="light"]) .hero__portrait-mark-rule {
-    background-color: rgba(15, 15, 20, 0.25);
-  }
-
-  .hero__portrait-mark-year {
-    font-family: var(--font-body);
-    font-size: 10px;
-    color: rgba(255, 255, 255, 0.6);
-    line-height: 1;
-  }
-
-  :global([data-theme="light"]) .hero__portrait-mark-year {
-    color: rgba(15, 15, 20, 0.55);
-  }
-
-  .hero__portrait-pulse {
-    position: absolute;
-    bottom: 18px;
-    right: 18px;
-    z-index: 4;
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 6px 12px 6px 11px;
-    border-radius: 9999px;
-    background-color: rgba(8, 8, 12, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    backdrop-filter: blur(10px) saturate(160%);
-    -webkit-backdrop-filter: blur(10px) saturate(160%);
-    text-decoration: none;
-    color: rgba(255, 255, 255, 0.92);
-    font-family: var(--font-body);
-    font-size: 10px;
-    font-weight: 600;
-    line-height: 1;
-    transition: border-color 200ms, color 200ms, transform 200ms var(--ease-out);
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  :global([data-theme="light"]) .hero__portrait-pulse {
-    background-color: rgba(255, 255, 255, 0.82);
-    border-color: rgba(15, 15, 20, 0.18);
-    color: rgba(15, 15, 20, 0.85);
-  }
-
-  .hero__portrait-pulse:hover {
-    transform: translateY(-1px);
-    border-color: var(--color-accent);
-    color: var(--color-accent);
-  }
-
-  .hero__portrait-pulse-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background-color: var(--color-accent);
-    box-shadow: 0 0 8px color-mix(in srgb, var(--color-accent) 60%, transparent);
-    animation: hero-portrait-pulse 2.4s ease-in-out infinite;
-  }
-
-  @keyframes hero-portrait-pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.6; transform: scale(0.85); }
   }
 
   /* ─── Spec panel below the frame ──────────────────────────────────── */
@@ -770,43 +573,4 @@ import QadanMark from '@/components/brand/QadanMark.astro';
     .hero__portrait-frame:hover .hero__portrait-img { transform: none; }
   }
 
-  /* ─── Scroll cue at bottom of hero ────────────────────────────────── */
-
-  .hero__scroll {
-    display: none;
-    position: absolute;
-    bottom: 32px;
-    left: 50%;
-    transform: translateX(-50%);
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    pointer-events: none;
-  }
-
-  @media (min-width: 1024px) {
-    .hero__scroll { display: flex; }
-  }
-
-  .hero__scroll-text {
-    font-family: var(--font-body);
-    font-size: 10px;
-    color: var(--color-text-subtle);
-  }
-
-  .hero__scroll-line {
-    width: 1px;
-    height: 28px;
-    background: linear-gradient(to bottom, var(--color-text-subtle), transparent);
-    animation: scroll-pulse 2.4s ease-in-out infinite;
-  }
-
-  @keyframes scroll-pulse {
-    0%, 100% { opacity: 0.4; transform: scaleY(0.7); transform-origin: top; }
-    50% { opacity: 1; transform: scaleY(1); }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .hero__scroll-line { animation: none; }
-  }
 </style>

@@ -85,7 +85,6 @@ const sections = [
       <div class="container-site">
         <div class="uses__sxn">
           <span class="uses__sxn-label">Uses</span>
-          <span class="uses__sxn-rule" aria-hidden="true"></span>
           <span class="uses__sxn-meta">A practical colophon</span>
         </div>
         <h1 class="uses__title">What I work with.</h1>
@@ -101,7 +100,6 @@ const sections = [
         <section class="uses__section">
           <header class="uses__section-head">
             <h2 class="uses__section-label">{section.label}</h2>
-            <span class="uses__section-rule" aria-hidden="true"></span>
             <span class="uses__section-count">{section.items.length}</span>
           </header>
           <dl class="uses__list">
@@ -173,6 +171,7 @@ const sections = [
   }
 
   .uses__sxn-meta {
+    margin-left: auto;
     font-family: var(--font-body);
     font-size: 11px;
     color: var(--color-text-subtle);

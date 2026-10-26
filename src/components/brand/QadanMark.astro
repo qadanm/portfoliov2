@@ -1,12 +1,17 @@
 ---
 interface Props {
   class?: string;
+  size?: string;
 }
 
-const { class: className } = Astro.props;
+const { class: className, size = '24px' } = Astro.props;
 ---
 
-<span class:list={['qadan-mark', className]} aria-hidden="true">
+<span
+  class:list={['qadan-mark', className]}
+  aria-hidden="true"
+  style={`--qadan-mark-size:${size};`}
+>
   <img
     class="qadan-mark__light"
     src="/brand/qadan-mark-light.svg"
@@ -29,8 +34,8 @@ const { class: className } = Astro.props;
   .qadan-mark {
     display: inline-flex;
     flex: none;
-    width: 24px;
-    height: 24px;
+    width: var(--qadan-mark-size, 24px);
+    height: var(--qadan-mark-size, 24px);
     line-height: 0;
   }
 

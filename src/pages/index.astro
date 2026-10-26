@@ -37,8 +37,6 @@ import ExperienceWall from '@/components/home/ExperienceWall.astro';
       <div class="home-approach__head">
         <div class="home-approach__sxn">
           <span class="home-approach__sxn-label">How I work</span>
-          <span class="home-approach__sxn-rule" aria-hidden="true"></span>
-          <span class="home-approach__sxn-meta">A method, not a manifesto</span>
         </div>
         <p class="home-approach__lead">
           A lot of the work I take on looks like repair. A platform
@@ -57,11 +55,11 @@ import ExperienceWall from '@/components/home/ExperienceWall.astro';
           </header>
           <h3 class="home-approach__step-title">The constraints first.</h3>
           <p class="home-approach__step-body">
-            Every long-running platform has opinions. Every team has
-            history the wireframes don't capture. The first job is
-            reading what's already true before drawing anything.
+            Every long-running platform has opinions. The wireframes
+            don't capture what the system has already been through. The
+            first job is reading what's already true before drawing
+            anything.
           </p>
-          <span class="home-approach__step-rule" aria-hidden="true"></span>
         </article>
 
         <article class="home-approach__step">
@@ -75,7 +73,6 @@ import ExperienceWall from '@/components/home/ExperienceWall.astro';
             and structure. Pick the right substrate (typed components,
             shared partials, prompt modules) once, ship for years.
           </p>
-          <span class="home-approach__step-rule" aria-hidden="true"></span>
         </article>
 
         <article class="home-approach__step home-approach__step--accent">
@@ -90,7 +87,6 @@ import ExperienceWall from '@/components/home/ExperienceWall.astro';
             the build, not the product, until it's structured enough
             to ship.
           </p>
-          <span class="home-approach__step-rule" aria-hidden="true"></span>
         </article>
       </div>
 
@@ -118,10 +114,6 @@ import ExperienceWall from '@/components/home/ExperienceWall.astro';
       <div class="home-contact__card">
         <span class="home-contact__card-glow" aria-hidden="true"></span>
         <span class="home-contact__card-grid" aria-hidden="true"></span>
-        <span class="home-contact__card-corner home-contact__card-corner--tl" aria-hidden="true"></span>
-        <span class="home-contact__card-corner home-contact__card-corner--tr" aria-hidden="true"></span>
-        <span class="home-contact__card-corner home-contact__card-corner--bl" aria-hidden="true"></span>
-        <span class="home-contact__card-corner home-contact__card-corner--br" aria-hidden="true"></span>
 
         <div class="home-contact__card-text">
           <div class="home-contact__sxn">
@@ -194,6 +186,7 @@ import ExperienceWall from '@/components/home/ExperienceWall.astro';
   }
 
   .home-approach__sxn-meta {
+    margin-left: auto;
     font-family: var(--font-body);
     font-size: 11px;
     color: var(--color-text-subtle);
