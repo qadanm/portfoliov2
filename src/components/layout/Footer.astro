@@ -1,4 +1,6 @@
 ---
+import PortfolioLogo from '@/components/brand/PortfolioLogo.astro';
+
 const year = new Date().getFullYear();
 
 const links = [
@@ -18,14 +20,10 @@ const sitemap = [
 
 <footer class="site-footer">
   <div class="container-site footer-inner">
-    {/* Closing mark — large monogram + tagline. Acts as the final
+    {/* Closing mark — the large Qadan wordmark. Acts as the final
         editorial signature for the page. */}
     <div class="footer-mark">
-      <a href="/" class="footer-monogram" aria-label="Qadan, home">
-        <span class="footer-monogram-mq">MQ</span>
-        <span class="footer-monogram-rule"></span>
-        <span class="footer-monogram-co">qadan.co</span>
-      </a>
+      <PortfolioLogo variant="wordmark" />
       <p class="footer-tagline">
         Independent senior UX &amp; frontend.<br />
         Designing, building, and shipping the web.
@@ -138,62 +136,11 @@ const sitemap = [
     }
   }
 
-  /* Mark / monogram block */
+  /* Mark / signature block */
   .footer-mark {
     display: flex;
     flex-direction: column;
     gap: var(--space-5);
-  }
-
-  .footer-monogram {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    color: var(--color-text);
-    text-decoration: none;
-    width: fit-content;
-  }
-
-  .footer-monogram-mq {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 56px;
-    height: 56px;
-    border-radius: 12px;
-    border: 1px solid var(--color-border);
-    background:
-      linear-gradient(180deg, var(--color-bg-elevated), var(--color-bg-deep));
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
-    font-family: var(--font-display);
-    font-size: 28px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    color: var(--color-text);
-    transition: border-color 200ms, color 200ms;
-  }
-
-  .footer-monogram:hover .footer-monogram-mq {
-    border-color: var(--color-accent);
-    color: var(--color-accent);
-  }
-
-  .footer-monogram-rule {
-    width: 16px;
-    height: 1px;
-    background-color: var(--color-border);
-  }
-
-  .footer-monogram-co {
-    font-family: var(--font-body);
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--color-text-muted);
-    transition: color 200ms;
-  }
-
-  .footer-monogram:hover .footer-monogram-co {
-    color: var(--color-text);
   }
 
   .footer-tagline {

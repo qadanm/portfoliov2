@@ -1,0 +1,54 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<span class:list={['qadan-mark', className]} aria-hidden="true">
+  <img
+    class="qadan-mark__light"
+    src="/brand/qadan-mark-light.svg"
+    width="136"
+    height="136"
+    alt=""
+    decoding="async"
+  />
+  <img
+    class="qadan-mark__dark"
+    src="/brand/qadan-mark-dark.svg"
+    width="136"
+    height="136"
+    alt=""
+    decoding="async"
+  />
+</span>
+
+<style>
+  .qadan-mark {
+    display: inline-flex;
+    flex: none;
+    width: 24px;
+    height: 24px;
+    line-height: 0;
+  }
+
+  .qadan-mark img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .qadan-mark .qadan-mark__dark {
+    display: none;
+  }
+
+  :global([data-theme="dark"]) .qadan-mark .qadan-mark__light {
+    display: none;
+  }
+
+  :global([data-theme="dark"]) .qadan-mark .qadan-mark__dark {
+    display: block;
+  }
+</style>

@@ -1,0 +1,38 @@
+---
+interface Props {
+  variant?: 'nav' | 'compact' | 'wordmark';
+  href?: string;
+  class?: string;
+}
+
+const { variant = 'nav', href = '/', class: className = '' } = Astro.props;
+const master = {
+  nav: { stem: 'qadan-nav', width: 560.017, height: 126 },
+  compact: { stem: 'qadan-nav-mq', width: 288.071, height: 126 },
+  wordmark: { stem: 'qadan-wordmark', width: 573.196, height: 130 },
+}[variant];
+---
+
+<a href={href} class:list={['portfolio-logo', `portfolio-logo--${variant}`, className]} aria-label="Moe Qadan, home">
+  <img class="portfolio-logo__light" src={`/brand/${master.stem}-light.svg`} width={Math.round(master.width)} height={Math.round(master.height)} alt="" decoding="async" />
+  <img class="portfolio-logo__dark" src={`/brand/${master.stem}-dark.svg`} width={Math.round(master.width)} height={Math.round(master.height)} alt="" decoding="async" />
+</a>
+
+<style>
+  .portfolio-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 44px;
+    flex: 0 0 auto;
+    text-decoration: none;
+    border-radius: 3px;
+  }
+  .portfolio-logo img { display: block; width: 128px; height: auto; }
+  .portfolio-logo--compact img { width: 64px; }
+  .portfolio-logo--wordmark img { width: min(240px, 100%); }
+  .portfolio-logo .portfolio-logo__dark { display: none; }
+  :global(html[data-theme='dark']) .portfolio-logo .portfolio-logo__light { display: none; }
+  :global(html[data-theme='dark']) .portfolio-logo .portfolio-logo__dark { display: block; }
+  .portfolio-logo:focus-visible { outline: 2px solid var(--color-accent, #D6006E); outline-offset: 5px; }
+</style>

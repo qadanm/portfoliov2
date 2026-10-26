@@ -20,8 +20,8 @@ interface Props {
 const {
   title = 'Moe Qadan, UX Engineer & Frontend Systems',
   description = "Portfolio of Moe Qadan, a senior UX and frontend practitioner in Los Angeles. UX engineering, frontend systems, design systems, content architecture, accessibility, and AI-assisted product work.",
-  image = '/og.jpg',
-  imageAlt = 'Moe Qadan, UX Engineer & Frontend Systems. Portfolio of selected work.',
+  image = '/brand/qadan-social-cover.png',
+  imageAlt = 'Qadan. — Moe Qadan, UX engineering and frontend systems.',
   article = false,
   noindex = false,
   keywords,
@@ -63,6 +63,7 @@ const personSchema = {
   name: 'Moe Qadan',
   alternateName: 'Muhammed Qadan',
   url: Astro.site?.toString(),
+  image: new URL('/brand/qadan-avatar.png', Astro.site).toString(),
   jobTitle: 'UX Engineer & Frontend Systems',
   description: 'UX engineering, frontend systems, and design systems for long-running platforms and AI-native products.',
   knowsAbout: [
@@ -151,7 +152,12 @@ const websiteSchema = {
   <meta name="twitter:image" content={ogImage} />
   <meta name="twitter:image:alt" content={imageAlt} />
 
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png" />
+  <link rel="icon" type="image/svg+xml" sizes="any" href="/favicon.svg" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#D6006E" />
+  <link rel="manifest" href="/site.webmanifest" />
   <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
 
   <ViewTransitions />

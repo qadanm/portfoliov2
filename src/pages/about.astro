@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@/components/layout/BaseLayout.astro';
 import CarSpotterWall from '@/components/carspotter/CarSpotterWall.astro';
+import QadanSignature from '@/components/brand/QadanSignature.astro';
 import { getCollection } from 'astro:content';
 
 // The CarSpotter timeline entry reads the project record rather than keeping
@@ -41,7 +42,10 @@ const carSpotterAbout =
               <span class="about__sxn-meta">Independent senior generalist</span>
             </div>
 
-            <h1 class="about__title">Moe Qadan.</h1>
+            <h1 class="about__title">
+              <span class="vhidden">Moe Qadan.</span>
+              <QadanSignature />
+            </h1>
             <p class="about__hero-sub">
               Senior UX and frontend practitioner based in Los Angeles. I
               do the parts of web work that usually get split across a

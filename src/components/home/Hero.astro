@@ -1,4 +1,6 @@
 ---
+import QadanMark from '@/components/brand/QadanMark.astro';
+
 // Hero. Editorial two-column composition: identity + headline + body
 // + CTAs on the left. Right column hosts the portrait stage — a single
 // transparent portrait grounded inside a designed backdrop:
@@ -80,7 +82,7 @@
 
         {/* Floating UI in front of the figure */}
         <div class="hero__portrait-mark">
-          <span class="hero__portrait-mark-mono">MQ</span>
+          <QadanMark />
           <span class="hero__portrait-mark-rule"></span>
           <span class="hero__portrait-mark-year">'26</span>
         </div>
@@ -603,19 +605,6 @@
   :global([data-theme="light"]) .hero__portrait-mark {
     background-color: rgba(255, 255, 255, 0.78);
     border-color: rgba(15, 15, 20, 0.08);
-  }
-
-  .hero__portrait-mark-mono {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    color: rgba(255, 255, 255, 0.92);
-    line-height: 1;
-  }
-
-  :global([data-theme="light"]) .hero__portrait-mark-mono {
-    color: rgba(15, 15, 20, 0.92);
   }
 
   .hero__portrait-mark-rule {

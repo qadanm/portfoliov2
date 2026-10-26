@@ -1,0 +1,52 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<span class:list={['qadan-signature', className]} aria-hidden="true">
+  <img
+    class="qadan-signature__light"
+    src="/brand/moe-qadan-signature-light.svg"
+    width="579"
+    height="231"
+    alt=""
+    decoding="async"
+  />
+  <img
+    class="qadan-signature__dark"
+    src="/brand/moe-qadan-signature-dark.svg"
+    width="579"
+    height="231"
+    alt=""
+    decoding="async"
+  />
+</span>
+
+<style>
+  .qadan-signature {
+    display: block;
+    width: min(300px, 100%);
+    line-height: 0;
+  }
+
+  .qadan-signature img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .qadan-signature .qadan-signature__dark {
+    display: none;
+  }
+
+  :global([data-theme="dark"]) .qadan-signature .qadan-signature__light {
+    display: none;
+  }
+
+  :global([data-theme="dark"]) .qadan-signature .qadan-signature__dark {
+    display: block;
+  }
+</style>
