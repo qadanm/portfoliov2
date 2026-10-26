@@ -41,7 +41,6 @@ const channels = [
       <header class="contact__head">
         <div class="contact__sxn">
           <span class="contact__sxn-label">Contact</span>
-          <span class="contact__sxn-rule" aria-hidden="true"></span>
           <span class="contact__sxn-meta">Replies within a day</span>
         </div>
 
@@ -59,15 +58,10 @@ const channels = [
       <div class="contact__grid">
         {/* Form card */}
         <section class="contact__form-card" aria-labelledby="contact-form-heading">
-          <span class="contact__form-corner contact__form-corner--tl" aria-hidden="true"></span>
-          <span class="contact__form-corner contact__form-corner--tr" aria-hidden="true"></span>
-          <span class="contact__form-corner contact__form-corner--bl" aria-hidden="true"></span>
-          <span class="contact__form-corner contact__form-corner--br" aria-hidden="true"></span>
           <span class="contact__form-glow" aria-hidden="true"></span>
 
           <header class="contact__form-head">
             <h2 id="contact-form-heading" class="contact__form-title">Send a message</h2>
-            <span class="contact__form-rule" aria-hidden="true"></span>
           </header>
 
           <div class="contact__form-wrap">
@@ -79,7 +73,6 @@ const channels = [
         <aside class="contact__channels-wrap" aria-labelledby="contact-channels-heading">
           <header class="contact__channels-head">
             <h2 id="contact-channels-heading" class="contact__channels-title">Or reach me directly</h2>
-            <span class="contact__channels-rule" aria-hidden="true"></span>
           </header>
 
           <ul class="contact__channels">
@@ -94,8 +87,6 @@ const channels = [
                   data-track-channel={c.label.toLowerCase()}
                   data-track-loc="contact-page"
                 >
-                  <span class="contact__channel-corner contact__channel-corner--tl" aria-hidden="true"></span>
-                  <span class="contact__channel-corner contact__channel-corner--br" aria-hidden="true"></span>
 
                   <span class="contact__channel-label">{c.label}</span>
                   <span class="contact__channel-value">{c.value}</span>
@@ -184,6 +175,7 @@ const channels = [
   }
 
   .contact__sxn-meta {
+    margin-left: auto;
     font-family: var(--font-body);
     font-size: 11px;
     color: var(--color-text-subtle);

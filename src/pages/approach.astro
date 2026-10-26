@@ -77,8 +77,6 @@ const projects = [
       <div class="container-site">
         <div class="apr__sxn">
           <span class="apr__sxn-label">Approach</span>
-          <span class="apr__sxn-rule" aria-hidden="true"></span>
-          <span class="apr__sxn-meta">A method, not a manifesto</span>
         </div>
         <h1 class="apr__title">How I work.</h1>
         <p class="apr__subtitle">
@@ -112,7 +110,6 @@ const projects = [
       <section class="apr__section">
         <header class="apr__sxn apr__sxn--inner">
           <span class="apr__sxn-label">A normal week</span>
-          <span class="apr__sxn-rule" aria-hidden="true"></span>
         </header>
         <h2 class="apr__h2">Concretely, the recurring work.</h2>
 
@@ -131,7 +128,6 @@ const projects = [
       <section class="apr__section">
         <header class="apr__sxn apr__sxn--inner">
           <span class="apr__sxn-label">How AI actually fits in</span>
-          <span class="apr__sxn-rule" aria-hidden="true"></span>
         </header>
         <h2 class="apr__h2">Two places: products, and the build.</h2>
 
@@ -202,16 +198,15 @@ const projects = [
         </p>
       </section>
 
-      {/* What I bring to a team */}
+      {/* What I bring */}
       <section class="apr__section">
         <header class="apr__sxn apr__sxn--inner">
-          <span class="apr__sxn-label">What I'm best at on a team</span>
-          <span class="apr__sxn-rule" aria-hidden="true"></span>
+          <span class="apr__sxn-label">What I'm best at</span>
         </header>
         <h2 class="apr__h2">Where I land naturally.</h2>
 
         <ul class="apr__bullets">
-          <li><strong>Owning the whole web experience for a team that doesn't have a department for it.</strong> One person carrying UX, the design system, the frontend, the content model, the SEO graph, and the performance budget.</li>
+          <li><strong>Owning the whole web experience for an organization that doesn't have a department for it.</strong> One person carrying UX, the design system, the frontend, the content model, the SEO graph, and the performance budget.</li>
           <li><strong>Modernizing a platform that can't be rewritten.</strong> Long-running stacks have opinions. I read those first, plan around them, and ship in increments that don't require a flag day.</li>
           <li><strong>Building systems engineers actually use.</strong> Typed components. Tokens. Layout primitives. Real consumers from day one. No big-bang library that ships into a vacuum.</li>
           <li><strong>Sitting between design and engineering and unblocking both.</strong> I read intent, not just specs. Most production breakage lives in the gap a handoff doesn't see.</li>
@@ -223,7 +218,6 @@ const projects = [
       <section class="apr__section">
         <header class="apr__sxn apr__sxn--inner">
           <span class="apr__sxn-label">Tools I reach for</span>
-          <span class="apr__sxn-rule" aria-hidden="true"></span>
           <span class="apr__sxn-meta">The judgment is the constant</span>
         </header>
         <h2 class="apr__h2">The default stack changes per project.</h2>
@@ -234,32 +228,24 @@ const projects = [
 
         <ul class="apr__tools">
           <li class="apr__tool">
-            <span class="apr__tool-corner apr__tool-corner--tl" aria-hidden="true"></span>
-            <span class="apr__tool-corner apr__tool-corner--br" aria-hidden="true"></span>
             <header class="apr__tool-head">
               <span class="apr__tool-name">Claude</span>
             </header>
             <span class="apr__tool-role">Code work and reasoning. The default for non-trivial refactors and anything that needs to think across more than one file.</span>
           </li>
           <li class="apr__tool">
-            <span class="apr__tool-corner apr__tool-corner--tl" aria-hidden="true"></span>
-            <span class="apr__tool-corner apr__tool-corner--br" aria-hidden="true"></span>
             <header class="apr__tool-head">
               <span class="apr__tool-name">Cursor</span>
             </header>
             <span class="apr__tool-role">Local iteration. Same code work as Claude, different interaction model. Whichever is faster on the task at hand.</span>
           </li>
           <li class="apr__tool">
-            <span class="apr__tool-corner apr__tool-corner--tl" aria-hidden="true"></span>
-            <span class="apr__tool-corner apr__tool-corner--br" aria-hidden="true"></span>
             <header class="apr__tool-head">
               <span class="apr__tool-name">Figma</span>
             </header>
             <span class="apr__tool-role">Precision design, component-system maintenance, handoff fidelity, and the occasional client review.</span>
           </li>
           <li class="apr__tool">
-            <span class="apr__tool-corner apr__tool-corner--tl" aria-hidden="true"></span>
-            <span class="apr__tool-corner apr__tool-corner--br" aria-hidden="true"></span>
             <header class="apr__tool-head">
               <span class="apr__tool-name">Claude Design</span>
             </header>
@@ -272,7 +258,6 @@ const projects = [
       <section class="apr__section">
         <header class="apr__sxn apr__sxn--inner">
           <span class="apr__sxn-label">Across the work</span>
-          <span class="apr__sxn-rule" aria-hidden="true"></span>
         </header>
         <h2 class="apr__h2">Different companies, different stacks, same question.</h2>
         <p class="apr__para">
@@ -286,10 +271,6 @@ const projects = [
               href={`/work/${p.slug}`}
               class:list={['apr__work', `apr__work--${p.category}`]}
             >
-              <span class="apr__work-corner apr__work-corner--tl" aria-hidden="true"></span>
-              <span class="apr__work-corner apr__work-corner--tr" aria-hidden="true"></span>
-              <span class="apr__work-corner apr__work-corner--bl" aria-hidden="true"></span>
-              <span class="apr__work-corner apr__work-corner--br" aria-hidden="true"></span>
 
               <div class="apr__work-shot">
                 <img
@@ -325,10 +306,6 @@ const projects = [
 
       {/* Closing CTA */}
       <section class="apr__cta">
-        <span class="apr__cta-corner apr__cta-corner--tl" aria-hidden="true"></span>
-        <span class="apr__cta-corner apr__cta-corner--tr" aria-hidden="true"></span>
-        <span class="apr__cta-corner apr__cta-corner--bl" aria-hidden="true"></span>
-        <span class="apr__cta-corner apr__cta-corner--br" aria-hidden="true"></span>
         <span class="apr__cta-glow" aria-hidden="true"></span>
 
         <div class="apr__cta-text">
@@ -407,6 +384,7 @@ const projects = [
   }
 
   .apr__sxn-meta {
+    margin-left: auto;
     font-family: var(--font-body);
     font-size: 11px;
     color: var(--color-text-subtle);

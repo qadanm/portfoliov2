@@ -1,5 +1,5 @@
 ---
-// The Garage — the car-enthusiast showcase for the three mobile apps.
+// The Garage — the car apps showcase for the three mobile apps.
 // CarSpotter is the hero (largest, lime arcade, the best-designed card);
 // VINly + ChatOBD2 sit below as a brand-accented 2-up. Energetic, warm/dark,
 // automotive — deliberately "these are mine," the opposite of the corporate
@@ -71,19 +71,11 @@ const apps = {
 <section class="garage" id="garage" aria-labelledby="garage-title">
   <div class="container-site garage__inner">
     <header class="garage__head">
-      <div class="garage__sxn">
-        <span class="garage__sxn-label">The Garage</span>
-        <span class="garage__sxn-rule" aria-hidden="true"></span>
-        <span class="garage__sxn-meta">Built by a car enthusiast</span>
-      </div>
-      <h2 class="garage__title" id="garage-title">Built for the love of cars.</h2>
+      <h2 class="garage__title" id="garage-title">Three car apps, built end to end.</h2>
       <p class="garage__lede">
-        I'm a car guy who ships car apps, three of them, designed and
-        engineered solo. A daily spotting game and a free VIN scanner,
-        both on the App Store today, and an AI mechanic in your pocket on
-        the way. Under them, two open-source libraries I pulled out and
-        shipped: an ELM327 emulator that puts Bluetooth code under test in
-        CI, and a typed client for US vehicle records.
+        A daily spotting game, a free VIN scanner, and an AI diagnostic tool.
+        Designed and engineered solo, with two open-source libraries pulled
+        from the same work.
       </p>
     </header>
 
@@ -91,10 +83,6 @@ const apps = {
     <article
       class="garage__hero"
     >
-      <span class="garage__hero-corner garage__hero-corner--tl" aria-hidden="true"></span>
-      <span class="garage__hero-corner garage__hero-corner--tr" aria-hidden="true"></span>
-      <span class="garage__hero-corner garage__hero-corner--bl" aria-hidden="true"></span>
-      <span class="garage__hero-corner garage__hero-corner--br" aria-hidden="true"></span>
 
       <div class="garage__hero-media">
         <picture class="garage__hero-picture">
@@ -118,7 +106,6 @@ const apps = {
             decoding="async"
           />
         </picture>
-        <span class="garage__hero-redline" aria-hidden="true"></span>
       </div>
 
       <div class="garage__hero-body">
@@ -274,10 +261,6 @@ const apps = {
     <article
       class="garage__oss"
     >
-      <span class="garage__hero-corner garage__hero-corner--tl garage__oss-corner" aria-hidden="true"></span>
-      <span class="garage__hero-corner garage__hero-corner--tr garage__oss-corner" aria-hidden="true"></span>
-      <span class="garage__hero-corner garage__hero-corner--bl garage__oss-corner" aria-hidden="true"></span>
-      <span class="garage__hero-corner garage__hero-corner--br garage__oss-corner" aria-hidden="true"></span>
 
       <div class="garage__oss-media">
         <img src={apps.elmulator.poster} alt={apps.elmulator.alt} width="2560" height="1600" loading="lazy" decoding="async" />
@@ -360,10 +343,6 @@ const apps = {
 
     {/* ── Open source: vinplain ────────────────────────────────────── */}
     <article class="garage__oss garage__oss--vinplain">
-      <span class="garage__hero-corner garage__hero-corner--tl garage__oss-corner" aria-hidden="true"></span>
-      <span class="garage__hero-corner garage__hero-corner--tr garage__oss-corner" aria-hidden="true"></span>
-      <span class="garage__hero-corner garage__hero-corner--bl garage__oss-corner" aria-hidden="true"></span>
-      <span class="garage__hero-corner garage__hero-corner--br garage__oss-corner" aria-hidden="true"></span>
 
       <div class="garage__oss-media">
         <div class="garage__oss-poster">
@@ -630,17 +609,6 @@ const apps = {
   }
 
   /* redline sweep that flares on hover */
-  .garage__hero-redline {
-    position: absolute;
-    left: 0; right: 0; bottom: 0;
-    height: 3px;
-    background: linear-gradient(to right, transparent, var(--lime), transparent);
-    opacity: 0;
-    transform: scaleX(0.4);
-    transition: opacity 360ms var(--ease-out), transform 520ms var(--ease-out);
-  }
-  .garage__hero:hover .garage__hero-redline { opacity: 0.9; transform: scaleX(1); }
-
   .garage__hero-corner {
     position: absolute;
     width: 12px; height: 12px;
@@ -1004,7 +972,7 @@ const apps = {
 
   @media (prefers-reduced-motion: reduce) {
     .garage__hero, .garage__app, .garage__hero-media img, .garage__app-media img,
-    .garage__hero-redline, .garage__cta svg, .garage__app-link svg,
+    .garage__cta svg, .garage__app-link svg,
     .garage__oss, .garage__oss-media img {
       transition: none !important;
     }

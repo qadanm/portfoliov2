@@ -11,22 +11,6 @@ const allProjects = (await getCollection('build', ({ data }) => !data.draft))
 const numberOf = (slug: string) =>
   String(allProjects.findIndex(p => p.slug === slug) + 1).padStart(2, '0');
 
-// The lede promises two passes: "My own car apps first ... then the companies
-// where I've shipped inside their team." The schema already carries that split.
-const groups = [
-  {
-    key: 'mine',
-    label: 'My own',
-    meta: 'Designed and built end to end',
-    items: allProjects.filter(p => p.data.engagement === 'independent'),
-  },
-  {
-    key: 'team',
-    label: 'Inside a team',
-    meta: 'Shipped within someone else\'s platform',
-    items: allProjects.filter(p => p.data.engagement === 'work'),
-  },
-];
 ---
 
 <BaseLayout
@@ -49,24 +33,15 @@ const groups = [
 >
   <div class="widx">
     <header class="widx__hero container-site">
-      <h1 class="widx__title">Selected work, in two passes.</h1>
+      <h1 class="widx__title">Selected work.</h1>
       <p class="widx__lede">
-        My own car apps first, designed and built end to end. Then the
-        companies where I've shipped inside their team. Each one is a
-        different surface, a different platform, a different posture.
+        Case studies across my own products and the platforms I've worked on.
       </p>
     </header>
 
-    {groups.map(group => (
-      <section class="widx__group container-site" aria-labelledby={`widx-${group.key}`}>
-        <div class="widx__group-head">
-          <h2 class="widx__group-label" id={`widx-${group.key}`}>{group.label}</h2>
-          <span class="widx__group-meta">{group.meta}</span>
-          <span class="widx__group-count">{group.items.length}</span>
-        </div>
-
-        <ol class="widx__list">
-          {group.items.map(p => (
+    <section class="widx__group container-site" aria-label="Case studies">
+      <ol class="widx__list">
+        {allProjects.map(p => (
             <li class="widx__row">
               <a
                 href={`/work/${p.slug}`}
@@ -100,10 +75,9 @@ const groups = [
                 </svg>
               </a>
             </li>
-          ))}
-        </ol>
-      </section>
-    ))}
+        ))}
+      </ol>
+    </section>
   </div>
 </BaseLayout>
 
