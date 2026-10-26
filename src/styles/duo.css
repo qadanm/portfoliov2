@@ -5,10 +5,15 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
   --header-h: calc(60px + var(--safe-top));
+  /* Header occupancy without the safe-area inset; main applies safe-top. */
+  --qh-header-offset: 60px;
 }
 
 @media (min-width: 768px) {
-  :root { --header-h: calc(64px + var(--safe-top)); }
+  :root {
+    --header-h: calc(64px + var(--safe-top));
+    --qh-header-offset: 64px;
+  }
 }
 
 main {
@@ -23,5 +28,8 @@ main {
 }
 
 @media (orientation: landscape) and (max-height: 500px) {
-  :root { --header-h: calc(52px + var(--safe-top)); }
+  :root {
+    --header-h: calc(52px + var(--safe-top));
+    --qh-header-offset: 52px;
+  }
 }
