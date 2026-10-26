@@ -57,10 +57,6 @@ const build = defineCollection({
     // never a centre crop of the desktop cover.
     coverMobileImage: z.string().optional(),
     coverMobileAlt: z.string().optional(),
-    // Release state. `candidate` means the screenshots come from a build that
-    // is not proven to be public yet; the page must say so.
-    releaseStatus: z.enum(['candidate', 'verified-live']).optional(),
-    releaseNote: z.string().optional(),
     // Per-project SEO overrides. Defaults stay title/short + /og/<slug>.jpg.
     seoTitle: z.string().optional(),
     seoDescription: z.string().optional(),
