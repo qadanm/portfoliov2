@@ -192,7 +192,7 @@ const categoryKey = data.category.toLowerCase();
           )}
         </dl>
 
-        {(data.appStoreUrl || data.siteUrl) && (
+        {(data.appStoreUrl || data.siteUrl || data.npmUrl) && (
           <div class="cs__get">
             {data.appStoreUrl && (
               <AppStoreBadge href={data.appStoreUrl} height={44} project={project.slug} cta="case-study-appstore" />
@@ -207,7 +207,23 @@ const categoryKey = data.category.toLowerCase();
                 data-track-cta="case-study-site"
                 data-track-project={project.slug}
               >
-                {new URL(data.siteUrl).hostname}
+                {data.siteLabel ?? new URL(data.siteUrl).hostname}
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M3 13L13 3M13 3H5M13 3v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+            )}
+            {data.npmUrl && (
+              <a
+                class="cs__get-site"
+                href={data.npmUrl}
+                target="_blank"
+                rel="noopener"
+                data-track="cta_click"
+                data-track-cta="case-study-npm"
+                data-track-project={project.slug}
+              >
+                npm
                 <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                   <path d="M3 13L13 3M13 3H5M13 3v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
