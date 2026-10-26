@@ -1,15 +1,7 @@
 ---
-import QadanMark from '@/components/brand/QadanMark.astro';
-
-// Hero. Editorial two-column composition: identity + headline + body
-// + CTAs on the left. Right column hosts the portrait stage — a single
-// transparent portrait grounded inside a designed backdrop:
-//   • ambient field (soft radial backlight that catches the torso)
-//   • subtle editorial grid + horizontal rules behind the figure
-//   • a tonal plinth at the bottom so the figure visually lands
-//   • theme-aware tonal treatment via CSS filter (subtle, no effect-y feel)
-//   • floating system UI in front (monogram mark, availability pulse)
-// One source image. Theme-aware atmosphere does the work.
+// Hero. Editorial two-column composition: copy on the left, one
+// backgroundless portrait on the right. The magenta Q is part of the
+// artwork; there is no frame, spec panel, or overlay text.
 ---
 
 <section class="hero" aria-label="Introduction">
@@ -48,60 +40,17 @@ import QadanMark from '@/components/brand/QadanMark.astro';
       </div>
     </div>
 
-    {/* Portrait stage. One transparent portrait, designed backdrop. */}
+    {/* Portrait. One backgroundless asset; no frame, spec panel, or overlays. */}
     <aside class="hero__portrait">
-      <div class="hero__portrait-frame-wrap">
-        <div class="hero__portrait-frame">
-          <div class="hero__portrait-stage" aria-hidden="true">
-            <span class="hero__portrait-glow"></span>
-          </div>
-
-          <img
-            src="/images/portrait/qadan-portrait.webp"
-            alt="Portrait of Muhammed Qadan"
-            width="1122"
-            height="1402"
-            fetchpriority="high"
-            decoding="async"
-            class="hero__portrait-img"
-          />
-        </div>
-
-        <div class="hero__portrait-q" aria-hidden="true">
-          <QadanMark size="var(--hero-q-size)" />
-        </div>
-      </div>
-
-      {/* Spec panel below the frame — a designed signature object that
-          carries the proof (Now / Solo / Past) the hero copy used to
-          dump in dense paragraphs. Quietly says: this person works in
-          systems, products, and frontend craft. */}
-      <dl class="hero__spec">
-        <div class="hero__spec-row">
-          <dt class="hero__spec-key">Now</dt>
-          <dd class="hero__spec-val">
-            Web experience at <span class="hero__spec-mark">MagTek</span>
-          </dd>
-        </div>
-        <div class="hero__spec-row">
-          <dt class="hero__spec-key">Solo</dt>
-          <dd class="hero__spec-val">
-            <a href="/work/vinly" class="hero__spec-link">
-              <span class="hero__spec-dot hero__spec-dot--flagship" aria-hidden="true"></span>
-              VINly <span class="hero__spec-sub">Free VIN research, iOS</span>
-            </a>
-          </dd>
-        </div>
-        <div class="hero__spec-row">
-          <dt class="hero__spec-key">Past</dt>
-          <dd class="hero__spec-val">
-            <a href="/work/financial-platforms" class="hero__spec-link">
-              <span class="hero__spec-dot hero__spec-dot--platform" aria-hidden="true"></span>
-              InvestCloud <span class="hero__spec-sub">50+ wealth &amp; banking portals</span>
-            </a>
-          </dd>
-        </div>
-      </dl>
+      <img
+        src="/images/portrait/qadan-hero-bw-q.webp"
+        alt="Moe Qadan"
+        width="1122"
+        height="1402"
+        fetchpriority="high"
+        decoding="async"
+        class="hero__portrait-img"
+      />
     </aside>
   </div>
 
@@ -300,18 +249,15 @@ import QadanMark from '@/components/brand/QadanMark.astro';
     }
   }
 
-  /* ─── Portrait stage ──────────────────────────────────────────────────
-     One transparent portrait, one Q that breaks the frame at the
-     bottom-left. No floating UI, brackets, grid, rules, or plinth. */
+  /* ─── Portrait ─────────────────────────────────────────────────────
+     One backgroundless asset. No frame, border, shadow, spec panel, or
+     overlaid Q; the magenta Q is part of the artwork. */
 
   .hero__portrait {
     --portrait-max: 380px;
     width: 100%;
     max-width: var(--portrait-max);
     margin-inline: auto;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
   }
 
   @media (min-width: 600px) {
@@ -327,250 +273,9 @@ import QadanMark from '@/components/brand/QadanMark.astro';
     }
   }
 
-  .hero__portrait-frame {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 1122 / 1402;
-    border-radius: var(--radius-2xl);
-    border: 1px solid var(--color-border);
-    overflow: hidden;
-    isolation: isolate;
-    box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.04) inset,
-      0 30px 60px -20px rgba(0, 0, 0, 0.45),
-      0 0 0 1px rgba(255, 255, 255, 0.02);
-    background:
-      /* Vertical tonal wash: lighter at top, deeper at bottom — feels
-         like a studio backdrop with directional light from above. */
-      linear-gradient(180deg,
-        color-mix(in srgb, var(--color-bg-elevated) 85%, transparent) 0%,
-        color-mix(in srgb, var(--color-bg-muted) 95%, transparent) 60%,
-        color-mix(in srgb, var(--color-bg-deep) 95%, transparent) 100%
-      );
-    transition: border-color 320ms var(--ease-out), box-shadow 320ms var(--ease-out);
-  }
-
-  :global([data-theme="light"]) .hero__portrait-frame {
-    box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.6) inset,
-      0 1px 2px rgba(15, 15, 20, 0.04),
-      0 24px 48px -16px rgba(15, 15, 20, 0.10);
-  }
-
-  .hero__portrait-frame:hover {
-    border-color: var(--color-accent-muted);
-  }
-
-  .hero__portrait-frame-wrap {
-    position: relative;
-  }
-
-  /* The Q is half inside the photo, half in the gutter. Its bottom edge
-     sits on the frame's bottom edge, so it reads as a corner mark rather
-     than another floating control. */
-  .hero__portrait-q {
-    --hero-q-size: 48px;
-    position: absolute;
-    left: calc(var(--hero-q-size) / -2);
-    bottom: 0;
-    z-index: 4;
-    width: var(--hero-q-size);
-    height: var(--hero-q-size);
-    pointer-events: none;
-  }
-
-  @media (min-width: 1024px) {
-    .hero__portrait-q {
-      --hero-q-size: clamp(72px, 8vw, 96px);
-    }
-  }
-
-  @media (min-width: 1200px) {
-    .hero__portrait-q {
-      --hero-q-size: clamp(120px, 11vw, 160px);
-    }
-  }
-
-  /* ─── Stage layers — sit behind the figure ────────────────────────── */
-
-  .hero__portrait-stage {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  /* Ambient backlight — a soft warm radial that catches the upper torso.
-     This is the most important visual layer: it gives the figure a sense
-     of being lit from behind, like a portrait stage. */
-  .hero__portrait-glow {
-    position: absolute;
-    top: 12%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 110%;
-    height: 75%;
-    background:
-      radial-gradient(ellipse 50% 60% at 50% 40%,
-        color-mix(in srgb, var(--color-accent) 18%, transparent) 0%,
-        color-mix(in srgb, var(--color-accent) 6%, transparent) 35%,
-        transparent 70%
-      );
-    filter: blur(28px);
-    opacity: 0.85;
-  }
-
-  :global([data-theme="light"]) .hero__portrait-glow {
-    background:
-      radial-gradient(ellipse 50% 60% at 50% 40%,
-        color-mix(in srgb, var(--color-accent) 12%, transparent) 0%,
-        color-mix(in srgb, var(--color-accent) 4%, transparent) 35%,
-        transparent 70%
-      );
-    opacity: 0.7;
-  }
-
-  /* ─── The figure ──────────────────────────────────────────────────── */
-
   .hero__portrait-img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    /* Desktop frame is portrait-oriented and matches the source aspect
-       so the figure lands cleanly at center-top. On phones the frame
-       compresses; nudging the crop down 6% lifts the face out of the
-       frame's top edge and gives the shoulders breathing room. */
-    object-position: center top;
     display: block;
-    z-index: 2;
-    /* Theme-aware tonal treatment + stacked drop-shadows.
-       Multiple sub-pixel dark shadows stacked together neutralize any
-       residual white halo from the alpha cutout, then a wider grounding
-       shadow lands the figure. All follow the alpha silhouette. */
-    filter:
-      contrast(1.03)
-      saturate(1.05)
-      drop-shadow(0 0 0.4px rgba(0, 0, 0, 0.95))
-      drop-shadow(0 0 0.8px rgba(0, 0, 0, 0.75))
-      drop-shadow(0 0 1.4px rgba(0, 0, 0, 0.45))
-      drop-shadow(0 14px 30px rgba(0, 0, 0, 0.4));
-    transition: transform 720ms var(--ease-out), filter 320ms var(--ease-out);
+    width: 100%;
+    height: auto;
   }
-
-  :global([data-theme="light"]) .hero__portrait-img {
-    filter:
-      contrast(0.97)
-      saturate(0.96)
-      brightness(1.02)
-      drop-shadow(0 0 0.4px rgba(40, 30, 20, 0.55))
-      drop-shadow(0 0 0.9px rgba(40, 30, 20, 0.35))
-      drop-shadow(0 12px 24px rgba(15, 15, 20, 0.18));
-  }
-
-  /* Mobile-only crop nudge: shift the portrait down so the face sits
-     naturally framed instead of pinning to the very top edge. */
-  @media (max-width: 600px) {
-    .hero__portrait-img {
-      object-position: center 8%;
-    }
-  }
-
-  .hero__portrait-frame:hover .hero__portrait-img {
-    transform: scale(1.015);
-  }
-
-  /* ─── Spec panel below the frame ──────────────────────────────────── */
-
-  .hero__spec {
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    border-top: 1px solid var(--color-border);
-    border-bottom: 1px solid var(--color-border-subtle);
-  }
-
-  .hero__spec-row {
-    display: grid;
-    grid-template-columns: 56px 1fr;
-    align-items: baseline;
-    gap: 12px;
-    padding: 9px 4px;
-    border-bottom: 1px dashed var(--color-border-subtle);
-  }
-
-  .hero__spec-row:last-child {
-    border-bottom: none;
-  }
-
-  .hero__spec-key {
-    font-family: var(--font-body);
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--color-text-subtle);
-    line-height: 1.1;
-  }
-
-  .hero__spec-val {
-    margin: 0;
-    font-size: 13px;
-    color: var(--color-text);
-    line-height: 1.45;
-    letter-spacing: -0.005em;
-  }
-
-  .hero__spec-mark {
-    font-weight: 600;
-  }
-
-  .hero__spec-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    color: var(--color-text);
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 150ms;
-  }
-
-  .hero__spec-link:hover {
-    color: var(--color-accent);
-  }
-
-  .hero__spec-link:hover .hero__spec-sub {
-    color: var(--color-accent);
-  }
-
-  .hero__spec-sub {
-    font-family: var(--font-body);
-    font-size: 11px;
-    color: var(--color-text-subtle);
-    transition: color 150ms;
-  }
-
-  .hero__spec-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  .hero__spec-dot--flagship {
-    background-color: var(--color-accent);
-    box-shadow: 0 0 6px color-mix(in srgb, var(--color-accent) 60%, transparent);
-  }
-
-  .hero__spec-dot--platform {
-    background-color: var(--color-text-subtle);
-  }
-
-  /* ─── Reduced motion ──────────────────────────────────────────────── */
-
-  @media (prefers-reduced-motion: reduce) {
-    .hero__portrait-img { transition: none; }
-    .hero__portrait-frame:hover .hero__portrait-img { transform: none; }
-  }
-
 </style>
