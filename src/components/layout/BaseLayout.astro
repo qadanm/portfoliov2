@@ -170,9 +170,22 @@ const websiteSchema = {
       the request and left the preconnects above doing half their job. As a <link>
       the preload scanner sees it in the initial HTML. */}
   <link
-    rel="stylesheet"
+    rel="preload"
+    as="style"
     href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@50..150,100..900&family=Inter:wght@300;400;500;600;700&family=Martian+Mono:wdth,wght@75..112.5,100..800&display=swap"
   />
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@50..150,100..900&family=Inter:wght@300;400;500;600;700&family=Martian+Mono:wdth,wght@75..112.5,100..800&display=swap"
+    media="print"
+    onload="this.media='all'"
+  />
+  <noscript>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@50..150,100..900&family=Inter:wght@300;400;500;600;700&family=Martian+Mono:wdth,wght@75..112.5,100..800&display=swap"
+    />
+  </noscript>
 
   <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
   <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
