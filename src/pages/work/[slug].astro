@@ -32,7 +32,7 @@ export async function getStaticPaths() {
 }
 
 const { project } = Astro.props;
-const { Content } = await project.render();
+const { Content, headings } = await project.render();
 const { data } = project;
 
 const allProjects = (await getCollection('build', ({ data }) => !data.draft))
@@ -71,6 +71,12 @@ const carSpotterSections = [
   { href: '#marketing', label: 'The product outside the app' },
   { href: '#reflection', label: 'What this work taught me' },
 ];
+
+const chapters = project.slug === 'car-spotter'
+  ? carSpotterSections
+  : headings
+      .filter(h => h.depth === 2 && h.text.trim())
+      .map(h => ({ href: `#${h.slug}`, label: h.text }));
 
 // Map slugs to bespoke artifact components for the hero preview frame.
 const artifactMap: Record<string, any> = {
@@ -115,8 +121,31 @@ const categoryKey = projectCategoryKey(data.category);
   <ReadingProgress />
 
   <article class:list={['cs', `cs--${project.slug}`, `cs--${categoryKey}`]}>
+
+
+    <div class="cs__reader container-site">
+      <aside class="cs__rail" aria-label="Case study contents">
+        <div class="cs__rail-inner">
+          <span class="cs__rail-eyebrow">Case study</span>
+          <span class="cs__rail-title">{data.title}</span>
+          {data.status && (
+            <span class="cs__rail-status"><span class="cs__rail-status-dot" aria-hidden="true"></span>{data.status}</span>
+          )}
+          <a class="cs__rail-link" href="#project-facts">Project facts</a>
+          {chapters.length > 0 && (
+            <nav class="cs__rail-nav" aria-label="Chapters">
+              <span class="cs__rail-eyebrow">Chapters</span>
+              <ol>
+                {chapters.map(c => <li><a href={c.href}>{c.label}</a></li>)}
+              </ol>
+            </nav>
+          )}
+          <a class="cs__rail-contact" href="/contact">Talk about this work <span aria-hidden="true">↗</span></a>
+        </div>
+      </aside>
+
+      <div class="cs__reader-main">
     <header class="cs__header">
-      <div class="container-site">
         <a href="/work" class="cs__back">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path d="M13 8H3M7 12l-4-4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -144,12 +173,14 @@ const categoryKey = projectCategoryKey(data.category);
           <span class="cs__sxn-meta">Case study</span>
         </div>
 
-        <h1 class="cs__title">{data.title}</h1>
+        <div class="cs__header-grid">
+          <div class="cs__header-copy">
+            <h1 class="cs__title">{data.title}</h1>
         <div class="cs__lede">
           <p class="cs__short">{dek}</p>
           {summary && <p class="cs__summary">{summary}</p>}
         </div>
-
+          </div>
         <dl class="cs__meta">
           {data.role && (
             <div>
@@ -170,67 +201,13 @@ const categoryKey = projectCategoryKey(data.category);
             </div>
           )}
         </dl>
+        </div>
 
-        {(data.appStoreUrl || data.siteUrl || data.npmUrl || data.repoUrl) && (
-          <div class="cs__get">
-            {data.appStoreUrl && (
-              <AppStoreBadge href={data.appStoreUrl} height={44} project={project.slug} cta="case-study-appstore" />
-            )}
-            {data.siteUrl && (
-              <a
-                class="cs__get-site"
-                href={data.siteUrl}
-                target="_blank"
-                rel="noopener"
-                data-track="cta_click"
-                data-track-cta="case-study-site"
-                data-track-project={project.slug}
-              >
-                {data.siteLabel ?? new URL(data.siteUrl).hostname}
-                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                  <path d="M3 13L13 3M13 3H5M13 3v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </a>
-            )}
-            {data.npmUrl && (
-              <a
-                class="cs__get-site"
-                href={data.npmUrl}
-                target="_blank"
-                rel="noopener"
-                data-track="cta_click"
-                data-track-cta="case-study-npm"
-                data-track-project={project.slug}
-              >
-                npm
-                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                  <path d="M3 13L13 3M13 3H5M13 3v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </a>
-            )}
-            {data.repoUrl && (
-              <a
-                class="cs__get-site"
-                href={data.repoUrl}
-                target="_blank"
-                rel="noopener"
-                data-track="cta_click"
-                data-track-cta="case-study-github"
-                data-track-project={project.slug}
-              >
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-                  <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/>
-                </svg>
-                GitHub
-              </a>
-            )}
-          </div>
-        )}
-      </div>
+
     </header>
 
-    <div class="container-site cs__cover-wrap">
-      <figure class="q-evidence cs__evidence">
+        <div class="cs__cover-wrap">
+      <figure class="q-evidence cs__evidence" transition:name={`project-cover-${project.slug}`}>
         <div class="q-evidence__media cs__cover">
 
         {project.slug === 'vinplain' ? (
@@ -278,7 +255,65 @@ const categoryKey = projectCategoryKey(data.category);
       </figure>
     </div>
 
-    <div class="container-site cs__facts-wrap">
+        <div class="cs__links">
+          {(data.appStoreUrl || data.siteUrl || data.npmUrl || data.repoUrl) && (
+            <div class="cs__get">
+              {data.appStoreUrl && (
+                <AppStoreBadge href={data.appStoreUrl} height={44} project={project.slug} cta="case-study-appstore" />
+              )}
+              {data.siteUrl && (
+                <a
+                  class="cs__get-site"
+                  href={data.siteUrl}
+                  target="_blank"
+                  rel="noopener"
+                  data-track="cta_click"
+                  data-track-cta="case-study-site"
+                  data-track-project={project.slug}
+                >
+                  {data.siteLabel ?? new URL(data.siteUrl).hostname}
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M3 13L13 3M13 3H5M13 3v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </a>
+              )}
+              {data.npmUrl && (
+                <a
+                  class="cs__get-site"
+                  href={data.npmUrl}
+                  target="_blank"
+                  rel="noopener"
+                  data-track="cta_click"
+                  data-track-cta="case-study-npm"
+                  data-track-project={project.slug}
+                >
+                  npm
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M3 13L13 3M13 3H5M13 3v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </a>
+              )}
+              {data.repoUrl && (
+                <a
+                  class="cs__get-site"
+                  href={data.repoUrl}
+                  target="_blank"
+                  rel="noopener"
+                  data-track="cta_click"
+                  data-track-cta="case-study-github"
+                  data-track-project={project.slug}
+                >
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/>
+                  </svg>
+                  GitHub
+                </a>
+              )}
+            </div>
+          )}
+        </div>
+
+    <div class="cs__facts-wrap" id="project-facts">
       <div class="cs__facts-head">
         <span class="q-cut" aria-hidden="true"></span>
         <span class="q-eyebrow">Project facts</span>
@@ -294,13 +329,13 @@ const categoryKey = projectCategoryKey(data.category);
     </div>
 
     {project.slug === 'car-spotter' && (
-      <div class="container-site cs__navwrap">
+      <div class="cs__navwrap">
         <CaseStudyNav items={carSpotterSections} />
       </div>
     )}
 
     {project.slug !== 'car-spotter' && (
-      <div class="container-narrow cs__content">
+      <div class="cs__content">
         <div class="cs__content-head">
           <span class="cs__content-label">The work</span>
         </div>
@@ -1358,6 +1393,9 @@ const categoryKey = projectCategoryKey(data.category);
       </>
     )}
 
+      </div>
+    </div>
+
     <footer class="cs__footer">
       <div class="container-site">
         <div class="cs__next-head">
@@ -1468,10 +1506,19 @@ const categoryKey = projectCategoryKey(data.category);
     }
   }
 
+  .cs__header-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+
+  .cs__header-copy { min-width: 0; }
+
   .cs__back {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    min-height: 44px;
     font-size: 13px;
     font-weight: 500;
     color: var(--color-text-muted);
@@ -1728,9 +1775,8 @@ const categoryKey = projectCategoryKey(data.category);
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    /* 24px minimum tap height — the label is 12px, so the padding carries it. */
-    min-height: 24px;
-    padding-block: 4px;
+    min-height: 44px;
+    padding-block: 10px;
     font-family: var(--font-body);
     font-size: 12px;
     color: var(--color-text-muted);
@@ -1888,6 +1934,203 @@ const categoryKey = projectCategoryKey(data.category);
 
   .cs__meta .cs__stack li + li::before { content: none; }
 
+  @media (min-width: 640px) {
+    .cs__header-grid {
+      grid-template-columns: minmax(0, 1fr) minmax(190px, 220px);
+      gap: var(--space-8);
+      align-items: start;
+    }
+    .cs__meta {
+      padding-top: 0;
+      border-top: 0;
+      display: flex;
+      flex-direction: column;
+      flex-wrap: nowrap;
+      gap: var(--space-4);
+    }
+    .cs__lede { margin-bottom: 0; }
+  }
+
+  @media (min-width: 640px) and (max-width: 1023px) {
+    .cs__header {
+      padding-top: calc(60px + var(--space-2));
+      padding-bottom: var(--space-2);
+    }
+    .cs__back { margin-bottom: var(--space-2); }
+    .cs__sxn { margin-bottom: var(--space-2); }
+    .cs__title {
+      font-size: clamp(40px, 6vw, 64px);
+      margin-bottom: var(--space-3);
+    }
+    .cs__lede { gap: var(--space-3); }
+    .cs__meta { gap: var(--space-3); }
+  }
+
+  @media (orientation: landscape) and (max-height: 500px) {
+    .cs__header {
+      padding-top: calc(52px + var(--space-3));
+      padding-bottom: var(--space-4);
+    }
+    .cs__back { margin-bottom: var(--space-2); }
+    .cs__sxn { margin-bottom: var(--space-3); }
+    .cs__header-grid {
+      grid-template-columns: minmax(0, 1fr) 170px;
+      gap: var(--space-5);
+    }
+    .cs__title {
+      font-size: clamp(32px, 5vw, 40px);
+      margin-bottom: var(--space-2);
+    }
+    .cs__short { font-size: 14px; line-height: 1.45; }
+    .cs__summary { display: none; }
+    .cs__meta { gap: var(--space-2); }
+    .cs__meta dt { font-size: 10px; }
+    .cs__meta-text { font-size: 12px; }
+  }
+
+  .cs__reader {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .cs__reader-main { min-width: 0; }
+  .cs__rail { display: none; }
+
+  @media (min-width: 900px) {
+    .cs__reader {
+      grid-template-columns: 200px minmax(0, 1fr);
+      gap: var(--space-8);
+      align-items: start;
+    }
+    .cs__rail {
+      display: block;
+      position: sticky;
+      top: calc(var(--header-h) + var(--space-6));
+    }
+    .cs__rail-inner {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      padding-top: calc(60px + var(--space-4));
+    }
+    .cs__rail-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      line-height: 1.5;
+      letter-spacing: .04em;
+      color: var(--color-text-muted);
+    }
+    .cs__rail-title {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -.025em;
+      line-height: 1.05;
+      color: var(--color-text);
+    }
+    .cs__rail-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      line-height: 1.5;
+      color: var(--color-accent);
+    }
+    .cs__rail-status-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+      flex: none;
+    }
+    .cs__rail-link,
+    .cs__rail-contact {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.4;
+      color: var(--color-text);
+      text-decoration: none;
+      border-top: 1px solid var(--color-border);
+      padding-top: var(--space-3);
+      margin-top: var(--space-1);
+    }
+    .cs__rail-link:hover,
+    .cs__rail-contact:hover { color: var(--color-accent); }
+    .cs__rail-nav {
+      border-top: 1px solid var(--color-border);
+      padding-top: var(--space-3);
+      margin-top: var(--space-1);
+    }
+    .cs__rail-nav ol {
+      list-style: none;
+      margin: var(--space-2) 0 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .cs__rail-nav a {
+      display: flex;
+      align-items: center;
+      min-height: 44px;
+      font-family: var(--font-body);
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--color-text-muted);
+      text-decoration: none;
+    }
+    .cs__rail-nav a:hover { color: var(--color-accent); }
+    .cs__rail-contact {
+      color: var(--color-accent);
+      margin-top: auto;
+    }
+  }
+
+  @media (min-width: 900px) and (max-width: 1199px) {
+    .cs__header-grid {
+      grid-template-columns: minmax(0, 1fr) 190px;
+      gap: var(--space-6);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .cs__rail-inner {
+      padding-top: calc(64px + var(--space-12));
+    }
+  }
+
+  @media (min-width: 900px) and (max-height: 800px) {
+    .cs__rail { position: static; }
+  }
+
+  @media (min-width: 1200px) {
+    .cs__reader {
+      grid-template-columns: 220px minmax(0, 1fr);
+      gap: var(--space-12);
+    }
+  }
+
+  .cs__links {
+    padding-bottom: var(--space-8);
+  }
+
+  .cs__links .cs__get { margin-top: 0; }
+
+  .cs__content {
+    width: 100%;
+    max-width: 720px;
+    margin-inline: auto;
+  }
+
+  @media (min-width: 900px) {
+    .cs__navwrap { display: none; }
+  }
+
   /* Cover frame — wraps the cover image or artifact in a card-style
      container with corner crosshairs matching the project cards. */
   .cs__cover-wrap {
@@ -1899,6 +2142,20 @@ const categoryKey = projectCategoryKey(data.category);
     .cs__cover-wrap {
       padding-top: var(--space-10);
       padding-bottom: var(--space-12);
+    }
+  }
+
+  @media (min-width: 640px) and (max-width: 1023px) {
+    .cs__reader .cs__cover-wrap {
+      padding-top: var(--space-2);
+      padding-bottom: var(--space-10);
+    }
+  }
+
+  @media (orientation: landscape) and (max-height: 500px) {
+    .cs__reader .cs__cover-wrap {
+      padding-top: var(--space-3);
+      padding-bottom: var(--space-8);
     }
   }
 
@@ -2198,7 +2455,7 @@ const categoryKey = projectCategoryKey(data.category);
 
   /* Anchor targets have to clear the fixed site header. */
   .cs__post[id] {
-    scroll-margin-top: calc(64px + var(--space-6));
+    scroll-margin-top: calc(var(--header-h) + var(--space-6));
   }
 
   /* The first section follows the jump list, so it does not open with a

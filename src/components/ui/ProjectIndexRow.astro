@@ -13,9 +13,10 @@ interface Props {
 }
 const { href, name, index, summary, category, thumbnail, meta, status, project } = Astro.props;
 ---
-<a class="q-index-row" href={href} data-track="cta_click" data-track-cta="work-index-row" data-track-project={project}>
+<a class="q-index-row" href={href} data-track="cta_click" data-track-cta="work-index-row" data-project={project}
+  data-track-project={project}>
   <span class="q-index-row__index" aria-hidden="true">{index}</span>
-  <img class="q-index-row__thumb" src={thumbnail} alt="" width="164" height="112" loading="lazy" decoding="async" />
+  <img class="q-index-row__thumb" src={thumbnail} alt="" width="164" height="112" loading="lazy" decoding="async" transition:name={`project-thumb-${project}`} />
   <span class="q-index-row__content">
     <h2 class="q-index-row__name">{name}</h2>
     <span class="q-index-row__summary">{summary}</span>

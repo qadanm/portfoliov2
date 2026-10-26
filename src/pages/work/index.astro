@@ -44,27 +44,63 @@ const thumbnail = (slug: string) => `/images/work-thumbs/${slug}.webp`;
       </p>
     </header>
 
-    <section class="widx__group container-site" aria-label="Case studies">
-      <ol class="widx__list">
-        {allProjects.map(p => (
-          <li>
-            <ProjectIndexRow
-              href={`/work/${p.slug}`}
-              name={p.data.title}
-              index={numberOf(p.slug)}
-              summary={p.data.short}
-              category={p.data.category}
-              thumbnail={thumbnail(p.slug)}
-              meta={p.data.roleShort ?? p.data.role}
-              status={p.data.inProgress ? 'In QA & field testing' : undefined}
-              project={p.slug}
-            />
-          </li>
+    <div class="widx__layout container-site">
+      <section class="widx__group" aria-label="Case studies">
+        <ol class="widx__list">
+          {allProjects.map(p => (
+            <li>
+              <ProjectIndexRow
+                href={`/work/${p.slug}`}
+                name={p.data.title}
+                index={numberOf(p.slug)}
+                summary={p.data.short}
+                category={p.data.category}
+                thumbnail={thumbnail(p.slug)}
+                meta={p.data.roleShort ?? p.data.role}
+                status={p.data.inProgress ? 'In QA & field testing' : undefined}
+                project={p.slug}
+              />
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <aside class="widx__preview" aria-hidden="true">
+        {allProjects.map((p, i) => (
+          <figure class:list={['widx__preview-item', { 'is-active': i === 0 }]} data-preview={p.slug}>
+            <img class="widx__preview-img" src={thumbnail(p.slug)} alt="" width="480" height="300" loading="lazy" decoding="async" />
+            <figcaption class="widx__preview-caption">
+              <span class="widx__preview-name">{p.data.title}</span>
+              <span class="widx__preview-meta">{p.data.category}{p.data.inProgress ? ' · In QA & field testing' : ''}</span>
+              <span class="widx__preview-role">{p.data.roleShort ?? p.data.role}</span>
+            </figcaption>
+          </figure>
         ))}
-      </ol>
-    </section>
+      </aside>
+    </div>
   </div>
 </BaseLayout>
+
+<script>
+  function initWorkPreview() {
+    const layout = document.querySelector<HTMLElement>('.widx__layout');
+    if (!layout || layout.dataset.previewBound === 'true') return;
+    layout.dataset.previewBound = 'true';
+    const items = [...layout.querySelectorAll<HTMLElement>('[data-preview]')];
+    const rows = [...layout.querySelectorAll<HTMLElement>('[data-project]')];
+    const activate = (slug: string) => {
+      items.forEach(item => item.classList.toggle('is-active', item.dataset.preview === slug));
+    };
+    rows.forEach(row => {
+      const slug = row.dataset.project;
+      if (!slug) return;
+      row.addEventListener('mouseenter', () => activate(slug));
+      row.addEventListener('focus', () => activate(slug));
+    });
+  }
+  initWorkPreview();
+  document.addEventListener('astro:page-load', initWorkPreview);
+</script>
 
 <style>
   /* The index is the counterweight to the homepage: dense where the homepage
@@ -106,6 +142,78 @@ const thumbnail = (slug: string) => `/images/work-thumbs/${slug}.webp`;
     font-size: clamp(15px, 1.5vw, 17px);
     line-height: 1.65;
     color: var(--color-text-muted);
+  }
+
+  .widx__layout {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .widx__preview {
+    display: none;
+  }
+
+  @media (min-width: 900px) {
+    .widx__layout {
+      grid-template-columns: minmax(0, 1fr) clamp(280px, 24vw, 340px);
+      gap: clamp(var(--space-6), 4vw, var(--space-12));
+      align-items: start;
+    }
+
+    .widx__preview {
+      display: block;
+      position: sticky;
+      top: calc(var(--header-h) + var(--space-6));
+    }
+
+    .widx__preview-item {
+      display: none;
+      margin: 0;
+    }
+
+    .widx__preview-item.is-active {
+      display: block;
+    }
+
+    .widx__preview-img {
+      display: block;
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      border: 1px solid var(--q-line);
+      border-radius: 12px;
+      background: var(--q-surface);
+    }
+
+    .widx__preview-caption {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-top: var(--space-4);
+    }
+
+    .widx__preview-name {
+      font-family: var(--font-display);
+      font-size: clamp(24px, 2.2vw, 30px);
+      font-weight: 800;
+      letter-spacing: -.025em;
+      line-height: 1.05;
+      color: var(--color-text);
+    }
+
+    .widx__preview-meta {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      line-height: 1.5;
+      color: var(--color-accent);
+    }
+
+    .widx__preview-role {
+      font-family: var(--font-body);
+      font-size: 12px;
+      line-height: 1.55;
+      color: var(--color-text-muted);
+    }
   }
 
   .widx__list {

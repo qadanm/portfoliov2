@@ -55,7 +55,9 @@ const { projectTitle } = Astro.props;
     z-index: 90;
     /* Safe-area aware bottom padding so the bar stays clear of the iOS
        home indicator and Android gesture bar. */
-    padding-bottom: env(safe-area-inset-bottom);
+    padding-bottom: var(--safe-bottom);
+    padding-left: var(--safe-left);
+    padding-right: var(--safe-right);
     background-color: color-mix(in srgb, var(--color-bg) 80%, transparent);
     backdrop-filter: blur(16px) saturate(140%);
     -webkit-backdrop-filter: blur(16px) saturate(140%);
@@ -66,6 +68,10 @@ const { projectTitle } = Astro.props;
   /* Mobile only — never visible on tablet/desktop. */
   @media (max-width: 760px) {
     .csbar { display: block; }
+  }
+
+  @media (orientation: landscape) and (max-height: 500px) {
+    .csbar { display: none; }
   }
 
   .csbar__inner {

@@ -3,7 +3,7 @@
   "name": "Moe Qadan",
   "short_name": "Qadan",
   "start_url": "/",
-  "display": "browser",
+  "display": "standalone",
   "background_color": "#FAFAF9",
   "theme_color": "#D6006E",
   "icons": [
@@ -24,6 +24,24 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "description": "Portfolio of Moe Qadan, UX engineer and frontend systems practitioner.",
+  "scope": "/",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "orientation": "any",
+  "lang": "en",
+  "dir": "ltr",
+  "screenshots": [
+    {
+      "src": "/brand-system/open_graph/home_light.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Qadan portfolio home"
     }
   ]
 }

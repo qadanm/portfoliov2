@@ -435,11 +435,18 @@ const carSpotterAbout =
     min-width: 0;
   }
 
+  @media (min-width: 640px) {
+    .about__hero-grid {
+      grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
+      gap: var(--space-8);
+      align-items: center;
+    }
+  }
+
   @media (min-width: 880px) {
     .about__hero-grid {
       grid-template-columns: 1fr minmax(260px, 360px);
       gap: clamp(var(--space-8), 5vw, var(--space-16));
-      align-items: center;
     }
   }
 
@@ -454,11 +461,17 @@ const carSpotterAbout =
     margin-inline: auto;
   }
 
+  @media (min-width: 640px) {
+    .about__hero-portrait {
+      max-width: 280px;
+      margin-inline: 0;
+      justify-self: end;
+    }
+  }
+
   @media (min-width: 880px) {
     .about__hero-portrait {
       max-width: 360px;
-      margin-inline: 0;
-      justify-self: end;
     }
   }
 
@@ -622,7 +635,7 @@ const carSpotterAbout =
     }
   }
 
-  @media (min-width: 1024px) {
+  @media (min-width: 900px) {
     .about__body {
       grid-template-columns: 1fr 340px;
       gap: var(--space-16);
