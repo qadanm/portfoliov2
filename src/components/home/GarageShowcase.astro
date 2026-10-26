@@ -9,6 +9,7 @@
 // (::after covers the card) so the App Store badge and site link can be
 // real anchors without nesting <a> inside <a>.
 import AppStoreBadge from '@/components/AppStoreBadge.astro';
+import VinplainPoster from '@/components/artifacts/VinplainPoster.astro';
 import { getCollection } from 'astro:content';
 
 // One record. The CarSpotter card reads the content collection rather than
@@ -64,8 +65,6 @@ const apps = {
     npm: 'https://www.npmjs.com/package/vinplain',
     github: 'https://github.com/qadanm/vinplain',
     site: 'https://qadanm.github.io/vinplain/',
-    poster: '/images/vinplain/poster.webp',
-    alt: 'vinplain poster: the 17-character VIN 1HGCM82633A004352 with the check digit in red, and the decoded 2003 Honda Accord record below it.',
   },
 };
 ---
@@ -374,7 +373,9 @@ const apps = {
       <span class="garage__hero-corner garage__hero-corner--br garage__oss-corner" aria-hidden="true"></span>
 
       <div class="garage__oss-media">
-        <img src={apps.vinplain.poster} alt={apps.vinplain.alt} width="1440" height="900" loading="lazy" decoding="async" />
+        <div class="garage__oss-poster">
+          <VinplainPoster decorative />
+        </div>
       </div>
 
       <div class="garage__oss-body">
@@ -429,10 +430,10 @@ const apps = {
             data-track-cta="garage-github"
             data-track-project="vinplain"
           >
-            GitHub
-            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M3 13L13 3M13 3H5M13 3v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/>
             </svg>
+            GitHub
           </a>
           <a
             class="garage__site"
@@ -936,9 +937,14 @@ const apps = {
     box-shadow: var(--shadow-card-hover), 0 0 0 1px rgba(var(--oss-rgb), 0.22), 0 24px 60px rgba(var(--oss-rgb), 0.10);
   }
 
-  /* The vinplain poster is a document, not a scene. Keep the whole sheet. */
-  .garage__oss--vinplain .garage__oss-media { background: #F3F3EF; }
-  .garage__oss--vinplain .garage__oss-media img { object-fit: contain; }
+  /* The vinplain poster is a live record sheet; the component owns its paper. */
+  .garage__oss-poster {
+    position: absolute;
+    inset: 0;
+    transition: transform 700ms var(--ease-out);
+    will-change: transform;
+  }
+  .garage__oss:hover .garage__oss-poster { transform: scale(1.03); }
 
   .garage__oss-corner { border-color: rgba(47, 129, 247, 0); }
   .garage__oss:hover .garage__oss-corner { border-color: #2f81f7; }

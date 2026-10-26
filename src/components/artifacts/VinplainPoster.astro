@@ -1,0 +1,316 @@
+---
+// vinplain's portfolio poster, rebuilt as a live record sheet rather than a
+// flat image. The paper, ink, rules, and check digit all come from local
+// variables so the poster follows the portfolio's data-theme toggle. The
+// layout is the same 1440×900 composition as the static OG card.
+interface Props {
+  label?: string;
+  decorative?: boolean;
+}
+
+const {
+  label = 'vinplain poster: the 17-character VIN 1HGCM82633A004352 with the check digit in red, and the decoded 2003 Honda Accord record below it.',
+  decorative = false,
+} = Astro.props;
+
+const vin = '1HGCM82633A004352';
+const checkIndex = 8;
+const fields = [
+  { label: 'MAKE', value: 'HONDA' },
+  { label: 'MODEL', value: 'ACCORD' },
+  { label: 'YEAR', value: '2003' },
+  { label: 'RECALLS', value: '24' },
+  { label: 'COMPLAINTS', value: '2013' },
+  { label: 'FUEL', value: '22 MPG' },
+];
+---
+
+<div
+  class="vposter"
+  role={decorative ? undefined : 'img'}
+  aria-label={decorative ? undefined : label}
+  aria-hidden={decorative ? 'true' : undefined}
+>
+  <div class="vposter__sheet">
+    <span class="vposter__frame" aria-hidden="true"></span>
+
+    <div class="vposter__meta" aria-hidden="true">
+      <span>VINPLAIN / PUBLIC RECORD / 2026</span>
+      <span>OPEN SOURCE / MIT</span>
+    </div>
+
+    <div class="vposter__identity" aria-hidden="true">
+      <p class="vposter__name">vinplain</p>
+      <p class="vposter__tagline">Public vehicle records for TypeScript.</p>
+      <p class="vposter__sub">VIN decode, recalls, complaints, crash ratings, and fuel economy from US public sources.</p>
+    </div>
+
+    <div class="vposter__vin-wrap" aria-hidden="true">
+      <div class="vposter__vin">
+        {[...vin].map((character, index) => (
+          <span class:list={['vposter__cell', index === checkIndex && 'vposter__cell--check']}>
+            {character}
+          </span>
+        ))}
+      </div>
+      <span class="vposter__check-label">CHECK DIGIT</span>
+    </div>
+
+    <div class="vposter__fields" aria-hidden="true">
+      {fields.map((field, index) => (
+        <div class:list={['vposter__field', index === 0 && 'vposter__field--first']}>
+          <span class="vposter__field-label">{field.label}</span>
+          <span class="vposter__field-value">{field.value}</span>
+        </div>
+      ))}
+    </div>
+
+    <span class="vposter__rule" aria-hidden="true"></span>
+
+    <div class="vposter__foot vposter__foot--top" aria-hidden="true">
+      <span>SOURCES / vPIC · NHTSA · EPA</span>
+      <span>npm install vinplain</span>
+    </div>
+    <div class="vposter__foot vposter__foot--bottom" aria-hidden="true">
+      <span>17 CHARACTERS / ONE CHECK DIGIT</span>
+      <span>0 RUNTIME DEPENDENCIES / MIT</span>
+    </div>
+  </div>
+</div>
+
+<style>
+  .vposter {
+    --vp-paper: #F3F3EF;
+    --vp-ink: #111214;
+    --vp-muted: #5F646A;
+    --vp-line: #C9CDD2;
+    --vp-cell: #FFFFFF;
+    --vp-red: #D7261E;
+    --vp-check-ink: #FFFFFF;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    background-color: var(--vp-paper);
+    container-type: inline-size;
+    transition: background-color 320ms var(--ease-out);
+  }
+
+  :global([data-theme="dark"]) .vposter {
+    --vp-paper: #0B0C0D;
+    --vp-ink: #F2F2EF;
+    --vp-muted: #9CA1A7;
+    --vp-line: #2A2D31;
+    --vp-cell: #141618;
+    --vp-red: #FF4D3D;
+    --vp-check-ink: #0B0C0D;
+  }
+
+  .vposter__sheet {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background-color: var(--vp-paper);
+    color: var(--vp-ink);
+    transition: background-color 320ms var(--ease-out), color 320ms var(--ease-out);
+  }
+
+  .vposter__frame {
+    position: absolute;
+    inset: 5.33% 3.33%;
+    border: 1px solid var(--vp-line);
+    pointer-events: none;
+    transition: border-color 320ms var(--ease-out);
+  }
+
+  .vposter__meta {
+    position: absolute;
+    top: 9.1%;
+    left: 3.33%;
+    right: 3.33%;
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5cqw;
+    font-family: var(--font-mono);
+    font-size: 0.76cqw;
+    letter-spacing: 0.2em;
+    line-height: 1;
+    color: var(--vp-muted);
+    transition: color 320ms var(--ease-out);
+  }
+
+  .vposter__identity {
+    position: absolute;
+    top: 16.6%;
+    left: 2.9%;
+    right: 3.33%;
+  }
+
+  .vposter__name {
+    margin: 0;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 10.4cqw;
+    font-weight: 700;
+    letter-spacing: -0.055em;
+    line-height: 1;
+    color: var(--vp-ink);
+    transition: color 320ms var(--ease-out);
+  }
+
+  .vposter__tagline {
+    margin: 1.5cqw 0 0;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 2.22cqw;
+    letter-spacing: -0.018em;
+    line-height: 1.1;
+    color: var(--vp-ink);
+    transition: color 320ms var(--ease-out);
+  }
+
+  .vposter__sub {
+    margin: 0.55cqw 0 0;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 1.11cqw;
+    line-height: 1.2;
+    color: var(--vp-muted);
+    transition: color 320ms var(--ease-out);
+  }
+
+  .vposter__vin-wrap {
+    position: absolute;
+    top: 47.8%;
+    left: 3.33%;
+    right: 3.33%;
+  }
+
+  .vposter__vin {
+    display: grid;
+    grid-template-columns: repeat(17, minmax(0, 1fr));
+    gap: 0.42cqw;
+  }
+
+  .vposter__cell {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 72 / 82;
+    border: 1px solid var(--vp-line);
+    background-color: var(--vp-cell);
+    color: var(--vp-ink);
+    font-family: var(--font-mono);
+    font-size: 2.36cqw;
+    line-height: 1;
+    transition: background-color 320ms var(--ease-out), border-color 320ms var(--ease-out), color 320ms var(--ease-out);
+  }
+
+  .vposter__cell--check {
+    border-color: var(--vp-red);
+    background-color: var(--vp-red);
+    color: var(--vp-check-ink);
+  }
+
+  .vposter__check-label {
+    position: absolute;
+    top: calc(100% + 1.25cqw);
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-mono);
+    font-size: 0.7cqw;
+    letter-spacing: 0.2em;
+    line-height: 1;
+    color: var(--vp-red);
+    white-space: nowrap;
+    transition: color 320ms var(--ease-out);
+  }
+
+  .vposter__check-label::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 0.3cqw);
+    left: 50%;
+    width: 1px;
+    height: 0.9cqw;
+    background-color: var(--vp-red);
+    transition: background-color 320ms var(--ease-out);
+  }
+
+  .vposter__fields {
+    position: absolute;
+    top: 67.6%;
+    left: 3.33%;
+    right: 3.33%;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .vposter__field {
+    padding-top: 1.1cqw;
+    padding-left: 1.1cqw;
+    border-left: 1px solid var(--vp-line);
+    transition: border-color 320ms var(--ease-out);
+  }
+
+  .vposter__field--first {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .vposter__field-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.72cqw;
+    letter-spacing: 0.18em;
+    line-height: 1;
+    color: var(--vp-muted);
+    transition: color 320ms var(--ease-out);
+  }
+
+  .vposter__field-value {
+    display: block;
+    margin-top: 0.6cqw;
+    font-family: var(--font-mono);
+    font-size: 1.8cqw;
+    line-height: 1;
+    color: var(--vp-ink);
+    transition: color 320ms var(--ease-out);
+  }
+
+  .vposter__rule {
+    position: absolute;
+    top: 80.4%;
+    left: 3.33%;
+    right: 3.33%;
+    height: 1px;
+    background-color: var(--vp-ink);
+    transition: background-color 320ms var(--ease-out);
+  }
+
+  .vposter__foot {
+    position: absolute;
+    left: 3.33%;
+    right: 3.33%;
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5cqw;
+    font-family: var(--font-mono);
+    font-size: 0.88cqw;
+    letter-spacing: 0.16em;
+    line-height: 1.2;
+    color: var(--vp-muted);
+    transition: color 320ms var(--ease-out);
+  }
+
+  .vposter__foot--top { top: 84.8%; }
+  .vposter__foot--bottom { top: 90.8%; font-size: 0.8cqw; }
+
+  @container (max-width: 520px) {
+    .vposter__meta { font-size: 0.9cqw; letter-spacing: 0.14em; }
+    .vposter__sub { display: none; }
+    .vposter__tagline { margin-top: 2.2cqw; font-size: 2.6cqw; }
+    .vposter__field-label { font-size: 0.9cqw; }
+    .vposter__field-value { font-size: 2.1cqw; }
+    .vposter__check-label { font-size: 0.85cqw; }
+    .vposter__foot--bottom { display: none; }
+    .vposter__foot { font-size: 0.95cqw; }
+  }
+</style>
