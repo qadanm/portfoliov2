@@ -1577,9 +1577,8 @@ const categoryKey = data.category.toLowerCase();
 
 
   .cs__sxn-tag--flagship {
-    /* --color-accent is 3.05:1 on the light page — fine as a fill, not as 10px
-       text. The hover shade is the same hue at 4.83:1 and is already in the
-       token set, so no new colour enters the system. */
+    /* The 10px label keeps the deeper hover shade on a dim fill so it stays
+       crisp on the light page without introducing another colour. */
     color: var(--color-accent-hover);
     background-color: var(--color-accent-dim);
     border-color: var(--color-accent-muted);
