@@ -6,6 +6,7 @@ import Footer from './Footer.astro';
 import Analytics from '@/components/analytics/Analytics.astro';
 import '@/styles/global.css';
 import '@/styles/brand.css';
+import '@/styles/duo.css';
 
 interface Props {
   title?: string;
@@ -116,10 +117,14 @@ const websiteSchema = {
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="color-scheme" content="dark light" />
   <meta name="theme-color" content="#FAFAF9" media="(prefers-color-scheme: light)" />
   <meta name="theme-color" content="#09090B" media="(prefers-color-scheme: dark)" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Qadan" />
+  <meta name="mobile-web-app-capable" content="yes" />
 
   <script set:html={themeScript} />
 
