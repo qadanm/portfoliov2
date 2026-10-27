@@ -1,6 +1,6 @@
 ---
 title: VINly
-short: 'Scan a VIN, get the car''s public safety record free: recalls, owner complaints, crash tests, fuel cost, and real listings nearby. Designed and engineered solo for iOS.'
+short: 'Scan a VIN and get the car''s public safety record free. Designed and built solo for iOS.'
 category: Independent product
 keyFocus:
   - VIN-first research
@@ -46,42 +46,42 @@ ogAlt: VINly / Moe Qadan
 
 ## The ninety seconds before a seller reply
 
-A used car is a stranger's optimism with a price on it. The buyer has to work out what's wrong with it, and most people guess: three tabs, half a forum thread, and an offer they can't defend.
+A used car is an expensive purchase with an unknown history. Most buyers guess: three tabs, half a forum thread, and an offer they can't defend.
 
-The strange part is that the information already exists and it is already free. Every recall, every owner complaint, every crash test is published by the federal government. It is just locked behind interfaces nobody wants to use, indexed by a VIN nobody wants to type, and scattered across agencies that do not talk to each other. Nobody assembles it in the ninety seconds before you message the seller.
+The information already exists and it is already free. Every recall, every owner complaint, every crash test is published by the federal government. It is locked behind interfaces nobody wants to use, indexed by a VIN nobody wants to type, and scattered across agencies that do not talk to each other. The information exists, but it is hard to use before you message the seller.
 
 ## What VINly does
 
 Point the camera at the VIN, on the door jamb or the dashboard or the paperwork, and VINly reads it. Then it returns that car's public record: open recalls, what owners have complained about, crash-test ratings, real yearly fuel cost, and how this model year compares to the ones on either side of it. When you are ready to shop, it shows real listings for that model near you, with photos, prices, and a link to the dealer.
 
-Free. No account, no subscription, no ads. The product is a bet that the fastest way to earn a car buyer's trust is to help with the car already in front of them and charge nothing for it.
+Free, with no account, subscription, or ads.
 
-## The VIN is the front door
+## The VIN is the starting point
 
-The decision the whole app hangs on is that the VIN is the entry point, not a form field.
+Every screen starts with the VIN.
 
-A VIN is 17 characters. It deliberately excludes I, O and Q so they cannot be confused with 1 and 0, and it carries a check digit in the ninth position. That check digit is the spine of the product. Every VIN, however it arrives, is validated against ISO 3779 arithmetic on the device before a single request goes out. A misread fails closed. The app would rather say it could not read the VIN than look up the wrong car.
+A VIN is 17 characters. It deliberately excludes I, O and Q so they cannot be confused with 1 and 0, and it carries a check digit in the ninth position. The check digit is the core of the product. Every VIN, however it arrives, is validated against ISO 3779 arithmetic on the device before a single request goes out. A misread fails closed. The app would rather say it could not read the VIN than look up the wrong car.
 
 Reading it happens two ways, both on the phone. The door-jamb barcode is decoded by the system scanner. When there is no barcode, the camera photographs the VIN text and Apple's Vision framework reads the characters. The recognizer hands back raw text and nothing else; a shared engine finds the 17-character windows in it, repairs a single OCR confusion only when the check digit proves the repair correct, and throws away the rest.
 
 ## What it refuses to claim
 
-VINly is deliberately narrow, and saying so out loud is part of the design.
+VINly only reports public safety data.
 
-It is not a vehicle-history report. There is no accident record, no title or lien check, no odometer verification. It reports what the government publishes, which is safety data, not provenance. It says so on the page rather than letting the buyer assume otherwise, and it keeps `carfax` and `history` out of its own keywords for the same reason, at a real cost in search traffic.
+It is not a vehicle-history report. There is no accident record, no title or lien check, no odometer verification. It reports what the government publishes, which is safety data, not provenance. It says so on the page and keeps `carfax` and `history` out of its own keywords, at a real cost in search traffic.
 
-It also refuses to be alarming. Recall counts are read against calm thresholds, because two open recalls is ordinary and treating it as a warning would be dishonest. Injury and fire mentions are normalized against total complaint volume, so a popular model is not smeared for being popular. Where the data is missing the app says *Not rated*, rather than drawing a dash and letting the reader fill in the blank themselves.
+It also avoids alarm. Two open recalls is ordinary, so recall counts are read against calm thresholds. Injury and fire mentions are normalized against total complaint volume, so a popular model is not penalized for being popular. Where the data is missing the app says *Not rated*, rather than showing a dash.
 
 ## Nothing leaves the phone
 
 An earlier version sent VIN photos to a server, where a vision model read the characters and handed back text.
 
-It worked, and it was wrong. It cost money on every scan of a free product. It needed a network round trip while the user was standing in a parking lot with one bar. And it forced a *Photos* disclosure in App Privacy for something the phone could do by itself. Apple's Vision framework does the same job on-device for nothing, offline, and privately. The photo path now never leaves the device, and the privacy answer went from a paragraph to a sentence.
+It worked, but it was wrong. It cost money on every scan of a free product. It needed a network round trip while the user was standing in a parking lot with one bar. And it forced a *Photos* disclosure in App Privacy for something the phone could do by itself. Apple's Vision framework does the same job on-device for nothing, offline, and privately. The photo never leaves the device, and the privacy disclosure is one line.
 
-The same instinct governs the backend. The keys that cost money never ship in the app bundle; they live as Edge Function secrets. And the functions that no longer serve a purpose do not sit there quietly. They get deleted, because an unauthenticated endpoint holding an API key is a bill waiting to be run up by somebody else.
+The same rule applies to the backend. API keys stay in Edge Function secrets, not the app bundle. I delete unused functions; an unauthenticated endpoint with an API key is a bill waiting to happen.
 
 ## One person, end to end
 
 The design, the iOS app, the shared research engine, the Supabase backend, and the marketing site are one person's work.
 
-The engine is the part worth pointing at. VIN validation, recall thresholds, complaint normalization, and year-over-year comparison live in one TypeScript package that both the app and vinly.dev import. The website and the phone reach the same verdict about the same car because they run the same code. Two surfaces that disagree about whether a car is safe are worse than one surface that does not exist.
+The engine is the part worth pointing at. VIN validation, recall thresholds, complaint normalization, and year-over-year comparison live in one TypeScript package that both the app and vinly.dev import. The website and the phone return the same verdict about the same car because they run the same code.

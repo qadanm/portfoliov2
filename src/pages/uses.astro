@@ -8,8 +8,8 @@ const sections = [
     icon: 'terminal',
     items: [
       { name: 'VS Code', note: 'Daily driver. JetBrains keymap, no theme overrides.' },
-      { name: 'Cursor', note: 'When the work is local iteration on a tight loop.' },
-      { name: 'Claude Code', note: 'When the work needs to think across more than one file.' },
+      { name: 'Cursor', note: 'For local iteration on a tight loop.' },
+      { name: 'Claude Code', note: 'For changes across multiple files.' },
       { name: 'iTerm2 + zsh', note: 'Tabbed sessions, per-project profiles.' },
       { name: 'GitHub Desktop', note: 'For diffs and quick commits. Branching and rebasing in CLI.' },
     ],
@@ -18,8 +18,8 @@ const sections = [
     label: 'Design',
     icon: 'layers',
     items: [
-      { name: 'Figma', note: 'Precision design, component-system maintenance, handoff fidelity.' },
-      { name: 'Claude Design', note: 'Visual exploration when a frame is faster to think in than markup.' },
+      { name: 'Figma', note: 'Design and component systems.' },
+      { name: 'Claude Design', note: 'For early visual exploration; the result goes back into code.' },
       { name: 'iA Writer', note: 'Writing-first for long-form content and case study drafts.' },
     ],
   },
@@ -41,9 +41,9 @@ const sections = [
     icon: 'review',
     items: [
       { name: 'Prompt modules in source', note: 'Typed, versioned, reviewed in PRs like any other code.' },
-      { name: 'Schema-bound outputs', note: 'Model output is constrained at the boundary, not at the UI layer.' },
+      { name: 'Schema-bound outputs', note: 'The output schema is validated before it reaches the UI.' },
       { name: 'Deterministic layers in front', note: 'Six reasoning layers before every model call in ChatOBD2; in VINly a VIN is check-digit validated on-device before anything is looked up, and no model runs at all.' },
-      { name: 'Token budgets as resource budgets', note: '38,000-token system prompt assembled per scan, P0 sections always make the cut.' },
+      { name: 'Token budgets as resource budgets', note: 'A 38,000-token prompt is assembled for each scan; P0 sections are always included.' },
     ],
   },
   {
@@ -60,7 +60,7 @@ const sections = [
     icon: 'document',
     items: [
       { name: 'Astro 4', note: 'Static-first, content collections for case studies, MDX.' },
-      { name: 'Hand-written CSS', note: 'No CSS framework. Design tokens and scoped component styles carry the system.' },
+      { name: 'Hand-written CSS', note: 'No CSS framework; design tokens and component styles do the work.' },
       { name: 'Anybody, Inter, Martian Mono', note: 'Loaded from Google Fonts via preconnect.' },
       { name: 'Plausible analytics', note: 'Privacy-respecting. No cookies, no fingerprinting.' },
       { name: 'Web3Forms', note: 'Static contact form, no backend required.' },
@@ -72,7 +72,7 @@ const sections = [
 
 <BaseLayout
   title="Uses"
-  description="The tools, stack, and AI workflow Moe Qadan uses for UX engineering, frontend systems, and product work. A practical colophon."
+  description="The tools, stack, and workflow Moe Qadan uses for UX engineering, frontend, and product work."
   keywords={[
     'Moe Qadan',
     'colophon',
@@ -95,12 +95,12 @@ const sections = [
         <div class="uses__sxn">
           <span class="q-cut" aria-hidden="true"></span>
           <span class="uses__sxn-label">Uses</span>
-          <span class="uses__sxn-meta">A practical colophon</span>
+          <span class="uses__sxn-meta">Tools and setup</span>
         </div>
         <h1 class="uses__title">What I work with.</h1>
         <p class="uses__lede">
-          The actual tools, stack, and workflow behind the work on this
-          site. Updated when something changes, not on a schedule.
+          The tools, stack, and workflow behind this site. I update it when
+          something changes.
         </p>
       </div>
     </header>
