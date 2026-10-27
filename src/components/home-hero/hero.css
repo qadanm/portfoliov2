@@ -52,10 +52,12 @@
 }
 .qh__control { min-height: 54px; display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--qh-line); font: 600 15px/1.4 var(--font-body, "Inter", sans-serif); color: var(--qh-ink); }
 .qh__control svg { width: 22px; height: 22px; color: var(--qh-pink); flex: 0 0 auto; }
+.qh__icon--eye-off { display: none; }
 .qh__when-open { display: none; }
 .qh__disclosure[open] .qh__when-closed { display: none; }
 .qh__disclosure[open] .qh__when-open { display: inline; }
-.qh__disclosure[open] .qh__control svg { transform: rotate(180deg); }
+.qh__disclosure[open] .qh__icon--eye { display: none; }
+.qh__disclosure[open] .qh__icon--eye-off { display: block; }
 .qh__sample:has(.qh__disclosure[open]) .qh__photo--answer {
   clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 0 100%);
 }
