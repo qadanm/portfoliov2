@@ -1,11 +1,11 @@
 ---
 title: ChatOBD2
-short: AI-native automotive diagnostics product, designed and engineered solo
+short: An AI car-diagnostics app, designed and built solo. In QA and field testing.
 category: Independent product
-seoDescription: 'ChatOBD2 is an AI-native automotive diagnostics product in QA and field testing, designed and engineered solo.'
+seoDescription: 'ChatOBD2 is an AI car-diagnostics app in QA and field testing, designed and built solo.'
 keyFocus:
-  - AI-native UX
-  - Structured pipeline design
+  - AI product design
+  - Structured pipeline
   - End-to-end product engineering
 role: Founder, sole designer & engineer
 period: 2025, present
@@ -45,25 +45,25 @@ ogAlt: ChatOBD2 / Moe Qadan
 
 Diagnostic apps for cars are written by engineers for engineers. Codes, freeze frames, partial explanations, all surfaced raw. The driver staring at a screen is supposed to take all of that and produce a decision: drive it, don't drive it, fix it now, fix it later.
 
-The actual problem isn't visualization. It's translation. The data is technically present; the user is left to assemble it into an answer.
+The data is present, but the driver still has to turn it into a decision.
 
 ## A verdict instead of a raw scan
 
-ChatOBD2 closes the gap by deciding for them.
+ChatOBD2 returns a verdict instead of a raw scan.
 
-The interface is intentionally simple. The system behind it isn't. Structured diagnostic inputs feed into layered interpretation, then into a constrained model call, then into a constrained output. Every scan returns the same shape: is it safe to drive, how confident is the answer, what matters most, what to do next.
+The interface shows one verdict. Behind it, structured inputs go through layered interpretation, a constrained model call, and a constrained output. Every scan returns the same shape: is it safe to drive, how confident is the answer, what matters most, what to do next.
 
-The model is one stage in a structured pipeline. Its job is reducing complexity, not generating prose.
+The model is one step in the pipeline. The output is schema-bound before it reaches the UI.
 
 ## Three constraints that shaped the verdict
 
-**The verdict comes first, before any text.** When a scan finishes, the safe-to-drive answer renders first. Full-width, color-coded, ahead of every paragraph. The tradeoff is less narrative warmth. Anyone glancing at the screen has the answer they came for in under a second.
+**The verdict comes first, before any text.** When a scan finishes, the safe-to-drive answer renders first. Full-width, color-coded, ahead of every paragraph. The tradeoff is less explanation, but the answer is visible in under a second.
 
-**Confidence is part of the answer.** A partial scan changes what the verdict means. Showing scan quality as a fixed bar instead of hiding it costs a small piece of optimism and earns a much larger piece of trust.
+**Confidence is part of the answer.** A partial scan changes what the verdict means. Showing scan quality costs some optimism but makes the result honest.
 
-**Prompts live in the system, not in components.** When prompts get scattered across components, every copy change is a hunt across files and the analytics taxonomy quietly drifts behind it. Pulling them into one module, keyed by verdict tier and code context, means a single change updates the whole product, and the analytics stay coherent across it.
+**Prompts live in one module.** If they are scattered across components, a copy change touches many files and the analytics fall out of sync. One module, keyed by verdict tier and code context, means one change updates the product.
 
-## The shape of the system
+## How the system works
 
 Chat surface as the home screen. Verdict card as the unit of output. The model held as one structured stage between deterministic input and constrained output.
 

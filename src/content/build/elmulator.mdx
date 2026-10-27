@@ -1,6 +1,6 @@
 ---
 title: elmulator
-short: An open-source ELM327 adapter emulator that puts a car app's Bluetooth code under test in CI, with no car and no hardware.
+short: An open-source ELM327 adapter emulator for testing a car app's Bluetooth code in CI, without a car or hardware.
 category: Open source
 keyFocus:
   - Test infrastructure
@@ -48,9 +48,9 @@ ogAlt: elmulator / Moe Qadan
 
 Most OBD2 apps reach the car through a Bluetooth adapter, and that link is the single hardest thing to test. The iOS Simulator has no Bluetooth at all. There is no supported way to mock `CBPeripheral`. So the Bluetooth path, the part most likely to break in a stranger's driveway, is usually the part that never gets a test.
 
-The usual workaround is a phone, a real adapter, and a car in the parking lot. That doesn't run in CI, and it doesn't run at 2am when a refactor lands.
+The usual workaround is a phone, a real adapter, and a car in the parking lot. That cannot run in CI or on every commit.
 
-## A scriptable adapter, not a mock framework
+## A scriptable adapter
 
 elmulator is a fake ELM327 you can script. It started as the test harness inside my own OBD2 app and came out as a standalone, MIT-licensed tool so the Bluetooth code can run on an ordinary CI runner instead of a car.
 
@@ -58,14 +58,14 @@ One JSON scenario describes a synthetic conversation: what the adapter replies, 
 
 ## Three decisions that made it portable
 
-**Two implementations, held byte-for-byte identical.** There is a Swift server and a pure-standard-library Python server, and a conformance suite runs the same scenarios through both and diffs the bytes. Neither is allowed to drift from the other. That differential test is the spine of the project: it is what lets a scenario mean exactly one thing no matter which runtime plays it.
+**Two implementations, held byte-for-byte identical.** There is a Swift server and a pure-standard-library Python server, and a conformance suite runs the same scenarios through both and diffs the bytes. Neither is allowed to drift from the other. That test keeps the two implementations in sync, so a scenario means the same thing in either runtime.
 
-**A protocol seam, not a mock framework.** The connection logic sits behind a `CentralStack` protocol that the real CoreBluetooth central and the fake one both implement. Tests swap one for the other and run the whole power-on, scan, connect, discover, subscribe, ready flow with no radio. The state machine is a plain value type, so it is trivial to drive and assert on.
+**A small protocol boundary.** The connection logic sits behind a `CentralStack` protocol that the real CoreBluetooth central and the fake one both implement. Tests swap one for the other and run the whole power-on, scan, connect, discover, subscribe, ready flow with no radio. The state machine is a plain value type, so it is easy to drive and assert on.
 
 **Scenarios are fixtures.** Each scenario also records the scan result it should produce, so the file that fakes the adapter is the same file that guards against regressions. Add a scenario, and you have both a new test case and a new piece of documentation.
 
-## Shipped, not just published
+## Published and tested
 
 elmulator is distributed the way a dependency should be: `pip install elmulator`, a Swift package on the Swift Package Index, and a one-line GitHub Action on the Marketplace. Releases publish themselves through OIDC trusted publishing, CI gates every change on the conformance suite, and there are zero third-party runtime dependencies to carry.
 
-It is the open-source counterpart to the car apps: the same domain, taken down a layer, and handed to anyone building on iOS OBD2.
+It is the open-source counterpart to the car apps: the same domain, packaged for anyone building an iOS OBD2 app.

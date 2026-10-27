@@ -1,6 +1,6 @@
 ---
 title: vinplain
-short: 'A typed, keyless TypeScript client for US vehicle records: VIN decode, NHTSA recalls and complaints, crash ratings, and EPA fuel economy.'
+short: 'A TypeScript client for US vehicle records: VIN decode, recalls, complaints, crash ratings, and fuel economy.'
 category: Open source
 keyFocus:
   - Public data
@@ -90,7 +90,7 @@ vinplain started as the research layer inside VINly. The product code stays priv
 
 The extraction excludes the listings, the record-pulse scoring, the peer comparisons, and the UI. What remains is the part that talks to public data: VIN validation and the ISO 3779 check digit, vPIC decode, NHTSA records, EPA economy, a cache seam, and configurable timeouts.
 
-## The surface
+## The API
 
 The package is on npm as `vinplain`, with a CLI, an API reference, a failure model, and source notes. There is an iOS companion, `expo-vin-ocr`, that reads a VIN from a photo with Apple Vision and hands the text to the same validation layer. The photo stays on the phone.
 
@@ -98,6 +98,6 @@ The website is a one-page product record. It answers three questions: what it do
 
 ## What this work taught me
 
-Public data is not clean because it is public. The recall endpoint returns the same 400 for a valid car with no campaigns and for a model name it does not recognise. A client that treats both as "no recalls" is wrong in a way that matters. Most of the work was learning where the sources lie and making the types tell the truth about it.
+Public data is messy. The recall endpoint returns the same 400 for a valid car with no campaigns and for a model name it does not recognise. A client that treats both as "no recalls" is wrong in a way that matters. Most of the work was mapping the failure modes and putting them in the types.
 
-The second lesson was scope. The package is more useful because it does not try to be a history report, an offline decoder, or a hosted API. It reads the public record and stops.
+The package is more useful because it does not try to be a history report, an offline decoder, or a hosted API. It reads the public record and stops.

@@ -1,6 +1,6 @@
 ---
 title: Advisor Platforms
-short: Advisor and customer portals deployed across 50+ wealth-management and banking institutions on InvestCloud's multi-tenant framework
+short: Advisor and customer portals for 50+ wealth and banking institutions on InvestCloud's multi-tenant framework
 category: Platform work
 keyFocus:
   - Multi-tenant frontend
@@ -41,26 +41,26 @@ ogAlt: Advisor Platforms / Moe Qadan
 
 Wealth-management advisor and client portals built on InvestCloud's framework. I contributed to or led 0-to-production deploys across 50+ institutions, including Chase, Cetera, Northwestern Mutual, Voya, Silicon Valley Bank, East West Bank, and many more.
 
-Multi-tenant by design. One platform underneath. Per-institution branding, structure, and information architecture on top. The shared system constrained what was possible. The per-institution work made each portal feel native to the bank that ran it. The volume, fifty-plus deploys against the same substrate, was its own discipline.
+One platform underneath; per-institution branding and content on top. Fifty-plus deploys on the same codebase.
 
-## Where the design problem actually was
+## Where the design work was
 
-Not in the components. Components were defined upstream by design teams that owned the Figma files and the brand systems. The design problem was in the gap between Figma and a multi-tenant CMS that wasn't built around modern token systems.
+The components came from upstream design teams that owned the Figma files and brand systems. The work was in the gap between Figma and a multi-tenant CMS that wasn't built around modern token systems.
 
-Most of the day-to-day was hand-written CSS implementing those handoffs faithfully, at the institution-specific level, without breaking the shared substrate underneath. That meant:
+Most of the day-to-day was hand-written CSS implementing those handoffs at the institution level, without breaking the shared codebase underneath. That meant:
 
-- Reading Figma intent, not just specs, and reproducing it in a CMS that didn't always have a primitive for what was drawn.
+- Reading the intent behind a Figma file, then reproducing it in a CMS that didn't always have a primitive for what was drawn.
 - Holding per-institution branding inside a system that wanted to enforce its own.
 - Keeping dense, data-heavy layouts readable across desktop, tablet, and mobile, often within design constraints authored mostly for one breakpoint.
 - Coordinating with design, product, and QA tightly enough that "this looks right in Figma" and "this works in production" stayed connected.
 
-## Handoff hygiene
+## Working with design
 
-The portals that shipped well shared one thing. The design team and the implementation layer treated each other as collaborators, not as a one-way file drop. The portals that shipped badly were the ones where the handoff was assumed instead of negotiated.
+The best portals came from design and implementation working together. The worst came from a one-way handoff.
 
-A good handoff names the constraints up front. Which spacings are token-backed. Which states the design has thought through. Where the system can flex. Where it can't. A bad handoff is just a frame.
+A good handoff names the constraints up front: which spacings are token-backed, which states are designed, and where the system can flex. A bad handoff is just a frame.
 
-The implementation work was sixty percent reproducing intent faithfully and forty percent closing gaps the original handoff didn't see. The second forty percent is where design literacy actually pays off.
+Most of the work was reproducing the design; the rest was closing gaps the handoff didn't see.
 
 ## What the platforms supported
 
@@ -71,4 +71,4 @@ The implementation work was sixty percent reproducing intent faithfully and fort
 
 ## Takeaway
 
-Years of high-fidelity implementation across many institutions builds a specific instinct: reading what a design team meant, and recognizing what the system underneath can actually carry. Both have stayed useful in every job since.
+Working across many institutions taught me to read what a design team meant and what the system could support. Both skills have stayed useful.

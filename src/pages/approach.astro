@@ -25,7 +25,7 @@ const projects = [
   {
     slug: 'chatobd2',
     title: 'ChatOBD2',
-    note: 'AI-native diagnostics, designed and engineered solo. In QA and field testing.',
+    note: 'An AI car-diagnostics app, designed and built solo. In QA and field testing.',
     src: '/images/chatobd2/hero.webp',
     alt: 'ChatOBD2 marketing hero with phone mockup of a live diagnostic chat.',
     category: 'Independent product',
@@ -33,7 +33,7 @@ const projects = [
   {
     slug: 'magtek-platform',
     title: 'MagTek',
-    note: 'Full-stack ownership across a multi-site platform on a long-running ASP.NET MVC stack.',
+    note: "I own the full stack across MagTek's eleven sites on ASP.NET MVC.",
     src: '/images/magtek/homepage.webp',
     alt: 'MagTek homepage with metric story and team photography.',
     category: 'Platform work',
@@ -41,7 +41,7 @@ const projects = [
   {
     slug: 'car-spotter',
     title: cs?.title ?? 'CarSpotter',
-    note: cs?.secondaryCopy?.approach ?? 'An independent iPhone game where I connect product decisions, interface design, game state and content tooling.',
+    note: cs?.secondaryCopy?.approach ?? 'An independent iPhone game where I built the product, interface, game state, and content tooling.',
     src: carSpotterCard ?? '/images/car-spotter/2026-10/artwork/01-carspotter-portfolio-hero-1600.webp',
     alt: cs?.coverAlt ?? 'CarSpotter’s Saturn identity beside a genuine car-detail question and the matching reveal.',
     category: 'Independent product',
@@ -59,7 +59,7 @@ const projects = [
 
 <BaseLayout
   title="Approach"
-  description="How Moe Qadan approaches UX, frontend, design systems, AI-assisted prototyping, and platforms that already exist. Read the constraints first, pick the structure carefully, use AI where it earns its place."
+  description="How Moe Qadan works: frontend, full-stack, design systems, content, performance, accessibility, and AI features."
   keywords={[
     'Moe Qadan',
     'design approach',
@@ -83,9 +83,8 @@ const projects = [
           <span class="apr__sxn-label">Approach</span>
         </div>
         <h1 class="apr__title">How I work.</h1>
-        <p class="apr__subtitle">
-          The short version. The long version is the rest of this page.
-        </p>
+        <p class="apr__subtitle">Frontend, full-stack, and AI features.</p>
+
       </div>
     </header>
 
@@ -93,20 +92,18 @@ const projects = [
       {/* Lead — discursive, not symmetrical */}
       <section class="apr__section apr__section--lead">
         <p class="apr__lead">
-          A lot of the work I take on looks like repair. A platform that
-          grew without a system. A site that ranks well and converts
-          badly. A frontend that looks fine in Chrome and falls apart on
-          iOS 15. Existing AI tooling that needs a real home in the
-          codebase. Greenfield happens, but most of the work I do isn't
-          that.
+          Most of the work I take on is repair: a platform that grew
+          without a system, a site that ranks but doesn't convert, a
+          frontend that works in Chrome and breaks on iOS, or an AI
+          feature that needs a real home in the codebase. Greenfield
+          happens, but it's not most of my work.
         </p>
 
         <p class="apr__para">
-          I'm a senior generalist. UX, frontend, design systems, content
-          architecture, SEO, performance, accessibility, AI-assisted
-          prototyping. Whichever subset the work needs, on whatever
-          platform the company runs on. The skills sit in one head, so
-          the tradeoffs between them get made in one head.
+          I work across the stack, mostly frontend: UX, design systems,
+          content, SEO, performance, accessibility, and AI features. I can
+          take a project from design through production and make the
+          tradeoffs between those areas myself.
         </p>
       </section>
 
@@ -115,11 +112,11 @@ const projects = [
         <header class="apr__sxn apr__sxn--inner">
           <span class="apr__sxn-label">Read / Pick / Use</span>
         </header>
-        <h2 class="apr__h2">The method, with the receipts.</h2>
+        <h2 class="apr__h2">Three steps.</h2>
         <p class="apr__para">
-          The same three moves show up in every project: read what the
-          system already knows, choose the structure that can carry it,
-          then put the result in front of a real review.
+          I start by reading the existing system, then choose a structure
+          that fits it. I put the result in front of real users and review
+          it before it ships.
         </p>
         <MethodSequence class="apr__method" headingLevel="h3" />
       </section>
@@ -129,30 +126,28 @@ const projects = [
         <header class="apr__sxn apr__sxn--inner">
           <span class="apr__sxn-label">A normal week</span>
         </header>
-        <h2 class="apr__h2">Concretely, the recurring work.</h2>
+        <h2 class="apr__h2">What a normal week looks like.</h2>
 
         <ul class="apr__bullets">
-          <li>Modify a Razor partial that's used in fifty places, knowing the typed ViewModel will surface every consumer that needs to update.</li>
-          <li>Argue for a slower header hero against the "but the carousel is what marketing wants" reflex, and sequence the migration so the analytics taxonomy doesn't go dark.</li>
-          <li>Open a hand-authored CSS file, find the spacing token that's almost right but not quite, decide whether to add a new token or stretch the existing one. Most of the time it's stretch.</li>
-          <li>Write a prompt module for ChatOBD2 that lives in the system, not in a component. Version it. Budget it inside the 38,000-token system prompt assembly.</li>
-          <li>Read a Figma file someone handed off. Notice the spacing they almost got right. Translate it into production at fidelity, while quietly fixing the spacing.</li>
-          <li>Run Lighthouse, watch the LCP regress when a marketing team drops a hero image, find a workable compromise that keeps both groups happy.</li>
-          <li>Ship something into production that nobody but me will notice. Watch the bug board not light up.</li>
+          <li>Change a Razor partial used in fifty places. The typed ViewModel shows every consumer that needs updating.</li>
+          <li>Replace a carousel with a static hero, then move the pages and analytics one step at a time so nothing breaks.</li>
+          <li>Find the spacing token that is almost right, then decide whether to add a new one or use the existing scale. Usually the existing scale.</li>
+          <li>Write and version a prompt module for ChatOBD2, and keep it inside the 38,000-token budget.</li>
+          <li>Translate a Figma handoff into production and fix small spacing issues as I go.</li>
+          <li>Run Lighthouse after a marketing hero lands, find the LCP regression, and make a tradeoff both teams can live with.</li>
         </ul>
       </section>
 
       {/* AI in the work */}
       <section class="apr__section">
         <header class="apr__sxn apr__sxn--inner">
-          <span class="apr__sxn-label">How AI actually fits in</span>
+          <span class="apr__sxn-label">How I use AI</span>
         </header>
-        <h2 class="apr__h2">Two places: products, and the build.</h2>
+        <h2 class="apr__h2">In products and in the build.</h2>
 
         <p class="apr__para">
-          The shape is the same in both: read the constraint, translate
-          it into a prompt that lives in source, execute where the work
-          fits best, ship reviewable output.
+          I keep prompts in source, use them where they help, and review
+          the output before it ships.
         </p>
 
         <div class="apr__flow">
@@ -160,39 +155,29 @@ const projects = [
         </div>
 
         <p class="apr__para">
-          <strong>In the products.</strong> <a href="/work/chatobd2">ChatOBD2</a> is the product
-          example, currently in QA and field testing. Vehicle data flows through six deterministic reasoning layers
-          before any model call. The system prompt isn't a string; it's
-          a module that assembles fragments by priority inside a
-          38,000-token budget, keyed by verdict tier and code context.
-          The fragments are typed, versioned, and reviewed in pull
-          requests like any other source. A copy change is a one-file
-          edit. The analytics taxonomy stays coherent because every
-          fragment is tagged. Outputs are schema-bound, which means the
-          rendering layer doesn't apologize for the model.
+          <a href="/work/chatobd2">ChatOBD2</a> is the product example,
+          currently in QA and field testing. Vehicle data goes through six
+          deterministic reasoning layers before any model call. The system
+          prompt is a module that assembles fragments by priority within a
+          38,000-token budget, based on the verdict and code context. The
+          fragments are typed, versioned, and reviewed in pull requests.
+          Outputs are schema-bound, so the UI gets the shape it expects.
         </p>
 
         <p class="apr__para">
-          <strong>And knowing when to take it out.</strong> <a href="/work/vinly">VINly</a> is the
-          other half of the same discipline. Its VIN reader used to send a
-          photo to a server so a vision model could read the characters. It
-          worked, and it was still wrong: it cost money on every scan of a
-          free product, it needed a network round trip while the user stood
-          in a parking lot, and it forced a photo disclosure in App Privacy
-          for something the phone could do by itself. Apple's Vision
-          framework does the same job on-device, for nothing, offline. So
-          the model came out. What decides whether a VIN is real was never
-          a model anyway: it's the ISO 3779 check digit, arithmetic that
-          has been correct since 1981.
+          <a href="/work/vinly">VINly</a> shows when to leave the model
+          out. Its VIN reader used to send a photo to a server for a
+          vision model. That worked, but it cost money on every scan of a
+          free app, needed a network round trip, and forced a photo
+          disclosure in App Privacy. Apple's Vision framework does the job
+          on-device, offline, for free. I removed the model. A VIN is valid
+          based on the ISO 3779 check digit, which the phone can calculate.
         </p>
 
         <p class="apr__para">
-          <strong>The prompt practice.</strong> Prompts as production
-          code. New behavior lands as a new fragment with a clear name.
-          Failure modes are tested. Token budgets are tracked the way
-          any other resource budget is. The result is AI you can keep
-          iterating on, in the same review loop as the rest of the
-          codebase.
+          I keep prompts in source, version them, test failure modes, and
+          track token budgets like any other resource. New behavior lands
+          as a new prompt fragment with a clear name.
         </p>
 
         <div class="apr__art">
@@ -201,73 +186,65 @@ const projects = [
         </div>
 
         <p class="apr__para">
-          <strong>In the build.</strong> Claude and Cursor handle code
-          work; the choice between them is contextual. Figma stays for
-          precision and design-system maintenance. Claude Design comes
-          in for visual exploration when a frame is faster to reason
-          about than markup. The codebase is the source of truth across
-          all of them.
+          For code, I use Claude and Cursor; which one depends on the
+          task. Figma is for design and component systems. Claude Design
+          is for early visual exploration, and the result goes back into
+          the codebase.
         </p>
 
         <p class="apr__para">
-          AI in the build, not the product. The model is one stage in a
-          structured pipeline. A human owns every decision that ships.
-          The goal is repeatability.
+          The model is one step in a controlled pipeline. A person makes
+          the final call.
         </p>
       </section>
 
       {/* What I bring */}
       <section class="apr__section">
         <header class="apr__sxn apr__sxn--inner">
-          <span class="apr__sxn-label">What I'm best at</span>
+          <span class="apr__sxn-label">What I do</span>
         </header>
-        <h2 class="apr__h2">Where I land naturally.</h2>
+        <h2 class="apr__h2">Where I do my best work.</h2>
 
         <ul class="apr__bullets">
-          <li><strong>Owning the whole web experience for an organization that doesn't have a department for it.</strong> One person carrying UX, the design system, the frontend, the content model, the SEO graph, and the performance budget.</li>
-          <li><strong>Modernizing a platform that can't be rewritten.</strong> Long-running stacks have opinions. I read those first, plan around them, and ship in increments that don't require a flag day.</li>
-          <li><strong>Building systems engineers actually use.</strong> Typed components. Tokens. Layout primitives. Real consumers from day one. No big-bang library that ships into a vacuum.</li>
-          <li><strong>Sitting between design and engineering and unblocking both.</strong> I read intent, not just specs. Most production breakage lives in the gap a handoff doesn't see.</li>
-          <li><strong>Building AI features as engineering.</strong> Prompt modules in source. Schema-bound outputs. Deterministic logic in front of the model, not behind it. In <a href="/work/vinly">VINly</a>, the VIN is read and check-digit validated on the device before a lookup. In <a href="/work/chatobd2">ChatOBD2</a>, deterministic reasoning and a budgeted prompt assembly structure the model's input.</li>
+          <li>I can own a whole site when there isn't a team for it: design, frontend, content, SEO, performance, and accessibility.</li>
+          <li>I modernize platforms that can't be rewritten. I learn how the current system works, then ship changes in small steps that don't require a flag day.</li>
+          <li>I build design systems engineers use: typed components, tokens, and layout primitives, with real consumers from the start.</li>
+          <li>I work between design and engineering. I read the intent behind a design and catch the handoff gaps that cause bugs.</li>
+          <li>I build AI features with prompts in source, schema-bound output, and deterministic checks before the model call. <a href="/work/vinly">VINly</a> validates the VIN on-device; <a href="/work/chatobd2">ChatOBD2</a> uses six reasoning layers and a 38,000-token budget.</li>
         </ul>
       </section>
 
       {/* Tools */}
       <section class="apr__section">
         <header class="apr__sxn apr__sxn--inner">
-          <span class="apr__sxn-label">Tools I reach for</span>
-          <span class="apr__sxn-meta">The judgment is the constant</span>
+          <span class="apr__sxn-label">Tools</span>
         </header>
-        <h2 class="apr__h2">The default stack changes per project.</h2>
-        <p class="apr__para">
-          The judgment about which tool to use for which job stays the
-          same.
-        </p>
+        <h2 class="apr__h2">What I use.</h2>
 
         <ul class="apr__tools">
           <li class="apr__tool">
             <header class="apr__tool-head">
               <span class="apr__tool-name">Claude</span>
             </header>
-            <span class="apr__tool-role">Code work and reasoning. The default for non-trivial refactors and anything that needs to think across more than one file.</span>
+            <span class="apr__tool-role">For code changes and reasoning across multiple files.</span>
           </li>
           <li class="apr__tool">
             <header class="apr__tool-head">
               <span class="apr__tool-name">Cursor</span>
             </header>
-            <span class="apr__tool-role">Local iteration. Same code work as Claude, different interaction model. Whichever is faster on the task at hand.</span>
+            <span class="apr__tool-role">For local iteration. Same kind of work as Claude; whichever is faster.</span>
           </li>
           <li class="apr__tool">
             <header class="apr__tool-head">
               <span class="apr__tool-name">Figma</span>
             </header>
-            <span class="apr__tool-role">Precision design, component-system maintenance, handoff fidelity, and the occasional client review.</span>
+            <span class="apr__tool-role">For design and component systems.</span>
           </li>
           <li class="apr__tool">
             <header class="apr__tool-head">
               <span class="apr__tool-name">Claude Design</span>
             </header>
-            <span class="apr__tool-role">Visual exploration when a frame is faster to think in than code. Output lands back in the codebase.</span>
+            <span class="apr__tool-role">For early visual exploration; the result goes back into code.</span>
           </li>
         </ul>
       </section>
@@ -277,10 +254,10 @@ const projects = [
         <header class="apr__sxn apr__sxn--inner">
           <span class="apr__sxn-label">Across the work</span>
         </header>
-        <h2 class="apr__h2">Different companies, different stacks, same question.</h2>
+        <h2 class="apr__h2">Different companies, same question.</h2>
         <p class="apr__para">
-          How do I move this surface from where it is to where it should
-          be without breaking what's already running.
+          How do I move this page or platform forward without breaking
+          what is already running?
         </p>
 
         <div class="apr__work-grid">
