@@ -5,14 +5,40 @@ interface Props {
 }
 const { assetBase = '/hero-2026', caseHref = '/work/car-spotter/' } = Astro.props;
 ---
-<figure class="qh__proof" aria-label="A detail from CarSpotter">
-  <p class="qh__proof-label"><span class="qh__cut" aria-hidden="true"></span>A detail from CarSpotter</p>
+{/*
+  Photo: Pexels photo 36378105, free to use under the Pexels license.
+  Source: https://www.pexels.com/photo/red-toyota-sedan-parked-by-urban-street-36378105/
+  The car is a Toyota Camry; this is a study image, not a CarSpotter game asset.
+  Both crops are derived from the 5754x3237 original.
+*/}
+<figure class="qh__proof" aria-label="A car detail and full-car reveal study for CarSpotter">
+  <p class="qh__proof-label"><span class="qh__cut" aria-hidden="true"></span>A detail from the CarSpotter study</p>
   <p id="qh-reveal-description" class="qh__sr">Toggle between a close crop of a car's headlight and the full car. The case study is always available.</p>
   <div class="qh__sample">
     <div class="qh__window" aria-hidden="true">
       <span class="qh__fallback">CarSpotter interaction study</span>
-      <img class="qh__photo" src={`${assetBase}/carspotter-detail.webp`} width="640" height="426" alt="" fetchpriority="high" decoding="async" />
-      <img class="qh__photo qh__photo--answer" src={`${assetBase}/carspotter-reveal.webp`} width="640" height="426" alt="" loading="eager" decoding="async" />
+      <img
+        class="qh__photo"
+        src={`${assetBase}/carspotter-detail-960.webp`}
+        srcset={`${assetBase}/carspotter-detail-640.webp 640w, ${assetBase}/carspotter-detail-960.webp 960w, ${assetBase}/carspotter-detail-1280.webp 1280w, ${assetBase}/carspotter-detail-1600.webp 1600w`}
+        sizes="(min-width: 1100px) 490px, (min-width: 760px) 45vw, (min-width: 480px) calc(100vw - 80px), min(calc(100vw - 40px), 320px)"
+        width="1600"
+        height="1067"
+        alt=""
+        fetchpriority="high"
+        decoding="async"
+      />
+      <img
+        class="qh__photo qh__photo--answer"
+        src={`${assetBase}/carspotter-reveal-960.webp`}
+        srcset={`${assetBase}/carspotter-reveal-640.webp 640w, ${assetBase}/carspotter-reveal-960.webp 960w, ${assetBase}/carspotter-reveal-1280.webp 1280w, ${assetBase}/carspotter-reveal-1600.webp 1600w`}
+        sizes="(min-width: 1100px) 490px, (min-width: 760px) 45vw, (min-width: 480px) calc(100vw - 80px), min(calc(100vw - 40px), 320px)"
+        width="1600"
+        height="1067"
+        alt=""
+        loading="eager"
+        decoding="async"
+      />
     </div>
     <details class="qh__disclosure">
       <summary class="qh__summary" aria-describedby="qh-reveal-description">
@@ -25,7 +51,7 @@ const { assetBase = '/hero-2026', caseHref = '/work/car-spotter/' } = Astro.prop
     </details>
   </div>
   <figcaption class="qh__caption">
-    <p class="qh__caption-text">A browser study of the crop and reveal in my iOS game.</p>
+    <p class="qh__caption-text">A browser study of the crop and reveal interaction.</p>
     <a class="qh__case" href={caseHref}>CarSpotter case study<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13 13 3M3 3h10v10" stroke="currentColor" stroke-width="1.4" /></svg></a>
   </figcaption>
 </figure>
