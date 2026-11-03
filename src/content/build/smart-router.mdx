@@ -1,0 +1,82 @@
+---
+title: OpenCode Smart Router
+short: 'A model router that bills against the subscription windows you actually bought, so allowance that is about to expire gets spent before it is lost.'
+category: Open source
+keyFocus:
+  - Subscription-aware costing
+  - Local classification
+  - Fails-closed routing
+role: Creator, sole author
+roleShort: Creator, sole author
+period: '2026'
+status: Open source · MIT · running on the maintainer's machine
+scope: Router plugin, quota modelling, ledger, portable allowance core, test harness
+engagement: independent
+siteUrl: https://github.com/qadanm/opencode-smart-router
+outcomes:
+  - label: Tests passing
+    value: '491'
+  - label: Safety properties under mutation
+    value: '62'
+  - label: Third-party runtime deps
+    value: '0'
+  - label: Cost of a routing decision
+    value: '~1 ms'
+stack:
+  - TypeScript
+  - OpenCode plugin API
+  - Node 20.12+
+  - Vitest
+  - esbuild
+coverImage: /images/smart-router/poster.png
+coverAlt: 'Smart Router poster: routes by your plan, not a price list, with the three-plan decision panel.'
+placeholder:
+  from: '#06110F'
+  to: '#0B2420'
+  label: smart router
+  sublabel: subscription-aware routing
+  angle: 135
+  labelTone: light
+featured: false
+order: 2.7
+---
+
+## The premise
+
+Every LLM router I could find prices a request the same way: tokens multiplied by dollars per million. That is the right model for pay-as-you-go, and it is the wrong model for almost anyone who reads this site. A coding subscription is not a price list. It is a set of windows that expire, a five-hour window inside a seven-day window inside a monthly ceiling, often metered per model, sometimes split across two credit pools that draw at different rates.
+
+A token-based router cannot see any of that. It picks the cheapest model on paper and keeps picking it while allowance you already paid for expires unused.
+
+## What it does instead
+
+OpenCode Smart Router models the plan rather than the token. Classification runs locally in about a millisecond, reading the structure of a prompt rather than its wording: scope, attachments, agent type, context size, recent failures. No model call is spent deciding which model to use.
+
+Then it filters before it prices. A candidate is discarded if the plan cannot fund it, if a provider allowance is exhausted, if the task needs native image input the model lacks, or if the work sits below the intelligence floor. Refusals are recorded with their reason, so "why did it pick that" has an answer.
+
+What remains is priced against the windows that will actually be charged, with one adjustment that matters more than any other: prepaid allowance that is about to reset is priced near its probability of being wasted. Spending a pool that expires in forty minutes is close to free, because the alternative is losing it. The discount is bounded and never reaches zero, since a pool with no headroom cannot carry the work.
+
+## Four decisions that shaped it
+
+**Eligibility runs before cost.** A cheap model that cannot serve the task is not a candidate, so it never wins on price. Filtering first also makes the refused cases explainable instead of silently expensive.
+
+**A refusal outlives the reading that produced it.** Quota probes go stale. If a provider reported exhausted a minute ago, it stays excluded until a fresh probe clears it, rather than becoming eligible the moment the number ages out. The opposite asymmetry, where a permission expires but a refusal does not, is how a router routes into a full allowance.
+
+**Missing quota fails closed, but only when it means something.** A probe-enabled provider with no reading yet is refused when other providers have already reported, because that is the window before the first probe where an exhausted allowance looks identical to a healthy one. A provider that is not probed at all stays allowed, because absence is how "untracked" is expressed and refusing there would break ordinary fallbacks.
+
+**Switching is not free.** A model change discards a warm prompt cache, which costs real money. The router prefers staying put and only moves when the saving clears a margin, so quota preference cannot turn into thrash.
+
+## Tested by breaking it
+
+491 tests across 41 files cover classification, eligibility, quota parsing, credential discovery and its security properties, ledger accounting, pool reconciliation, cache-aware routing, premium protection, purchased-credit blocking, failure classification and the portable allowance core.
+
+Tests alone prove less than they look like they do. `npm run mutate` reverts each of 62 safety properties in turn and fails if the suite still passes, which is the only check that proves a test is guarding anything. Several mutations came back vacuous during development, and each one exposed dead code that was then deleted rather than guarded.
+
+`npm run verify` repeats the whole suite in a clean room with an empty `HOME`, so a pass cannot depend on the maintainer's config or credentials. Both run in CI on Node 20.12 and 22, on Ubuntu and macOS.
+
+## Shipped as a tool, not a demo
+
+One command installs it, and it validates the source and runs the full suite before touching a config file. Installs are versioned: each one lands in its own directory and only the config pointer changes, so a running session keeps the module it already loaded. That detail is not incidental. Replacing files inside the watched plugin directory invalidates the module mid-session and empties the provider's model list, which surfaces as a model-unavailable error for a model that is perfectly healthy. I shipped that bug, found it in the logs, and rebuilt the installer around it.
+
+The quota engine also ships standalone as `dist/allowance.js`, with no host dependency, so "when does this plan run out" is answerable outside OpenCode.
+
+[Repository](https://github.com/qadanm/opencode-smart-router) · [Landing page](https://qadanm.github.io/opencode-smart-router/) · [README](https://github.com/qadanm/opencode-smart-router#readme)
