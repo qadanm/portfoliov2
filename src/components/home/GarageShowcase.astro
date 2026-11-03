@@ -64,6 +64,12 @@ const apps = {
     github: 'https://github.com/qadanm/vinplain',
     site: 'https://qadanm.github.io/vinplain/',
   },
+
+  smartRouter: {
+    href: '/work/smart-router',
+    github: 'https://github.com/qadanm/opencode-smart-router',
+    site: 'https://qadanm.github.io/opencode-smart-router/',
+  },
 };
 ---
 
@@ -261,17 +267,17 @@ const apps = {
       </a>
     </div>
 
-    {/* ── Open source shelf: the two libraries pulled from the apps ── */}
+    {/* ── Open source shelf: libraries and tools from the same work ── */}
     <section class="garage__shelf" aria-labelledby="garage-oss-title">
       <header class="garage__shelf-head">
         <div class="garage__sxn">
           <span class="q-cut" aria-hidden="true"></span>
           <span class="q-eyebrow">Open source</span>
         </div>
-        <h3 class="garage__shelf-title" id="garage-oss-title">Two open-source libraries.</h3>
+        <h3 class="garage__shelf-title" id="garage-oss-title">Three open-source tools.</h3>
         <p class="garage__shelf-lede">
-          Two libraries from the car apps: one tests the Bluetooth
-          connection, one reads public vehicle records.
+          Two libraries from the car apps and the router I built to stop
+          paying for tokens I had already committed to.
         </p>
       </header>
 
@@ -308,6 +314,26 @@ const apps = {
             <h4 class="garage__shelf-name">vinplain</h4>
             <span class="garage__shelf-desc">The public record for a VIN in one typed call: recalls, complaints, crash ratings and fuel economy. No API key, no runtime dependencies.</span>
             <span class="garage__shelf-meta">Open source · TypeScript · npm</span>
+          </span>
+          <span class="garage__shelf-arrow" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 13L13 3M13 3H5M13 3v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </a>
+
+        <a
+          href={apps.smartRouter.href}
+          class="garage__shelf-item"
+          data-track="cta_click"
+          data-track-cta="garage-oss"
+          data-track-project="smart-router"
+        >
+          <img src="/images/work-thumbs/smart-router.webp" alt="" width="480" height="300" loading="lazy" decoding="async" />
+          <span class="garage__shelf-copy">
+            <h4 class="garage__shelf-name">Smart Router</h4>
+            <span class="garage__shelf-desc">Prices a request against the subscription you bought, not a token list, so allowance that is about to expire gets spent first.</span>
+            <span class="garage__shelf-meta">Open source · TypeScript · MIT</span>
           </span>
           <span class="garage__shelf-arrow" aria-hidden="true">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -787,6 +813,12 @@ const apps = {
     .garage__shelf-list {
       grid-template-columns: 1fr 1fr;
       column-gap: var(--space-8);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .garage__shelf-list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 
