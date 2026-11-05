@@ -1,35 +1,29 @@
 #!/usr/bin/env bash
 #
-# OG card for the Smart Router case study. It is a still of the demo film's
-# end card, with the npm chip and test count beside it, so the card reads as a
-# product even at feed size. Regenerate after a release with the new version
-# number and test count in the two annotate lines.
+# OG card for the Smart Router case study. Built as a 1200x675 poster and
+# captured headlessly: heading, brand row, npm chip on the left; the router
+# panel itself (a still of the demo film at the self-heal moment) on the right.
 #
-# Requires: ImageMagick 7+. Fonts live in scripts/_og-fonts (see generate-og.sh
-# for the one-time download; the film frame is committed alongside so this runs
-# without the demo build).
+# The panel still comes from the film build (assets/screenshots/src/demo.html
+# in the router repo, frame ~17s). After a release, bump the NPM_VERSION and
+# TESTS_COUNT chips below, re-run this, commit.
+#
+# Requires: headless Chrome at /Applications/Google Chrome.app, ImageMagick.
 set -euo pipefail
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-FONTS="$DIR/scripts/_og-fonts"
-OUT="$DIR/public/og/smart-router.jpg"
-[ -f "$FONTS/smart-router-film-frame.png" ] || { echo "film frame missing" >&2; exit 1; }
+FRAME_DIR="$(mktemp -d)"
+trap 'rm -rf "$FRAME_DIR"' EXIT
 NPM="${NPM_VERSION:-0.4.0}"; TESTS="${TESTS_COUNT:-759}"
-magick "$FONTS/smart-router-film-frame.png" -gravity South -crop 1200x630+0+30 +repage \
-  \( "$FONTS/_grid.png" -alpha set -channel A -evaluate multiply 0.35 +channel \) -compose over -composite \
-  -strokewidth 1 -stroke '#7C8BA0' -fill none \
-  -draw "line 32,32 32,52   line 32,32 52,32" \
-  -draw "line 1168,32 1168,52  line 1168,32 1148,32" \
-  -draw "line 32,598 32,578   line 32,598 52,598" \
-  -draw "line 1168,598 1168,578  line 1168,598 1148,598" \
-  -fill '#0F766E33' -stroke '#0F766EAA' -strokewidth 1 \
-  -draw "roundrectangle 964,44 1168,80 19,19" \
-  -font "$FONTS/JetBrainsMono.ttf" -pointsize 14 -fill '#7ADCC8' -stroke none \
-  -gravity NorthEast -annotate +60+56 "npm v$NPM" \
-  -fill '#7ADCC833' -stroke '#7ADCC899' -strokewidth 1 \
-  -draw "roundrectangle 976,92 1168,128 19,19" \
-  -font "$FONTS/JetBrainsMono.ttf" -pointsize 14 -fill '#BFEDE2' -stroke none \
-  -gravity NorthEast -annotate +60+104 "$TESTS tests · MIT" \
-  -font "$FONTS/JetBrainsMono.ttf" -pointsize 13 -fill '#74839A' -stroke none -kerning 0.5 \
-  -gravity SouthWest -annotate +60+44 "for OpenCode · qadan.co" \
-  -strip -quality 90 -interlace Plane "$OUT"
+# 1) panel still from the film (frame ~17s at 12fps == frame 204)
+SRC=~/.opencode-smart-router/assets/screenshots/src/demo.html
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --disable-gpu \
+  --window-size=1200,675 --screenshot="$FRAME_DIR/film.png" "file://$SRC?t=17.0&still=1" 2>/dev/null
+magick "$FRAME_DIR/film.png" -crop 340x614+806+42 +repage "$FRAME_DIR/panel.png"
+# 2) poster compose + capture (og.html reads panel.png from its own directory)
+HTML="$DIR/scripts/og-smart-router.html"
+sed "s|panelcrop3.png|$FRAME_DIR/panel.png|; s|npm v0.4.0|npm v$NPM|; s|759 tests|$TESTS tests|" "$HTML" > "$FRAME_DIR/og.html"
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --disable-gpu \
+  --window-size=1200,675 --screenshot="$DIR/public/og/smart-router.png" "file://$FRAME_DIR/og.html" 2>/dev/null
+magick "$DIR/public/og/smart-router.png" -quality 88 -strip "$DIR/public/og/smart-router.jpg"
+rm -f "$DIR/public/og/smart-router.png"
 echo "✓ og/smart-router.jpg (npm v$NPM, $TESTS tests)"
