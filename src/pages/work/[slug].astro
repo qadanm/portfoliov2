@@ -356,7 +356,7 @@ const categoryKey = projectCategoryKey(data.category);
 
     {data.appStoreUrl && project.slug !== 'car-spotter' && (
       <div class="container-narrow">
-        <aside class="cs__download" aria-label={`Get ${data.title}`}>
+        <div class="cs__download" role="group" aria-label={`Get ${data.title}`}>
           <div class="cs__download-copy">
             <h2 class="cs__download-title">{data.title} is on the App Store.</h2>
             <p class="cs__download-sub">Open the app or site.</p>
@@ -380,7 +380,7 @@ const categoryKey = projectCategoryKey(data.category);
               </a>
             )}
           </div>
-        </aside>
+        </div>
       </div>
     )}
 
@@ -1251,7 +1251,7 @@ const categoryKey = projectCategoryKey(data.category);
           </div>
 
           <div class="cs__closing">
-            <aside class="cs__download" aria-label="Get CarSpotter">
+            <div class="cs__download" role="group" aria-label="Get CarSpotter">
               <div class="cs__download-copy">
                 <h2 class="cs__download-title">Try the product.</h2>
                 <p class="cs__download-sub">
@@ -1278,7 +1278,7 @@ const categoryKey = projectCategoryKey(data.category);
                   </a>
                 )}
               </div>
-            </aside>
+            </div>
 
             <p class="cs__credits">
               Product decisions, design direction and implementation: Moe Qadan.
