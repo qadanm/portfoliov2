@@ -61,6 +61,9 @@ const pageDescription = data.seoDescription ?? data.short;
 
 // The responsive ladder is addressed by base path (`…-640.webp`, `…-960.webp`).
 const coverBase = data.coverImage?.replace(/-\d+\.webp$/, '');
+// The v1.4 poster is one composition at 1.598:1 (1585×992). It has no separate
+// portrait companion: the same poster is used at both breakpoints, so the
+// mobile base resolves to the same ladder instead of an old 4:5 crop.
 const coverMobileBase = data.coverMobileImage?.replace(/-\d+\.webp$/, '');
 
 const carSpotterSections = [
@@ -70,6 +73,7 @@ const carSpotterSections = [
   { href: '#results', label: 'A clearer result' },
   { href: '#engineering', label: 'Engineering judgement' },
   { href: '#marketing', label: 'The product outside the app' },
+  { href: '#campaign', label: 'From gameplay to campaign' },
   { href: '#reflection', label: 'What this work taught me' },
 ];
 
@@ -220,8 +224,12 @@ const categoryKey = projectCategoryKey(data.category);
             base={coverBase}
             mobileBase={coverMobileBase}
             alt={data.coverAlt ?? data.title}
-            width={2560}
-            height={1600}
+            width={1585}
+            height={992}
+            widths={[480, 720, 960, 1600, 2560]}
+            mobileWidths={[480, 720, 960, 1600]}
+            mobileWidth={1600}
+            mobileHeight={1002}
             sizes="(min-width: 1280px) 1120px, calc(100vw - 40px)"
             eager
           />
@@ -694,15 +702,15 @@ const categoryKey = projectCategoryKey(data.category);
             <figure class="cs__shot">
               <a
                 class="cs__shot-link"
-                href="/images/car-spotter/2026-10/screens/home-720.webp"
+                href="/images/car-spotter/v1.4/iphone-home-720.webp"
                 target="_blank"
                 rel="noopener"
               >
                 <img
-                  src="/images/car-spotter/2026-10/screens/home-720.webp"
-                  srcset="/images/car-spotter/2026-10/screens/home-480.webp 480w, /images/car-spotter/2026-10/screens/home-720.webp 720w"
+                  src="/images/car-spotter/v1.4/iphone-home-720.webp"
+                  srcset="/images/car-spotter/v1.4/iphone-home-480.webp 480w, /images/car-spotter/v1.4/iphone-home-720.webp 720w"
                   sizes="(min-width: 720px) 42vw, 88vw"
-                  alt="CarSpotter home screen with the wordmark, the car wall, today's Daily 5 action and the practice entry."
+                  alt="CarSpotter v1.4 home: the headlamp lockup, the next-Daily reading, and START DAILY 5 above the Extra Laps and Progress tabs."
                   width="1320"
                   height="2868"
                   loading="lazy"
@@ -711,23 +719,23 @@ const categoryKey = projectCategoryKey(data.category);
                 <span class="vhidden"> (opens in a new tab)</span>
               </a>
               <figcaption>
-                The October 2026 home: the wordmark has room, the Daily 5 is
-                still the clearest thing to tap, and the streak sits
-                underneath as the reason to come back.
+                The v1.4 home: the headlamp lockup, the next-Daily reading
+                beside it, and one clear action. The streak sits underneath as
+                the reason to come back.
               </figcaption>
             </figure>
             <figure class="cs__shot">
               <a
                 class="cs__shot-link"
-                href="/images/car-spotter/2026-10/screens/practice-reveal-720.webp"
+                href="/images/car-spotter/v1.4/iphone-practice-720.webp"
                 target="_blank"
                 rel="noopener"
               >
                 <img
-                  src="/images/car-spotter/2026-10/screens/practice-reveal-720.webp"
-                  srcset="/images/car-spotter/2026-10/screens/practice-reveal-480.webp 480w, /images/car-spotter/2026-10/screens/practice-reveal-720.webp 720w"
+                  src="/images/car-spotter/v1.4/iphone-practice-720.webp"
+                  srcset="/images/car-spotter/v1.4/iphone-practice-480.webp 480w, /images/car-spotter/v1.4/iphone-practice-720.webp 720w"
                   sizes="(min-width: 720px) 42vw, 88vw"
-                  alt="A Ferrari 296 GTB reveal in practice."
+                  alt="The Extra Laps pack collection on iPhone: recommended sets and nine named packs."
                   width="1320"
                   height="2868"
                   loading="lazy"
@@ -736,9 +744,9 @@ const categoryKey = projectCategoryKey(data.category);
                 <span class="vhidden"> (opens in a new tab)</span>
               </a>
               <figcaption>
-                Extra Laps is the second mode: the same answering language
-                and the same reveal, without the pressure of the daily set.
-                The capture is from the same build as the Daily screens below.
+                Extra Laps is the second mode: named packs, the same answering
+                language and the same reveal, without the pressure of the daily
+                set. This capture and the ones below come from the same build.
               </figcaption>
             </figure>
           </div>
@@ -769,15 +777,15 @@ const categoryKey = projectCategoryKey(data.category);
             <figure class="cs__shot">
               <a
                 class="cs__shot-link"
-                href="/images/car-spotter/2026-10/screens/question-720.webp"
+                href="/images/car-spotter/v1.4/iphone-question-720.webp"
                 target="_blank"
                 rel="noopener"
               >
                 <img
-                  src="/images/car-spotter/2026-10/screens/question-720.webp"
-                  srcset="/images/car-spotter/2026-10/screens/question-480.webp 480w, /images/car-spotter/2026-10/screens/question-720.webp 720w"
+                  src="/images/car-spotter/v1.4/iphone-question-720.webp"
+                  srcset="/images/car-spotter/v1.4/iphone-question-480.webp 480w, /images/car-spotter/v1.4/iphone-question-720.webp 720w"
                   sizes="(min-width: 900px) 30vw, (min-width: 600px) 44vw, 88vw"
-                  alt="A Toyota Camry photographic clue with four real answer choices."
+                  alt="A CarSpotter question: one cropped headlight detail above four car choices and the round timer."
                   width="1320"
                   height="2868"
                   loading="lazy"
@@ -786,20 +794,20 @@ const categoryKey = projectCategoryKey(data.category);
                 <span class="vhidden"> (opens in a new tab)</span>
               </a>
               <figcaption>
-                Question: the photographed detail and all four choices, from the
-                recorded Camry round.
+                Question: the photographed detail and all four choices, with the
+                timer the game actually runs.
               </figcaption>
             </figure>
             <figure class="cs__shot">
               <a
                 class="cs__shot-link"
-                href="/images/car-spotter/2026-10/screens/reveal-720.webp"
+                href="/images/car-spotter/v1.4/iphone-reveal-720.webp"
                 target="_blank"
                 rel="noopener"
               >
                 <img
-                  src="/images/car-spotter/2026-10/screens/reveal-720.webp"
-                  srcset="/images/car-spotter/2026-10/screens/reveal-480.webp 480w, /images/car-spotter/2026-10/screens/reveal-720.webp 720w"
+                  src="/images/car-spotter/v1.4/iphone-reveal-720.webp"
+                  srcset="/images/car-spotter/v1.4/iphone-reveal-480.webp 480w, /images/car-spotter/v1.4/iphone-reveal-720.webp 720w"
                   sizes="(min-width: 900px) 30vw, (min-width: 600px) 44vw, 88vw"
                   alt="The matching Toyota Camry reveal, marked correct, with a fact and Next action."
                   width="1320"
@@ -811,21 +819,21 @@ const categoryKey = projectCategoryKey(data.category);
               </a>
               <figcaption>
                 Reveal: the same car shown whole, with its recorded verdict and
-                fact.
+                note.
               </figcaption>
             </figure>
             <figure class="cs__shot">
               <a
                 class="cs__shot-link"
-                href="/images/car-spotter/2026-10/screens/results-720.webp"
+                href="/images/car-spotter/v1.4/iphone-progress-720.webp"
                 target="_blank"
                 rel="noopener"
               >
                 <img
-                  src="/images/car-spotter/2026-10/screens/results-720.webp"
-                  srcset="/images/car-spotter/2026-10/screens/results-480.webp 480w, /images/car-spotter/2026-10/screens/results-720.webp 720w"
+                  src="/images/car-spotter/v1.4/iphone-progress-720.webp"
+                  srcset="/images/car-spotter/v1.4/iphone-progress-480.webp 480w, /images/car-spotter/v1.4/iphone-progress-720.webp 720w"
                   sizes="(min-width: 900px) 30vw, (min-width: 600px) 44vw, 88vw"
-                  alt="The completed Daily 5 result: 1,645 points, 5/5 and Q1–Q5 outcome marks."
+                  alt="The CarSpotter Progress screen: current rank, the last seven days and XP toward the next level."
                   width="1320"
                   height="2868"
                   loading="lazy"
@@ -834,8 +842,8 @@ const categoryKey = projectCategoryKey(data.category);
                 <span class="vhidden"> (opens in a new tab)</span>
               </a>
               <figcaption>
-                Results: one completed recorded run, with round outcomes and the
-                share action. This is not a business metric.
+                Progress: rank, the last seven days and XP. Demo values, not a
+                business metric.
               </figcaption>
             </figure>
           </div>
@@ -1053,6 +1061,116 @@ const categoryKey = projectCategoryKey(data.category);
               attributed to these images.
             </figcaption>
           </figure>
+        </section>
+
+
+        <section id="campaign" class="container-site cs__post cs__post--alt" aria-labelledby="campaign-title">
+          <header class="cs__post-head">
+            <div class="cs__post-sxn">
+              <span class="cs__post-eyebrow">07 / From gameplay to campaign</span>
+            </div>
+            <h2 class="cs__post-title" id="campaign-title">From gameplay to campaign.</h2>
+          </header>
+          <div class="cs__post-body">
+            <p>
+              Two finished pieces do different jobs. The App Store preview has to
+              survive Apple's review and a three-second scroll in the store; the
+              motion study exists to show the brand system moving. Both were
+              built from the same components, which is why they feel like one
+              family without being the same film twice.
+            </p>
+          </div>
+
+          <div class="cs__films">
+            <figure class="cs__film">
+              <div class="cs__film-frame cs__film-frame--phone">
+                <video
+                  class="cs__video"
+                  controls
+                  preload="none"
+                  playsinline
+                  width="540"
+                  height="1170"
+                  poster="/media/car-spotter/app-preview-poster.jpg"
+                  aria-label="CarSpotter App Store preview: a 27-second vertical film of real gameplay with kinetic type."
+                >
+                  <source src="/media/car-spotter/app-preview-540.mp4" type="video/mp4" />
+                  <p>
+                    Your browser cannot play this video.
+                    <a href="/media/car-spotter/app-preview-540.mp4">Download the App Store preview</a>.
+                  </p>
+                </video>
+              </div>
+              <figcaption>
+                <span class="cs__film-label">App Store preview · 886 × 1920 · 27s</span>
+                A cold open, two real clue-to-reveal beats, a value beat and a
+                store call to action, all cut to the app's own sound effects.
+                Apple's preview canvas is 886 wide, so the layout is authored at
+                that width rather than resized from 1080.
+              </figcaption>
+            </figure>
+
+            <figure class="cs__film">
+              <div class="cs__film-frame cs__film-frame--wide">
+                <video
+                  class="cs__video"
+                  controls
+                  preload="none"
+                  playsinline
+                  width="900"
+                  height="633"
+                  poster="/media/car-spotter/motion-preview-poster.jpg"
+                  aria-label="CarSpotter motion study: a short landscape preview of the brand system's four motion sequences."
+                >
+                  <source src="/media/car-spotter/motion-preview-900.mp4" type="video/mp4" />
+                  <p>
+                    Your browser cannot play this video.
+                    <a href="/media/car-spotter/motion-preview-900.mp4">Download the motion study</a>.
+                  </p>
+                </video>
+              </div>
+              <figcaption>
+                <span class="cs__film-label">Motion study · 1280 × 900 · 4.8s</span>
+                The system moving: four short sequences from the artwork
+                package, each with a static poster as the fallback. It is a
+                design artefact, not a store asset — the brief was to prove the
+                motion language before any of it was implemented in the app.
+              </figcaption>
+            </figure>
+          </div>
+          <div class="cs__post-body cs__post-body--aside">
+            <h3 class="cs__film-subhead">How they were made</h3>
+            <p>
+              The gameplay footage is real: the app was driven through its own
+              states on a simulator, and the finished takes were cut into
+              segments (crop, reveal, crop, reveal) that the composition plays
+              back. Nothing in the film is a mock-up of a screen that does not
+              exist.
+            </p>
+            <p>
+              The films are Remotion compositions in this repository
+              (<code>social/renderer</code>). Type, layout, timing, easing and
+              transitions are React components driven by frame numbers, so every
+              beat is reproducible from the source rather than hand-animated in a
+              timeline. Audio is the app's own sound effects, sequenced as
+              <code>&lt;Audio&gt;</code> elements with explicit frame starts and
+              volumes; the music decision was to use no licensed track at all.
+              The renderer emits H.264, and the App Store cut is then encoded with
+              FFmpeg to Apple's spec (High@4.0, 30 fps constant, AAC stereo,
+              faststart) and probed with <code>ffprobe</code> to confirm the
+              stream properties rather than assume them.
+            </p>
+            <p>
+              What I designed and directed: the beat sheet, the type system, the
+              palette, the transition language, the copy on the end card, and the
+              decision to carry the app's real interaction sounds instead of a
+              music bed. What is implemented programmatically: the layouts and
+              animation, which live as components. AI assisted with drafting
+              code and copy in the same way it assists the rest of the product;
+              the finished cut, its timing and its claims are mine.
+            </p>
+          </div>
+
         </section>
 
         <section id="reflection" class="container-site cs__post cs__post--last" aria-labelledby="reflection-title">
@@ -1472,6 +1590,22 @@ const categoryKey = projectCategoryKey(data.category);
   </article>
 
   <CaseStudyMobileBar projectTitle={data.title} />
+
+<script is:inline>
+  // One audible owner per page: starting a video pauses any other. Ordinary
+  // browsing stays quiet because nothing loads or plays until a press.
+  (() => {
+    if (window.__csVideoInit) return;
+    window.__csVideoInit = true;
+    document.querySelectorAll('video').forEach((v) => {
+      v.addEventListener('play', () => {
+        document.querySelectorAll('video').forEach((other) => {
+          if (other !== v && !other.paused) other.pause();
+        });
+      });
+    });
+  })();
+</script>
 </BaseLayout>
 
 <style>
@@ -3046,6 +3180,77 @@ const categoryKey = projectCategoryKey(data.category);
 
     .cs__wall-caption {
       font-size: 14px;
+    }
+  }
+
+  /* ── Videos ───────────────────────────────────────────────────────────────
+     Native aspect ratios, no cropping, and nothing loads until a visitor presses
+     play (preload="none" + poster). The two films sit side by side on a wide
+     screen and stack on a phone; the phone film is the taller object, so the row
+     aligns to the top rather than stretching the wide film. */
+  .cs__films {
+    display: grid;
+    grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+    gap: clamp(20px, 3vw, 40px);
+    align-items: start;
+    margin-top: clamp(20px, 3vw, 36px);
+  }
+  .cs__film {
+    margin: 0;
+  }
+  .cs__film-frame {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    background: #101313;
+  }
+  .cs__video {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: #101313;
+  }
+  .cs__film-frame--phone {
+    max-width: 320px;
+    margin-inline: auto;
+  }
+  .cs__film figcaption {
+    margin-top: 12px;
+    font-size: var(--fs-sm, 0.9375rem);
+    line-height: 1.6;
+    color: var(--color-text-muted);
+  }
+  .cs__film-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text);
+    margin-bottom: 4px;
+  }
+  .cs__post-body--aside {
+    grid-column: 2;
+    margin-top: clamp(18px, 3vw, 28px);
+  }
+  .cs__post-body--aside p:first-child {
+    margin-top: 0;
+  }
+  .cs__film-subhead {
+    font-family: var(--font-display);
+    font-size: clamp(1.15rem, 2vw, 1.5rem);
+    margin-bottom: 0.75rem;
+  }
+  .cs__post-body code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+  }
+  @media (max-width: 760px) {
+    .cs__films {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .cs__film-frame--phone {
+      max-width: 260px;
     }
   }
 </style>
