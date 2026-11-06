@@ -750,6 +750,60 @@ const categoryKey = projectCategoryKey(data.category);
               </figcaption>
             </figure>
           </div>
+
+          {/* The tablet is a composition, not a stretched phone. It gets its own
+              figure at its own 4:3 landscape aspect rather than being squeezed
+              into the phone column. */}
+          <figure class="cs__board cs__board--ipad">
+            <a
+              class="cs__shot-link"
+              href="/images/car-spotter/v1.4/ipad-question-1376.webp"
+              target="_blank"
+              rel="noopener"
+            >
+              <img
+                src="/images/car-spotter/v1.4/ipad-question-1376.webp"
+                srcset="/images/car-spotter/v1.4/ipad-question-960.webp 960w, /images/car-spotter/v1.4/ipad-question-1376.webp 1376w"
+                sizes="(min-width: 900px) 820px, calc(100vw - 40px)"
+                alt="CarSpotter on iPad in landscape: the crop on the left and the four answer choices in a column on the right."
+                width="2752"
+                height="2064"
+                loading="lazy"
+                decoding="async"
+              />
+              <span class="vhidden"> (opens in a new tab)</span>
+            </a>
+            <figcaption>
+              iPad landscape is its own composition: the photograph leads and the
+              four choices sit in a column beside it, rather than the phone layout
+              being stretched across a 13-inch board.
+            </figcaption>
+          </figure>
+
+          <figure class="cs__board cs__board--ipad">
+            <a
+              class="cs__shot-link"
+              href="/images/car-spotter/v1.4/ipad-practice-1376.webp"
+              target="_blank"
+              rel="noopener"
+            >
+              <img
+                src="/images/car-spotter/v1.4/ipad-practice-1376.webp"
+                srcset="/images/car-spotter/v1.4/ipad-practice-960.webp 960w, /images/car-spotter/v1.4/ipad-practice-1376.webp 1376w"
+                sizes="(min-width: 900px) 820px, calc(100vw - 40px)"
+                alt="Extra Laps on iPad: a hero pack feature above a grid of named packs."
+                width="2752"
+                height="2064"
+                loading="lazy"
+                decoding="async"
+              />
+              <span class="vhidden"> (opens in a new tab)</span>
+            </a>
+            <figcaption>
+              The same pack collection on a tablet: the hero pack feature leads,
+              the grid keeps its collection order.
+            </figcaption>
+          </figure>
         </section>
 
         <section id="loop" class="container-site cs__post" aria-labelledby="loop-title">
@@ -3252,5 +3306,21 @@ const categoryKey = projectCategoryKey(data.category);
     .cs__film-frame--phone {
       max-width: 260px;
     }
+  }
+
+  .cs__board--ipad {
+    margin-top: clamp(20px, 3vw, 34px);
+  }
+  .cs__board--ipad img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 14px;
+    border: 1px solid var(--color-border);
+  }
+  .cs__board--ipad figcaption {
+    margin-top: 10px;
+    font-size: var(--fs-sm, 0.9375rem);
+    color: var(--color-text-muted);
   }
 </style>
