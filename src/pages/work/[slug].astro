@@ -971,81 +971,210 @@ const categoryKey = projectCategoryKey(data.category);
           </header>
           <div class="cs__post-body">
             <p>
-              The earlier result card used letters tied to types of detail. That
-              made the summary depend on a category the player did not need to
-              know, and that the production content could not consistently
-              support.
+              The result card was redrawn four times in five months, and each pass
+              asked a narrower question than the one before it. July answered in
+              letters nobody explained. October kept the letters but printed the
+              legend, then dropped the letters a day later. November stopped being
+              a scoreboard at all and named the car you actually guessed. Each
+              version is dated by the day it shipped.
             </p>
             <p>
-              The redesign uses Q1–Q5 with explicit check and miss symbols. It
-              answers a more useful question: what happened in each round? The
-              same outcome language carries into the exported card, while the car
-              names and clue photos stay out of it.
-            </p>
-            <p>
-              These are different recorded runs; the comparison documents the
-              change in visual language. Comprehension and conversion remain
-              questions for further testing.
+              The same outcome language carries into the exported card, where the
+              car names and clue photos stay out of it.
             </p>
           </div>
-          <div class="cs__compare">
-            <div class="cs__compare-col">
-              <h3 class="cs__compare-label">Earlier interface</h3>
-              <figure class="cs__shot">
-                <a
-                  class="cs__shot-link"
-                  href="/images/car-spotter/2026-10/screens/earlier-share-card.webp"
-                  target="_blank"
-                  rel="noopener"
-                >
-                  <img
-                    src="/images/car-spotter/2026-10/screens/earlier-share-card.webp"
-                    alt="Earlier result card with the geometric mark and letter-coded round tiles."
-                    width="905"
-                    height="675"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <span class="vhidden"> (opens in a new tab)</span>
-                </a>
-                <figcaption>
-                  Earlier interface. Its old mark is intentionally preserved as
-                  historical evidence.
-                </figcaption>
-              </figure>
+
+          <ol class="cs__evo" aria-label="Four successive versions of the CarSpotter result card">
+            <li class="cs__evo-step">
+              <div class="cs__evo-head">
+                <span class="cs__evo-era">July 2026</span>
+                <time class="cs__evo-date" datetime="2026-07-16">2026-07-16</time>
+                <span class="cs__evo-num" aria-hidden="true">01</span>
+              </div>
+              <div class="cs__evo-body">
+                <figure class="cs__evo-figure cs__evo-figure--card">
+                  <a class="cs__shot-link" href="/images/car-spotter/2026-10/screens/earlier-share-card.webp" target="_blank" rel="noopener">
+                    <img
+                      src="/images/car-spotter/2026-10/screens/earlier-share-card.webp"
+                      alt="The July 2026 result card: 2 of 5 correct, 347 points, five solid-filled tiles reading G H W H T in green and red, and the grade Warming up."
+                      width="905"
+                      height="675"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <span class="vhidden"> (opens in a new tab)</span>
+                  </a>
+                </figure>
+                <div class="cs__evo-copy">
+                  <p class="cs__evo-note">A letter in a filled square, one per detail: H for headlight, G for grille, W for wheel. Green meant right, red meant wrong, and nothing printed on the card said which was which. The idea shipped with the first build in June; this is Daily #43 in July.</p>
+                  <ul class="cs__evo-deltas">
+                    <li><span>Rounds</span>a letter per part, filled solid</li>
+                    <li><span>Legend</span>none, on the card or anywhere</li>
+                    <li><span>Verdict</span>a grade name with no context</li>
+                  </ul>
+                </div>
+              </div>
+            </li>
+            <li class="cs__evo-step">
+              <div class="cs__evo-head">
+                <span class="cs__evo-era">October 2026 · legend added</span>
+                <time class="cs__evo-date" datetime="2026-10-16">2026-10-16</time>
+                <span class="cs__evo-num" aria-hidden="true">02</span>
+              </div>
+              <div class="cs__evo-body">
+                <figure class="cs__evo-figure cs__evo-figure--card">
+                  <a class="cs__shot-link" href="/images/car-spotter/results-history/oct16-export-948.webp" target="_blank" rel="noopener">
+                    <img
+                      src="/images/car-spotter/results-history/oct16-export-720.webp"
+                      srcset="/images/car-spotter/results-history/oct16-export-480.webp 480w, /images/car-spotter/results-history/oct16-export-720.webp 720w"
+                      sizes="(min-width: 900px) 300px, 88vw"
+                      alt="The October 2026 result card, still letter-coded: 3 of 5 correct, 537 points, five outlined squares reading W W H G H, each with a small check or cross in the corner, and the grade Solid run."
+                      width="948"
+                      height="720"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <span class="vhidden"> (opens in a new tab)</span>
+                  </a>
+                </figure>
+                <div class="cs__evo-copy">
+                  <p class="cs__evo-note">The same letters, made legible. The squares hollowed out, a tick or cross moved to the corner, and a legend printed the rule underneath. A real improvement, and still a code that had to be learned before the card meant anything.</p>
+                  <ul class="cs__evo-deltas">
+                    <li><span>Rounds</span>a letter per part, outlined</li>
+                    <li><span>Legend</span>printed: right, missed, letter = the part</li>
+                    <li><span>Verdict</span>a grade name, still unexplained</li>
+                  </ul>
+                </div>
+              </div>
+            </li>
+            <li class="cs__evo-step">
+              <div class="cs__evo-head">
+                <span class="cs__evo-era">October 2026 · letters removed</span>
+                <time class="cs__evo-date" datetime="2026-10-17">2026-10-17</time>
+                <span class="cs__evo-num" aria-hidden="true">03</span>
+              </div>
+              <div class="cs__evo-body">
+                <figure class="cs__evo-figure cs__evo-figure--card">
+                  <a class="cs__shot-link" href="/images/car-spotter/2026-10/screens/share-card-720.webp" target="_blank" rel="noopener">
+                    <img
+                      src="/images/car-spotter/2026-10/screens/share-card-720.webp"
+                      srcset="/images/car-spotter/2026-10/screens/share-card-480.webp 480w, /images/car-spotter/2026-10/screens/share-card-720.webp 720w"
+                      sizes="(min-width: 900px) 300px, 88vw"
+                      alt="The 17 October 2026 result card: 5 of 5 correct, 1,645 points, five numbered rings Q1 to Q5 each with a check, the verdict Clean sheet, and the site address."
+                      width="720"
+                      height="703"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <span class="vhidden"> (opens in a new tab)</span>
+                  </a>
+                </figure>
+                <div class="cs__evo-copy">
+                  <p class="cs__evo-note">The letters went away entirely. Q1 to Q5 needs no glossary, the tick and cross carry the outcome on their own, and a single legend answers the only question left. This is the card that shipped to the store.</p>
+                  <ul class="cs__evo-deltas">
+                    <li><span>Rounds</span>numbered Q1 to Q5</li>
+                    <li><span>Legend</span>one line: tick correct, cross missed</li>
+                    <li><span>Verdict</span>a scene name</li>
+                  </ul>
+                </div>
+              </div>
+            </li>
+            <li class="cs__evo-step cs__evo-step--current">
+              <div class="cs__evo-head">
+                <span class="cs__evo-era">November 2026 · v1.4 <span class="cs__evo-flag">current</span></span>
+                <time class="cs__evo-date" datetime="2026-11-05">2026-11-05</time>
+                <span class="cs__evo-num" aria-hidden="true">04</span>
+              </div>
+              <div class="cs__evo-body">
+                <div class="cs__evo-pair">
+                  <figure class="cs__evo-device cs__evo-device--phone">
+                    <a class="cs__shot-link" href="/images/car-spotter/v1.4/results/phone-720.webp" target="_blank" rel="noopener">
+                      <img
+                        src="/images/car-spotter/v1.4/results/phone-720.webp"
+                        srcset="/images/car-spotter/v1.4/results/phone-480.webp 480w, /images/car-spotter/v1.4/results/phone-720.webp 720w"
+                        sizes="(min-width: 900px) 168px, 44vw"
+                        alt="The v1.4 result on iPhone: Sharp eye, 4 of 5 cars correct and 954 points, the 24-hour reset clock, a level bar, and the run listed under it with Hit and Miss marks."
+                        width="720"
+                        height="1561"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                      <span class="vhidden"> (opens in a new tab)</span>
+                    </a>
+                    <figcaption>iPhone</figcaption>
+                  </figure>
+                  <figure class="cs__evo-device cs__evo-device--ipad">
+                    <a class="cs__shot-link" href="/images/car-spotter/v1.4/results/ipad-960.webp" target="_blank" rel="noopener">
+                      <img
+                        src="/images/car-spotter/v1.4/results/ipad-960.webp"
+                        srcset="/images/car-spotter/v1.4/results/ipad-960.webp 960w, /images/car-spotter/v1.4/results/ipad-1440.webp 1440w"
+                        sizes="(min-width: 900px) 560px, 92vw"
+                        alt="The v1.4 result on iPad: a card reading Solid run, 3 of 5 cars correct and 607 points, the reset clock beside it, and a column of the five cars each marked Hit or Miss with the guessed name printed under the misses."
+                        width="960"
+                        height="720"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                      <span class="vhidden"> (opens in a new tab)</span>
+                    </a>
+                    <figcaption>iPad</figcaption>
+                  </figure>
+                </div>
+                <div class="cs__evo-copy">
+                  <p class="cs__evo-note">The card stopped being a scoreboard. It says what happened in words, the 24-hour reset clock sits in its corner, and the five cars become the interface: their own photographs, their own times, and the name you guessed printed under every miss.</p>
+                  <ul class="cs__evo-deltas">
+                    <li><span>Rounds</span>the five cars, with photographs</li>
+                    <li><span>Outcome</span>Hit or Miss, in words, plus the time</li>
+                    <li><span>Misses</span>the card prints the name you picked</li>
+                    <li><span>Clock</span>the reset dial, on the card itself</li>
+                  </ul>
+                </div>
+              </div>
+            </li>
+          </ol>
+
+          <div class="cs__evo-detail">
+            <div class="cs__evo-detail-body">
+              <h3 class="cs__evo-detail-title">A miss now tells you what you said.</h3>
+              <p>
+                Every row carries three things: the car, how long you took, and
+                whether it landed. Where it did not, the row prints the answer you
+                chose underneath it, so the correction happens on the result
+                screen rather than later in a comment thread.
+              </p>
+              <p>
+                That sounds small. It changes what the screen is for. The earlier
+                card graded you. This one teaches you the name you were missing,
+                which is the only thing a car-spotting game can usefully give
+                back.
+              </p>
+              <p class="cs__evo-detail-aside">
+                Different recorded runs. This is a comparison of visual language,
+                not a measured performance result, and no conversion claim is
+                attached to it.
+              </p>
             </div>
-            <div class="cs__compare-col">
-              <h3 class="cs__compare-label">October 2026 update</h3>
-              <figure class="cs__shot">
-                <a
-                  class="cs__shot-link"
-                  href="/images/car-spotter/2026-10/screens/share-card-720.webp"
-                  target="_blank"
-                  rel="noopener"
-                >
-                  <img
-                    src="/images/car-spotter/2026-10/screens/share-card-720.webp"
-                    srcset="/images/car-spotter/2026-10/screens/share-card-480.webp 480w, /images/car-spotter/2026-10/screens/share-card-720.webp 720w"
-                    sizes="(min-width: 720px) 42vw, 88vw"
-                    alt="Exported result for Daily 136: 5/5, 1,645 points and numbered round outcomes, with no car names."
-                    width="900"
-                    height="879"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <span class="vhidden"> (opens in a new tab)</span>
-                </a>
-                <figcaption>
-                  The exported result card: the result stays readable without
-                  revealing the cars.
-                </figcaption>
-              </figure>
-            </div>
+            <figure class="cs__evo-detail-figure">
+              <a
+                class="cs__shot-link"
+                href="/images/car-spotter/v1.4/results/missed-cars-765.webp"
+                target="_blank"
+                rel="noopener"
+              >
+                <img
+                  src="/images/car-spotter/v1.4/results/missed-cars-520.webp"
+                  srcset="/images/car-spotter/v1.4/results/missed-cars-520.webp 520w, /images/car-spotter/v1.4/results/missed-cars-765.webp 765w"
+                  sizes="(min-width: 900px) 260px, 70vw"
+                  alt="The five-car column at full size: Ram 1500 TRX marked Hit in 1.5 seconds, Subaru Outback marked Miss with the line You picked Subaru Forester, then Hyundai Kona N, Toyota Camry and Oldsmobile 88."
+                  width="765"
+                  height="1140"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <span class="vhidden"> (opens in a new tab)</span>
+              </a>
+            </figure>
           </div>
-          <p class="cs__note">
-            Different recorded runs. This is a visual comparison, not a measured
-            performance result.
-          </p>
         </section>
 
         <section id="engineering" class="container-site cs__post" aria-labelledby="engineering-title">
@@ -1127,22 +1256,21 @@ const categoryKey = projectCategoryKey(data.category);
           </header>
           <div class="cs__post-body">
             <p>
-              Two finished pieces do different jobs. The App Store preview has to
-              survive Apple's review and a three-second scroll in the store; the
-              motion study exists to show the brand system moving. Both were
-              built from the same components, which is why they feel like one
-              family without being the same film twice.
+              The App Store gives you thirty seconds and a three-second scroll. I
+              wanted the preview to teach the game rather than describe it, so I
+              built both films as code instead of cutting them in a timeline.
+              These are the two files attached to the 1.4 listing, one per slot
+              Apple serves: a vertical film for iPhone and a landscape film for
+              iPad.
             </p>
           </div>
 
           <div class="cs__films">
             <figure class="cs__film">
               <figcaption>
-                <span class="cs__film-label">App Store preview · 886 × 1920</span>
-                A cold open, two real clue-to-reveal beats, a value beat and a
-                store call to action, all cut to the app's own sound effects.
-                Apple's preview canvas is 886 wide, so the layout is authored at
-                that width rather than resized from 1080.
+                <span class="cs__film-label">iPhone preview · 886 × 1920</span>
+                Twenty-eight seconds, 864 frames. A detail, the whole car, then
+                the run that follows it, cut to the app's own cues.
               </figcaption>
               <div class="cs__film-frame cs__film-frame--phone">
                 <video
@@ -1150,28 +1278,25 @@ const categoryKey = projectCategoryKey(data.category);
                   controls
                   preload="none"
                   playsinline
-                  width="540"
-                  height="1170"
-                  poster="/media/car-spotter/app-preview-poster.jpg"
-                  aria-label="CarSpotter App Store preview: a 27-second vertical film of real gameplay with kinetic type."
+                  width="720"
+                  height="1560"
+                  poster="/media/car-spotter/app-preview-iphone-poster.jpg"
+                  aria-label="CarSpotter iPhone App Store preview: twenty-eight seconds of real gameplay, opening on a detail and pulling back to the whole car."
                 >
-                  <source src="/media/car-spotter/app-preview-540.mp4" type="video/mp4" />
+                  <source src="/media/car-spotter/app-preview-iphone-720.mp4" type="video/mp4" />
                   <p>
                     Your browser cannot play this video.
-                    <a href="/media/car-spotter/app-preview-540.mp4">Download the App Store preview</a>.
+                    <a href="/media/car-spotter/app-preview-iphone-720.mp4">Download the iPhone preview</a>.
                   </p>
                 </video>
               </div>
-              
             </figure>
 
             <figure class="cs__film">
               <figcaption>
-                <span class="cs__film-label">Motion study · 1280 × 900</span>
-                The system moving: four short sequences from the artwork
-                package, each with a static poster as the fallback. It is a
-                design artefact, not a store asset — the brief was to prove the
-                motion language before any of it was implemented in the app.
+                <span class="cs__film-label">iPad preview · 1600 × 1200</span>
+                The same three acts composed for a 4:3 board, where the answer
+                column sits beside the photograph instead of under it.
               </figcaption>
               <div class="cs__film-frame cs__film-frame--wide">
                 <video
@@ -1179,60 +1304,83 @@ const categoryKey = projectCategoryKey(data.category);
                   controls
                   preload="none"
                   playsinline
-                  width="900"
-                  height="633"
-                  poster="/media/car-spotter/motion-preview-poster.jpg"
-                  aria-label="CarSpotter motion study: a short landscape preview of the brand system's four motion sequences."
+                  width="960"
+                  height="720"
+                  poster="/media/car-spotter/app-preview-ipad-poster.jpg"
+                  aria-label="CarSpotter iPad App Store preview: the same twenty-eight second film composed for a landscape tablet."
                 >
-                  <source src="/media/car-spotter/motion-preview-900.mp4" type="video/mp4" />
+                  <source src="/media/car-spotter/app-preview-ipad-960.mp4" type="video/mp4" />
                   <p>
                     Your browser cannot play this video.
-                    <a href="/media/car-spotter/motion-preview-900.mp4">Download the motion study</a>.
+                    <a href="/media/car-spotter/app-preview-ipad-960.mp4">Download the iPad preview</a>.
                   </p>
                 </video>
               </div>
-              
             </figure>
-          </div>
-          <div class="cs__post-body cs__post-body--aside">
-            <h3 class="cs__film-subhead">How they were made</h3>
-            <p>
-              The gameplay footage is real: the app was driven through its own
-              states on a simulator, and the finished takes were cut into
-              segments (crop, reveal, crop, reveal) that the composition plays
-              back. Nothing in the film is a mock-up of a screen that does not
-              exist.
-            </p>
-            <p>
-              The films are Remotion compositions in this repository
-              (<code>social/renderer</code>). Type, layout, timing, easing and
-              transitions are React components driven by frame numbers, so every
-              beat is reproducible from the source rather than hand-animated in a
-              timeline. Audio is the app's own sound effects, sequenced as
-              <code>&lt;Audio&gt;</code> elements with explicit frame starts and
-              volumes; the music decision was to use no licensed track at all.
-              The renderer emits H.264, and the App Store cut is then encoded with
-              FFmpeg to Apple's spec (High@4.0, 30 fps constant, AAC stereo,
-              faststart) and probed with <code>ffprobe</code> to confirm the
-              stream properties rather than assume them.
-            </p>
-            <p>
-              What I designed and directed: the beat sheet, the type system, the
-              palette, the transition language, the copy on the end card, and the
-              decision to carry the app's real interaction sounds instead of a
-              music bed. What is implemented programmatically: the layouts and
-              animation, which live as components. AI assisted with drafting
-              code and copy in the same way it assists the rest of the product;
-              the finished cut, its timing and its claims are mine.
-            </p>
-          </div>
 
+          <div class="cs__post-body cs__post-body--aside">
+            <h3 class="cs__film-subhead">Built like software</h3>
+            <p>
+              Both films are Remotion compositions in the app's monorepo
+              (<code>social/renderer</code>). Every layout, easing curve and
+              cut is a React component driven by a frame number, so a beat
+              moves by editing an integer and the whole film re-renders
+              identically. Nothing is keyframed by hand.
+            </p>
+            <p>
+              Apple's rules turned out to be a design constraint rather than a
+              checklist: previews may show only content from inside the app,
+              must use plain transitions, and should carry a single score. So
+              the intro and outro are built from two files the app already
+              ships, the Home hero artwork and the wordmark. No stock footage,
+              and no invented title card.
+            </p>
+            <p>
+              The intro performs the mechanic instead of explaining it. The
+              game shows a detail, then lands the whole car, so the film opens
+              tight on one headlight and pulls back to the line-up behind it.
+              My first pass had the artwork full bleed with the wordmark
+              centred, and the letters landed across a bonnet. The app's own
+              Home screen already solves that: cars occupy the lower frame and
+              copy sits in the space above, so the art is boxed to the bottom
+              66 per cent with its top edge dissolving into ink.
+            </p>
+            <p>
+              Audio is the game's, not a library's. <code>city.mp3</code> runs
+              unbroken across all three acts, and every one-shot is the cue the
+              app fires at that moment. One problem surfaced before mixing: the
+              raw samples span 30 dB, from -9 to -39 dBFS, so any mix either
+              buried the cues or clipped. I normalised the whole library first,
+              -3 per one-shot and -9 for the bed, and only then made a mixing
+              decision.
+            </p>
+            <p>
+              The check that earned its keep was cutting from real simulator
+              takes. My first draft assumed where each clip started, and three
+              of the six iPad clips were wrong: <code>progress</code> showed
+              the old result screen, <code>packs</code> showed Home,
+              <code>packq</code> showed Progress. The film showed the new
+              result layout and then the old one, which is exactly what a
+              viewer notices. Since then, one frame from every clip is compared
+              to the clip's name before anything renders. <code>ffprobe</code>
+              on both delivered files confirms H.264 High at level 4.0,
+              <code>yuv420p</code>, TV range, 30 fps, stereo AAC.
+            </p>
+            <p>
+              One thing I nearly shipped: the 6.5-inch slot already held a
+              preview from an earlier release. The upload succeeded, which is
+              why it looked fine, and the old film would have appeared
+              alongside the new one on smaller phones. Checking that your asset
+              landed is not the same as checking what the slot contains.
+            </p>
+          </div>
+        </div>
         </section>
 
         <section id="reflection" class="container-site cs__post cs__post--last" aria-labelledby="reflection-title">
           <header class="cs__post-head">
             <div class="cs__post-sxn">
-              <span class="cs__post-eyebrow">07 / What this work taught me</span>
+              <span class="cs__post-eyebrow">08 / What this work taught me</span>
             </div>
             <h2 class="cs__post-title" id="reflection-title">Simplification has to reach the data as well as the screen.</h2>
           </header>
@@ -3247,6 +3395,7 @@ const categoryKey = projectCategoryKey(data.category);
   .cs__films {
     display: grid;
     grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+    grid-template-rows: auto auto;
     gap: clamp(20px, 3vw, 40px);
     align-items: start;
     margin-top: clamp(20px, 3vw, 36px);
@@ -3295,8 +3444,9 @@ const categoryKey = projectCategoryKey(data.category);
     text-overflow: ellipsis;
   }
   .cs__post-body--aside {
-    grid-column: 2;
-    margin-top: clamp(18px, 3vw, 28px);
+    grid-column: 1 / -1;
+    margin-top: clamp(24px, 4vw, 40px);
+    max-width: 72ch;
   }
   .cs__post-body--aside p:first-child {
     margin-top: 0;
@@ -3319,6 +3469,7 @@ const categoryKey = projectCategoryKey(data.category);
     }
     .cs__post-body--aside {
       grid-column: 1;
+      max-width: none;
     }
     .cs__film-frame--phone {
       max-width: 300px;
@@ -3363,6 +3514,314 @@ const categoryKey = projectCategoryKey(data.category);
     #marketing,
     #reflection {
       scroll-margin-top: 72px;
+    }
+  }
+
+  /* ── The result, three passes ─────────────────────────────────────────────
+     A vertical timeline: oldest at the top, a rule down the left, a node per
+     pass. Reading order and visual order agree, which a three-across row could
+     not do without putting the current state first and the history after it.
+     Each step is a header band, then artwork beside the reasoning. */
+  .cs__evo {
+    list-style: none;
+    margin: clamp(28px, 4vw, 44px) 0 0;
+    padding: 0 0 0 clamp(20px, 2.6vw, 32px);
+    position: relative;
+  }
+  .cs__evo::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 10px;
+    bottom: 10px;
+    width: 1px;
+    background: linear-gradient(
+      to bottom,
+      var(--color-border) 0%,
+      var(--color-border) 82%,
+      var(--cs-accent, #d7ff24) 100%
+    );
+  }
+  .cs__evo-step {
+    position: relative;
+    padding-bottom: clamp(30px, 4vw, 52px);
+  }
+  .cs__evo-step:last-child {
+    padding-bottom: 0;
+  }
+  /* The node sits ON the rail. */
+  .cs__evo-step::before {
+    content: "";
+    position: absolute;
+    left: calc(-1 * clamp(20px, 2.6vw, 32px));
+    top: 7px;
+    width: 9px;
+    height: 9px;
+    margin-left: -4px;
+    border-radius: 50%;
+    background: var(--color-bg, #fff);
+    border: 1.5px solid var(--color-border);
+  }
+  .cs__evo-step--current::before {
+    background: var(--cs-accent, #d7ff24);
+    border-color: var(--cs-accent, #d7ff24);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--cs-accent, #d7ff24) 20%, transparent);
+  }
+
+  .cs__evo-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding-bottom: 8px;
+    margin-bottom: clamp(14px, 2vw, 20px);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .cs__evo-step--current .cs__evo-head {
+    border-bottom-color: var(--cs-accent, #d7ff24);
+  }
+  .cs__evo-era {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text);
+  }
+  .cs__evo-flag {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: var(--cs-accent, #d7ff24);
+    color: #101313;
+    font-size: 0.625rem;
+    letter-spacing: 0.08em;
+    vertical-align: 1px;
+  }
+  /* The specific date, so "October 2026" is not the only precision offered. */
+  .cs__evo-date {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+    margin-left: 2px;
+  }
+  .cs__evo-num {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+
+  .cs__evo-body {
+    display: grid;
+    grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+    gap: clamp(18px, 2.6vw, 36px);
+    align-items: start;
+  }
+  /* The current pass shows TWO devices, so it spans the body: the pair on top,
+     then the reasoning and the delta table side by side underneath. Squeezing a
+     phone and a tablet into the 300px artwork column made the tablet a thumbnail,
+     which defeats the point of showing both. */
+  .cs__evo-step--current .cs__evo-body {
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(16px, 2.2vw, 24px);
+  }
+  .cs__evo-step--current .cs__evo-copy {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: clamp(16px, 2.4vw, 32px);
+    align-items: start;
+  }
+  .cs__evo-step--current .cs__evo-note {
+    margin-bottom: 0;
+  }
+
+  .cs__evo-figure {
+    margin: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    background: #101313;
+  }
+  /* The card is the object here, not a photo, so it carries no plate or frame. */
+  .cs__evo-figure--card {
+    max-width: 300px;
+    background: transparent;
+    border-color: transparent;
+  }
+  .cs__evo-figure img,
+  .cs__evo-device img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  /* Each era ships at its own aspect. Filling the column keeps every card the same
+     width, so the eye compares the design rather than the frame it arrived in. */
+  .cs__evo-figure--card img {
+    object-fit: contain;
+    object-position: center left;
+  }
+
+  .cs__evo-pair {
+    display: grid;
+    grid-template-columns: minmax(0, 190px) minmax(0, 1fr);
+    gap: clamp(12px, 1.8vw, 22px);
+    /* Bottom-aligned so the two device captions share a baseline; the phone is
+       the taller object, so its top defines where the pair starts. */
+    align-items: end;
+  }
+  .cs__evo-device {
+    margin: 0;
+  }
+  .cs__evo-device a {
+    display: block;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    background: #101313;
+  }
+  /* The phone is a whole screen, not a card: give it the device ratio so it
+     cannot be mistaken for a crop of the tablet composition. */
+  .cs__evo-device--phone a {
+    border-radius: 18px;
+  }
+  .cs__evo-device figcaption {
+    margin-top: 8px;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .cs__evo-copy {
+    min-width: 0;
+  }
+  .cs__evo-note {
+    margin: 0 0 14px;
+    font-size: var(--fs-sm, 0.9375rem);
+    line-height: 1.65;
+    color: var(--color-text-muted);
+  }
+  /* What actually changed, as data rather than prose. The label column is fixed
+     so the three steps line up and can be compared down the page. */
+  .cs__evo-deltas {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--color-border-subtle, var(--color-border));
+  }
+  .cs__evo-deltas li {
+    display: grid;
+    grid-template-columns: 82px minmax(0, 1fr);
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--color-border-subtle, var(--color-border));
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--color-text);
+  }
+  .cs__evo-deltas span {
+    color: var(--color-text-muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .cs__evo-detail {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 260px);
+    gap: clamp(20px, 3vw, 40px);
+    align-items: start;
+    margin-top: clamp(28px, 4vw, 44px);
+    padding-top: clamp(22px, 3vw, 32px);
+    border-top: 1px solid var(--color-border);
+  }
+  .cs__evo-detail-figure {
+    margin: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    background: #101313;
+  }
+  .cs__evo-detail-figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .cs__evo-detail-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+    margin: 0 0 0.75rem;
+  }
+  .cs__evo-detail-body p {
+    margin: 0 0 0.85rem;
+  }
+  .cs__evo-detail-aside {
+    font-size: var(--fs-sm, 0.9375rem);
+    color: var(--color-text-muted);
+  }
+
+  @media (max-width: 900px) {
+    .cs__evo-body,
+    .cs__evo-step--current .cs__evo-body {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .cs__evo-figure--card {
+      max-width: none;
+    }
+    .cs__evo-figure--card img {
+      object-fit: contain;
+      object-position: left center;
+    }
+    .cs__evo-step--current .cs__evo-copy {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .cs__evo-pair {
+      grid-template-columns: minmax(0, clamp(120px, 26vw, 180px)) minmax(0, 1fr);
+    }
+    .cs__evo-detail {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .cs__evo-detail-figure {
+      max-width: 260px;
+    }
+  }
+  @media (max-width: 560px) {
+    .cs__evo-deltas li {
+      grid-template-columns: 74px minmax(0, 1fr);
+    }
+    /* The era, the date, the current flag and the step number cannot share one
+       266px row: stack the date beneath and let the number hold the top right. */
+    .cs__evo-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: baseline;
+      column-gap: 10px;
+      row-gap: 3px;
+    }
+    .cs__evo-era {
+      grid-column: 1;
+      grid-row: 1;
+    }
+    .cs__evo-num {
+      grid-column: 2;
+      grid-row: 1;
+      justify-self: end;
+    }
+    .cs__evo-date {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      margin-left: 0;
+    }
+    /* Two devices side by side at this width makes both of them thumbnails. Give
+       each its own row at a size where the interface is actually legible. */
+    .cs__evo-pair {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 16px;
+    }
+    .cs__evo-device--phone {
+      max-width: 190px;
     }
   }
 </style>
