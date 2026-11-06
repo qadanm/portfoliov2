@@ -3327,4 +3327,28 @@ const categoryKey = projectCategoryKey(data.category);
     font-size: var(--fs-sm, 0.9375rem);
     color: var(--color-text-muted);
   }
+
+  /* The mobile action bar is fixed, so the page must end above it. Without this
+     the last caption and the footer sit under the bar on a phone. */
+  @media (max-width: 760px) {
+    /* The meta column states the status once, in sentence case. In the phone rail
+       the same string wrapped to three mono lines and read as a log entry, so the
+       rail keeps only the eyebrow and the title. */
+    .cs__rail-status {
+      display: none;
+    }
+    .cs--car-spotter {
+      padding-bottom: calc(76px + var(--safe-bottom, 0px));
+    }
+    #campaign,
+    #premise,
+    #loop,
+    #identity,
+    #results,
+    #engineering,
+    #marketing,
+    #reflection {
+      scroll-margin-top: 72px;
+    }
+  }
 </style>
