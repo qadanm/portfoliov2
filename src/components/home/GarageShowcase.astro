@@ -30,8 +30,9 @@ const apps = {
     appStore: cs?.appStoreUrl ?? 'https://apps.apple.com/app/carspotter-daily-car-game/id6777868215',
     site: cs?.siteUrl ?? 'https://carspottergame.com',
     siteLabel: new URL(cs?.siteUrl ?? 'https://carspottergame.com').hostname,
-    base: stripWidth(cs?.coverImage) ?? '/images/car-spotter/2026-10/artwork/01-carspotter-portfolio-hero',
-    mobileBase: stripWidth(cs?.coverMobileImage) ?? '/images/car-spotter/2026-10/artwork/01-carspotter-portfolio-hero-mobile',
+    // Fallbacks point at the current poster, not a retired identity's artwork.
+    base: stripWidth(cs?.coverImage) ?? '/images/car-spotter/v1.4/poster',
+    mobileBase: stripWidth(cs?.coverMobileImage) ?? '/images/car-spotter/v1.4/poster',
     alt: cs?.coverAlt ?? 'CarSpotter artwork beside a genuine car-detail question and its reveal.',
     name: cs?.title ?? 'CarSpotter',
     description: cs?.cardDescription ?? cs?.short ?? 'A daily car-identification game, designed and built end to end.',
