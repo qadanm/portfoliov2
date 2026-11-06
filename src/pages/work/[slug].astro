@@ -1137,6 +1137,13 @@ const categoryKey = projectCategoryKey(data.category);
 
           <div class="cs__films">
             <figure class="cs__film">
+              <figcaption>
+                <span class="cs__film-label">App Store preview · 886 × 1920</span>
+                A cold open, two real clue-to-reveal beats, a value beat and a
+                store call to action, all cut to the app's own sound effects.
+                Apple's preview canvas is 886 wide, so the layout is authored at
+                that width rather than resized from 1080.
+              </figcaption>
               <div class="cs__film-frame cs__film-frame--phone">
                 <video
                   class="cs__video"
@@ -1155,16 +1162,17 @@ const categoryKey = projectCategoryKey(data.category);
                   </p>
                 </video>
               </div>
-              <figcaption>
-                <span class="cs__film-label">App Store preview · 886 × 1920 · 27s</span>
-                A cold open, two real clue-to-reveal beats, a value beat and a
-                store call to action, all cut to the app's own sound effects.
-                Apple's preview canvas is 886 wide, so the layout is authored at
-                that width rather than resized from 1080.
-              </figcaption>
+              
             </figure>
 
             <figure class="cs__film">
+              <figcaption>
+                <span class="cs__film-label">Motion study · 1280 × 900</span>
+                The system moving: four short sequences from the artwork
+                package, each with a static poster as the fallback. It is a
+                design artefact, not a store asset — the brief was to prove the
+                motion language before any of it was implemented in the app.
+              </figcaption>
               <div class="cs__film-frame cs__film-frame--wide">
                 <video
                   class="cs__video"
@@ -1183,13 +1191,7 @@ const categoryKey = projectCategoryKey(data.category);
                   </p>
                 </video>
               </div>
-              <figcaption>
-                <span class="cs__film-label">Motion study · 1280 × 900 · 4.8s</span>
-                The system moving: four short sequences from the artwork
-                package, each with a static poster as the fallback. It is a
-                design artefact, not a store asset — the brief was to prove the
-                motion language before any of it was implemented in the app.
-              </figcaption>
+              
             </figure>
           </div>
           <div class="cs__post-body cs__post-body--aside">
@@ -3268,8 +3270,13 @@ const categoryKey = projectCategoryKey(data.category);
     max-width: 320px;
     margin-inline: auto;
   }
+  /* Captions lead their media, so the two films share a top edge and a caption
+     baseline instead of each caption trailing its own object's height. */
   .cs__film figcaption {
-    margin-top: 12px;
+    margin: 0 0 12px;
+    /* Equal caption blocks so the two media start on one line. The longer
+       caption sets the height; nothing is stretched or clipped. */
+    min-height: 168px;
     font-size: var(--fs-sm, 0.9375rem);
     line-height: 1.6;
     color: var(--color-text-muted);
@@ -3282,6 +3289,10 @@ const categoryKey = projectCategoryKey(data.category);
     text-transform: uppercase;
     color: var(--color-text);
     margin-bottom: 4px;
+    /* The spec line is one line: a wrapped "27S" defeats the datum. */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .cs__post-body--aside {
     grid-column: 2;
@@ -3302,6 +3313,9 @@ const categoryKey = projectCategoryKey(data.category);
   @media (max-width: 980px) {
     .cs__films {
       grid-template-columns: minmax(0, 1fr);
+    }
+    .cs__film figcaption {
+      min-height: 0;
     }
     .cs__post-body--aside {
       grid-column: 1;
