@@ -1,9 +1,11 @@
 ---
-// CarSpotter thumbnail. Recreates the Daily 5 round: a cropped car detail in
-// a lime viewfinder with a draining timer, over a 2×2 arcade answer grid with
-// the correct car locked in. The plate is the app's "midnight arcade"
-// screen, so it stays dark in both themes (a screen is a screen); only the
-// surrounding atmosphere + caption follow the page theme. Lime #C8FF00 accent.
+// CarSpotter thumbnail. A structural interaction study of the round: a car
+// detail in a chartreuse viewfinder above the 2×2 answer grid with one choice
+// locked in. The labels are generic ("Choice A–D") and the timer is omitted —
+// this is a layout study, not a gameplay capture, and no round is invented.
+// The plate is the app's "midnight arcade" screen, so it stays dark in both
+// themes (a screen is a screen); only the surrounding atmosphere + caption
+// follow the page theme. Chartreuse #D7FF24 accent.
 ---
 
 <div class="csart" aria-hidden="true">
@@ -17,7 +19,7 @@
         <span class="csart__brand-mark"></span>
         <span class="csart__brand-name">CarSpotter</span>
       </div>
-      <span class="csart__head-mono">Daily&nbsp;5 · 01/05</span>
+      <span class="csart__head-mono">Interaction&nbsp;study</span>
     </div>
 
     <div class="csart__crop">
@@ -27,23 +29,22 @@
       <span class="csart__bracket csart__bracket--br"></span>
       <span class="csart__detail"></span>
       <span class="csart__scanline"></span>
-      <span class="csart__timer">0:07</span>
     </div>
 
     <div class="csart__answers">
-      <span class="csart__ans csart__ans--correct">
-        <span class="csart__ans-name">Honda S2000</span>
+      <span class="csart__ans csart__ans--locked">
+        <span class="csart__ans-name">Choice A</span>
         <span class="csart__ans-check">✓</span>
       </span>
-      <span class="csart__ans"><span class="csart__ans-name">Toyota Supra</span></span>
-      <span class="csart__ans"><span class="csart__ans-name">Mazda MX-5</span></span>
-      <span class="csart__ans"><span class="csart__ans-name">Toyota MR2</span></span>
+      <span class="csart__ans"><span class="csart__ans-name">Choice B</span></span>
+      <span class="csart__ans"><span class="csart__ans-name">Choice C</span></span>
+      <span class="csart__ans"><span class="csart__ans-name">Choice D</span></span>
     </div>
   </div>
 
   <div class="csart__caption">
     <span class="csart__caption-line"></span>
-    <span>Daily 5 · CarSpotter</span>
+    <span>Interaction study · CarSpotter</span>
   </div>
 </div>
 
@@ -51,13 +52,13 @@
   /* Theme-aware ONLY for the atmosphere behind the plate. Default = dark. */
   .csart {
     --cs-atmos:
-      radial-gradient(ellipse 70% 70% at 78% 16%, rgba(200, 255, 0, 0.10), transparent 60%),
-      radial-gradient(ellipse 80% 70% at 20% 92%, rgba(200, 255, 0, 0.04), transparent 60%),
-      linear-gradient(160deg, #111316 0%, #0B0C0E 60%, #08090B 100%);
+      radial-gradient(ellipse 70% 70% at 78% 16%, rgba(215, 255, 36, 0.10), transparent 60%),
+      radial-gradient(ellipse 80% 70% at 20% 92%, rgba(215, 255, 36, 0.04), transparent 60%),
+      linear-gradient(160deg, #111316 0%, #101313 60%, #08090B 100%);
     --cs-grid: rgba(255, 255, 255, 0.022);
-    --cs-dot-1: rgba(200, 255, 0, 0.05);
+    --cs-dot-1: rgba(215, 255, 36, 0.05);
     --cs-dot-2: rgba(255, 255, 255, 0.03);
-    --cs-halo: radial-gradient(circle, rgba(200, 255, 0, 0.22), transparent 65%);
+    --cs-halo: radial-gradient(circle, rgba(215, 255, 36, 0.22), transparent 65%);
     --cs-caption: rgba(231, 233, 236, 0.46);
     --cs-caption-rule: rgba(231, 233, 236, 0.3);
   }
@@ -161,8 +162,8 @@
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    border: 1.5px solid #C8FF00;
-    box-shadow: 0 0 8px rgba(200, 255, 0, 0.5);
+    border: 1.5px solid #D7FF24;
+    box-shadow: 0 0 8px rgba(215, 255, 36, 0.5);
     flex-shrink: 0;
   }
   .csart__brand-mark::after {
@@ -172,7 +173,7 @@
     left: 50%;
     width: 6px;
     height: 1.5px;
-    background: #C8FF00;
+    background: #D7FF24;
     border-radius: 1px;
     transform-origin: left center;
     transform: translate(0, -50%) rotate(-38deg);
@@ -201,7 +202,7 @@
     border-radius: 8px;
     overflow: hidden;
     background:
-      radial-gradient(ellipse 60% 80% at 42% 34%, rgba(200, 255, 0, 0.10), transparent 62%),
+      radial-gradient(ellipse 60% 80% at 42% 34%, rgba(215, 255, 36, 0.10), transparent 62%),
       linear-gradient(150deg, #23262B 0%, #14161A 55%, #0C0D10 100%);
     border: 1px solid rgba(255, 255, 255, 0.06);
   }
@@ -229,9 +230,9 @@
     top: 26%;
     width: 70%;
     height: 12%;
-    background: #C8FF00;
+    background: #D7FF24;
     border-radius: 2px;
-    box-shadow: 0 0 8px rgba(200, 255, 0, 0.7);
+    box-shadow: 0 0 8px rgba(215, 255, 36, 0.7);
   }
   .csart__detail::after {
     content: '';
@@ -240,7 +241,7 @@
     top: 56%;
     width: 54%;
     height: 9%;
-    background: rgba(200, 255, 0, 0.55);
+    background: rgba(215, 255, 36, 0.55);
     border-radius: 2px;
   }
 
@@ -250,36 +251,20 @@
     right: 0;
     top: 38%;
     height: 1px;
-    background: linear-gradient(to right, transparent, rgba(200, 255, 0, 0.5), transparent);
+    background: linear-gradient(to right, transparent, rgba(215, 255, 36, 0.5), transparent);
   }
 
   .csart__bracket {
     position: absolute;
     width: 13px;
     height: 13px;
-    border: 1.5px solid #C8FF00;
+    border: 1.5px solid #D7FF24;
     z-index: 2;
   }
   .csart__bracket--tl { top: 7px; left: 7px; border-right: none; border-bottom: none; }
   .csart__bracket--tr { top: 7px; right: 7px; border-left: none; border-bottom: none; }
   .csart__bracket--bl { bottom: 7px; left: 7px; border-right: none; border-top: none; }
   .csart__bracket--br { bottom: 7px; right: 7px; border-left: none; border-top: none; }
-
-  .csart__timer {
-    position: absolute;
-    right: 8px;
-    bottom: 7px;
-    z-index: 3;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    color: #C8FF00;
-    padding: 2px 6px;
-    border-radius: 5px;
-    background: rgba(8, 9, 11, 0.72);
-    border: 1px solid rgba(200, 255, 0, 0.35);
-  }
 
   .csart__answers {
     display: grid;
@@ -318,23 +303,23 @@
     .csart__ans-name { font-size: 11px; }
   }
 
-  .csart__ans--correct {
-    background: linear-gradient(180deg, #C8FF00, #A6D400);
-    border-color: rgba(200, 255, 0, 0.7);
+  .csart__ans--locked {
+    background: linear-gradient(180deg, #D7FF24, #A6D400);
+    border-color: rgba(215, 255, 36, 0.7);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.3),
-      0 0 14px rgba(200, 255, 0, 0.3);
+      0 0 14px rgba(215, 255, 36, 0.3);
   }
 
-  .csart__ans--correct .csart__ans-name {
-    color: #0B0C0E;
+  .csart__ans--locked .csart__ans-name {
+    color: #101313;
     font-weight: 700;
   }
 
   .csart__ans-check {
     font-size: 9px;
     font-weight: 800;
-    color: #0B0C0E;
+    color: #101313;
     flex-shrink: 0;
   }
 

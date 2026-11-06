@@ -15,6 +15,7 @@ import ReadingProgress from '@/components/ReadingProgress.astro';
 import CaseStudyMobileBar from '@/components/work/CaseStudyMobileBar.astro';
 import CarSpotterPicture from '@/components/work/CarSpotterPicture.astro';
 import CarSpotterWall from '@/components/carspotter/CarSpotterWall.astro';
+import { carSpotterWallImages } from '@/data/car-spotter-wall';
 import CaseStudyNav from '@/components/work/CaseStudyNav.astro';
 import AppStoreBadge from '@/components/AppStoreBadge.astro';
 import SchemaArticle from '@/components/seo/SchemaArticle.astro';
@@ -680,10 +681,13 @@ const categoryKey = projectCategoryKey(data.category);
             </p>
             <p>
               That gives the game a clear endpoint without ending the
-              experience. Quick Practice offers more guessing, while progress
-              and streaks give returning players a record of their play. The
-              Daily timer is configurable, so I describe the game by its
-              decisions and cadence rather than promising one fixed time limit.
+              experience. Extra Laps offers more guessing through recommended
+              practice packs with no rank and no streak — Muscle Memory, JDM /
+              Imports, Workhorses, Dirt Road, German Steel, Long Roofs, Beaters,
+              Van Life, Oddballs — while progress and streaks give returning
+              players a record of their play. The Daily timer is configurable,
+              so I describe the game by its decisions and cadence rather than
+              promising one fixed time limit.
             </p>
           </div>
           <div class="cs__shot-grid cs__shot-grid--duo">
@@ -698,7 +702,7 @@ const categoryKey = projectCategoryKey(data.category);
                   src="/images/car-spotter/2026-10/screens/home-720.webp"
                   srcset="/images/car-spotter/2026-10/screens/home-480.webp 480w, /images/car-spotter/2026-10/screens/home-720.webp 720w"
                   sizes="(min-width: 720px) 42vw, 88vw"
-                  alt="CarSpotter home screen with the Saturn identity, today's Daily 5 action and Quick Practice."
+                  alt="CarSpotter home screen with the wordmark, the car wall, today's Daily 5 action and the practice entry."
                   width="1320"
                   height="2868"
                   loading="lazy"
@@ -707,9 +711,9 @@ const categoryKey = projectCategoryKey(data.category);
                 <span class="vhidden"> (opens in a new tab)</span>
               </a>
               <figcaption>
-                The October 2026 home: the wordmark and the Saturn have room,
-                the Daily 5 is still the clearest thing to tap, and the streak
-                sits underneath as the reason to come back.
+                The October 2026 home: the wordmark has room, the Daily 5 is
+                still the clearest thing to tap, and the streak sits
+                underneath as the reason to come back.
               </figcaption>
             </figure>
             <figure class="cs__shot">
@@ -723,7 +727,7 @@ const categoryKey = projectCategoryKey(data.category);
                   src="/images/car-spotter/2026-10/screens/practice-reveal-720.webp"
                   srcset="/images/car-spotter/2026-10/screens/practice-reveal-480.webp 480w, /images/car-spotter/2026-10/screens/practice-reveal-720.webp 720w"
                   sizes="(min-width: 720px) 42vw, 88vw"
-                  alt="A Ferrari 296 GTB reveal in Quick Practice."
+                  alt="A Ferrari 296 GTB reveal in practice."
                   width="1320"
                   height="2868"
                   loading="lazy"
@@ -732,9 +736,9 @@ const categoryKey = projectCategoryKey(data.category);
                 <span class="vhidden"> (opens in a new tab)</span>
               </a>
               <figcaption>
-                Quick Practice is the second mode: the same answering language
-                and the same reveal, without the pressure of the daily set. The
-                capture is from the same build as the Daily screens below.
+                Extra Laps is the second mode: the same answering language
+                and the same reveal, without the pressure of the daily set.
+                The capture is from the same build as the Daily screens below.
               </figcaption>
             </figure>
           </div>
@@ -843,7 +847,7 @@ const categoryKey = projectCategoryKey(data.category);
           <div class="container-site cs__wall-copy">
             <div class="cs__wall-top">
               <span class="cs__wall-eyebrow">The wall</span>
-              <span class="cs__wall-meta">43 photos / always moving</span>
+              <span class="cs__wall-meta">{carSpotterWallImages.length} photos / always moving</span>
             </div>
             <div class="cs__wall-bottom">
               <h2 class="cs__wall-title" id="wall-title">One crop, then the whole car.</h2>
@@ -857,33 +861,41 @@ const categoryKey = projectCategoryKey(data.category);
             <div class="cs__post-sxn">
               <span class="cs__post-eyebrow">03 / Identity</span>
             </div>
-            <h2 class="cs__post-title" id="identity-title">An ordinary Saturn, made unmistakably CarSpotter.</h2>
+            <h2 class="cs__post-title" id="identity-title">A headlamp mark, unmistakably CarSpotter.</h2>
           </header>
           <div class="cs__post-body">
             <p>
-              A Saturn wagon is a more personal signal for this game than a
-              generic sports-car silhouette. It reflects the kind of enthusiasm
-              behind CarSpotter: everyday cars can be recognisable and
-              interesting too.
+              The current identity is built around a chartreuse "C" drawn as a
+              headlamp: a beam, a housing, a car caught at night. It fits what
+              the game actually asks of a player, which is to read a car from
+              the small detail that catches the light first.
             </p>
             <p>
-              The cream wagon, electric lime and dark grey surfaces give the
-              identity continuity across the home screen and marketing artwork.
-              I kept the photographic game content distinct from the illustrated
-              brand character, so the identity does not suggest a driving or
-              racing mode.
+              The palette is restrained: chartreuse on near-black with a chalk
+              white for type. The accent is spent on the actions and the
+              instruments that matter, and the photography — real cars, real
+              crops — carries everything else. I kept the photographic game
+              content distinct from the mark, so the identity does not suggest
+              a driving or racing mode.
+            </p>
+            <p>
+              The board below documents the earlier identity as it shipped in
+              the October 2026 home iteration. The brand work since has moved
+              to the headlamp mark and the chartreuse-and-near-black palette;
+              the game content and its typography carried over.
             </p>
           </div>
           <figure class="cs__board">
             <CarSpotterPicture
               base="/images/car-spotter/2026-10/artwork/04-carspotter-brand-system"
-              alt="Approved Saturn illustration, CarSpotter wordmark, the lime, asphalt and chalk palette, and the October 2026 home screen."
+              alt="The earlier CarSpotter brand board: a cream station-wagon illustration beside the wordmark, swatches for the lime, asphalt and chalk palette, and the October 2026 home screen."
               width={2560}
               height={1500}
               class="cs__board-pic"
             />
             <figcaption>
-              The brand system as applied to the October 2026 home iteration.
+              The October 2026 brand board, from the earlier identity
+              iteration.
             </figcaption>
           </figure>
         </section>
@@ -1017,7 +1029,7 @@ const categoryKey = projectCategoryKey(data.category);
             <p>
               I developed new store artwork around the experience itself:
               identify a detail, see the whole car, then finish a run. The
-              Saturn-led brand artwork and the gameplay-led creative have
+              identity-led brand artwork and the gameplay-led creative have
               different jobs, but use the same visual system.
             </p>
             <p>
@@ -1474,15 +1486,15 @@ const categoryKey = projectCategoryKey(data.category);
 
      It is spent as a PLANE and nowhere else. A plane carries its own field,
      so it reads identically in both themes and needs no light/dark fork —
-     which is exactly what an accent used as text could not do: #C8FF00 is
-     16.9:1 on the dark page and 1.13:1 on the light one. */
+     which is exactly what an accent used as text could not do: #D7FF24 is
+     16.2:1 on the dark page and near-invisible on the light one. */
   .cs {
     --plane: var(--color-accent);
     --ink: #1F1408;
     position: relative;
   }
 
-  .cs--car-spotter         { --plane: #C8FF00; --ink: #0B0C0E; }  /* CarSpotterArtifact */
+  .cs--car-spotter         { --plane: #D7FF24; --ink: #101313; }  /* CarSpotterArtifact */
   .cs--vinly               { --plane: #EA580C; --ink: #1A120B; }  /* VinlyArtifact */
   .cs--chatobd2            { --plane: #F59E0B; --ink: #1F1408; }  /* VerdictArtifact — check-engine amber */
   .cs--elmulator           { --plane: #0969DA; --ink: #FFFFFF; }  /* ElmulatorArtifact — GitHub blue; it ships on the Marketplace */
@@ -2977,7 +2989,7 @@ const categoryKey = projectCategoryKey(data.category);
     font-size: 10px;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: #C8FF00;
+    color: #D7FF24;
   }
 
   .cs__wall-meta {

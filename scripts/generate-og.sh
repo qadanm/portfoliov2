@@ -127,7 +127,7 @@ gen_card "${OUT_DIR}/car-spotter.jpg" \
   "CarSpotter." \
   "A daily car-spotting game for enthusiasts. Designed and engineered solo for iOS." \
   "FLAGSHIP" \
-  "C8FF00" \
+  "D7FF24" \
   "Case study" \
   "qadan.co · 2026"
 

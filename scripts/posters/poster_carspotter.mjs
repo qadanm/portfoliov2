@@ -36,7 +36,7 @@ const argOut = process.argv.indexOf('--out');
 const OUT = argOut > -1 ? process.argv[argOut + 1] : `${PORTFOLIO}/public/images/car-spotter/poster.webp`;
 
 const W = 2560, H = 1600;
-const LIME = '#C8FF00';
+const LIME = '#D7FF24';
 const INK = '#08090B';
 const WHITE = '#F4F6F8';
 

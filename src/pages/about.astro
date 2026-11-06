@@ -10,7 +10,7 @@ const carSpotter = (await getCollection('build')).find(p => p.slug === 'car-spot
 const cs = carSpotter?.data;
 const carSpotterAbout =
   cs?.secondaryCopy?.about ??
-  'CarSpotter is my independent iPhone game, designed and engineered end to end.';
+  'CarSpotter is my independent iPhone and iPad game, designed and engineered end to end.';
 ---
 
 <BaseLayout

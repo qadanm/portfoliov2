@@ -32,10 +32,10 @@ const apps = {
     siteLabel: new URL(cs?.siteUrl ?? 'https://carspottergame.com').hostname,
     base: stripWidth(cs?.coverImage) ?? '/images/car-spotter/2026-10/artwork/01-carspotter-portfolio-hero',
     mobileBase: stripWidth(cs?.coverMobileImage) ?? '/images/car-spotter/2026-10/artwork/01-carspotter-portfolio-hero-mobile',
-    alt: cs?.coverAlt ?? 'CarSpotter’s Saturn identity beside a genuine car-detail question and the matching reveal.',
+    alt: cs?.coverAlt ?? 'CarSpotter artwork beside a genuine car-detail question and its reveal.',
     name: cs?.title ?? 'CarSpotter',
     description: cs?.cardDescription ?? cs?.short ?? 'A daily car-identification game, designed and built end to end.',
-    chips: cs?.keyFocus ?? ['Daily 5', 'Quick Practice', 'Spoiler-free results'],
+    chips: cs?.keyFocus ?? ['Daily 5', 'Extra Laps', 'Browser play'],
   },
   vinly: {
     href: '/work/vinly',
@@ -354,8 +354,8 @@ const apps = {
     padding-top: var(--space-16);
     padding-bottom: var(--space-16);
     border-top: 1px solid var(--color-border-subtle);
-    --lime: #C8FF00;
-    --lime-rgb: 200, 255, 0;
+    --lime: #D7FF24;
+    --lime-rgb: 215, 255, 36;
   }
 
   @media (min-width: 768px) {
@@ -518,9 +518,9 @@ const apps = {
   }
 
   /* Two columns means the image no longer owns the row height, and this cover
-     is a composed board: cropping it to fill would cut into the Saturn and the
-     phone stack. Contain keeps the whole poster; the artwork's own near-black
-     edge means the letterbox reads as breathing room, not a band. */
+     is a composed board: cropping it to fill would cut into the artwork and
+     the phone stack. Contain keeps the whole poster; the artwork's own
+     near-black edge means the letterbox reads as breathing room, not a band. */
   @media (min-width: 880px) {
     .garage__hero-media img { object-fit: contain; object-position: center; }
   }
