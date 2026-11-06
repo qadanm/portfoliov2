@@ -125,7 +125,7 @@ gen_card "${OUT_DIR}/magtek-platform.jpg" \
 
 gen_card "${OUT_DIR}/car-spotter.jpg" \
   "CarSpotter." \
-  "A daily car-spotting game for enthusiasts. Designed and engineered solo for iOS." \
+  "Five real cars a day, one detail each. Designed, built and shipped solo for iPhone, iPad and the browser." \
   "FLAGSHIP" \
   "D7FF24" \
   "Case study" \
