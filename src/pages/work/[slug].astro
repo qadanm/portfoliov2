@@ -3299,12 +3299,16 @@ const categoryKey = projectCategoryKey(data.category);
     font-family: var(--font-mono);
     font-size: 0.86em;
   }
-  @media (max-width: 760px) {
+  @media (max-width: 980px) {
     .cs__films {
       grid-template-columns: minmax(0, 1fr);
     }
+    .cs__post-body--aside {
+      grid-column: 1;
+    }
     .cs__film-frame--phone {
-      max-width: 260px;
+      max-width: 300px;
+      margin-inline: 0;
     }
   }
 
