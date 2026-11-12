@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#151714">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/cover-180.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Cover Studio">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="description" content="A private, photo-aware Instagram carousel cover editor.">
+  <title>Cover Studio · Qadan Travels</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <a class="tools-back" href="/" aria-label="Back to all tools">← <span>Tools</span></a>
+      <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+      <div class="brand-copy"><strong>Cover Studio</strong><small>QADAN TRAVELS</small></div>
+      <div class="header-spacer"></div>
+      <span class="save-status" id="saveStatus">Ready</span>
+      <button class="button button-quiet header-photo" id="replacePhoto" type="button">Add photo</button>
+      <button class="button button-primary" id="downloadButton" type="button" disabled>Save cover</button>
+    </header>
+
+    <main class="workspace">
+      <section class="stage-column" aria-label="Cover preview and photo controls">
+        <div class="stage-head">
+          <div><h1>Your cover</h1><p>Tap a word to edit it. Drag the photo to reframe.</p></div>
+          <span class="dimension-chip" id="dimensionChip">1080 × 1440</span>
+        </div>
+        <div class="stage" id="stage">
+          <canvas id="coverCanvas" width="1080" height="1440" aria-label="Cover preview"></canvas>
+          <div class="cover-hit-layer" id="hitLayer" hidden></div>
+          <div class="empty-state" id="emptyState">
+            <div class="empty-glyph" aria-hidden="true"><span></span><span></span></div>
+            <strong>Start with a photo</strong>
+            <p>Drop an image here or choose one from this device. Your photo stays in this browser.</p>
+            <button class="button button-primary" id="choosePhoto" type="button">Choose photo</button>
+            <small>JPEG, PNG, WebP, and HEIC</small>
+          </div>
+          <div class="busy-overlay" id="busyOverlay" hidden><div class="spinner"></div><span>Preparing photo…</span></div>
+        </div>
+        <div class="stage-footer">
+          <div class="zoom-control">
+            <label for="zoomSlider">Photo zoom</label>
+            <input id="zoomSlider" type="range" min="100" max="220" value="100" disabled>
+            <output id="zoomValue">100%</output>
+          </div>
+          <button class="text-button" id="resetCrop" type="button" disabled>Reset crop</button>
+        </div>
+        <div class="stage-photo-actions" id="stagePhotoActions" hidden><button class="button button-quiet" id="changePhotoBelow" type="button">Change photo</button><button class="text-button" id="newCover" type="button">New cover</button></div>
+        <p class="stage-note" id="stageNote">The preview and saved image use the same renderer.</p>
+      </section>
+
+      <aside class="inspector" aria-label="Cover settings">
+        <div class="inspector-head"><div><h2>Edit cover</h2><p>Tap text in the preview or edit it here.</p></div><span class="shortcut-pill">LIVE</span></div>
+        <div class="inspector-body">
+          <div class="input-group"><label for="eyebrowInput">Eyebrow / make</label><input id="eyebrowInput" data-field="eyebrow" type="text" maxlength="32" value="MAKE" autocomplete="off"></div>
+          <div class="input-group"><label for="titleInput">Large title</label><input id="titleInput" data-field="title" type="text" maxlength="42" value="MODEL" autocomplete="off"><small>Keep the most recognizable word here.</small></div>
+          <div class="input-group"><label for="subtitleInput">Small title line <span class="optional">optional</span></label><input id="subtitleInput" data-field="subtitle" type="text" maxlength="42" placeholder="e.g. CAPTUR" autocomplete="off"></div>
+
+          <div class="group-heading"><span>Spotted in</span></div>
+          <div class="input-group"><label for="spottedInput">City and region</label><input id="spottedInput" data-field="spottedPlace" type="text" maxlength="64" value="CITY, REGION" autocomplete="off"><small>Flags update when a region is recognized.</small></div>
+          <div class="flag-row" id="spottedFlagRow"><span>Flags</span><button type="button" class="flag-choice" data-flag="spottedRegion" aria-label="Choose spotted region flag"><span id="spottedRegionPreview">+</span><small>Region</small></button><button type="button" class="flag-choice" data-flag="spottedCountry" aria-label="Choose spotted country flag"><span id="spottedCountryPreview">+</span><small>Country</small></button></div>
+
+          <label class="toggle-row" for="platesToggle"><span><strong>Plate origin</strong><small>Show a separate “plates from” line</small></span><input id="platesToggle" type="checkbox" role="switch"><i aria-hidden="true"></i></label>
+          <div class="plates-fields" id="platesFields" hidden>
+            <div class="input-group"><label for="platesInput">Plates from</label><input id="platesInput" data-field="platesPlace" type="text" maxlength="64" placeholder="REGION, COUNTRY" autocomplete="off"></div>
+            <div class="flag-row"><span>Flags</span><button type="button" class="flag-choice" data-flag="platesRegion" aria-label="Choose plate region flag"><span id="platesRegionPreview">+</span><small>Region</small></button><button type="button" class="flag-choice" data-flag="platesCountry" aria-label="Choose plate country flag"><span id="platesCountryPreview">+</span><small>Country</small></button></div>
+          </div>
+
+          <div class="input-group handle-group"><label for="handleInput">Signature</label><input id="handleInput" data-field="handle" type="text" maxlength="32" value="@qadantravels" autocomplete="off"></div>
+
+          <details class="advanced"><summary>Style & export <span aria-hidden="true">⌄</span></summary>
+            <div class="advanced-content">
+              <div class="input-group"><label for="titleColor">Title color</label><select id="titleColor"><option value="auto">Auto · photo aware</option><option value="cream">Warm cream</option><option value="white">White</option><option value="ink">Dark ink</option></select></div>
+              <div class="input-group"><label for="formatSelect">Canvas size</label><select id="formatSelect"><option value="3:4">3:4 · 1080 × 1440</option><option value="4:5">4:5 · 1080 × 1350</option></select></div>
+              <div class="contrast-readout" id="contrastReadout">Contrast is measured after you add a photo.</div>
+            </div>
+          </details>
+        </div>
+        <div class="inspector-actions"><button class="button button-primary full-width" id="downloadButtonSide" type="button" disabled>Save PNG cover</button><button class="button button-quiet full-width" id="shareButton" type="button" hidden>Share image</button></div>
+      </aside>
+    </main>
+  </div>
+
+  <div class="quick-edit" id="quickEdit" hidden><label id="quickEditLabel" for="quickEditInput">Edit text</label><div><input id="quickEditInput" type="text" autocomplete="off"><button id="quickEditDone" type="button">Done</button></div></div>
+
+  <dialog class="flag-dialog" id="flagDialog" aria-labelledby="flagDialogTitle"><div class="dialog-head"><div><h2 id="flagDialogTitle">Choose a flag</h2><p id="flagDialogHint">Search countries and regions</p></div><button class="icon-button" id="closeFlagDialog" type="button" aria-label="Close flag picker">×</button></div><input id="flagSearch" type="search" placeholder="Search by name" aria-label="Search flags"><div class="flag-region-filters" id="flagRegionFilters" aria-label="Filter regions by country" hidden><button type="button" data-country-filter="all" aria-pressed="true">All</button><button type="button" data-country-filter="US" aria-pressed="false">U.S.</button><button type="button" data-country-filter="CA" aria-pressed="false">Canada</button><button type="button" data-country-filter="MX" aria-pressed="false">Mexico</button></div><p class="flag-count" id="flagCount"></p><div class="flag-results" id="flagResults"></div><button class="text-button clear-flag" id="clearFlag" type="button">Remove this flag</button></dialog>
+  <dialog class="confirm-dialog" id="newCoverDialog" aria-labelledby="newCoverTitle"><h2 id="newCoverTitle">Start a new cover?</h2><p>This replaces the draft saved in this browser. Save a PNG first if you want to keep the current cover.</p><div class="confirm-actions"><button class="button button-quiet" id="cancelNewCover" type="button">Keep editing</button><button class="button button-primary" id="confirmNewCover" type="button">Start new cover</button></div></dialog>
+
+  <input id="photoInput" type="file" accept="image/*,.heic,.heif" hidden>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <script src="app.js" type="module"></script>
+</body>
+</html>

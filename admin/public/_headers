@@ -1,10 +1,9 @@
-# Cloudflare Pages security headers for admin.qadan.co.
-# Anything served from this domain is private and gated by Cloudflare Access.
-
+# The custom domain is gated by Cloudflare Access. The Pages Worker redirects
+# pages.dev hostnames to that domain before static content is served.
 /*
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: interest-cohort=()
   X-Robots-Tag: noindex, nofollow
-  Cache-Control: private, no-store
+  Cache-Control: private, max-age=3600

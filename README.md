@@ -35,7 +35,7 @@ Copy `.env.example` to `.env` and fill in what you need:
 
 Case studies live in `src/content` as MDX and are typed by `src/content/config.ts`. Pages are in `src/pages`; shared components and layout primitives are in `src/components` and `src/styles`.
 
-The `admin/` directory is a separate Astro app with its own README and deployment notes.
+The `admin/` directory is the private [Qadan Tools](./admin/README.md) app. The folder name is retained because the existing Cloudflare Pages project builds from that subdirectory. It is separate from the public portfolio.
 
 ## Deployment
 

@@ -1,104 +1,46 @@
-# Qadan Admin
+# Qadan Tools
 
-Career operating system. Runs locally by default; can be served privately at
-`admin.qadan.co` behind Cloudflare Access — see [REMOTE-SETUP.md](./REMOTE-SETUP.md).
+The private tools center at `admin.qadan.co`. This directory remains named `admin/` because the existing Cloudflare Pages project builds from this repo subfolder. The user-facing product is **Qadan Tools**.
 
-## What this is
+## Included
 
-A private Astro app that lives next to the public portfolio in this repo. It generates
-angle-aware resumes, recruiter messaging, and tracks job applications. All data is
-authored in source files (`src/data/`) or stored in your browser's `localStorage`.
+- A mobile-first tools home at `/`.
+- Cover Studio at `/tools/cover-studio/index.html`: choose any JPEG, PNG, WebP, or HEIC photo; tap cover text to edit; auto-adjust contrast; add location and plate flags; export a 1080-pixel-wide PNG.
 
-## What this is not
+Cover Studio runs entirely in the browser. Its current draft and photo are stored in IndexedDB on each device. No image is uploaded or synced. The same tool is available from any location where `admin.qadan.co` can be reached and the owner can sign in through Cloudflare Access.
 
-- Hosted anywhere
-- Authenticated
-- Connected to a database
-- Reachable from the public site at qadan.co
+## Home Screen apps
 
-The public Astro project lives at the repo root. This admin project is a sibling, not
-a subroute. The public Astro build doesn't see `/admin` and can't accidentally publish it.
+The center and Cover Studio each have their own web app manifest, stable app ID, 180/192/512-pixel icons, and standalone display mode. Open the desired page in iPhone or iPad Safari, use **Share → Add to Home Screen**, and leave **Open as Web App** enabled. The icons launch the center or Cover Studio directly. Each future tool can follow the same manifest and icon pattern under its own path.
 
-## Security model — read this once
+Home Screen web apps can have separate browser storage from Safari, so a draft created in one installation should not be treated as a synced backup. Export the PNG to keep the finished cover.
 
-| What | Status |
-|---|---|
-| The dev server binds to `127.0.0.1` | Not reachable from other devices on your LAN |
-| `dist/` and `node_modules/` are gitignored | Build output never enters the repo |
-| `exports/` and `*.pdf` are gitignored | Generated resumes don't get committed |
-| No third-party API keys, no secrets | Nothing to leak |
-| No login, no auth | Because there's no remote surface to log into |
+## Existing infrastructure
 
-If you ever want to host this privately, two clean migrations:
+- Cloudflare Pages project: `qadan-admin`, built from this `admin/` directory with output `dist/`.
+- Custom domain: `admin.qadan.co`, protected by Cloudflare Access.
+- `public/_worker.js` redirects the production and preview `qadan-admin.pages.dev` hostnames to the Access-protected custom domain before serving content. It serves assets on the custom domain through `env.ASSETS`.
+- `public/_headers` sets no-index and browser security headers.
 
-1. **Cloudflare Pages + Cloudflare Access** (free for personal): deploy this Astro
-   project as a separate Pages project, gate the entire domain with Access (Google
-   sign-in, restricted to your email). You never see a login page; Cloudflare handles it.
-2. **Vercel + Password Protection** (paid): deploy and turn on the project-level password.
+The retired job suite's Pages Functions and KV binding have been removed from this app. Any old data in the former KV namespace is no longer read or written by the new site.
 
-Both keep the admin off the public surface entirely.
+## Local development
 
-## Run
+Requires Node 20 or newer.
 
 ```bash
-# from the admin/ directory
-npm install
-npm run dev
-# → http://127.0.0.1:4322
+cd admin
+npm ci
+npm run dev        # http://127.0.0.1:4322
+npm run build      # static output in dist/
 ```
 
-Or from the repo root:
+From the repo root, `npm run tools` starts the local app. Cloudflare Pages builds this subdirectory on pushes to `main`.
 
-```bash
-npm run admin
-```
+## Access checks after deployment
 
-(That script is added to the root `package.json`.)
+- `https://admin.qadan.co/` should require Cloudflare Access without a valid session.
+- `https://qadan-admin.pages.dev/` should redirect to `https://admin.qadan.co/`.
+- Cover Studio should load at `/tools/cover-studio/index.html` and export a PNG from a selected photo.
 
-## What's inside
-
-```
-src/
-├── data/
-│   ├── identity.ts        ← contact info, links, location
-│   ├── angles.ts          ← the 9 role angles + emphasis rules
-│   ├── projects.ts        ← work entries with per-angle bullet variants
-│   ├── skills.ts          ← skills with categories + per-angle weights
-│   ├── content.ts         ← per-angle headlines + summaries
-│   └── recruiter.ts       ← per-angle recruiter messaging
-├── lib/
-│   └── engine.ts          ← composer: takes an angle, returns a resume
-├── layouts/
-│   ├── Admin.astro        ← sidebar shell
-│   └── Print.astro        ← no chrome, A4
-├── pages/
-│   ├── index.astro        ← dashboard
-│   ├── resume/[angle].astro    ← resume builder, all 9 angles
-│   ├── recruiter/[angle].astro ← recruiter toolkit per angle
-│   ├── jobs.astro         ← job tracker (localStorage)
-│   └── interview.astro    ← interview prep notes
-└── styles/
-    └── global.css         ← shared tokens, print stylesheet
-```
-
-## Three resume output modes
-
-Every angle generates the same content in three formats:
-
-1. **Beautiful** — visually aligned with qadan.co, serif headers, single column. Print to PDF for the visual version recruiters react to.
-2. **ATS** — same content, plain HTML structure. Single column. System fonts. Optimized for parsers that strip CSS.
-3. **Plain text** — copy-paste friendly. For job application forms with raw text fields.
-
-To export PDF: open the resume page, hit Cmd-P, "Save as PDF". The print stylesheet hides chrome and renders at A4.
-
-## Editing content
-
-All angle content lives in `src/data/`. Edit there. Changes hot-reload.
-
-Don't author per-resume; author per-angle. The engine recombines.
-
-## Job tracker
-
-`/jobs` uses `localStorage` only. Clearing your browser data clears the tracker. No
-network calls. If you want it persistent across machines, that's the migration to
-Supabase / a private backend — not added by default because it adds operational weight.
+The source files for the bundled font, flags, and HEIC decoder have their license texts in `public/tools/cover-studio/licenses/`.

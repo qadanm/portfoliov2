@@ -1,35 +1,5 @@
-# Cloudflare Pages config. Used by `wrangler pages dev` for local testing
-# of Pages Functions and by Cloudflare Pages at deploy time.
-#
-# KV BINDING:
-#   Once a Pages project has a wrangler.toml, the Cloudflare dashboard
-#   locks the Bindings UI ("Bindings for this project are being managed
-#   through wrangler.toml"). So the binding MUST be declared here with
-#   the production namespace id — there is no longer a "set it in the
-#   dashboard" alternative.
-#
-#   The namespace id below is the real production namespace
-#   (qadan-admin-data), found at:
-#     Workers & Pages → Storage & databases → Workers KV → qadan-admin-data
-#     → Settings → Namespace ID
-#   If the namespace ever gets recreated, update this id.
-#
-#   An earlier version of this file declared a placeholder
-#   `id = "00000000000000000000000000000000"` instead of the real id and
-#   relied on the dashboard binding to override it. That stopped working
-#   when Cloudflare added strict id validation at publish time, and the
-#   dashboard later became read-only too — so both escape hatches are
-#   gone. Keep a real id here.
-#
-# LOCAL DEV:
-#   `wrangler pages dev dist --kv KV` spins up an in-memory KV namespace
-#   bound as `KV`, ignoring the production id. Or just use `npm run dev`
-#   — the function isn't reachable in pure astro dev, but the rest of
-#   the admin works fine without it.
+# The existing Cloudflare Pages project remains the deployment target.
+# Access protects admin.qadan.co; _worker.js sends pages.dev traffic there.
 name = "qadan-admin"
-compatibility_date = "2025-04-01"
+compatibility_date = "2026-11-12"
 pages_build_output_dir = "dist"
-
-[[kv_namespaces]]
-binding = "KV"
-id = "3a35707770ad424c8446c751ec493b23"
