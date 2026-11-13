@@ -1,4 +1,4 @@
-import {renderCover, COVER_WIDTH, HEIGHTS} from './render.js?v=3';
+import {renderCover, COVER_WIDTH, HEIGHTS} from './render.js?v=4';
 import {loadEndcards, randomEndcard, renderEndcard} from './endcards.js?v=3';
 import {zipFiles} from './zip.js?v=3';
 import {startUpdateChecks} from '../../update-check.js?v=3';
@@ -85,8 +85,8 @@ function render() {
     renderHits(lastRender.zones);
     if (lastRender.contrast) {
       const c = lastRender.contrast;
-      $('contrastReadout').textContent = `Title ${c.name} · minimum ${c.title.toFixed(1)}:1 contrast · photo shading ${Math.round(c.alpha * 100)}%`;
-      $('stageNote').textContent = c.alpha > .4 ? 'A stronger title backing was added for this photo.' : 'The photo keeps a light touch; lettering stays readable.';
+      $('contrastReadout').textContent = `Photo-aware ${c.name} title · ${c.title.toFixed(1)}:1 fill-to-outline contrast · no photo shading`;
+      $('stageNote').textContent = 'The photo stays clear. Lettering uses an outline and a soft shadow for contrast.';
     } else {
       $('contrastReadout').textContent = 'Contrast is measured after you add a photo.';
       $('stageNote').textContent = 'The preview and saved image use the same renderer.';

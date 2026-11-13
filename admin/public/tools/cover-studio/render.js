@@ -20,52 +20,35 @@ function ratio(a, b) {
   const x = luminance(a), y = luminance(b);
   return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
 }
-function mix(a, b, t) { return [0, 1, 2].map(i => a[i] * (1 - t) + b[i] * t); }
 function rgba(rgb, a) { return `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${a})`; }
-function sampleExtrema(ctx, box) {
-  const x = Math.max(0, Math.floor(box.x)), y = Math.max(0, Math.floor(box.y));
-  const w = Math.min(ctx.canvas.width - x, Math.ceil(box.w));
-  const h = Math.min(ctx.canvas.height - y, Math.ceil(box.h));
-  const {data} = ctx.getImageData(x, y, w, h);
-  const extrema = {min: [255, 255, 255], max: [0, 0, 0]};
-  for (let py = 0; py < h; py += 4) {
-    for (let px = 0; px < w; px += 4) {
-      const i = (py * w + px) * 4;
-      for (let channel = 0; channel < 3; channel++) {
-        extrema.min[channel] = Math.min(extrema.min[channel], data[i + channel]);
-        extrema.max[channel] = Math.max(extrema.max[channel], data[i + channel]);
+function samplePhoto(ctx, boxes) {
+  const pixels = [];
+  for (const box of boxes) {
+    const x = Math.max(0, Math.floor(box.x)), y = Math.max(0, Math.floor(box.y));
+    const w = Math.min(ctx.canvas.width - x, Math.ceil(box.w));
+    const h = Math.min(ctx.canvas.height - y, Math.ceil(box.h));
+    if (w <= 0 || h <= 0) continue;
+    const {data} = ctx.getImageData(x, y, w, h);
+    for (let py = 0; py < h; py += 12) {
+      for (let px = 0; px < w; px += 12) {
+        const i = (py * w + px) * 4;
+        pixels.push([data[i], data[i + 1], data[i + 2]]);
       }
     }
   }
-  return extrema;
+  return pixels;
 }
-function combineExtrema(parts) {
-  return parts.reduce((result, part) => {
-    for (let channel = 0; channel < 3; channel++) {
-      result.min[channel] = Math.min(result.min[channel], part.min[channel]);
-      result.max[channel] = Math.max(result.max[channel], part.max[channel]);
-    }
-    return result;
-  }, {min: [255, 255, 255], max: [0, 0, 0]});
-}
-function scoreTreatment(extrema, fill, backdrop, alpha) {
-  const worst = luminance(fill) > 0.5 ? extrema.max : extrema.min;
-  return ratio(fill, mix(worst, backdrop, alpha));
-}
-function chooseTreatment(extrema, requested) {
+function chooseTreatment(pixels, requested) {
   const names = requested === 'auto' ? ['cream', 'white', 'ink'] : [requested];
   const candidates = names.map(name => {
     const fill = COLORS[name];
-    const backdrop = name === 'ink' ? COLORS.light : COLORS.dark;
-    let alpha = 0, contrast = scoreTreatment(extrema, fill, backdrop, 0);
-    while (contrast < 7 && alpha < 0.88) {
-      alpha = Math.min(0.88, alpha + 0.02);
-      contrast = scoreTreatment(extrema, fill, backdrop, alpha);
-    }
-    const preference = name === 'cream' ? 0 : name === 'white' ? 0.08 : 0.2;
-    return {name, fill, backdrop, alpha, contrast, cost: alpha + preference};
+    const outline = name === 'ink' ? COLORS.light : COLORS.dark;
+    const scores = pixels.map(pixel => ratio(fill, pixel)).sort((a, b) => a - b);
+    const photoContrast = scores[Math.floor(scores.length * 0.25)] || 1;
+    const preference = name === 'cream' ? 0 : name === 'white' ? 0.15 : 0.35;
+    return {name, fill, outline, photoContrast, contrast: ratio(fill, outline), score: photoContrast - preference};
   });
-  candidates.sort((a, b) => a.cost - b.cost);
+  candidates.sort((a, b) => b.score - a.score);
   return candidates[0];
 }
 function titleLayout(ctx, raw) {
@@ -99,42 +82,48 @@ function drawPhoto(ctx, photo, crop) {
   ctx.drawImage(photo, x, y, dw, dh);
   return {x, y, dw, dh, offsetX: x - (w - dw) / 2, offsetY: y - (h - dh) / 2};
 }
-function drawTitleText(ctx, text, x, y, size, fill, dark) {
+function drawTitleText(ctx, text, x, y, size, fill, lightText) {
   ctx.save();
   ctx.font = `800 ${size}px Barlow`;
   ctx.textBaseline = 'top';
   ctx.textAlign = 'center';
   ctx.lineJoin = 'round';
-  ctx.shadowColor = dark ? 'rgba(0,0,0,.76)' : 'rgba(0,0,0,.52)';
-  ctx.shadowBlur = 14;
-  ctx.shadowOffsetX = 7;
-  ctx.shadowOffsetY = 9;
-  ctx.fillStyle = rgba(fill, 1);
-  ctx.fillText(text, x, y);
-  ctx.shadowColor = 'transparent';
-  ctx.strokeStyle = dark ? 'rgba(9,12,9,.9)' : 'rgba(255,250,233,.9)';
-  ctx.lineWidth = size > 180 ? 5 : 4;
+  ctx.shadowColor = 'rgba(0,0,0,.48)';
+  ctx.shadowBlur = 9;
+  ctx.shadowOffsetX = 2;
+  ctx.shadowOffsetY = 4;
+  ctx.strokeStyle = rgba(lightText ? COLORS.dark : COLORS.light, 0.96);
+  ctx.lineWidth = size > 180 ? 6 : 4;
   ctx.strokeText(text, x, y);
+  ctx.shadowColor = 'transparent';
+  ctx.fillStyle = rgba(fill, 1);
   ctx.fillText(text, x, y);
   ctx.restore();
 }
-function drawSmall(ctx, text, x, y, size, maxWidth, color = '#fffaf0', weight = 700) {
+function drawSmall(ctx, text, x, y, size, maxWidth, color = '#fffaf0', weight = 700, darkText = false) {
   const value = (text || '').trim().toUpperCase();
   let s = size;
+  ctx.save();
   ctx.textBaseline = 'top';
+  ctx.textAlign = 'left';
   while (s > 25) {
     ctx.font = `${weight} ${s}px Barlow`;
     if (ctx.measureText(value).width <= maxWidth) break;
     s--;
   }
   ctx.font = `${weight} ${s}px Barlow`;
-  ctx.shadowColor = 'rgba(0,0,0,.86)';
-  ctx.shadowBlur = 7;
-  ctx.shadowOffsetX = 2;
-  ctx.shadowOffsetY = 3;
-  ctx.fillStyle = color;
-  ctx.fillText(value, x, y);
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = s >= 40 ? 3 : 2.5;
+  ctx.strokeStyle = darkText ? 'rgba(246,240,222,.95)' : 'rgba(8,11,9,.95)';
+  ctx.shadowColor = 'rgba(0,0,0,.5)';
+  ctx.shadowBlur = 6;
+  ctx.shadowOffsetX = 1;
+  ctx.shadowOffsetY = 2;
+  ctx.strokeText(value, x, y, maxWidth);
   ctx.shadowColor = 'transparent';
+  ctx.fillStyle = color;
+  ctx.fillText(value, x, y, maxWidth);
+  ctx.restore();
   return s;
 }
 function footerLayout(ctx, raw, maxWidth) {
@@ -181,23 +170,19 @@ function drawFlag(ctx, code, x, y, cache, redraw) {
   }
   if (!img.complete || !img.naturalWidth) return false;
   const fw = 62, fh = 40;
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,.42)';
+  ctx.shadowBlur = 6;
+  ctx.shadowOffsetY = 2;
   ctx.fillStyle = '#fff';
   ctx.fillRect(x - 3, y - 3, fw + 6, fh + 6);
+  ctx.shadowColor = 'transparent';
   const ratio = img.naturalWidth / img.naturalHeight;
   const iw = Math.min(fw, fh * ratio), ih = Math.min(fh, fw / ratio);
   ctx.drawImage(img, x + (fw - iw) / 2, y + (fh - ih) / 2, iw, ih);
+  ctx.restore();
   return true;
 }
-function footerContrast(ctx, y) {
-  const extrema = sampleExtrema(ctx, {x: 0, y, w: ctx.canvas.width, h: ctx.canvas.height - y});
-  let alpha = 0.45, score = scoreTreatment(extrema, COLORS.white, COLORS.dark, alpha);
-  while (score < 7 && alpha < 0.94) {
-    alpha = Math.min(0.94, alpha + 0.03);
-    score = scoreTreatment(extrema, COLORS.white, COLORS.dark, alpha);
-  }
-  return {alpha, score};
-}
-
 export function renderCover(canvas, photo, state, flagCache, redraw) {
   const h = HEIGHTS[state.format] || 1440;
   if (canvas.width !== COVER_WIDTH) canvas.width = COVER_WIDTH;
@@ -209,39 +194,23 @@ export function renderCover(canvas, photo, state, flagCache, redraw) {
   const title = titleLayout(ctx, state.title);
   const titleY = 125, lineH = title.lineHeight;
   const titleH = title.lines.length * lineH + 25;
-  const titleSamples = [
-    sampleExtrema(ctx, {x: 55, y: 41, w: 970, h: 75}),
-    sampleExtrema(ctx, {x: 55, y: titleY - 4, w: 970, h: titleH + 30}),
-  ];
-  if (state.subtitle) titleSamples.push(sampleExtrema(ctx, {x: 55, y: titleY + titleH, w: 970, h: 75}));
-  const treatment = chooseTreatment(combineExtrema(titleSamples), state.titleColor || 'auto');
-  const topEnd = Math.min(h * 0.56, titleY + titleH + (state.subtitle ? 105 : 48));
-  if (treatment.alpha > 0) {
-    ctx.fillStyle = rgba(treatment.backdrop, treatment.alpha);
-    ctx.fillRect(0, 0, COVER_WIDTH, topEnd);
-    const grad = ctx.createLinearGradient(0, topEnd, 0, Math.min(h, topEnd + 190));
-    grad.addColorStop(0, rgba(treatment.backdrop, treatment.alpha));
-    grad.addColorStop(1, rgba(treatment.backdrop, 0));
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, topEnd, COVER_WIDTH, 190);
-  }
-  const footerY = h - 215;
-  const footer = footerContrast(ctx, footerY);
-  const footGrad = ctx.createLinearGradient(0, footerY - 145, 0, footerY);
-  footGrad.addColorStop(0, rgba(COLORS.dark, 0));
-  footGrad.addColorStop(1, rgba(COLORS.dark, footer.alpha));
-  ctx.fillStyle = footGrad;
-  ctx.fillRect(0, footerY - 145, COVER_WIDTH, 145);
-  ctx.fillStyle = rgba(COLORS.dark, footer.alpha);
-  ctx.fillRect(0, footerY, COVER_WIDTH, h - footerY);
+  ctx.font = `800 ${title.size}px Barlow`;
+  const bottomLine = title.lines[title.lines.length - 1];
+  const bottomWidth = ctx.measureText(bottomLine).width;
+  const subtitleX = (COVER_WIDTH - bottomWidth) / 2;
+  const titlePixels = samplePhoto(ctx, title.lines.map((line, index) => {
+    const width = ctx.measureText(line).width;
+    return {x: (COVER_WIDTH - width) / 2, y: titleY + index * lineH, w: width, h: title.size * 0.72};
+  }));
+  const treatment = chooseTreatment(titlePixels, state.titleColor || 'auto');
 
-  drawSmall(ctx, state.eyebrow || 'MAKE', 65, 51, 43, 920, treatment.name === 'ink' ? '#182019' : '#f8f3e7', 700);
+  drawSmall(ctx, state.eyebrow || 'MAKE', 65, 51, 43, 920, treatment.name === 'ink' ? '#182019' : '#f8f3e7', 700, treatment.name === 'ink');
   title.lines.forEach((line, i) => drawTitleText(ctx, line, COVER_WIDTH / 2, titleY + i * lineH, title.size, treatment.fill, treatment.name !== 'ink'));
   let subtitleZone = null;
   if (state.subtitle && state.subtitle.trim()) {
     const sy = titleY + titleH + 9;
-    drawSmall(ctx, state.subtitle, 66, sy, 52, 940, treatment.name === 'ink' ? '#182019' : '#f6e2af', 700);
-    subtitleZone = {x: 58, y: sy - 5, w: 970, h: 70};
+    drawSmall(ctx, state.subtitle, subtitleX, sy, 52, Math.max(1, bottomWidth - 5), treatment.name === 'ink' ? '#182019' : '#f6e2af', 700, treatment.name === 'ink');
+    subtitleZone = {x: subtitleX - 8, y: sy - 5, w: bottomWidth + 16, h: 70};
   }
 
   const labelY = h - 203, placeY = h - 164, flagsY = h - 104;
@@ -268,10 +237,14 @@ export function renderCover(canvas, photo, state, flagCache, redraw) {
   ctx.shadowColor = 'rgba(0,0,0,.95)';
   ctx.shadowBlur = 6;
   ctx.shadowOffsetY = 2;
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = 'rgba(8,11,9,.95)';
+  ctx.strokeText(state.handle || '@qadantravels', 1031, h - 41);
+  ctx.shadowColor = 'transparent';
   ctx.fillStyle = '#fff';
   ctx.fillText(state.handle || '@qadantravels', 1031, h - 41);
   ctx.textAlign = 'left';
-  ctx.shadowColor = 'transparent';
 
   const zones = {
     eyebrow: {x: 55, y: 41, w: 970, h: 70},
@@ -281,5 +254,5 @@ export function renderCover(canvas, photo, state, flagCache, redraw) {
   };
   if (subtitleZone) zones.subtitle = subtitleZone;
   if (state.showPlates) zones.platesPlace = {x: 550, y: labelY - 9, w: 485, h: 164};
-  return {zones, contrast: {title: treatment.contrast, footer: footer.score, name: treatment.name, alpha: treatment.alpha}, photoBox};
+  return {zones, contrast: {title: treatment.contrast, footer: ratio(COLORS.white, COLORS.dark), name: treatment.name, alpha: 0}, photoBox};
 }
