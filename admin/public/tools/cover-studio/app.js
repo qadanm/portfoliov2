@@ -1,6 +1,9 @@
 import {renderCover, COVER_WIDTH, HEIGHTS} from './render.js';
+import {loadEndcards, randomEndcard, renderEndcard} from './endcards.js';
+import {zipFiles} from './zip.js';
 
 const $ = id => document.getElementById(id);
+const appleMobile = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const canvas = $('coverCanvas');
 const stage = $('stage');
 const hitLayer = $('hitLayer');
@@ -15,13 +18,14 @@ const initial = {
   eyebrow: 'MAKE', title: 'MODEL', subtitle: '', spottedPlace: 'CITY, REGION',
   platesPlace: '', handle: '@qadantravels', showPlates: false,
   spottedRegion: '', spottedCountry: '', platesRegion: '', platesCountry: '',
-  titleColor: 'auto', format: '3:4', crop: {x: 0, y: 0, zoom: 1},
+  titleColor: 'auto', format: '3:4', crop: {x: 0, y: 0, zoom: 1}, endcardSlug: '',
   manualFlags: {spottedRegion: false, spottedCountry: false, platesRegion: false, platesCountry: false},
 };
 let state = structuredClone(initial);
 let photo = null, photoBlob = null, catalog = {countries: [], regions: []};
 let flagTarget = null, activeFlagCountry = 'all', selectedField = null, lastRender = null, drawing = false;
 let saveTimer = 0, toastTimer = 0, activeDrag = null;
+let endcards = [], endcardPreviewVersion = 0;
 const flagCache = new Map();
 
 function toast(message) {
@@ -41,11 +45,12 @@ function updateEnabled() {
   hitLayer.hidden = !has;
   $('downloadButton').disabled = !has;
   $('downloadButtonSide').disabled = !has;
+  $('coverOnlyButton').disabled = !has;
   $('zoomSlider').disabled = !has;
   $('resetCrop').disabled = !has;
   $('stagePhotoActions').hidden = !has;
   $('replacePhoto').textContent = has ? 'Replace photo' : 'Add photo';
-  $('shareButton').hidden = !has || !navigator.share;
+  $('shareButton').hidden = !has || (!appleMobile && !navigator.share);
 }
 function syncForm() {
   for (const [key, input] of Object.entries(fieldInputs)) input.value = state[key] || '';
@@ -55,6 +60,7 @@ function syncForm() {
   $('formatSelect').value = state.format;
   $('dimensionChip').textContent = `1080 × ${HEIGHTS[state.format]}`;
   stage.style.aspectRatio = `1080 / ${HEIGHTS[state.format]}`;
+  $('endcardPreview').style.aspectRatio = `1080 / ${HEIGHTS[state.format]}`;
   $('zoomSlider').value = Math.round(state.crop.zoom * 100);
   $('zoomValue').textContent = `${Math.round(state.crop.zoom * 100)}%`;
   for (const [key, el] of Object.entries(flagPreviews)) {
@@ -272,6 +278,8 @@ function clearDraft() {
   $('newCoverDialog').close();
   if (photo?.close) photo.close();
   photo = null; photoBlob = null; state = structuredClone(initial);
+  state.endcardSlug = randomEndcard(endcards)?.slug || '';
+  updateEndcardPreview();
   selectedField = null; closeQuickEdit(); syncForm(); updateEnabled(); render(); queueSave();
   window.scrollTo({top: 0, behavior: 'smooth'});
 }
@@ -330,7 +338,7 @@ function validateCover() {
   if (state.showPlates && !state.platesPlace.trim()) { selectField('platesPlace'); toast('Add the plate origin or turn that section off.'); return false; }
   return true;
 }
-function canvasBlob() { return new Promise(resolve => canvas.toBlob(resolve, 'image/png')); }
+function canvasBlob(target) { return new Promise(resolve => target.toBlob(resolve, 'image/png')); }
 async function waitForFlags() {
   const codes = [state.spottedRegion, state.spottedCountry];
   if (state.showPlates) codes.push(state.platesRegion, state.platesCountry);
@@ -344,25 +352,87 @@ async function waitForFlags() {
     if (!image.src) image.src = url;
   })));
 }
-async function exportImage(share = false) {
-  if (!validateCover()) return;
-  await document.fonts.ready;
-  await waitForFlags();
-  lastRender = renderCover(canvas, photo, state, flagCache, render);
-  const blob = await canvasBlob();
-  if (!blob) { toast('Could not create the PNG. Please try again.'); return; }
-  const base = `${state.eyebrow}-${state.title}`.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 45) || 'cover';
-  const file = new File([blob], `${base}-cover.png`, {type: 'image/png'});
-  if (share && navigator.canShare?.({files: [file]})) {
-    try { await navigator.share({files: [file], title: 'Carousel cover'}); return; }
-    catch (error) { if (error.name === 'AbortError') return; }
-  }
+function saveBlob(blob, name) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
-  link.href = url; link.download = file.name;
+  link.href = url; link.download = name;
   document.body.appendChild(link); link.click(); link.remove();
   setTimeout(() => URL.revokeObjectURL(url), 60000);
-  toast('PNG cover saved.');
+}
+function selectedEndcard() { return endcards.find(card => card.slug === state.endcardSlug); }
+function copyEndcardToDialog() {
+  const source = $('endcardPreview'), target = $('endcardLargePreview');
+  target.width = source.width; target.height = source.height;
+  target.getContext('2d').drawImage(source, 0, 0);
+  $('endcardDialogName').textContent = selectedEndcard()?.name || 'CarSpotter';
+}
+async function updateEndcardPreview() {
+  const card = selectedEndcard();
+  $('shuffleEndcard').disabled = endcards.length < 2;
+  $('endcardPreviewButton').disabled = true;
+  $('endcardName').textContent = card?.name || 'Cards unavailable';
+  if (!card) return;
+  const version = ++endcardPreviewVersion;
+  try {
+    const preview = document.createElement('canvas');
+    await renderEndcard(preview, card, state.format);
+    if (version !== endcardPreviewVersion) return;
+    const visible = $('endcardPreview');
+    visible.width = preview.width; visible.height = preview.height;
+    visible.getContext('2d').drawImage(preview, 0, 0);
+    visible.setAttribute('aria-label', `${card.name} CarSpotter endcard preview`);
+    $('endcardPreviewButton').disabled = false;
+    if ($('endcardDialog').open) copyEndcardToDialog();
+  } catch (error) {
+    console.error(error);
+    $('endcardName').textContent = 'Card preview unavailable';
+  }
+}
+function pickAnotherEndcard() {
+  const next = randomEndcard(endcards, state.endcardSlug);
+  if (!next) return;
+  state.endcardSlug = next.slug;
+  updateEndcardPreview(); queueSave();
+}
+async function exportImage(mode = 'pair') {
+  if (!validateCover()) return;
+  const card = selectedEndcard();
+  if (mode !== 'cover' && !card) { toast('Endcards are unavailable. Reload the page or download the cover only.'); return; }
+  setBusy(true, 'Preparing your slides…');
+  try {
+    await document.fonts.ready;
+    await waitForFlags();
+    lastRender = renderCover(canvas, photo, state, flagCache, render);
+    const coverBlob = await canvasBlob(canvas);
+    if (!coverBlob) throw new Error('Could not create the cover PNG');
+    const base = `${state.eyebrow}-${state.title}`.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 45) || 'cover';
+    if (mode === 'cover') {
+      saveBlob(coverBlob, `${base}-cover.png`);
+      toast('Cover PNG saved.');
+      return;
+    }
+    const endcardCanvas = document.createElement('canvas');
+    await renderEndcard(endcardCanvas, card, state.format);
+    const endcardBlob = await canvasBlob(endcardCanvas);
+    if (!endcardBlob) throw new Error('Could not create the endcard PNG');
+    const files = [
+      new File([coverBlob], `01-${base}-cover.png`, {type: 'image/png'}),
+      new File([endcardBlob], `02-carspotter-${card.slug}-endcard.png`, {type: 'image/png'}),
+    ];
+    if (mode === 'share' && navigator.canShare?.({files})) {
+      setBusy(false);
+      try { await navigator.share({files}); return; }
+      catch (error) { if (error.name === 'AbortError') return; }
+    }
+    const archive = await zipFiles(files);
+    saveBlob(archive, `${base}-carousel.zip`);
+    toast(mode === 'share' ? 'Saving to Photos is unavailable here. Downloaded both slides as a ZIP.' : 'Two slides saved in one ZIP.');
+  } catch (error) {
+    console.error(error);
+    toast('Could not export the slides. Please try again.');
+  } finally {
+    setBusy(false);
+  }
 }
 
 for (const [field, input] of Object.entries(fieldInputs)) input.addEventListener('input', () => updateField(field, input.value));
@@ -375,7 +445,7 @@ $('confirmNewCover').addEventListener('click', clearDraft);
 photoInput.addEventListener('change', () => usePhoto(photoInput.files[0]));
 $('platesToggle').addEventListener('change', event => { state.showPlates = event.target.checked; $('platesFields').hidden = !state.showPlates; render(); queueSave(); if (state.showPlates) $('platesInput').focus(); });
 $('titleColor').addEventListener('change', event => { state.titleColor = event.target.value; render(); queueSave(); });
-$('formatSelect').addEventListener('change', event => { state.format = event.target.value; syncForm(); render(); queueSave(); });
+$('formatSelect').addEventListener('change', event => { state.format = event.target.value; syncForm(); render(); updateEndcardPreview(); queueSave(); });
 $('zoomSlider').addEventListener('input', event => { state.crop.zoom = Number(event.target.value) / 100; $('zoomValue').textContent = event.target.value + '%'; render(); queueSave(); });
 $('resetCrop').addEventListener('click', () => { state.crop = {x: 0, y: 0, zoom: 1}; syncForm(); render(); queueSave(); });
 $('quickEditInput').addEventListener('input', event => { if (selectedField) updateField(selectedField, event.target.value, 'quick'); });
@@ -385,9 +455,14 @@ $('flagSearch').addEventListener('input', showFlagResults);
 for (const button of $('flagRegionFilters').querySelectorAll('button')) button.addEventListener('click', () => { activeFlagCountry = button.dataset.countryFilter; showFlagResults(); });
 $('clearFlag').addEventListener('click', () => { state[flagTarget] = ''; state.manualFlags[flagTarget] = true; syncFlagPreviews(); render(); queueSave(); $('flagDialog').close(); });
 $('closeFlagDialog').addEventListener('click', () => $('flagDialog').close());
-$('downloadButton').addEventListener('click', () => exportImage(false));
-$('downloadButtonSide').addEventListener('click', () => exportImage(false));
-$('shareButton').addEventListener('click', () => exportImage(true));
+$('downloadButton').addEventListener('click', () => exportImage(appleMobile ? 'share' : 'pair'));
+$('downloadButtonSide').addEventListener('click', () => exportImage(appleMobile ? 'share' : 'pair'));
+$('shareButton').addEventListener('click', () => exportImage(appleMobile ? 'pair' : 'share'));
+$('coverOnlyButton').addEventListener('click', () => exportImage('cover'));
+$('shuffleEndcard').addEventListener('click', pickAnotherEndcard);
+$('shuffleEndcardDialog').addEventListener('click', pickAnotherEndcard);
+$('endcardPreviewButton').addEventListener('click', () => { copyEndcardToDialog(); $('endcardDialog').showModal(); });
+$('closeEndcardDialog').addEventListener('click', () => $('endcardDialog').close());
 canvas.addEventListener('pointerdown', onDragStart);
 canvas.addEventListener('pointermove', onDragMove);
 canvas.addEventListener('pointerup', onDragEnd);
@@ -402,11 +477,21 @@ document.addEventListener('paste', event => {
 });
 
 async function start() {
+  if (appleMobile) {
+    $('downloadButton').textContent = 'Save to Photos';
+    $('downloadButtonSide').textContent = 'Save both to Photos';
+    $('shareButton').textContent = 'Download ZIP instead';
+    $('endcardFootnote').textContent = 'Opens the iOS share sheet with both images. Tap “Save 2 Images” to add them to Photos.';
+  }
   updateEnabled(); syncForm();
   try { catalog = await (await fetch('assets/regions.json')).json(); }
   catch (error) { toast('Flag list could not load. Other editing still works.'); }
+  try { endcards = await loadEndcards(); }
+  catch (error) { console.error(error); toast('CarSpotter endcards could not load. Cover-only export is available.'); }
   await document.fonts.ready;
   await restoreDraft();
+  if (!selectedEndcard()) state.endcardSlug = randomEndcard(endcards)?.slug || '';
+  updateEndcardPreview();
   render();
 }
 start();

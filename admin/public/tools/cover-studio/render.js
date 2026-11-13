@@ -103,6 +103,7 @@ function drawTitleText(ctx, text, x, y, size, fill, dark) {
   ctx.save();
   ctx.font = `800 ${size}px Barlow`;
   ctx.textBaseline = 'top';
+  ctx.textAlign = 'center';
   ctx.lineJoin = 'round';
   ctx.shadowColor = dark ? 'rgba(0,0,0,.76)' : 'rgba(0,0,0,.52)';
   ctx.shadowBlur = 14;
@@ -235,7 +236,7 @@ export function renderCover(canvas, photo, state, flagCache, redraw) {
   ctx.fillRect(0, footerY, COVER_WIDTH, h - footerY);
 
   drawSmall(ctx, state.eyebrow || 'MAKE', 65, 51, 43, 920, treatment.name === 'ink' ? '#182019' : '#f8f3e7', 700);
-  title.lines.forEach((line, i) => drawTitleText(ctx, line, 62, titleY + i * lineH, title.size, treatment.fill, treatment.name !== 'ink'));
+  title.lines.forEach((line, i) => drawTitleText(ctx, line, COVER_WIDTH / 2, titleY + i * lineH, title.size, treatment.fill, treatment.name !== 'ink'));
   let subtitleZone = null;
   if (state.subtitle && state.subtitle.trim()) {
     const sy = titleY + titleH + 9;

@@ -22,7 +22,7 @@
       <div class="header-spacer"></div>
       <span class="save-status" id="saveStatus">Ready</span>
       <button class="button button-quiet header-photo" id="replacePhoto" type="button">Add photo</button>
-      <button class="button button-primary" id="downloadButton" type="button" disabled>Save cover</button>
+      <button class="button button-primary" id="downloadButton" type="button" disabled>Save 2 slides</button>
     </header>
 
     <main class="workspace">
@@ -74,6 +74,15 @@
 
           <div class="input-group handle-group"><label for="handleInput">Signature</label><input id="handleInput" data-field="handle" type="text" maxlength="32" value="@qadantravels" autocomplete="off"></div>
 
+          <section class="endcard-section" aria-labelledby="endcardHeading">
+            <div class="endcard-heading"><div><h3 id="endcardHeading">Your final slide</h3><p>One of 11 CarSpotter cards is picked for this cover.</p></div><span>02 / 02</span></div>
+            <div class="endcard-choice">
+              <button type="button" class="endcard-preview-trigger" id="endcardPreviewButton" aria-label="View the selected endcard larger" disabled><canvas id="endcardPreview" width="1080" height="1440" aria-hidden="true"></canvas></button>
+              <div class="endcard-copy"><strong id="endcardName">Loading cards…</strong><small>CarSpotter × @qadantravels</small><button type="button" class="button button-quiet" id="shuffleEndcard" disabled>Pick another</button></div>
+            </div>
+            <p class="endcard-footnote" id="endcardFootnote">The cover and final slide export at the same size, ready to order in a carousel.</p>
+          </section>
+
           <details class="advanced"><summary>Style & export <span aria-hidden="true">⌄</span></summary>
             <div class="advanced-content">
               <div class="input-group"><label for="titleColor">Title color</label><select id="titleColor"><option value="auto">Auto · photo aware</option><option value="cream">Warm cream</option><option value="white">White</option><option value="ink">Dark ink</option></select></div>
@@ -82,7 +91,7 @@
             </div>
           </details>
         </div>
-        <div class="inspector-actions"><button class="button button-primary full-width" id="downloadButtonSide" type="button" disabled>Save PNG cover</button><button class="button button-quiet full-width" id="shareButton" type="button" hidden>Share image</button></div>
+        <div class="inspector-actions"><button class="button button-primary full-width" id="downloadButtonSide" type="button" disabled>Download 2-slide pack</button><button class="button button-quiet full-width" id="shareButton" type="button" hidden>Share both images</button><button class="text-button cover-only" id="coverOnlyButton" type="button" disabled>Download cover only</button></div>
       </aside>
     </main>
   </div>
@@ -90,7 +99,8 @@
   <div class="quick-edit" id="quickEdit" hidden><label id="quickEditLabel" for="quickEditInput">Edit text</label><div><input id="quickEditInput" type="text" autocomplete="off"><button id="quickEditDone" type="button">Done</button></div></div>
 
   <dialog class="flag-dialog" id="flagDialog" aria-labelledby="flagDialogTitle"><div class="dialog-head"><div><h2 id="flagDialogTitle">Choose a flag</h2><p id="flagDialogHint">Search countries and regions</p></div><button class="icon-button" id="closeFlagDialog" type="button" aria-label="Close flag picker">×</button></div><input id="flagSearch" type="search" placeholder="Search by name" aria-label="Search flags"><div class="flag-region-filters" id="flagRegionFilters" aria-label="Filter regions by country" hidden><button type="button" data-country-filter="all" aria-pressed="true">All</button><button type="button" data-country-filter="US" aria-pressed="false">U.S.</button><button type="button" data-country-filter="CA" aria-pressed="false">Canada</button><button type="button" data-country-filter="MX" aria-pressed="false">Mexico</button></div><p class="flag-count" id="flagCount"></p><div class="flag-results" id="flagResults"></div><button class="text-button clear-flag" id="clearFlag" type="button">Remove this flag</button></dialog>
-  <dialog class="confirm-dialog" id="newCoverDialog" aria-labelledby="newCoverTitle"><h2 id="newCoverTitle">Start a new cover?</h2><p>This replaces the draft saved in this browser. Save a PNG first if you want to keep the current cover.</p><div class="confirm-actions"><button class="button button-quiet" id="cancelNewCover" type="button">Keep editing</button><button class="button button-primary" id="confirmNewCover" type="button">Start new cover</button></div></dialog>
+  <dialog class="endcard-dialog" id="endcardDialog" aria-labelledby="endcardDialogTitle"><div class="endcard-dialog-head"><div><h2 id="endcardDialogTitle">Final slide</h2><p id="endcardDialogName">CarSpotter</p></div><button class="icon-button" id="closeEndcardDialog" type="button" aria-label="Close endcard preview">×</button></div><canvas id="endcardLargePreview" width="1080" height="1440" role="img" aria-label="Full-size endcard preview"></canvas><button type="button" class="button button-quiet full-width" id="shuffleEndcardDialog">Pick another card</button></dialog>
+  <dialog class="confirm-dialog" id="newCoverDialog" aria-labelledby="newCoverTitle"><h2 id="newCoverTitle">Start a new cover?</h2><p>This replaces the draft saved in this browser. Download your current slides first if you want to keep them.</p><div class="confirm-actions"><button class="button button-quiet" id="cancelNewCover" type="button">Keep editing</button><button class="button button-primary" id="confirmNewCover" type="button">Start new cover</button></div></dialog>
 
   <input id="photoInput" type="file" accept="image/*,.heic,.heif" hidden>
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>

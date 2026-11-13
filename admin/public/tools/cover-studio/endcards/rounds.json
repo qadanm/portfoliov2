@@ -1,0 +1,200 @@
+[
+  {
+    "slug": "01-daewoo-lanos",
+    "name": "Daewoo Lanos",
+    "crop": [
+      590,
+      510,
+      430,
+      258
+    ],
+    "choices": [
+      "Hyundai Accent",
+      "Daewoo Lanos",
+      "Kia Sephia",
+      "Ford Aspire"
+    ],
+    "caption": "Those oval headlamps.",
+    "credit": "IFCAR"
+  },
+  {
+    "slug": "02-geo-storm",
+    "name": "Geo Storm",
+    "crop": [
+      450,
+      730,
+      600,
+      360
+    ],
+    "choices": [
+      "Nissan NX",
+      "Toyota Paseo",
+      "Geo Storm",
+      "Ford Probe"
+    ],
+    "caption": "Those sleepy headlamps.",
+    "credit": "IFCAR"
+  },
+  {
+    "slug": "03-saab-900",
+    "name": "Saab 900",
+    "crop": [
+      1450,
+      740,
+      480,
+      288
+    ],
+    "choices": [
+      "Volvo 240",
+      "Saab 900",
+      "Audi 80",
+      "BMW 3 Series"
+    ],
+    "caption": "That amber corner lamp.",
+    "credit": "IFCAR"
+  },
+  {
+    "slug": "04-isuzu-vehicross",
+    "name": "Isuzu VehiCROSS",
+    "crop": [
+      780,
+      760,
+      600,
+      360
+    ],
+    "choices": [
+      "Toyota RAV4",
+      "Isuzu VehiCROSS",
+      "Honda HR-V",
+      "Suzuki Vitara"
+    ],
+    "caption": "The riveted wheel-arch cladding.",
+    "credit": "IFCAR"
+  },
+  {
+    "slug": "05-subaru-svx",
+    "name": "Subaru SVX",
+    "crop": [
+      800,
+      50,
+      300,
+      180
+    ],
+    "choices": [
+      "Nissan 300ZX",
+      "Toyota Soarer",
+      "Ford Probe",
+      "Subaru SVX"
+    ],
+    "caption": "A window within a window.",
+    "credit": "IFCAR"
+  },
+  {
+    "slug": "06-pontiac-aztek",
+    "name": "Pontiac Aztek",
+    "crop": [
+      180,
+      140,
+      300,
+      180
+    ],
+    "choices": [
+      "Pontiac Aztek",
+      "Buick Rendezvous",
+      "Isuzu Axiom",
+      "Honda Element"
+    ],
+    "caption": "That triangular rear lamp.",
+    "credit": "IFCAR"
+  },
+  {
+    "slug": "07-amc-pacer",
+    "name": "AMC Pacer",
+    "crop": [
+      85,
+      250,
+      310,
+      186
+    ],
+    "choices": [
+      "AMC Gremlin",
+      "Ford Pinto",
+      "AMC Pacer",
+      "Chevrolet Chevette"
+    ],
+    "caption": "All that wraparound glass.",
+    "credit": "Christopher Ziemnowicz"
+  },
+  {
+    "slug": "08-suzuki-x90",
+    "name": "Suzuki X-90",
+    "crop": [
+      875,
+      405,
+      290,
+      174
+    ],
+    "choices": [
+      "Honda del Sol",
+      "Suzuki X-90",
+      "Toyota MR2",
+      "Daihatsu Rocky"
+    ],
+    "caption": "Those little rear lamps.",
+    "credit": "Retired electrician"
+  },
+  {
+    "slug": "09-merkur-xr4ti",
+    "name": "Merkur XR4Ti",
+    "crop": [
+      850,
+      150,
+      650,
+      390
+    ],
+    "choices": [
+      "Saab 900",
+      "Nissan 200SX",
+      "Merkur XR4Ti",
+      "Volvo 480"
+    ],
+    "caption": "The extra quarter window.",
+    "credit": "IFCAR"
+  },
+  {
+    "slug": "10-plymouth-prowler",
+    "name": "Prowler",
+    "crop": [
+      535,
+      425,
+      345,
+      207
+    ],
+    "choices": [
+      "Chevrolet SSR",
+      "Ford Thunderbird",
+      "Chrysler Crossfire",
+      "Prowler"
+    ],
+    "caption": "Those separate front fenders.",
+    "credit": "IFCAR"
+  },
+  {
+    "slug": "11-saturn-sw",
+    "name": "Saturn SW",
+    "crop": [
+      285,
+      488,
+      365,
+      219
+    ],
+    "choices": [
+      "Volvo V70",
+      "Ford Escort",
+      "Saturn SW",
+      "Subaru Legacy"
+    ],
+    "caption": "The S-Series wagon.",
+    "credit": "IFCAR"
+  }
+]

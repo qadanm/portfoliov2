@@ -5,7 +5,7 @@ The private tools center at `admin.qadan.co`. This directory remains named `admi
 ## Included
 
 - A mobile-first tools home at `/`.
-- Cover Studio at `/tools/cover-studio/index.html`: choose any JPEG, PNG, WebP, or HEIC photo; tap cover text to edit; auto-adjust contrast; add location and plate flags; export a 1080-pixel-wide PNG.
+- Cover Studio at `/tools/cover-studio/index.html`: choose any JPEG, PNG, WebP, or HEIC photo; tap cover text to edit; auto-adjust contrast; add location and plate flags; export the cover with one of 11 branded CarSpotter endcards. Both slides are 1080 pixels wide and share the selected ratio. The endcard is randomly selected per draft and can be changed before export.
 
 Cover Studio runs entirely in the browser. Its current draft and photo are stored in IndexedDB on each device. No image is uploaded or synced. The same tool is available from any location where `admin.qadan.co` can be reached and the owner can sign in through Cloudflare Access.
 
@@ -13,7 +13,7 @@ Cover Studio runs entirely in the browser. Its current draft and photo are store
 
 The center and Cover Studio each have their own web app manifest, stable app ID, 180/192/512-pixel icons, and standalone display mode. Open the desired page in iPhone or iPad Safari, use **Share → Add to Home Screen**, and leave **Open as Web App** enabled. The icons launch the center or Cover Studio directly. Each future tool can follow the same manifest and icon pattern under its own path.
 
-Home Screen web apps can have separate browser storage from Safari, so a draft created in one installation should not be treated as a synced backup. Export the PNG to keep the finished cover.
+Home Screen web apps can have separate browser storage from Safari, so a draft created in one installation should not be treated as a synced backup. Export the finished slides to keep them. On iPhone and iPad, the primary export opens the iOS share sheet with both PNGs; choose **Save 2 Images** to put them in Photos. Other browsers download a ZIP containing numbered PNGs. Cover-only download remains available.
 
 ## Existing infrastructure
 
@@ -41,6 +41,6 @@ From the repo root, `npm run tools` starts the local app. Cloudflare Pages build
 
 - `https://admin.qadan.co/` should require Cloudflare Access without a valid session.
 - `https://qadan-admin.pages.dev/` should redirect to `https://admin.qadan.co/`.
-- Cover Studio should load at `/tools/cover-studio/index.html` and export a PNG from a selected photo.
+- Cover Studio should load at `/tools/cover-studio/index.html` and export two same-size PNGs from a selected photo, with a different CarSpotter endcard available from **Pick another**.
 
 The source files for the bundled font, flags, and HEIC decoder have their license texts in `public/tools/cover-studio/licenses/`.
