@@ -37,9 +37,13 @@ Case studies live in `src/content` as MDX and are typed by `src/content/config.t
 
 The `admin/` directory is the private [Qadan Tools](./admin/README.md) app. The folder name is retained because the existing Cloudflare Pages project builds from that subdirectory. It is separate from the public portfolio.
 
+For agent handoff, start with [AGENTS.md](./AGENTS.md); the tools app has its own [agent guide](./admin/AGENTS.md) and [roadmap](./admin/ROADMAP.md).
+
 ## Deployment
 
 A push to `main` builds the site and deploys it to GitHub Pages through `.github/workflows/deploy.yml`. The workflow requires `PUBLIC_WEB3FORMS_KEY` as a repository secret.
+
+`.github/workflows/ci.yml` builds both the portfolio and Qadan Tools on pull requests and on `main`. The tools app deploys separately through Cloudflare Pages; its [deployment guide](./admin/README.md#build-and-deployment) records the required settings and checks.
 
 ## Licensing
 
