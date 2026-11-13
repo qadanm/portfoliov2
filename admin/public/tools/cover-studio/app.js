@@ -1,4 +1,4 @@
-import {renderCover, COVER_WIDTH, HEIGHTS} from './render.js?v=5';
+import {renderCover, COVER_WIDTH, HEIGHTS} from './render.js?v=6';
 import {loadEndcards, randomEndcard, renderEndcard} from './endcards.js?v=3';
 import {zipFiles} from './zip.js?v=3';
 import {startUpdateChecks} from '../../update-check.js?v=3';

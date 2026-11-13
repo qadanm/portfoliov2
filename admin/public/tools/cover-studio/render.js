@@ -158,7 +158,7 @@ function drawFooterPlace(ctx, raw, x, y, maxWidth) {
   return layout.lines.length;
 }
 function drawFlag(ctx, code, x, y, cache, redraw) {
-  if (!code) return false;
+  if (!code) return 0;
   const url = code.includes('-') ? `assets/flags/region/${code}.png` : `assets/flags/country/${code.toLowerCase()}.svg`;
   let img = cache.get(url);
   if (!img) {
@@ -168,20 +168,23 @@ function drawFlag(ctx, code, x, y, cache, redraw) {
     img.onerror = redraw;
     img.src = url;
   }
-  if (!img.complete || !img.naturalWidth) return false;
-  const fw = 62, fh = 40;
-  ctx.save();
-  ctx.shadowColor = 'rgba(0,0,0,.42)';
-  ctx.shadowBlur = 6;
-  ctx.shadowOffsetY = 2;
-  ctx.fillStyle = '#fff';
-  ctx.fillRect(x - 3, y - 3, fw + 6, fh + 6);
-  ctx.shadowColor = 'transparent';
+  if (!img.complete || !img.naturalWidth) return 0;
   const ratio = img.naturalWidth / img.naturalHeight;
-  const iw = Math.min(fw, fh * ratio), ih = Math.min(fh, fw / ratio);
-  ctx.drawImage(img, x + (fw - iw) / 2, y + (fh - ih) / 2, iw, ih);
+  const height = 60;
+  const width = Math.min(106, Math.round(height * ratio));
+  const drawnHeight = Math.round(width / ratio);
+  const top = y + (height - drawnHeight) / 2;
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,.58)';
+  ctx.shadowBlur = 10;
+  ctx.shadowOffsetY = 3;
+  ctx.drawImage(img, x, top, width, drawnHeight);
+  ctx.shadowColor = 'transparent';
+  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = 'rgba(8,11,9,.78)';
+  ctx.strokeRect(x + 0.75, top + 0.75, width - 1.5, drawnHeight - 1.5);
   ctx.restore();
-  return true;
+  return width;
 }
 export function renderCover(canvas, photo, state, flagCache, redraw) {
   const h = HEIGHTS[state.format] || 1440;
@@ -216,13 +219,14 @@ export function renderCover(canvas, photo, state, flagCache, redraw) {
     subtitleZone = {x: subtitleRight - subtitleWidth - 8, y: sy - 5, w: subtitleWidth + 16, h: 70};
   }
 
-  const labelY = h - 203, placeY = h - 164, flagsY = h - 104;
+  const labelY = h - 203, placeY = h - 164, flagsY = h - 105;
   const columnW = state.showPlates ? 490 : 940;
   drawSmall(ctx, 'SPOTTED IN', 48, labelY, 34, columnW, '#fffaf2', 800, false, true);
   const spottedLines = drawFooterPlace(ctx, state.spottedPlace || 'CITY, REGION', 48, placeY, columnW);
   let fx = 51;
   for (const code of [state.spottedRegion, state.spottedCountry]) {
-    if (drawFlag(ctx, code, fx, spottedLines > 1 ? h - 84 : flagsY, flagCache, redraw)) fx += 77;
+    const width = drawFlag(ctx, code, fx, spottedLines > 1 ? h - 72 : flagsY, flagCache, redraw);
+    if (width) fx += width + 13;
   }
   if (state.showPlates) {
     ctx.fillStyle = 'rgba(255,255,255,.21)';
@@ -231,7 +235,8 @@ export function renderCover(canvas, photo, state, flagCache, redraw) {
     const plateLines = drawFooterPlace(ctx, state.platesPlace || 'REGION, COUNTRY', 565, placeY, 465);
     let px = 568;
     for (const code of [state.platesRegion, state.platesCountry]) {
-      if (drawFlag(ctx, code, px, plateLines > 1 ? h - 84 : flagsY, flagCache, redraw)) px += 77;
+      const width = drawFlag(ctx, code, px, plateLines > 1 ? h - 72 : flagsY, flagCache, redraw);
+      if (width) px += width + 13;
     }
   }
   ctx.font = '700 30px Barlow';
