@@ -21,6 +21,7 @@ Home Screen web apps can have separate browser storage from Safari, so a draft c
 - Custom domain: `admin.qadan.co`, protected by Cloudflare Access.
 - `public/_worker.js` redirects the production and preview `qadan-admin.pages.dev` hostnames to the Access-protected custom domain before serving content. It serves assets on the custom domain through `env.ASSETS`.
 - The Worker sends `Cache-Control: private, no-store` for HTML, CSS, JavaScript, JSON, and manifests. Cover Studio versions its stylesheet and entry module URLs so a phone does not pair a new interface with cached old code during a release.
+- Each Pages build writes its commit SHA to `version.json` and stamps it into both Home Screen app pages. The shared `update-check.js` checks on load, when the app returns to the foreground, when connectivity returns, and every five minutes while open. A newer build reloads at a fresh URL. Cover Studio saves its IndexedDB draft first and postpones the reload if that save fails. No Home Screen reinstall is needed for page and tool updates.
 - `public/_headers` sets no-index and browser security headers.
 
 The retired job suite's Pages Functions and KV binding have been removed from this app. Any old data in the former KV namespace is no longer read or written by the new site.

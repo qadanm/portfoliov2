@@ -1,6 +1,7 @@
-import {renderCover, COVER_WIDTH, HEIGHTS} from './render.js?v=2';
-import {loadEndcards, randomEndcard, renderEndcard} from './endcards.js?v=2';
-import {zipFiles} from './zip.js?v=2';
+import {renderCover, COVER_WIDTH, HEIGHTS} from './render.js?v=3';
+import {loadEndcards, randomEndcard, renderEndcard} from './endcards.js?v=3';
+import {zipFiles} from './zip.js?v=3';
+import {startUpdateChecks} from '../../update-check.js?v=3';
 
 const $ = id => document.getElementById(id);
 const appleMobile = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -301,7 +302,8 @@ async function saveDraft() {
     });
     db.close();
     $('saveStatus').textContent = 'Saved on this device';
-  } catch (error) { $('saveStatus').textContent = 'Session only'; }
+    return true;
+  } catch (error) { $('saveStatus').textContent = 'Session only'; return false; }
 }
 function queueSave() {
   $('saveStatus').textContent = 'Saving…';
@@ -493,5 +495,13 @@ async function start() {
   if (!selectedEndcard()) state.endcardSlug = randomEndcard(endcards)?.slug || '';
   updateEndcardPreview();
   render();
+  startUpdateChecks(async () => {
+    if (activeDrag || !$('quickEdit').hidden || document.activeElement?.matches('input, textarea, select')) return false;
+    clearTimeout(saveTimer);
+    $('saveStatus').textContent = 'Updating…';
+    const saved = await saveDraft();
+    if (!saved) toast('An update is ready. Save your images and reopen the app to get it.');
+    return saved;
+  });
 }
 start();
