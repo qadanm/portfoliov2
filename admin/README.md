@@ -20,6 +20,7 @@ Home Screen web apps can have separate browser storage from Safari, so a draft c
 - Cloudflare Pages project: `qadan-admin`, built from this `admin/` directory with output `dist/`.
 - Custom domain: `admin.qadan.co`, protected by Cloudflare Access.
 - `public/_worker.js` redirects the production and preview `qadan-admin.pages.dev` hostnames to the Access-protected custom domain before serving content. It serves assets on the custom domain through `env.ASSETS`.
+- The Worker sends `Cache-Control: private, no-store` for HTML, CSS, JavaScript, JSON, and manifests. Cover Studio versions its stylesheet and entry module URLs so a phone does not pair a new interface with cached old code during a release.
 - `public/_headers` sets no-index and browser security headers.
 
 The retired job suite's Pages Functions and KV binding have been removed from this app. Any old data in the former KV namespace is no longer read or written by the new site.

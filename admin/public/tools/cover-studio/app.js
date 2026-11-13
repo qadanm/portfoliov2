@@ -1,6 +1,6 @@
-import {renderCover, COVER_WIDTH, HEIGHTS} from './render.js';
-import {loadEndcards, randomEndcard, renderEndcard} from './endcards.js';
-import {zipFiles} from './zip.js';
+import {renderCover, COVER_WIDTH, HEIGHTS} from './render.js?v=2';
+import {loadEndcards, randomEndcard, renderEndcard} from './endcards.js?v=2';
+import {zipFiles} from './zip.js?v=2';
 
 const $ = id => document.getElementById(id);
 const appleMobile = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);

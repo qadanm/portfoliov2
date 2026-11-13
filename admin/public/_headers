@@ -1,5 +1,6 @@
 # The custom domain is gated by Cloudflare Access. The Pages Worker redirects
-# pages.dev hostnames to that domain before static content is served.
+# pages.dev hostnames to that domain before static content is served. The Worker
+# also sets no-store on HTML, CSS, and JS so an updated editor stays in sync.
 /*
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
