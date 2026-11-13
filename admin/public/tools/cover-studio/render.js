@@ -100,12 +100,12 @@ function drawTitleText(ctx, text, x, y, size, fill, lightText) {
   ctx.fillText(text, x, y);
   ctx.restore();
 }
-function drawSmall(ctx, text, x, y, size, maxWidth, color = '#fffaf0', weight = 700, darkText = false) {
+function drawSmall(ctx, text, x, y, size, maxWidth, color = '#fffaf0', weight = 700, darkText = false, strong = false, align = 'left') {
   const value = (text || '').trim().toUpperCase();
   let s = size;
   ctx.save();
   ctx.textBaseline = 'top';
-  ctx.textAlign = 'left';
+  ctx.textAlign = align;
   while (s > 25) {
     ctx.font = `${weight} ${s}px Barlow`;
     if (ctx.measureText(value).width <= maxWidth) break;
@@ -113,12 +113,12 @@ function drawSmall(ctx, text, x, y, size, maxWidth, color = '#fffaf0', weight = 
   }
   ctx.font = `${weight} ${s}px Barlow`;
   ctx.lineJoin = 'round';
-  ctx.lineWidth = s >= 40 ? 3 : 2.5;
+  ctx.lineWidth = strong ? (s >= 40 ? 6 : 5) : (s >= 40 ? 3 : 2.5);
   ctx.strokeStyle = darkText ? 'rgba(246,240,222,.95)' : 'rgba(8,11,9,.95)';
-  ctx.shadowColor = 'rgba(0,0,0,.5)';
-  ctx.shadowBlur = 6;
-  ctx.shadowOffsetX = 1;
-  ctx.shadowOffsetY = 2;
+  ctx.shadowColor = strong ? 'rgba(0,0,0,.8)' : 'rgba(0,0,0,.5)';
+  ctx.shadowBlur = strong ? 11 : 6;
+  ctx.shadowOffsetX = strong ? 2 : 1;
+  ctx.shadowOffsetY = strong ? 3 : 2;
   ctx.strokeText(value, x, y, maxWidth);
   ctx.shadowColor = 'transparent';
   ctx.fillStyle = color;
@@ -129,8 +129,8 @@ function drawSmall(ctx, text, x, y, size, maxWidth, color = '#fffaf0', weight = 
 function footerLayout(ctx, raw, maxWidth) {
   const text = (raw || 'CITY, REGION').trim().toUpperCase();
   let fallback = [];
-  for (let size = 42; size >= 24; size--) {
-    ctx.font = `700 ${size}px Barlow`;
+  for (let size = 44; size >= 24; size--) {
+    ctx.font = `800 ${size}px Barlow`;
     const lines = [];
     let line = '';
     for (const word of text.split(/\s+/)) {
@@ -147,14 +147,14 @@ function footerLayout(ctx, raw, maxWidth) {
     fallback = lines;
   }
   const lines = [fallback[0], fallback.slice(1).join(' ')];
-  ctx.font = '700 24px Barlow';
+  ctx.font = '800 24px Barlow';
   while (lines[1] && ctx.measureText(lines[1] + '…').width > maxWidth) lines[1] = lines[1].slice(0, -1);
   lines[1] += '…';
   return {lines, size: 24};
 }
 function drawFooterPlace(ctx, raw, x, y, maxWidth) {
   const layout = footerLayout(ctx, raw, maxWidth);
-  layout.lines.forEach((line, index) => drawSmall(ctx, line, x, y + index * (layout.size * 0.82), layout.size, maxWidth, '#fffaf2', 700));
+  layout.lines.forEach((line, index) => drawSmall(ctx, line, x, y + index * (layout.size * 0.82), layout.size, maxWidth, '#fffaf2', 800, false, true));
   return layout.lines.length;
 }
 function drawFlag(ctx, code, x, y, cache, redraw) {
@@ -197,7 +197,7 @@ export function renderCover(canvas, photo, state, flagCache, redraw) {
   ctx.font = `800 ${title.size}px Barlow`;
   const bottomLine = title.lines[title.lines.length - 1];
   const bottomWidth = ctx.measureText(bottomLine).width;
-  const subtitleX = (COVER_WIDTH - bottomWidth) / 2;
+  const subtitleRight = (COVER_WIDTH + bottomWidth) / 2;
   const titlePixels = samplePhoto(ctx, title.lines.map((line, index) => {
     const width = ctx.measureText(line).width;
     return {x: (COVER_WIDTH - width) / 2, y: titleY + index * lineH, w: width, h: title.size * 0.72};
@@ -209,13 +209,16 @@ export function renderCover(canvas, photo, state, flagCache, redraw) {
   let subtitleZone = null;
   if (state.subtitle && state.subtitle.trim()) {
     const sy = titleY + titleH + 9;
-    drawSmall(ctx, state.subtitle, subtitleX, sy, 52, Math.max(1, bottomWidth - 5), treatment.name === 'ink' ? '#182019' : '#f6e2af', 700, treatment.name === 'ink');
-    subtitleZone = {x: subtitleX - 8, y: sy - 5, w: bottomWidth + 16, h: 70};
+    const subtitleMaxWidth = Math.max(1, bottomWidth - 5);
+    const subtitleSize = drawSmall(ctx, state.subtitle, subtitleRight, sy, 52, subtitleMaxWidth, treatment.name === 'ink' ? '#182019' : '#f6e2af', 700, treatment.name === 'ink', false, 'right');
+    ctx.font = `700 ${subtitleSize}px Barlow`;
+    const subtitleWidth = Math.min(ctx.measureText(state.subtitle.trim().toUpperCase()).width, subtitleMaxWidth);
+    subtitleZone = {x: subtitleRight - subtitleWidth - 8, y: sy - 5, w: subtitleWidth + 16, h: 70};
   }
 
   const labelY = h - 203, placeY = h - 164, flagsY = h - 104;
   const columnW = state.showPlates ? 490 : 940;
-  drawSmall(ctx, 'SPOTTED IN', 48, labelY, 30, columnW, '#f5f1e8', 600);
+  drawSmall(ctx, 'SPOTTED IN', 48, labelY, 34, columnW, '#fffaf2', 800, false, true);
   const spottedLines = drawFooterPlace(ctx, state.spottedPlace || 'CITY, REGION', 48, placeY, columnW);
   let fx = 51;
   for (const code of [state.spottedRegion, state.spottedCountry]) {
@@ -224,7 +227,7 @@ export function renderCover(canvas, photo, state, flagCache, redraw) {
   if (state.showPlates) {
     ctx.fillStyle = 'rgba(255,255,255,.21)';
     ctx.fillRect(535, labelY, 1, 147);
-    drawSmall(ctx, 'PLATES FROM', 565, labelY, 30, 468, '#f5f1e8', 600);
+    drawSmall(ctx, 'PLATES FROM', 565, labelY, 34, 468, '#fffaf2', 800, false, true);
     const plateLines = drawFooterPlace(ctx, state.platesPlace || 'REGION, COUNTRY', 565, placeY, 465);
     let px = 568;
     for (const code of [state.platesRegion, state.platesCountry]) {
