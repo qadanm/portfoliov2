@@ -21,6 +21,15 @@ function ratio(a, b) {
   return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
 }
 function rgba(rgb, a) { return `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${a})`; }
+function roundedRect(ctx, x, y, width, height, radius) {
+  const r = Math.min(radius, width / 2, height / 2);
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + width, y, x + width, y + height, r);
+  ctx.arcTo(x + width, y + height, x, y + height, r);
+  ctx.arcTo(x, y + height, x, y, r);
+  ctx.arcTo(x, y, x + width, y, r);
+  ctx.closePath();
+}
 function samplePhoto(ctx, boxes) {
   const pixels = [];
   for (const box of boxes) {
@@ -100,7 +109,7 @@ function drawTitleText(ctx, text, x, y, size, fill, lightText) {
   ctx.fillText(text, x, y);
   ctx.restore();
 }
-function drawSmall(ctx, text, x, y, size, maxWidth, color = '#fffaf0', weight = 700, darkText = false, strong = false, align = 'left') {
+function drawSmall(ctx, text, x, y, size, maxWidth, color = '#fffaf0', weight = 700, darkText = false, strong = false, align = 'left', microPlate = false) {
   const value = (text || '').trim().toUpperCase();
   let s = size;
   ctx.save();
@@ -112,8 +121,22 @@ function drawSmall(ctx, text, x, y, size, maxWidth, color = '#fffaf0', weight = 
     s--;
   }
   ctx.font = `${weight} ${s}px Barlow`;
+  const measuredWidth = Math.min(ctx.measureText(value).width, maxWidth);
+  if (microPlate) {
+    const plateX = align === 'right' ? x - measuredWidth - 18 : x - 18;
+    const plateY = y - 8;
+    const plateW = measuredWidth + 36;
+    const plateH = s + 16;
+    ctx.fillStyle = 'rgba(8,11,9,.64)';
+    ctx.beginPath();
+    roundedRect(ctx, plateX, plateY, plateW, plateH, Math.min(10, plateH / 3));
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,250,233,.28)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  }
   ctx.lineJoin = 'round';
-  ctx.lineWidth = strong ? (s >= 40 ? 6 : 5) : (s >= 40 ? 3 : 2.5);
+  ctx.lineWidth = strong ? (s >= 40 ? 8 : 7) : (s >= 40 ? 3 : 2.5);
   ctx.strokeStyle = darkText ? 'rgba(246,240,222,.95)' : 'rgba(8,11,9,.95)';
   ctx.shadowColor = strong ? 'rgba(0,0,0,.8)' : 'rgba(0,0,0,.5)';
   ctx.shadowBlur = strong ? 11 : 6;
@@ -213,8 +236,8 @@ export function renderCover(canvas, photo, state, flagCache, redraw) {
   if (state.subtitle && state.subtitle.trim()) {
     const sy = titleY + titleH + 9;
     const subtitleMaxWidth = Math.max(1, bottomWidth - 5);
-    const subtitleSize = drawSmall(ctx, state.subtitle, subtitleRight, sy, 52, subtitleMaxWidth, treatment.name === 'ink' ? '#182019' : '#f6e2af', 700, treatment.name === 'ink', false, 'right');
-    ctx.font = `700 ${subtitleSize}px Barlow`;
+    const subtitleSize = drawSmall(ctx, state.subtitle, subtitleRight, sy, 52, subtitleMaxWidth, treatment.name === 'ink' ? '#182019' : '#f6e2af', 800, treatment.name === 'ink', true, 'right', true);
+    ctx.font = `800 ${subtitleSize}px Barlow`;
     const subtitleWidth = Math.min(ctx.measureText(state.subtitle.trim().toUpperCase()).width, subtitleMaxWidth);
     subtitleZone = {x: subtitleRight - subtitleWidth - 8, y: sy - 5, w: subtitleWidth + 16, h: 70};
   }
