@@ -123,20 +123,20 @@ function drawSmall(ctx, text, x, y, size, maxWidth, color = '#fffaf0', weight = 
   ctx.font = `${weight} ${s}px Barlow`;
   const measuredWidth = Math.min(ctx.measureText(value).width, maxWidth);
   if (microPlate) {
-    const plateX = align === 'right' ? x - measuredWidth - 18 : x - 18;
-    const plateY = y - 8;
-    const plateW = measuredWidth + 36;
-    const plateH = s + 16;
-    ctx.fillStyle = 'rgba(8,11,9,.64)';
+    const plateX = align === 'right' ? x - measuredWidth - 28 : x - 28;
+    const plateY = y - 12;
+    const plateW = measuredWidth + 56;
+    const plateH = s + 24;
+    ctx.fillStyle = 'rgba(8,11,9,.88)';
     ctx.beginPath();
     roundedRect(ctx, plateX, plateY, plateW, plateH, Math.min(10, plateH / 3));
     ctx.fill();
-    ctx.strokeStyle = 'rgba(255,250,233,.28)';
-    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = 'rgba(255,250,233,.48)';
+    ctx.lineWidth = 2;
     ctx.stroke();
   }
   ctx.lineJoin = 'round';
-  ctx.lineWidth = strong ? (s >= 40 ? 8 : 7) : (s >= 40 ? 3 : 2.5);
+  ctx.lineWidth = strong ? (s >= 40 ? 10 : 9) : (s >= 40 ? 3 : 2.5);
   ctx.strokeStyle = darkText ? 'rgba(246,240,222,.95)' : 'rgba(8,11,9,.95)';
   ctx.shadowColor = strong ? 'rgba(0,0,0,.8)' : 'rgba(0,0,0,.5)';
   ctx.shadowBlur = strong ? 11 : 6;
@@ -234,7 +234,7 @@ export function renderCover(canvas, photo, state, flagCache, redraw) {
   title.lines.forEach((line, i) => drawTitleText(ctx, line, COVER_WIDTH / 2, titleY + i * lineH, title.size, treatment.fill, treatment.name !== 'ink'));
   let subtitleZone = null;
   if (state.subtitle && state.subtitle.trim()) {
-    const sy = titleY + titleH + 9;
+    const sy = titleY + titleH + 16;
     const subtitleMaxWidth = Math.max(1, bottomWidth - 5);
     const subtitleSize = drawSmall(ctx, state.subtitle, subtitleRight, sy, 52, subtitleMaxWidth, treatment.name === 'ink' ? '#182019' : '#f6e2af', 800, treatment.name === 'ink', true, 'right', true);
     ctx.font = `800 ${subtitleSize}px Barlow`;
